@@ -1,9 +1,13 @@
 {
   "extends": "./tsconfig.app.json",
   "compilerOptions": {
+    "composite": true,
+    "outDir": "./tsdist",
+    "tsBuildInfoFile": "./tsdist/tsconfig.test.tsbuildinfo",
     "types": ["vitest/globals"]
   },
   "files": ["src/test-setup.ts", "src/global.d.ts"],
   "include": ["src/**/*.test.ts", "src/**/*.test.tsx"],
-  "exclude": []
+  "exclude": [],
+  "references": [{ "path": "./tsconfig.app.json" }]
 }

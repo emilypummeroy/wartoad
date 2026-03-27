@@ -7,7 +7,7 @@ const Phase = {
 } as const;
 type Phase = (typeof Phase)[keyof typeof Phase];
 
-function App() {
+export function App() {
   const [phase, setPhase] = useState<Phase>(Phase.Main);
   const setNextPhase = () =>
     setPhase(p => (p === Phase.End ? Phase.Main : Phase.End));
@@ -20,5 +20,3 @@ function App() {
     </>
   );
 }
-
-export default App;

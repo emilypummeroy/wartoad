@@ -10,5 +10,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['src/test-setup.ts'],
+    exclude: ['tsdist', '**/node_modules/**', '**/.git/**'],
+    coverage: { exclude: ['tsdist', '**/node_modules/**', '**/.git/**'] },
   },
 });

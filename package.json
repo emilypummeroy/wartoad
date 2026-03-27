@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsgo -b && vite build",
-    "tsc": "tsgo -b ./tsconfig.app.json && tsgo -b",
+    "tsc": "tsgo -b",
     "tsc:test": "tsgo -b ./tsconfig.test.json",
     "tsc:app": "tsgo -b ./tsconfig.app.json",
     "tsc:node": "tsgo -b ./tsconfig.node.json",
@@ -15,7 +15,8 @@
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest --coverage",
+    "test:only": "vitest"
   },
   "dependencies": {
     "react": "^19.2.4",
@@ -30,6 +31,7 @@
     "@types/react-dom": "^19.2.3",
     "@typescript/native-preview": "^7.0.0-dev.20260326.1",
     "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "4.1.1",
     "globals": "^17.4.0",
     "jsdom": "^29.0.1",
     "oxfmt": "^0.42.0",

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import App from './App.tsx';
+import { App } from './App.tsx';
 
 const FEW = 3;
 
