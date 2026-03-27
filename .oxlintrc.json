@@ -1,0 +1,91 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "unicorn", "typescript", "oxc", "promise"],
+  "categories": {
+    "correctness": "deny",
+    "suspicious": "deny",
+    "pedantic": "warn",
+    "perf": "warn",
+    "style": "warn",
+    "nursery": "warn"
+  },
+  "rules": {
+    "func-style": [
+      "error",
+      "declaration",
+      {
+        "allowArrowFunctions": true
+      }
+    ],
+    "id-length": "allow",
+    "no-ternary": "allow",
+    "no-magic-numbers": ["warn", { "ignore": [-1, 0, 1] }],
+    "sort-keys": "allow",
+    "sort-imports": "allow", // Handled by fmt
+    "filename-case": "error",
+    "no-confusing-void-expression": [
+      "error",
+      {
+        "ignoreArrowShorthand": true
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["**/*.tsx"],
+      "plugins": ["react"],
+      "rules": {
+        "filename-case": [
+          "error",
+          {
+            "cases": {
+              "pascalCase": true
+            },
+            "ignore": "^main.tsx$"
+          }
+        ],
+        "react-in-jsx-scope": "allow"
+      }
+    },
+    {
+      "files": ["src/test-setup.ts", "**/*.test.ts*"],
+      "plugins": ["vitest"],
+      "rules": {
+        "no-await-in-loop": "allow"
+      },
+      "env": {
+        "vitest": true
+      }
+    }
+  ],
+  "options": {
+    "typeAware": true
+  },
+  "settings": {
+    "jsx-a11y": {
+      "components": {},
+      "attributes": {}
+    },
+    "react": {
+      "formComponents": [],
+      "linkComponents": [],
+      "componentWrapperFunctions": []
+    },
+    "jsdoc": {
+      "ignorePrivate": false,
+      "ignoreInternal": false,
+      "ignoreReplacesDocs": true,
+      "overrideReplacesDocs": true,
+      "augmentsExtendsReplacesDocs": false,
+      "implementsReplacesDocs": false,
+      "exemptDestructuredRootsFromChecks": false,
+      "tagNamePreference": {}
+    }
+  },
+  "env": {
+    "browser": true,
+    "builtin": true
+  },
+  "globals": {},
+  "ignorePatterns": []
+}
