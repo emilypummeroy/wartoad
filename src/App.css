@@ -23,15 +23,16 @@ header {
 .title {
   height: 100%;
   width: 300px;
-  padding-left: 36px;
+  padding: 0 36px;
   align-content: center;
   border: var(--accent-border);
 
   h1 {
     text-align: left;
   }
+
   @media (max-width: 1024px) {
-    padding-left: 24px;
+    padding: 0 24px;
   }
 }
 
@@ -46,7 +47,12 @@ span.accent {
   justify-content: end;
   display: flex;
   align-items: center;
-  padding: 0 9px;
+
+  padding: 0 36px;
+
+  @media (max-width: 1024px) {
+    padding: 0 24px;
+  }
 
   gap: 9px;
 
@@ -56,11 +62,16 @@ span.accent {
 }
 
 main {
-  margin-top: 126px;
+  margin-top: 90px;
+
+  @media (max-width: 1024px) {
+    margin-top: 72px;
+  }
 }
 
 .playarea {
-  height: 80vh;
+  height: 83vh;
+  margin: 2vh 0 1vh;
 
   display: flex;
   align-items: center;
@@ -71,14 +82,16 @@ main {
 .zonerow {
   display: flex;
   gap: 4vh;
+  height: 13vh;
+  align-items: center;
 }
 
 .zone {
-  height: 16vh;
+  height: 13vh;
 }
 
 .card {
-  height: 12vh;
+  height: 11vh;
   aspect-ratio: 63 / 88;
 
   border-radius: 0.4vh;
