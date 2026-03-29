@@ -7,16 +7,61 @@ const Phase = {
 } as const;
 type Phase = (typeof Phase)[keyof typeof Phase];
 
+// oxlint-disable react/jsx-max-depth
+// To be refactored later
 export function App() {
   const [phase, setPhase] = useState<Phase>(Phase.Main);
   const setNextPhase = () =>
     setPhase(p => (p === Phase.End ? Phase.Main : Phase.End));
   return (
     <>
-      <h1>Wartide</h1>
-      <h4 id="phase">Phase</h4>
-      <p aria-labelledby="phase">{phase}</p>
-      <button onClick={setNextPhase}>Next phase</button>
+      <header>
+        <div className="title">
+          <h1>
+            War<span className="accent">tide</span>
+          </h1>
+        </div>
+        <section className="phases">
+          <h3>
+            <span className="accent">{phase}</span> Phase
+          </h3>
+          <button onClick={setNextPhase}>Next</button>
+        </section>
+      </header>
+      <main>
+        <div className="playarea" role="grid">
+          <div className="zonerow" role="row">
+            <div className="facedown card zone opponent" role="gridcell" />
+            <div className="facedown card zone opponent" role="gridcell" />
+            <div className="facedown card zone opponent" role="gridcell" />
+          </div>
+          <div className="zonerow" role="row">
+            <div className="facedown card zone opponent" role="gridcell" />
+            <div className="facedown card zone opponent" role="gridcell" />
+            <div className="facedown card zone opponent" role="gridcell" />
+          </div>
+          <div className="zonerow" role="row">
+            <div className="facedown card zone opponent" role="gridcell" />
+            <div className="facedown card zone opponent" role="gridcell" />
+            <div className="facedown card zone opponent" role="gridcell" />
+          </div>
+          <div className="zonerow" role="row">
+            <div className="facedown card zone player" role="gridcell" />
+            <div className="facedown card zone player" role="gridcell" />
+            <div className="facedown card zone player" role="gridcell" />
+          </div>
+          <div className="zonerow" role="row">
+            <div className="facedown card zone player" role="gridcell" />
+            <div className="facedown card zone player" role="gridcell" />
+            <div className="facedown card zone player" role="gridcell" />
+          </div>
+          <div className="zonerow" role="row">
+            <div className="facedown card zone player" role="gridcell" />
+            <div className="facedown card zone player" role="gridcell" />
+            <div className="facedown card zone player" role="gridcell" />
+          </div>
+        </div>
+      </main>
     </>
   );
 }

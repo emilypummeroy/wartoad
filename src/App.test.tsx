@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { App } from './App.tsx';
 
@@ -13,30 +13,72 @@ describe('the dom test environment', () => {
 describe(App, () => {
   beforeEach(() => render(<App />));
 
-  it('should have the wartide heading', async () => {
-    const heading = await screen.findByRole('heading', { level: 1 });
-    expect(heading).toHaveTextContent('Wartide');
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Wartide',
-    );
+  describe('Header', () => {
+    it('should have the wartide heading', () => {
+      const heading = screen.getByRole('heading', { level: 1 });
+      expect(heading).toHaveTextContent('Wartide');
+    });
+
+    describe('Phases', () => {
+      it('should be indicated between the heading and the play area', () => {
+        const indicator = screen.getByText('Main');
+        const heading = screen.getByRole('heading', { level: 1 });
+        const main = screen.getByRole('main');
+
+        expect(indicator).toAppearAfter(heading);
+        expect(indicator).toAppearBefore(main);
+      });
+
+      it('should start in the main phase', () => {
+        const indicator = screen.getByText('Main');
+        expect(indicator).toBeVisible();
+        expect(screen.queryByText('End Phase')).not.toBeInTheDocument();
+      });
+
+      it('should advance to the end phase when the button is clicked', () => {
+        fireEvent.click(screen.getByText('Next'));
+
+        const indicator = screen.getByText('End');
+        expect(indicator).toBeVisible();
+        expect(screen.queryByText('Main')).not.toBeInTheDocument();
+      });
+
+      it('should cycle between main and end phase when the button is clicked', () => {
+        for (let x = 0; x < FEW; x += 1) {
+          const mainIndicator = screen.getByText('Main');
+          expect(mainIndicator).toBeVisible();
+          expect(screen.queryByText('End')).not.toBeInTheDocument();
+
+          fireEvent.click(screen.getByText('Next'));
+
+          const endIndicator = screen.getByText('End');
+          expect(endIndicator).toBeVisible();
+          expect(screen.queryByText('Main')).not.toBeInTheDocument();
+
+          fireEvent.click(screen.getByText('Next'));
+        }
+      });
+    });
   });
 
-  describe('Phase', () => {
-    it('should start in the main phase', async () => {
-      expect(await screen.findByLabelText('Phase')).toHaveTextContent('Main');
+  describe('Play area', () => {
+    const ROW_COUNT = 6;
+    const FIELDS_PER_ROW = 3;
+
+    it('should exist', () => {
+      expect(within(screen.getByRole('main')).getByRole('grid')).toBeVisible();
     });
 
-    it('should advance to the end phase when the button is clicked', async () => {
-      fireEvent.click(await screen.findByText('Next phase'));
-      expect(screen.getByLabelText('Phase')).toHaveTextContent('End');
-    });
-
-    it('should cycle between main and end phase when the button is clicked', async () => {
-      for (let x = 0; x < FEW; x += 1) {
-        fireEvent.click(await screen.findByText('Next phase'));
-        expect(screen.getByLabelText('Phase')).toHaveTextContent('End');
-        fireEvent.click(await screen.findByText('Next phase'));
-        expect(screen.getByLabelText('Phase')).toHaveTextContent('Main');
+    it('should 18 fields in 6 rows of 3', () => {
+      const playArea = within(screen.getByRole('main')).getByRole('grid');
+      const rows = within(playArea).getAllByRole('row');
+      expect(rows).toHaveLength(ROW_COUNT);
+      for (const row of rows) {
+        const fields = within(row).getAllByRole('gridcell');
+        expect(fields).toHaveLength(FIELDS_PER_ROW);
+        for (const field of fields) {
+          expect(field).toBeVisible();
+        }
       }
     });
   });
