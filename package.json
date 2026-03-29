@@ -16,7 +16,10 @@
     "fmt:check": "oxfmt --check",
     "preview": "vite preview",
     "test": "vitest --coverage",
-    "test:only": "vitest"
+    "test:once": "vitest --no-watch --coverage",
+    "test:only:once": "vitest --no-watch",
+    "test:only": "vitest",
+    "check": "bun run tsc && bun run lint && bun run fmt && bun run test:once"
   },
   "dependencies": {
     "react": "^19.2.4",

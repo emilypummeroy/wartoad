@@ -44,14 +44,21 @@
             "ignore": "^main.tsx$"
           }
         ],
-        "react-in-jsx-scope": "allow"
+        "react-in-jsx-scope": "allow",
+        "max-lines-per-function": [
+          "warn",
+          {
+            "max": 100
+          }
+        ]
       }
     },
     {
       "files": ["src/test-setup.ts", "**/*.test.ts*"],
       "plugins": ["vitest"],
       "rules": {
-        "no-await-in-loop": "allow"
+        "no-await-in-loop": "allow",
+        "max-lines-per-function": "allow"
       },
       "env": {
         "vitest": true
