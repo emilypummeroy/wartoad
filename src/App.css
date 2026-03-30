@@ -139,13 +139,13 @@ main {
   border-radius: 0.4vh;
   box-shadow: var(--card-shadow);
 
+  &:hover {
+    filter: brightness(150%);
+  }
+
   &.south {
     border: 1px solid var(--south-accent);
   }
-
-    &:hover {
-      filter: brightness(150%);
-    }
 
   &.north {
     border: 1px solid var(--north-accent);
@@ -163,9 +163,7 @@ main {
     }
   }
 
-  &.facedown.south {
-    svg {
-      transform: scaleY(-1);
-    }
+  &.facedown.south svg {
+    transform: scaleY(-1);
   }
 }

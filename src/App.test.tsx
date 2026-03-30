@@ -21,8 +21,10 @@ describe(App, () => {
     });
 
     it('should have the phase indicator', () => {
-      const indicator = screen.getByRole('region', { name: 'Main phase' });
-      expect(indicator).toHaveTextContent('Main phase');
+      const indicator = screen.getByRole('region', {
+        name: 'South: Main phase',
+      });
+      expect(indicator).toHaveTextContent('South: Main phase');
       expect(screen.getByRole('banner')).toContainElement(indicator);
 
       const heading = screen.getByRole('heading', { level: 1 });
@@ -32,35 +34,72 @@ describe(App, () => {
     describe('Phases', () => {
       const withinHeader = () => within(screen.getByRole('banner'));
 
-      it('should start in the main phase', () => {
+      it('should start in the south main phase', () => {
         expect(
-          withinHeader().getByRole('region', { name: 'Main phase' }),
+          withinHeader().getByRole('region', { name: 'South: Main phase' }),
         ).toBeVisible();
         expect(screen.queryByLabelText('End Phase')).not.toBeInTheDocument();
       });
 
-      it('should advance to the end phase when the button is clicked', () => {
+      it('should advance to the south end phase when the button is clicked', () => {
         fireEvent.click(screen.getByText('Next phase'));
 
         expect(
-          withinHeader().getByRole('region', { name: 'End phase' }),
+          withinHeader().getByRole('region', { name: 'South: End phase' }),
         ).toBeVisible();
-        expect(screen.queryByLabelText('Main phase')).not.toBeInTheDocument();
+        expect(
+          screen.queryByLabelText('South: Main phase'),
+        ).not.toBeInTheDocument();
       });
 
-      it('should cycle between main and end phase when the button is clicked', () => {
+      it('should advance to the north start phase when the button is clicked twice', () => {
+        fireEvent.click(screen.getByText('Next phase'));
+        fireEvent.click(screen.getByText('Next phase'));
+
+        expect(
+          withinHeader().getByRole('region', { name: 'North: Main phase' }),
+        ).toBeVisible();
+        expect(
+          screen.queryByLabelText('South: End phase'),
+        ).not.toBeInTheDocument();
+      });
+
+      it('should advance to the north end phase when the button is clicked thrice', () => {
+        fireEvent.click(screen.getByText('Next phase'));
+        fireEvent.click(screen.getByText('Next phase'));
+        fireEvent.click(screen.getByText('Next phase'));
+
+        expect(
+          withinHeader().getByRole('region', { name: 'North: End phase' }),
+        ).toBeVisible();
+        expect(
+          screen.queryByLabelText('North: Main phase'),
+        ).not.toBeInTheDocument();
+      });
+
+      it('should cycle between all turns and phases as the button is clicked', () => {
         for (let x = 0; x < FEW; x += 1) {
           expect(
-            withinHeader().getByRole('region', { name: 'Main phase' }),
+            withinHeader().getByRole('region', { name: 'South: Main phase' }),
           ).toBeVisible();
-          expect(screen.queryByLabelText('End phase')).not.toBeInTheDocument();
 
           fireEvent.click(screen.getByText('Next phase'));
 
           expect(
-            withinHeader().getByRole('region', { name: 'End phase' }),
+            withinHeader().getByRole('region', { name: 'South: End phase' }),
           ).toBeVisible();
-          expect(screen.queryByLabelText('Main phase')).not.toBeInTheDocument();
+
+          fireEvent.click(screen.getByText('Next phase'));
+
+          expect(
+            withinHeader().getByRole('region', { name: 'North: Main phase' }),
+          ).toBeVisible();
+
+          fireEvent.click(screen.getByText('Next phase'));
+
+          expect(
+            withinHeader().getByRole('region', { name: 'North: End phase' }),
+          ).toBeVisible();
 
           fireEvent.click(screen.getByText('Next phase'));
         }
