@@ -1,5 +1,5 @@
 import './App.css';
-import { StepForward } from 'lucide-react';
+import { StepForward, Pyramid } from 'lucide-react';
 import { useState } from 'react';
 
 const Phase = {
@@ -9,6 +9,7 @@ const Phase = {
 type Phase = (typeof Phase)[keyof typeof Phase];
 
 // oxlint-disable react/jsx-max-depth
+// oxlint-disable max-lines-per-function
 // To be refactored later
 export function App() {
   const [phase, setPhase] = useState<Phase>(Phase.Main);
@@ -39,34 +40,106 @@ export function App() {
       <main>
         <div className="playarea" role="grid">
           <div className="zonerow" role="row">
-            <div className="facedown card zone opponent" role="gridcell" />
-            <div className="facedown card zone opponent" role="gridcell" />
-            <div className="facedown card zone opponent" role="gridcell" />
+            <div className="facedown card zone opponent" role="gridcell">
+              <Pyramid>
+                <title>Opponent field</title>
+              </Pyramid>
+            </div>
+            <div className="facedown card zone opponent" role="gridcell">
+              <Pyramid>
+                <title>Opponent field</title>
+              </Pyramid>
+            </div>
+            <div className="facedown card zone opponent" role="gridcell">
+              <Pyramid>
+                <title>Opponent field</title>
+              </Pyramid>
+            </div>
           </div>
           <div className="zonerow" role="row">
-            <div className="facedown card zone opponent" role="gridcell" />
-            <div className="facedown card zone opponent" role="gridcell" />
-            <div className="facedown card zone opponent" role="gridcell" />
+            <div className="facedown card zone opponent" role="gridcell">
+              <Pyramid>
+                <title>Opponent field</title>
+              </Pyramid>
+            </div>
+            <div className="facedown card zone opponent" role="gridcell">
+              <Pyramid>
+                <title>Opponent field</title>
+              </Pyramid>
+            </div>
+            <div className="facedown card zone opponent" role="gridcell">
+              <Pyramid>
+                <title>Opponent field</title>
+              </Pyramid>
+            </div>
           </div>
           <div className="zonerow" role="row">
-            <div className="facedown card zone opponent" role="gridcell" />
-            <div className="facedown card zone opponent" role="gridcell" />
-            <div className="facedown card zone opponent" role="gridcell" />
+            <div className="facedown card zone opponent" role="gridcell">
+              <Pyramid>
+                <title>Opponent field</title>
+              </Pyramid>
+            </div>
+            <div className="facedown card zone opponent" role="gridcell">
+              <Pyramid>
+                <title>Opponent field</title>
+              </Pyramid>
+            </div>
+            <div className="facedown card zone opponent" role="gridcell">
+              <Pyramid>
+                <title>Opponent field</title>
+              </Pyramid>
+            </div>
           </div>
           <div className="zonerow" role="row">
-            <div className="facedown card zone player" role="gridcell" />
-            <div className="facedown card zone player" role="gridcell" />
-            <div className="facedown card zone player" role="gridcell" />
+            <div className="facedown card zone player" role="gridcell">
+              <Pyramid>
+                <title>Player field</title>
+              </Pyramid>
+            </div>
+            <div className="facedown card zone player" role="gridcell">
+              <Pyramid>
+                <title>Player field</title>
+              </Pyramid>
+            </div>
+            <div className="facedown card zone player" role="gridcell">
+              <Pyramid>
+                <title>Player field</title>
+              </Pyramid>
+            </div>
           </div>
           <div className="zonerow" role="row">
-            <div className="facedown card zone player" role="gridcell" />
-            <div className="facedown card zone player" role="gridcell" />
-            <div className="facedown card zone player" role="gridcell" />
+            <div className="facedown card zone player" role="gridcell">
+              <Pyramid>
+                <title>Player field</title>
+              </Pyramid>
+            </div>
+            <div className="facedown card zone player" role="gridcell">
+              <Pyramid>
+                <title>Player field</title>
+              </Pyramid>
+            </div>
+            <div className="facedown card zone player" role="gridcell">
+              <Pyramid>
+                <title>Player field</title>
+              </Pyramid>
+            </div>
           </div>
           <div className="zonerow" role="row">
-            <div className="facedown card zone player" role="gridcell" />
-            <div className="facedown card zone player" role="gridcell" />
-            <div className="facedown card zone player" role="gridcell" />
+            <div className="facedown card zone player" role="gridcell">
+              <Pyramid>
+                <title>Player field</title>
+              </Pyramid>
+            </div>
+            <div className="facedown card zone player" role="gridcell">
+              <Pyramid>
+                <title>Player field</title>
+              </Pyramid>
+            </div>
+            <div className="facedown card zone player" role="gridcell">
+              <Pyramid>
+                <title>Player field</title>
+              </Pyramid>
+            </div>
           </div>
         </div>
       </main>

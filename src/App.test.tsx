@@ -70,21 +70,47 @@ describe(App, () => {
 
   describe('Play area', () => {
     const ROW_COUNT = 6;
-    const FIELDS_PER_ROW = 3;
+    const ROW_COUNT_PER_PLAYER = 3;
+    const FIELD_COUNT_PER_ROW = 3;
 
-    it('should exist', () => {
-      expect(within(screen.getByRole('main')).getByRole('grid')).toBeVisible();
+    const withinMain = () => within(screen.getByRole('main'));
+    const withinPlayArea = () =>
+      within(within(screen.getByRole('main')).getByRole('grid'));
+
+    it('should be in the main content area', () => {
+      expect(withinMain().getByRole('grid')).toBeVisible();
     });
 
-    it('should 18 fields in 6 rows of 3', () => {
-      const playArea = within(screen.getByRole('main')).getByRole('grid');
-      const rows = within(playArea).getAllByRole('row');
+    it('should have 18 fields in 6 rows of 3', () => {
+      const rows = withinPlayArea().getAllByRole('row');
       expect(rows).toHaveLength(ROW_COUNT);
       for (const row of rows) {
         const fields = within(row).getAllByRole('gridcell');
-        expect(fields).toHaveLength(FIELDS_PER_ROW);
+        expect(fields).toHaveLength(FIELD_COUNT_PER_ROW);
         for (const field of fields) {
           expect(field).toBeVisible();
+        }
+      }
+    });
+
+    it('should have opponent fields in the top 3 rows', () => {
+      const playerRows = withinPlayArea()
+        .getAllByRole('row')
+        .slice(0, ROW_COUNT_PER_PLAYER);
+      for (const row of playerRows) {
+        for (const field of within(row).getAllByRole('gridcell')) {
+          expect(field).toHaveAccessibleName('Opponent field');
+        }
+      }
+    });
+
+    it('should have player fields in the bottom 3 rows', () => {
+      const playerRows = withinPlayArea()
+        .getAllByRole('row')
+        .slice(ROW_COUNT_PER_PLAYER);
+      for (const row of playerRows) {
+        for (const field of within(row).getAllByRole('gridcell')) {
+          expect(field).toHaveAccessibleName('Player field');
         }
       }
     });

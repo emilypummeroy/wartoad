@@ -107,16 +107,15 @@ main {
 .card {
   height: 11vh;
   aspect-ratio: 63 / 88;
-
   border-radius: 0.4vh;
   box-shadow: var(--card-shadow);
 
-  &:hover {
-    filter: brightness(150%);
-  }
-
   &.player {
     border: 3px solid var(--player-accent);
+
+    &:hover {
+      filter: brightness(150%);
+    }
   }
 
   &.opponent {
@@ -125,5 +124,11 @@ main {
 
   &.facedown {
     background: var(--accent-bg-solid);
+    align-content: center;
+  }
+  &.facedown.player {
+    svg {
+      transform: scaleY(-1);
+    }
   }
 }
