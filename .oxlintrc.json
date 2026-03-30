@@ -45,6 +45,12 @@
           }
         ],
         "react-in-jsx-scope": "allow",
+        "jsx-max-depth": [
+          "warn",
+          {
+            "max": 4
+          }
+        ],
         "max-lines-per-function": [
           "warn",
           {

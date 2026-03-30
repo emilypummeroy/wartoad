@@ -36,34 +36,42 @@ function SouthFacedownCard() {
   );
 }
 
-function NorthBasicField() {
+function NorthHomeBasicField() {
   const nameId = useId();
   const symbolId = useId();
   return (
     <section aria-labelledby={`${symbolId} ${nameId}`} className="card north">
-      <p id={nameId}>Basic Field</p>
-      <Pyramid>
-        <title id={symbolId}>North owned</title>
-      </Pyramid>
+      <div id={nameId}>Basic Field</div>
+      <div className="card-line">
+        <Pyramid>
+          <title id={symbolId}>North owned</title>
+        </Pyramid>
+        +0
+      </div>
+      <div>Home field</div>
     </section>
   );
 }
 
-function SouthBasicField() {
+function SouthHomeBasicField() {
   const nameId = useId();
   const symbolId = useId();
   return (
     <section aria-labelledby={`${symbolId} ${nameId}`} className="card south">
-      <p id={nameId}>Basic Field</p>
-      <Pyramid>
-        <title id={symbolId}>South owned</title>
-      </Pyramid>
+      <div id={nameId}>Basic Field</div>
+      <div className="card-line">
+        <Pyramid>
+          <title id={symbolId}>South owned</title>
+        </Pyramid>
+        +0
+      </div>
+      <div>Home field</div>
     </section>
   );
 }
 
-// oxlint-disable react/jsx-max-depth
 // oxlint-disable max-lines-per-function
+// oxlint-disable react/jsx-max-depth
 // To be refactored later
 export function App() {
   const [{ phase, player }, setPhasePlayer] = useState<
@@ -95,7 +103,10 @@ export function App() {
         </div>
         <section aria-labelledby="current-phase" className="phases">
           <h3 id="current-phase">
-            {player}: <span className="accent">{phase}</span> phase
+            <span className={player === Player.North ? 'north' : 'south'}>
+              {player}
+            </span>
+            : <span className="accent">{phase}</span> phase
           </h3>
           <button
             className="icon-text accent"
@@ -114,7 +125,7 @@ export function App() {
               <NorthFacedownCard />
             </div>
             <div className="zone north" role="gridcell">
-              <NorthBasicField />
+              <NorthHomeBasicField />
             </div>
             <div className="zone north" role="gridcell">
               <NorthFacedownCard />
@@ -169,7 +180,7 @@ export function App() {
               <SouthFacedownCard />
             </div>
             <div className="zone south" role="gridcell">
-              <SouthBasicField />
+              <SouthHomeBasicField />
             </div>
             <div className="zone south" role="gridcell">
               <SouthFacedownCard />
