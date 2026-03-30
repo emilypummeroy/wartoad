@@ -70,7 +70,7 @@ describe(App, () => {
 
   describe('Play area', () => {
     const ROW_COUNT = 6;
-    const ROW_COUNT_PER_PLAYER = 3;
+    const ROW_COUNT_PER_south = 3;
     const FIELD_COUNT_PER_ROW = 3;
 
     const withinMain = () => within(screen.getByRole('main'));
@@ -93,24 +93,24 @@ describe(App, () => {
       }
     });
 
-    it('should have opponent fields in the top 3 rows', () => {
-      const playerRows = withinPlayArea()
+    it('should have north fields in the top 3 rows', () => {
+      const southRows = withinPlayArea()
         .getAllByRole('row')
-        .slice(0, ROW_COUNT_PER_PLAYER);
-      for (const row of playerRows) {
+        .slice(0, ROW_COUNT_PER_south);
+      for (const row of southRows) {
         for (const field of within(row).getAllByRole('gridcell')) {
-          expect(field).toHaveAccessibleName('Opponent field');
+          expect(field).toHaveAccessibleName('north field');
         }
       }
     });
 
-    it('should have player fields in the bottom 3 rows', () => {
-      const playerRows = withinPlayArea()
+    it('should have south fields in the bottom 3 rows', () => {
+      const southRows = withinPlayArea()
         .getAllByRole('row')
-        .slice(ROW_COUNT_PER_PLAYER);
-      for (const row of playerRows) {
+        .slice(ROW_COUNT_PER_south);
+      for (const row of southRows) {
         for (const field of within(row).getAllByRole('gridcell')) {
-          expect(field).toHaveAccessibleName('Player field');
+          expect(field).toHaveAccessibleName('south field');
         }
       }
     });

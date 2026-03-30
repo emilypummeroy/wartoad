@@ -40,105 +40,141 @@ export function App() {
       <main>
         <div className="playarea" role="grid">
           <div className="zonerow" role="row">
-            <div className="facedown card zone opponent" role="gridcell">
+            <div className="zone north" role="gridcell">
+            <div className="facedown card north">
               <Pyramid>
-                <title>Opponent field</title>
+                <title>north field</title>
               </Pyramid>
             </div>
-            <div className="facedown card zone opponent" role="gridcell">
+            </div>
+            <div className="zone north" role="gridcell">
+            <div className="facedown card north">
               <Pyramid>
-                <title>Opponent field</title>
+                <title>north field</title>
               </Pyramid>
             </div>
-            <div className="facedown card zone opponent" role="gridcell">
+            </div>
+            <div className="zone north" role="gridcell">
+            <div className="facedown card north">
               <Pyramid>
-                <title>Opponent field</title>
+                <title>north field</title>
               </Pyramid>
             </div>
-          </div>
-          <div className="zonerow" role="row">
-            <div className="facedown card zone opponent" role="gridcell">
-              <Pyramid>
-                <title>Opponent field</title>
-              </Pyramid>
-            </div>
-            <div className="facedown card zone opponent" role="gridcell">
-              <Pyramid>
-                <title>Opponent field</title>
-              </Pyramid>
-            </div>
-            <div className="facedown card zone opponent" role="gridcell">
-              <Pyramid>
-                <title>Opponent field</title>
-              </Pyramid>
             </div>
           </div>
           <div className="zonerow" role="row">
-            <div className="facedown card zone opponent" role="gridcell">
+            <div className="zone north" role="gridcell">
+            <div className="facedown card north">
               <Pyramid>
-                <title>Opponent field</title>
+                <title>north field</title>
               </Pyramid>
             </div>
-            <div className="facedown card zone opponent" role="gridcell">
+            </div>
+            <div className="zone north" role="gridcell">
+            <div className="facedown card north">
               <Pyramid>
-                <title>Opponent field</title>
+                <title>north field</title>
               </Pyramid>
             </div>
-            <div className="facedown card zone opponent" role="gridcell">
+            </div>
+            <div className="zone north" role="gridcell">
+            <div className="facedown card north">
               <Pyramid>
-                <title>Opponent field</title>
+                <title>north field</title>
               </Pyramid>
             </div>
-          </div>
-          <div className="zonerow" role="row">
-            <div className="facedown card zone player" role="gridcell">
-              <Pyramid>
-                <title>Player field</title>
-              </Pyramid>
-            </div>
-            <div className="facedown card zone player" role="gridcell">
-              <Pyramid>
-                <title>Player field</title>
-              </Pyramid>
-            </div>
-            <div className="facedown card zone player" role="gridcell">
-              <Pyramid>
-                <title>Player field</title>
-              </Pyramid>
             </div>
           </div>
           <div className="zonerow" role="row">
-            <div className="facedown card zone player" role="gridcell">
+            <div className="zone north" role="gridcell">
+            <div className="facedown card north">
               <Pyramid>
-                <title>Player field</title>
+                <title>north field</title>
               </Pyramid>
             </div>
-            <div className="facedown card zone player" role="gridcell">
+            </div>
+            <div className="zone north" role="gridcell">
+            <div className="facedown card north">
               <Pyramid>
-                <title>Player field</title>
+                <title>north field</title>
               </Pyramid>
             </div>
-            <div className="facedown card zone player" role="gridcell">
+            </div>
+            <div className="zone north" role="gridcell">
+            <div className="facedown card north">
               <Pyramid>
-                <title>Player field</title>
+                <title>north field</title>
               </Pyramid>
+            </div>
             </div>
           </div>
           <div className="zonerow" role="row">
-            <div className="facedown card zone player" role="gridcell">
+            <div className="zone south" role="gridcell">
+            <div className="facedown card south">
               <Pyramid>
-                <title>Player field</title>
+                <title>south field</title>
               </Pyramid>
             </div>
-            <div className="facedown card zone player" role="gridcell">
+            </div>
+            <div className="zone south" role="gridcell">
+            <div className="facedown card south">
               <Pyramid>
-                <title>Player field</title>
+                <title>south field</title>
               </Pyramid>
             </div>
-            <div className="facedown card zone player" role="gridcell">
+            </div>
+            <div className="zone south" role="gridcell">
+            <div className="facedown card south">
               <Pyramid>
-                <title>Player field</title>
+                <title>south field</title>
               </Pyramid>
+            </div>
+            </div>
+          </div>
+          <div className="zonerow" role="row">
+            <div className="zone south" role="gridcell">
+            <div className="facedown card south">
+              <Pyramid>
+                <title>south field</title>
+              </Pyramid>
+            </div>
+            </div>
+            <div className="zone south" role="gridcell">
+            <div className="facedown card south">
+              <Pyramid>
+                <title>south field</title>
+              </Pyramid>
+            </div>
+            </div>
+            <div className="zone south" role="gridcell">
+            <div className="facedown card south">
+              <Pyramid>
+                <title>south field</title>
+              </Pyramid>
+            </div>
+            </div>
+          </div>
+          <div className="zonerow" role="row">
+            <div className="zone south" role="gridcell">
+            <div className="facedown card south">
+              <Pyramid>
+                <title>south field</title>
+              </Pyramid>
+            </div>
+            </div>
+            <div className="zone south" role="gridcell">
+            <div className="facedown card south">
+              <Pyramid>
+                <title>south field</title>
+              </Pyramid>
+            </div>
+            </div>
+            <div className="zone south" role="gridcell">
+            <div className="facedown card south">
+              <Pyramid>
+                <title>south field</title>
+              </Pyramid>
+            </div>
             </div>
           </div>
         </div>

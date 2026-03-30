@@ -1,17 +1,28 @@
 :root {
-  --player-accent: hsl(240, 80%, 65%);
-  --opponent-accent: hsl(0, 80%, 65%);
+  --south-accent: hsl(240, 80%, 55%);
+  --north-accent: hsl(0, 80%, 55%);
+  --south: hsl(240, 50%, 70%);
+  --north: hsl(0, 50%, 70%);
+  --south-bg: hsl(240, 10%, 85%);
+  --north-bg: hsl(0, 10%, 85%);
 
   --card-shadow:
     rgba(0, 0, 0, 0.2) 0 10px 15px 0, rgba(0, 0, 0, 0.1) 0 4px 6px 0;
+
+  --card-back: #251726;
+  --card-back-symbol: #c18b2c;
 
   color-scheme: light dark;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --player-accent: hsl(240, 80%, 45%);
-    --opponent-accent: hsl(0, 80%, 45%);
+    --south-accent: hsl(240, 80%, 40%);
+    --north-accent: hsl(0, 80%, 40%);
+    --south: hsl(240, 50%, 30%);
+    --north: hsl(0, 50%, 30%);
+    --south-bg: hsl(240, 10%, 15%);
+    --north-bg: hsl(0, 10%, 15%);
 
     --card-shadow:
       rgba(0, 0, 0, 0.5) 0 10px 15px 0, rgba(0, 0, 0, 0.3) 0 4px 6px 0;
@@ -101,7 +112,25 @@ main {
 }
 
 .zone {
-  height: 13vh;
+  height: 11vh;
+  width: 13vh;
+
+  padding: 0.5vh;
+  border-radius: 0.5vh;
+
+  &:hover {
+    filter: brightness(110%);
+  }
+
+  &.south {
+    border: 3px solid var(--south);
+    background: var(--south-bg);
+  }
+
+  &.north {
+    border: 3px solid var(--north);
+    background: var(--north-bg);
+  }
 }
 
 .card {
@@ -110,23 +139,31 @@ main {
   border-radius: 0.4vh;
   box-shadow: var(--card-shadow);
 
-  &.player {
-    border: 3px solid var(--player-accent);
+  &.south {
+    border: 1px solid var(--south-accent);
+  }
 
     &:hover {
       filter: brightness(150%);
     }
-  }
 
-  &.opponent {
-    border: 3px solid var(--opponent-accent);
+  &.north {
+    border: 1px solid var(--north-accent);
   }
 
   &.facedown {
-    background: var(--accent-bg-solid);
+    background: var(--card-back);
     align-content: center;
+    color: var(--card-back-symbol);
+    border: 1px solid var(--border);
+
+    svg {
+      height: 3vh;
+      width: 3vh;
+    }
   }
-  &.facedown.player {
+
+  &.facedown.south {
     svg {
       transform: scaleY(-1);
     }
