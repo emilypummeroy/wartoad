@@ -1,14 +1,19 @@
 :root {
-  --south-accent: hsl(240, 80%, 55%);
+  --south-accent: hsl(240, 85%, 50%);
   --north-accent: hsl(0, 80%, 55%);
-  --south: hsl(240, 50%, 70%);
-  --north: hsl(0, 50%, 70%);
-  --south-bg: hsl(240, 10%, 85%);
+  --south: hsl(240, 65%, 50%);
+  --north: hsl(0, 60%, 50%);
+  --south-faint: hsla(240, 65%, 50%, 0.5);
+  --north-faint: hsla(0, 60%, 60%, 0.5);
+  --south-bg: hsl(240, 15%, 80%);
   --north-bg: hsl(0, 10%, 85%);
 
   --card-shadow:
     rgba(0, 0, 0, 0.2) 0 10px 15px 0, rgba(0, 0, 0, 0.1) 0 4px 6px 0;
 
+  --card-front: #6c6964;
+  --card-front-highlight: #b3aeab;
+  --card-text: white;
   --card-back: #251726;
   --card-back-symbol: #c18b2c;
 
@@ -17,11 +22,13 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --south-accent: hsl(240, 80%, 40%);
+    --south-accent: hsl(240, 80%, 50%);
     --north-accent: hsl(0, 80%, 40%);
-    --south: hsl(240, 50%, 30%);
-    --north: hsl(0, 50%, 30%);
-    --south-bg: hsl(240, 10%, 15%);
+    --south: hsl(240, 40%, 40%);
+    --north: hsl(0, 40%, 30%);
+    --south-faint: hsla(240, 40%, 40%, 0.5);
+    --north-faint: hsla(0, 40%, 30%, 0.5);
+    --south-bg: hsl(240, 10%, 20%);
     --north-bg: hsl(0, 10%, 15%);
 
     --card-shadow:
@@ -118,18 +125,21 @@ main {
   padding: 0.5vh;
   border-radius: 0.5vh;
 
-  &:hover {
-    filter: brightness(110%);
-  }
-
   &.south {
     border: 3px solid var(--south);
     background: var(--south-bg);
+
+    &:hover {
+      border: 3px solid var(--south-accent);
+    }
   }
 
   &.north {
     border: 3px solid var(--north);
     background: var(--north-bg);
+    &:hover {
+      border: 3px solid var(--north-accent);
+    }
   }
 }
 
@@ -138,32 +148,47 @@ main {
   aspect-ratio: 63 / 88;
   border-radius: 0.4vh;
   box-shadow: var(--card-shadow);
-
-  &:hover {
-    filter: brightness(150%);
-  }
+  background: var(--card-front);
+  color: var(--card-text);
+  border: 1px solid var(--border);
 
   &.south {
-    border: 1px solid var(--south-accent);
+    outline: 1px solid var(--south-faint);
+    svg {
+      color: var(--south);
+      height: 3vh;
+      width: 3vh;
+      transform: scaleY(-1);
+    }
+    &:hover {
+      outline: 2px solid var(--south);
+    }
   }
 
   &.north {
-    border: 1px solid var(--north-accent);
+    outline: 1px solid var(--north-faint);
+    svg {
+      color: var(--north);
+      height: 3vh;
+      width: 3vh;
+    }
+    &:hover {
+      outline: 2px solid var(--north);
+    }
+  }
+  &:hover {
+    filter: brightness(110%);
   }
 
   &.facedown {
     background: var(--card-back);
     align-content: center;
-    color: var(--card-back-symbol);
     border: 1px solid var(--border);
 
     svg {
+      color: var(--card-back-symbol);
       height: 3vh;
       width: 3vh;
     }
-  }
-
-  &.facedown.south svg {
-    transform: scaleY(-1);
   }
 }

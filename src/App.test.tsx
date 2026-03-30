@@ -120,40 +120,60 @@ describe(App, () => {
       expect(withinMain().getByRole('grid')).toBeVisible();
     });
 
-    it('should have 18 fields in 6 rows of 3', () => {
-      const rows = withinPlayArea().getAllByRole('row');
-      expect(rows).toHaveLength(ROW_COUNT);
-      for (const row of rows) {
-        const fields = within(row).getAllByRole('gridcell');
-        expect(fields).toHaveLength(FIELD_COUNT_PER_ROW);
-        for (const field of fields) {
-          expect(field).toBeVisible();
+    describe('The initial placement of fields', () => {
+      it('should have 18 fields in 6 rows of 3', () => {
+        const rows = withinPlayArea().getAllByRole('row');
+        expect(rows).toHaveLength(ROW_COUNT);
+        for (const row of rows) {
+          const fields = within(row).getAllByRole('gridcell');
+          expect(fields).toHaveLength(FIELD_COUNT_PER_ROW);
+          for (const field of fields) {
+            expect(field).toBeVisible();
+          }
         }
-      }
-    });
+      });
 
-    it('should have north fields in the top 3 rows', () => {
-      const southRows = withinPlayArea()
-        .getAllByRole('row')
-        .slice(0, ROW_COUNT_PER_PLAYER);
-      for (const row of southRows) {
-        for (const zone of within(row).getAllByRole('gridcell')) {
-          const card = within(zone).getByRole('region');
-          expect(card).toHaveAccessibleName(/North( Basic)? field/);
+      it('should have north fields in the top 3 rows', () => {
+        const southRows = withinPlayArea()
+          .getAllByRole('row')
+          .slice(0, ROW_COUNT_PER_PLAYER);
+        for (const row of southRows) {
+          for (const zone of within(row).getAllByRole('gridcell')) {
+            const card = within(zone).getByRole('region');
+            expect(card).toHaveAccessibleName(/North owned/);
+          }
         }
-      }
-    });
+      });
 
-    it('should have south fields in the bottom 3 rows', () => {
-      const southRows = withinPlayArea()
-        .getAllByRole('row')
-        .slice(ROW_COUNT_PER_PLAYER);
-      for (const row of southRows) {
-        for (const zone of within(row).getAllByRole('gridcell')) {
-          const card = within(zone).getByRole('region');
-          expect(card).toHaveAccessibleName(/South( Basic)? field/);
+      it('should have south fields in the bottom 3 rows', () => {
+        const southRows = withinPlayArea()
+          .getAllByRole('row')
+          .slice(ROW_COUNT_PER_PLAYER);
+        for (const row of southRows) {
+          for (const zone of within(row).getAllByRole('gridcell')) {
+            const card = within(zone).getByRole('region');
+            expect(card).toHaveAccessibleName(/South owned/);
+          }
         }
-      }
+      });
+
+      it('should have the north home field', () => {
+        const [_, homeZone] = within(
+          withinPlayArea().getAllByRole('row')[0],
+        ).getAllByRole('gridcell');
+        expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
+          'North owned Basic Field',
+        );
+      });
+
+      it('should have the south home field', () => {
+        const [_, homeZone] = within(
+          withinPlayArea().getAllByRole('row')[ROW_COUNT - 1],
+        ).getAllByRole('gridcell');
+        expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
+          'South owned Basic Field',
+        );
+      });
     });
   });
 });

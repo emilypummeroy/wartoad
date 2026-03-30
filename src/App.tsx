@@ -19,29 +19,7 @@ function NorthFacedownCard() {
   return (
     <section aria-labelledby={id} className="facedown card north">
       <Pyramid>
-        <title id={id}>North field</title>
-      </Pyramid>
-    </section>
-  );
-}
-
-function NorthBasicField() {
-  const id = useId();
-  return (
-    <section aria-labelledby={id} className="facedown card north">
-      <Pyramid>
-        <title id={id}>North field</title>
-      </Pyramid>
-    </section>
-  );
-}
-
-function SouthBasicField() {
-  const id = useId();
-  return (
-    <section aria-labelledby={id} className="facedown card south">
-      <Pyramid>
-        <title id={id}>South field</title>
+        <title id={id}>North owned</title>
       </Pyramid>
     </section>
   );
@@ -52,7 +30,33 @@ function SouthFacedownCard() {
   return (
     <section aria-labelledby={id} className="facedown card south">
       <Pyramid>
-        <title id={id}>South field</title>
+        <title id={id}>South owned</title>
+      </Pyramid>
+    </section>
+  );
+}
+
+function NorthBasicField() {
+  const nameId = useId();
+  const symbolId = useId();
+  return (
+    <section aria-labelledby={`${symbolId} ${nameId}`} className="card north">
+      <p id={nameId}>Basic Field</p>
+      <Pyramid>
+        <title id={symbolId}>North owned</title>
+      </Pyramid>
+    </section>
+  );
+}
+
+function SouthBasicField() {
+  const nameId = useId();
+  const symbolId = useId();
+  return (
+    <section aria-labelledby={`${symbolId} ${nameId}`} className="card south">
+      <p id={nameId}>Basic Field</p>
+      <Pyramid>
+        <title id={symbolId}>South owned</title>
       </Pyramid>
     </section>
   );
