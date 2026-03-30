@@ -17,43 +17,50 @@ describe(App, () => {
     it('should have the wartide heading', () => {
       const heading = screen.getByRole('heading', { level: 1 });
       expect(heading).toHaveTextContent('Wartide');
+      expect(screen.getByRole('banner')).toContainElement(heading);
+    });
+
+    it('should have the phase indicator', () => {
+      const indicator = screen.getByRole('region', { name: 'Main phase' });
+      expect(indicator).toHaveTextContent('Main phase');
+      expect(screen.getByRole('banner')).toContainElement(indicator);
+
+      const heading = screen.getByRole('heading', { level: 1 });
+      expect(indicator).toAppearAfter(heading);
     });
 
     describe('Phases', () => {
-      it('should be indicated between the heading and the play area', () => {
-        const indicator = screen.getByText('Main');
-        const heading = screen.getByRole('heading', { level: 1 });
-        const main = screen.getByRole('main');
-
-        expect(indicator).toAppearAfter(heading);
-        expect(indicator).toAppearBefore(main);
-      });
+      const withinHeader = () => within(screen.getByRole('banner'));
 
       it('should start in the main phase', () => {
-        const indicator = screen.getByText('Main');
-        expect(indicator).toBeVisible();
-        expect(screen.queryByText('End Phase')).not.toBeInTheDocument();
+        expect(
+          withinHeader().getByRole('region', { name: 'Main phase' }),
+        ).toBeVisible();
+        expect(screen.queryByLabelText('End Phase')).not.toBeInTheDocument();
       });
 
       it('should advance to the end phase when the button is clicked', () => {
         fireEvent.click(screen.getByText('Next phase'));
 
-        const indicator = screen.getByText('End');
-        expect(indicator).toBeVisible();
-        expect(screen.queryByText('Main')).not.toBeInTheDocument();
+        expect(
+          withinHeader().getByRole('region', { name: 'End phase' }),
+        ).toBeVisible();
+        expect(screen.queryByLabelText('Main phase')).not.toBeInTheDocument();
       });
 
       it('should cycle between main and end phase when the button is clicked', () => {
         for (let x = 0; x < FEW; x += 1) {
-          const mainIndicator = screen.getByText('Main');
-          expect(mainIndicator).toBeVisible();
-          expect(screen.queryByText('End')).not.toBeInTheDocument();
+          expect(
+            withinHeader().getByRole('region', { name: 'Main phase' }),
+          ).toBeVisible();
+          expect(screen.queryByLabelText('End phase')).not.toBeInTheDocument();
 
           fireEvent.click(screen.getByText('Next phase'));
 
-          const endIndicator = screen.getByText('End');
-          expect(endIndicator).toBeVisible();
-          expect(screen.queryByText('Main')).not.toBeInTheDocument();
+          expect(
+            withinHeader().getByRole('region', { name: 'End phase' }),
+          ).toBeVisible();
+          expect(screen.queryByLabelText('Main phase')).not.toBeInTheDocument();
 
           fireEvent.click(screen.getByText('Next phase'));
         }
