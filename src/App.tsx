@@ -1,4 +1,5 @@
 import './App.css';
+import { StepForward } from 'lucide-react';
 import { useState } from 'react';
 
 const Phase = {
@@ -21,11 +22,18 @@ export function App() {
             War<span className="accent">tide</span>
           </h1>
         </div>
-        <section className="phases">
-          <h3>
-            <span className="accent">{phase}</span> Phase
+        <section aria-labelledby="current-phase" className="phases">
+          <h3 id="current-phase">
+            <span className="accent">{phase}</span> phase
           </h3>
-          <button onClick={setNextPhase}>Next</button>
+          <button
+            className="icon-text accent"
+            aria-label="Next phase"
+            onClick={setNextPhase}
+          >
+            <StepForward />
+            Next phase
+          </button>
         </section>
       </header>
       <main>

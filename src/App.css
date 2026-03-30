@@ -1,3 +1,23 @@
+:root {
+  --player-accent: hsl(240, 80%, 65%);
+  --opponent-accent: hsl(0, 80%, 65%);
+
+  --card-shadow:
+    rgba(0, 0, 0, 0.2) 0 10px 15px 0, rgba(0, 0, 0, 0.1) 0 4px 6px 0;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --player-accent: hsl(240, 80%, 45%);
+    --opponent-accent: hsl(0, 80%, 45%);
+
+    --card-shadow:
+      rgba(0, 0, 0, 0.5) 0 10px 15px 0, rgba(0, 0, 0, 0.3) 0 4px 6px 0;
+  }
+}
+
 header {
   height: 90px;
   max-width: 100%;
@@ -22,10 +42,8 @@ header {
 
 .title {
   height: 100%;
-  width: 300px;
   padding: 0 36px;
   align-content: center;
-  border: var(--accent-border);
 
   h1 {
     text-align: left;
@@ -55,10 +73,6 @@ span.accent {
   }
 
   gap: 9px;
-
-  button {
-    height: 36px;
-  }
 }
 
 main {
@@ -96,20 +110,20 @@ main {
 
   border-radius: 0.4vh;
   box-shadow: var(--card-shadow);
-}
 
-.card.player {
-  border: 3px solid var(--player-accent);
-}
+  &:hover {
+    filter: brightness(150%);
+  }
 
-.card.opponent {
-  border: 3px solid var(--opponent-accent);
-}
+  &.player {
+    border: 3px solid var(--player-accent);
+  }
 
-.card:hover {
-  filter: brightness(150%);
-}
+  &.opponent {
+    border: 3px solid var(--opponent-accent);
+  }
 
-.facedown {
-  background: var(--accent-bg-solid);
+  &.facedown {
+    background: var(--accent-bg-solid);
+  }
 }

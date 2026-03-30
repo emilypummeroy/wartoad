@@ -36,7 +36,7 @@ describe(App, () => {
       });
 
       it('should advance to the end phase when the button is clicked', () => {
-        fireEvent.click(screen.getByText('Next'));
+        fireEvent.click(screen.getByText('Next phase'));
 
         const indicator = screen.getByText('End');
         expect(indicator).toBeVisible();
@@ -49,13 +49,13 @@ describe(App, () => {
           expect(mainIndicator).toBeVisible();
           expect(screen.queryByText('End')).not.toBeInTheDocument();
 
-          fireEvent.click(screen.getByText('Next'));
+          fireEvent.click(screen.getByText('Next phase'));
 
           const endIndicator = screen.getByText('End');
           expect(endIndicator).toBeVisible();
           expect(screen.queryByText('Main')).not.toBeInTheDocument();
 
-          fireEvent.click(screen.getByText('Next'));
+          fireEvent.click(screen.getByText('Next phase'));
         }
       });
     });
