@@ -121,9 +121,11 @@ main {
 .handarea {
   padding: 2vh;
 
-  min-width: 180px;
+  background: var(--bg-solid);
 
-  width: calc(90% - 70vh);
+  min-width: max(180px, 20vh);
+
+  width: calc(100% - 65vh);
 
   display: flex;
   flex-direction: column;
@@ -132,39 +134,63 @@ main {
   gap: 1vh;
 }
 
-.jiggle-row {
+.stack-row {
   display: flex;
-  flex-direction: row-reverse;
-  justify-content: space-between;
+  flex-direction: row;
 
-  margin: 0 2vh 0vh;
+  margin: 0vh 2vh;
   transition: margin 300ms ease;
+  .stacking {
+    margin: 0 -2vh;
+    transition: margin 300ms ease;
 
-  .jiggle-card {
     z-index: 10;
-    margin: 0 -2vh 0vh;
-    transition: all 300ms ease;
   }
 
   @media (max-aspect-ratio: 1) {
-    margin: 0 3.6vh 0vh;
-    .jiggle-card {
-      margin: 0 -3.6vh 0vh;
+    margin-left: 4.3vh;
+    .stacking {
+      margin-left: -4.3vh;
     }
 
     &:hover {
-      .jiggle-card {
-        margin: 0 -2vh 0vh;
+      margin: 0vh 2vh;
+      .stacking {
+        margin: 0vh -2vh;
       }
+    }
+  }
+}
+
+.jiggle-row {
+  display: flex;
+  flex-direction: row-reverse;
+
+  margin: 0vh 2vh;
+  transition: margin 300ms ease;
+  .stacking {
+    margin: 0vh -2vh;
+    transition:
+      margin 300ms ease,
+      padding 300ms ease;
+
+    z-index: 10;
+  }
+
+  @media (max-aspect-ratio: 1) {
+    margin-left: 4.3vh;
+    .stacking {
+      margin-left: -4.3vh;
     }
   }
 
   &:hover {
-    justify-content: start;
-    margin: -2vh -3vh 0vh;
-    .jiggle-card {
+    margin: -1vh -3vh -2vh;
+    .stacking {
+      margin: 0 -2vh 0vh;
       padding: 3vh 0 0;
-      &:hover {
+
+      &.jiggling:hover {
         margin: 0vh 0vh 0vh;
         padding: 0 3vh 3vh;
       }
@@ -177,11 +203,14 @@ main {
   flex-grow: 1;
 
   overflow: scroll;
+}
 
+.zonegrid {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1vh;
+  width: fit-content;
 }
 
 .zonerow {

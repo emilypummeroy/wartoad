@@ -13,6 +13,8 @@ describe('the dom test environment', () => {
 describe(App, () => {
   beforeEach(() => render(<App />));
 
+  const withinHeader = () => within(screen.getByRole('banner'));
+
   describe('Header', () => {
     it('should have the wartide heading', () => {
       const heading = screen.getByRole('heading', { level: 1 });
@@ -33,8 +35,6 @@ describe(App, () => {
     });
 
     describe('Phases', () => {
-      const withinHeader = () => within(screen.getByRole('banner'));
-
       it('should start in the south main phase', () => {
         expect(
           withinHeader().getByRole('region', { name: 'South: Main phase' }),
@@ -83,142 +83,202 @@ describe(App, () => {
           expect(
             withinHeader().getByRole('region', { name: 'South: Main phase' }),
           ).toBeVisible();
-
           fireEvent.click(screen.getByText('Next phase'));
 
           expect(
             withinHeader().getByRole('region', { name: 'South: End phase' }),
           ).toBeVisible();
-
           fireEvent.click(screen.getByText('Next phase'));
 
           expect(
             withinHeader().getByRole('region', { name: 'North: Main phase' }),
           ).toBeVisible();
-
           fireEvent.click(screen.getByText('Next phase'));
 
           expect(
             withinHeader().getByRole('region', { name: 'North: End phase' }),
           ).toBeVisible();
-
           fireEvent.click(screen.getByText('Next phase'));
         }
       });
     });
-  });
 
-  describe('Hands', () => {
-    const INITIAL_HAND_CARD_COUNT = 7;
+    describe('Hands', () => {
+      const INITIAL_HAND_CARD_COUNT = 7;
 
-    const withinMain = () => within(screen.getByRole('main'));
+      const withinMain = () => within(screen.getByRole('main'));
 
-    it('should have the South hand before the North hand', () => {
-      const south = withinMain().getByRole('region', { name: 'South hand' });
-      const north = withinMain().getByRole('region', { name: 'North hand' });
-      expect(north).toBeVisible();
-      expect(south).toBeVisible();
-      expect(north).toAppearBefore(south);
-    });
-
-    it('should have both hands before the Play area', () => {
-      const south = withinMain().getByRole('region', { name: 'South hand' });
-      const north = withinMain().getByRole('region', { name: 'North hand' });
-      const playArea = screen.getByRole('grid');
-      expect(north).toBeVisible();
-      expect(south).toBeVisible();
-      expect(north).toAppearBefore(playArea);
-      expect(south).toAppearBefore(playArea);
-    });
-
-    describe('North hand', () => {
-      const withinHand = () =>
-        within(withinMain().getByRole('region', { name: 'North hand' }));
-
-      it('should start with 7 cards', () => {
-        expect(withinHand().getAllByRole('region')).toHaveLength(
-          INITIAL_HAND_CARD_COUNT,
-        );
+      it('should have the South hand before the North hand', () => {
+        const south = withinMain().getByRole('region', { name: 'South hand' });
+        const north = withinMain().getByRole('region', { name: 'North hand' });
+        expect(north).toBeVisible();
+        expect(south).toBeVisible();
+        expect(north).toAppearBefore(south);
       });
-    });
 
-    describe('South hand', () => {
-      const withinHand = () =>
-        within(withinMain().getByRole('region', { name: 'South hand' }));
-
-      it('should start with 7 cards', () => {
-        expect(withinHand().getAllByRole('region')).toHaveLength(
-          INITIAL_HAND_CARD_COUNT,
-        );
+      it('should have both hands before the Play area', () => {
+        const south = withinMain().getByRole('region', { name: 'South hand' });
+        const north = withinMain().getByRole('region', { name: 'North hand' });
+        const playArea = screen.getByRole('grid');
+        expect(north).toBeVisible();
+        expect(south).toBeVisible();
+        expect(north).toAppearBefore(playArea);
+        expect(south).toAppearBefore(playArea);
       });
-    });
-  });
 
-  describe('Play area', () => {
-    const ROW_COUNT = 6;
-    const ROW_COUNT_PER_PLAYER = 3;
-    const FIELD_COUNT_PER_ROW = 3;
+      describe('North hand', () => {
+        const withinHand = () =>
+          within(withinMain().getByRole('region', { name: 'North hand' }));
 
-    const withinMain = () => within(screen.getByRole('main'));
-    const withinPlayArea = () => within(withinMain().getByRole('grid'));
+        it('should start with 7 cards', () => {
+          expect(withinHand().getAllByRole('region')).toHaveLength(
+            INITIAL_HAND_CARD_COUNT,
+          );
+        });
 
-    it('should be in the main content area', () => {
-      expect(withinMain().getByRole('grid')).toBeVisible();
-    });
-
-    describe('The initial placement of fields', () => {
-      it('should have 18 fields in 6 rows of 3', () => {
-        const rows = withinPlayArea().getAllByRole('row');
-        expect(rows).toHaveLength(ROW_COUNT);
-        for (const row of rows) {
-          const fields = within(row).getAllByRole('gridcell');
-          expect(fields).toHaveLength(FIELD_COUNT_PER_ROW);
-          for (const field of fields) {
-            expect(field).toBeVisible();
+        it('should be visible during the North turn', () => {
+          for (let i = 0; i < FEW; i += 1) {
+            if (withinHeader().queryByLabelText(/North:/)) break;
+            fireEvent.click(screen.getByText('Next phase'));
           }
-        }
-      });
+          expect(withinHeader().queryByLabelText(/North:/)).toBeVisible();
 
-      it('should have north fields in the top 3 rows', () => {
-        const southRows = withinPlayArea()
-          .getAllByRole('row')
-          .slice(0, ROW_COUNT_PER_PLAYER);
-        for (const row of southRows) {
-          for (const zone of within(row).getAllByRole('gridcell')) {
-            const card = within(zone).getByRole('region');
-            expect(card).toHaveAccessibleName(/North owned/);
+          const cards = withinHand().getAllByRole('region');
+          expect(cards).toHaveLength(INITIAL_HAND_CARD_COUNT);
+          for (const c of cards) {
+            expect(c).toHaveAccessibleName('Basic Field');
           }
-        }
-      });
+          fireEvent.click(screen.getByText('Next phase'));
+        });
 
-      it('should have south fields in the bottom 3 rows', () => {
-        const southRows = withinPlayArea()
-          .getAllByRole('row')
-          .slice(ROW_COUNT_PER_PLAYER);
-        for (const row of southRows) {
-          for (const zone of within(row).getAllByRole('gridcell')) {
-            const card = within(zone).getByRole('region');
-            expect(card).toHaveAccessibleName(/South owned/);
+        it('should not be visible outside the North turn', () => {
+          for (let i = 0; i < FEW; i += 1) {
+            if (!withinHeader().queryByLabelText(/North:/)) break;
+            fireEvent.click(screen.getByText('Next phase'));
           }
-        }
+          expect(
+            withinHeader().queryByLabelText(/North:/),
+          ).not.toBeInTheDocument();
+
+          const cards = withinHand().getAllByRole('region');
+          expect(cards).toHaveLength(INITIAL_HAND_CARD_COUNT);
+          for (const c of cards) {
+            expect(c).toHaveAccessibleName('Facedown card');
+          }
+          fireEvent.click(screen.getByText('Next phase'));
+        });
       });
 
-      it('should have the north home field', () => {
-        const [_, homeZone] = within(
-          withinPlayArea().getAllByRole('row')[0],
-        ).getAllByRole('gridcell');
-        expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
-          'North owned Basic Field',
-        );
+      describe('South hand', () => {
+        const withinHand = () =>
+          within(withinMain().getByRole('region', { name: 'South hand' }));
+
+        it('should start with 7 cards', () => {
+          expect(withinHand().getAllByRole('region')).toHaveLength(
+            INITIAL_HAND_CARD_COUNT,
+          );
+        });
+
+        it('should be visible during the South turn', () => {
+          for (let i = 0; i < FEW; i += 1) {
+            if (withinHeader().queryByLabelText(/South:/)) break;
+            fireEvent.click(screen.getByText('Next phase'));
+          }
+          expect(withinHeader().queryByLabelText(/South:/)).toBeVisible();
+
+          const cards = withinHand().getAllByRole('region');
+          expect(cards).toHaveLength(INITIAL_HAND_CARD_COUNT);
+          for (const c of cards) {
+            expect(c).toHaveAccessibleName('Basic Field');
+          }
+          fireEvent.click(screen.getByText('Next phase'));
+        });
+
+        it('should not be visible outside the South turn', () => {
+          for (let i = 0; i < FEW; i += 1) {
+            if (!withinHeader().queryByLabelText(/South:/)) break;
+            fireEvent.click(screen.getByText('Next phase'));
+          }
+          expect(
+            withinHeader().queryByLabelText(/South:/),
+          ).not.toBeInTheDocument();
+
+          const cards = withinHand().getAllByRole('region');
+          expect(cards).toHaveLength(INITIAL_HAND_CARD_COUNT);
+          for (const c of cards) {
+            expect(c).toHaveAccessibleName('Facedown card');
+          }
+          fireEvent.click(screen.getByText('Next phase'));
+        });
+      });
+    });
+
+    describe('Play area', () => {
+      const ROW_COUNT = 6;
+      const ROW_COUNT_PER_PLAYER = 3;
+      const FIELD_COUNT_PER_ROW = 3;
+
+      const withinMain = () => within(screen.getByRole('main'));
+      const withinPlayArea = () => within(withinMain().getByRole('grid'));
+
+      it('should be in the main content area', () => {
+        expect(withinMain().getByRole('grid')).toBeVisible();
       });
 
-      it('should have the south home field', () => {
-        const [_, homeZone] = within(
-          withinPlayArea().getAllByRole('row')[ROW_COUNT - 1],
-        ).getAllByRole('gridcell');
-        expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
-          'South owned Basic Field',
-        );
+      describe('The initial placement of fields', () => {
+        it('should have 18 fields in 6 rows of 3', () => {
+          const rows = withinPlayArea().getAllByRole('row');
+          expect(rows).toHaveLength(ROW_COUNT);
+          for (const row of rows) {
+            const fields = within(row).getAllByRole('gridcell');
+            expect(fields).toHaveLength(FIELD_COUNT_PER_ROW);
+            for (const field of fields) {
+              expect(field).toBeVisible();
+            }
+          }
+        });
+
+        it('should have north fields in the top 3 rows', () => {
+          const southRows = withinPlayArea()
+            .getAllByRole('row')
+            .slice(0, ROW_COUNT_PER_PLAYER);
+          for (const row of southRows) {
+            for (const zone of within(row).getAllByRole('gridcell')) {
+              const card = within(zone).getByRole('region');
+              expect(card).toHaveAccessibleName(/North owned/);
+            }
+          }
+        });
+
+        it('should have south fields in the bottom 3 rows', () => {
+          const southRows = withinPlayArea()
+            .getAllByRole('row')
+            .slice(ROW_COUNT_PER_PLAYER);
+          for (const row of southRows) {
+            for (const zone of within(row).getAllByRole('gridcell')) {
+              const card = within(zone).getByRole('region');
+              expect(card).toHaveAccessibleName(/South owned/);
+            }
+          }
+        });
+
+        it('should have the north home field', () => {
+          const [_, homeZone] = within(
+            withinPlayArea().getAllByRole('row')[0],
+          ).getAllByRole('gridcell');
+          expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
+            'North owned Basic Field',
+          );
+        });
+
+        it('should have the south home field', () => {
+          const [_, homeZone] = within(
+            withinPlayArea().getAllByRole('row')[ROW_COUNT - 1],
+          ).getAllByRole('gridcell');
+          expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
+            'South owned Basic Field',
+          );
+        });
       });
     });
   });

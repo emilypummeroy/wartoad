@@ -59,18 +59,29 @@ function SouthHomeBasicField() {
   const nameId = useId();
   const symbolId = useId();
   return (
-    <div className="jiggle-card">
-      <section aria-labelledby={`${symbolId} ${nameId}`} className="card south">
-        <div id={nameId}>Basic Field</div>
-        <div className="card-line">
-          <Pyramid>
-            <title id={symbolId}>South owned</title>
-          </Pyramid>
-          <div>
-            <small>Gives:</small>+0
-          </div>
+    <section aria-labelledby={`${symbolId} ${nameId}`} className="card south">
+      <div id={nameId}>Basic Field</div>
+      <div className="card-line">
+        <Pyramid>
+          <title id={symbolId}>South owned</title>
+        </Pyramid>
+        <div>
+          <small>Gives:</small>+0
         </div>
-        <div>Home field</div>
+      </div>
+      <div>Home field</div>
+    </section>
+  );
+}
+
+function HandFacedownCard() {
+  const id = useId();
+  return (
+    <div className="stacking ">
+      <section aria-labelledby={id} className="facedown card">
+        <Pyramid>
+          <title id={id}>Facedown card</title>
+        </Pyramid>
       </section>
     </div>
   );
@@ -80,7 +91,7 @@ function HandBasicField() {
   const nameId = useId();
   const symbolId = useId();
   return (
-    <div className="jiggle-card">
+    <div className="stacking jiggling">
       <section aria-labelledby={`${symbolId} ${nameId}`} className="card">
         <div id={nameId}>Basic Field</div>
         <div className="card-line">
@@ -151,96 +162,122 @@ export function App() {
             <h3 id="north-hand" className="north">
               North hand
             </h3>
-            <div className="jiggle-row">
-              <HandBasicField />
-              <HandBasicField />
-              <HandBasicField />
-              <HandBasicField />
-              <HandBasicField />
-              <HandBasicField />
-              <HandBasicField />
-            </div>
+            {player === Player.North ? (
+              <div className="jiggle-row">
+                <HandBasicField />
+                <HandBasicField />
+                <HandBasicField />
+                <HandBasicField />
+                <HandBasicField />
+                <HandBasicField />
+                <HandBasicField />
+              </div>
+            ) : (
+              <div className="stack-row">
+                <HandFacedownCard />
+                <HandFacedownCard />
+                <HandFacedownCard />
+                <HandFacedownCard />
+                <HandFacedownCard />
+                <HandFacedownCard />
+                <HandFacedownCard />
+              </div>
+            )}
           </section>
           <section aria-labelledby="south-hand">
             <h3 id="south-hand" className="south">
               South hand
             </h3>
-          <div className="jiggle-row">
-            <HandBasicField />
-            <HandBasicField />
-            <HandBasicField />
-            <HandBasicField />
-            <HandBasicField />
-            <HandBasicField />
-            <HandBasicField />
-          </div>
+              {player === Player.South ? (
+              <div className="jiggle-row">
+                <HandBasicField />
+                <HandBasicField />
+                <HandBasicField />
+                <HandBasicField />
+                <HandBasicField />
+                <HandBasicField />
+                <HandBasicField />
+              </div>
+            ) : (
+              <div className="stack-row">
+                <HandFacedownCard />
+                <HandFacedownCard />
+                <HandFacedownCard />
+                <HandFacedownCard />
+                <HandFacedownCard />
+                <HandFacedownCard />
+                <HandFacedownCard />
+              </div>
+              )}
           </section>
         </section>
-        <div className="playarea" role="grid">
-          <div className="zonerow" role="row">
-            <div className="zone north" role="gridcell">
-              <NorthFacedownCard />
+        <div className="playarea">
+          <div role="grid">
+            <div className="zonerow" role="row">
+              <div className="zone north" role="gridcell">
+                <NorthFacedownCard />
+              </div>
+              <div className="zone north" role="gridcell">
+                <NorthHomeBasicField />
+              </div>
+              <div className="zone north" role="gridcell">
+                <NorthFacedownCard />
+              </div>
             </div>
-            <div className="zone north" role="gridcell">
-              <NorthHomeBasicField />
+            <div className="zonerow" role="row">
+              <div className="zone north" role="gridcell">
+                <NorthFacedownCard />
+              </div>
+              <div className="zone north" role="gridcell">
+                <NorthFacedownCard />
+              </div>
+              <div className="zone north" role="gridcell">
+                <NorthFacedownCard />
+              </div>
             </div>
-            <div className="zone north" role="gridcell">
-              <NorthFacedownCard />
+            <div className="zonerow" role="row">
+              <div className="zone north" role="gridcell">
+                <NorthFacedownCard />
+              </div>
+              <div className="zone north" role="gridcell">
+                <NorthFacedownCard />
+              </div>
+              <div className="zone north" role="gridcell">
+                <NorthFacedownCard />
+              </div>
             </div>
-          </div>
-          <div className="zonerow" role="row">
-            <div className="zone north" role="gridcell">
-              <NorthFacedownCard />
+            <div className="zonerow" role="row">
+              <div className="zone south" role="gridcell">
+                <SouthFacedownCard />
+              </div>
+              <div className="zone south" role="gridcell">
+                <SouthFacedownCard />
+              </div>
+              <div className="zone south" role="gridcell">
+                <SouthFacedownCard />
+              </div>
             </div>
-            <div className="zone north" role="gridcell">
-              <NorthFacedownCard />
+            <div className="zonerow" role="row">
+              <div className="zone south" role="gridcell">
+                <SouthFacedownCard />
+              </div>
+              <div className="zone south" role="gridcell">
+                <SouthFacedownCard />
+              </div>
+              <div className="zone south" role="gridcell">
+                <SouthFacedownCard />
+              </div>
             </div>
-            <div className="zone north" role="gridcell">
-              <NorthFacedownCard />
-            </div>
-          </div>
-          <div className="zonerow" role="row">
-            <div className="zone north" role="gridcell">
-              <NorthFacedownCard />
-            </div>
-            <div className="zone north" role="gridcell">
-              <NorthFacedownCard />
-            </div>
-            <div className="zone north" role="gridcell">
-              <NorthFacedownCard />
-            </div>
-          </div>
-          <div className="zonerow" role="row">
-            <div className="zone south" role="gridcell">
-              <SouthFacedownCard />
-            </div>
-            <div className="zone south" role="gridcell">
-              <SouthFacedownCard />
-            </div>
-            <div className="zone south" role="gridcell">
-              <SouthFacedownCard />
-            </div>
-          </div>
-          <div className="zonerow" role="row">
-            <div className="zone south" role="gridcell">
-              <SouthFacedownCard />
-            </div>
-            <div className="zone south" role="gridcell">
-              <SouthFacedownCard />
-            </div>
-            <div className="zone south" role="gridcell">
-              <SouthFacedownCard />
-            </div>
-          </div>
-          <div className="zonerow" role="row">
-            <div className="zone south" role="gridcell">
-              <SouthFacedownCard />
-            </div>
-            <div className="zone south" role="gridcell">
-              <SouthHomeBasicField />
-            </div>
-            <div className="zone south" role="gridcell">
-              <SouthFacedownCard />
+            <div className="zonerow" role="row">
+              <div className="zone south" role="gridcell">
+                <SouthFacedownCard />
+              </div>
+              <div className="zone south" role="gridcell">
+                <SouthHomeBasicField />
+              </div>
+              <div className="zone south" role="gridcell">
+                <SouthFacedownCard />
+              </div>
             </div>
           </div>
         </div>
