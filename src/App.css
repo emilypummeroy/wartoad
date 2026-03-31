@@ -102,19 +102,34 @@ span.south {
 
 main {
   margin-top: 90px;
+  height: calc(100vh - 90px);
+
+  display: flex;
+  justify-content: space-between;
 
   @media (max-width: 1024px) {
     margin-top: 72px;
+    height: calc(100vh - 72px);
   }
 }
 
-.playarea {
-  height: 83vh;
-  margin: 2vh 0 1vh;
+.handarea {
+  margin: 2vh;
 
   display: flex;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
+  gap: 1vh;
+}
+
+.playarea {
+  margin: 3vh 1vh 1vh;
+
+  overflow: scroll;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 1vh;
 }
 

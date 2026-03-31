@@ -16,8 +16,9 @@ describe(App, () => {
   describe('Header', () => {
     it('should have the wartide heading', () => {
       const heading = screen.getByRole('heading', { level: 1 });
+      const banner = screen.getByRole('banner');
       expect(heading).toHaveTextContent('Wartide');
-      expect(screen.getByRole('banner')).toContainElement(heading);
+      expect(banner).toContainElement(heading);
     });
 
     it('should have the phase indicator', () => {
@@ -104,6 +105,16 @@ describe(App, () => {
           fireEvent.click(screen.getByText('Next phase'));
         }
       });
+    });
+  });
+
+  describe('Hand area', () => {
+    const withinMain = () => within(screen.getByRole('main'));
+
+    it('should be in the main content area before the play area', () => {
+      const hands = withinMain().getByRole('region', { name: 'Hands' });
+      const playArea = screen.getByRole('grid');
+      expect(hands).toAppearBefore(playArea);
     });
   });
 

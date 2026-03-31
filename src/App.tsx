@@ -119,6 +119,9 @@ export function App() {
         </section>
       </header>
       <main>
+        <section className="handarea" aria-labelledby="hands">
+          <h2 id="hands">Hands</h2>
+        </section>
         <div className="playarea" role="grid">
           <div className="zonerow" role="row">
             <div className="zone north" role="gridcell">
