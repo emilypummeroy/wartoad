@@ -46,7 +46,9 @@ function NorthHomeBasicField() {
         <Pyramid>
           <title id={symbolId}>North owned</title>
         </Pyramid>
-        +0
+        <div>
+          <small>Gives:</small>+0
+        </div>
       </div>
       <div>Home field</div>
     </section>
@@ -57,16 +59,41 @@ function SouthHomeBasicField() {
   const nameId = useId();
   const symbolId = useId();
   return (
-    <section aria-labelledby={`${symbolId} ${nameId}`} className="card south">
-      <div id={nameId}>Basic Field</div>
-      <div className="card-line">
-        <Pyramid>
-          <title id={symbolId}>South owned</title>
-        </Pyramid>
-        +0
-      </div>
-      <div>Home field</div>
-    </section>
+    <div className="jiggle-card">
+      <section aria-labelledby={`${symbolId} ${nameId}`} className="card south">
+        <div id={nameId}>Basic Field</div>
+        <div className="card-line">
+          <Pyramid>
+            <title id={symbolId}>South owned</title>
+          </Pyramid>
+          <div>
+            <small>Gives:</small>+0
+          </div>
+        </div>
+        <div>Home field</div>
+      </section>
+    </div>
+  );
+}
+
+function HandBasicField() {
+  const nameId = useId();
+  const symbolId = useId();
+  return (
+    <div className="jiggle-card">
+      <section aria-labelledby={`${symbolId} ${nameId}`} className="card">
+        <div id={nameId}>Basic Field</div>
+        <div className="card-line">
+          <div>
+            <small>Cost:</small>0
+          </div>
+          <div>
+            <small>Gives:</small>+0
+          </div>
+        </div>
+        <div>Home field</div>
+      </section>
+    </div>
   );
 }
 
@@ -119,8 +146,35 @@ export function App() {
         </section>
       </header>
       <main>
-        <section className="handarea" aria-labelledby="hands">
-          <h2 id="hands">Hands</h2>
+        <section className="handarea">
+          <section aria-labelledby="north-hand">
+            <h3 id="north-hand" className="north">
+              North hand
+            </h3>
+            <div className="jiggle-row">
+              <HandBasicField />
+              <HandBasicField />
+              <HandBasicField />
+              <HandBasicField />
+              <HandBasicField />
+              <HandBasicField />
+              <HandBasicField />
+            </div>
+          </section>
+          <section aria-labelledby="south-hand">
+            <h3 id="south-hand" className="south">
+              South hand
+            </h3>
+          <div className="jiggle-row">
+            <HandBasicField />
+            <HandBasicField />
+            <HandBasicField />
+            <HandBasicField />
+            <HandBasicField />
+            <HandBasicField />
+            <HandBasicField />
+          </div>
+          </section>
         </section>
         <div className="playarea" role="grid">
           <div className="zonerow" role="row">

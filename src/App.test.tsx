@@ -108,13 +108,49 @@ describe(App, () => {
     });
   });
 
-  describe('Hand area', () => {
+  describe('Hands', () => {
+    const INITIAL_HAND_CARD_COUNT = 7;
+
     const withinMain = () => within(screen.getByRole('main'));
 
-    it('should be in the main content area before the play area', () => {
-      const hands = withinMain().getByRole('region', { name: 'Hands' });
+    it('should have the South hand before the North hand', () => {
+      const south = withinMain().getByRole('region', { name: 'South hand' });
+      const north = withinMain().getByRole('region', { name: 'North hand' });
+      expect(north).toBeVisible();
+      expect(south).toBeVisible();
+      expect(north).toAppearBefore(south);
+    });
+
+    it('should have both hands before the Play area', () => {
+      const south = withinMain().getByRole('region', { name: 'South hand' });
+      const north = withinMain().getByRole('region', { name: 'North hand' });
       const playArea = screen.getByRole('grid');
-      expect(hands).toAppearBefore(playArea);
+      expect(north).toBeVisible();
+      expect(south).toBeVisible();
+      expect(north).toAppearBefore(playArea);
+      expect(south).toAppearBefore(playArea);
+    });
+
+    describe('North hand', () => {
+      const withinHand = () =>
+        within(withinMain().getByRole('region', { name: 'North hand' }));
+
+      it('should start with 7 cards', () => {
+        expect(withinHand().getAllByRole('region')).toHaveLength(
+          INITIAL_HAND_CARD_COUNT,
+        );
+      });
+    });
+
+    describe('South hand', () => {
+      const withinHand = () =>
+        within(withinMain().getByRole('region', { name: 'South hand' }));
+
+      it('should start with 7 cards', () => {
+        expect(withinHand().getAllByRole('region')).toHaveLength(
+          INITIAL_HAND_CARD_COUNT,
+        );
+      });
     });
   });
 
@@ -124,8 +160,7 @@ describe(App, () => {
     const FIELD_COUNT_PER_ROW = 3;
 
     const withinMain = () => within(screen.getByRole('main'));
-    const withinPlayArea = () =>
-      within(within(screen.getByRole('main')).getByRole('grid'));
+    const withinPlayArea = () => within(withinMain().getByRole('grid'));
 
     it('should be in the main content area', () => {
       expect(withinMain().getByRole('grid')).toBeVisible();
