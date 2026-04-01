@@ -134,7 +134,7 @@ main {
   gap: 1vh;
 }
 
-.stack-row {
+.splay-row {
   display: flex;
   flex-direction: row;
 
@@ -185,7 +185,7 @@ main {
   }
 
   &:hover {
-    margin: -1vh -3vh -2vh;
+    margin: -3vh -3vh 0vh;
     .stacking {
       margin: 0 -2vh 0vh;
       padding: 3vh 0 0;

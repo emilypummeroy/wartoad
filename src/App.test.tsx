@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
-import { App } from './App.tsx';
+import { App, INITIAL_HAND_CARD_COUNT } from './App.tsx';
 
 const FEW = 3;
 
@@ -104,8 +104,6 @@ describe(App, () => {
     });
 
     describe('Hands', () => {
-      const INITIAL_HAND_CARD_COUNT = 7;
-
       const withinMain = () => within(screen.getByRole('main'));
 
       it('should have the South hand before the North hand', () => {

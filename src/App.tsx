@@ -2,6 +2,8 @@ import './App.css';
 import { StepForward, Pyramid } from 'lucide-react';
 import { useId, useState } from 'react';
 
+export const INITIAL_HAND_CARD_COUNT = 7;
+
 const Phase = {
   Main: 'Main',
   End: 'End',
@@ -121,6 +123,9 @@ export function App() {
     phase: Phase.Main,
     player: Player.South,
   });
+  const [southHand] = useState(INITIAL_HAND_CARD_COUNT);
+  const [northHand] = useState(INITIAL_HAND_CARD_COUNT);
+
   const setNextPhase = () => {
     setPhasePlayer(old =>
       old.phase === Phase.End
@@ -164,23 +169,15 @@ export function App() {
             </h3>
             {player === Player.North ? (
               <div className="jiggle-row">
-                <HandBasicField />
-                <HandBasicField />
-                <HandBasicField />
-                <HandBasicField />
-                <HandBasicField />
-                <HandBasicField />
-                <HandBasicField />
+                {Array.from({ length: northHand }, (_, i) => (
+                  <HandBasicField key={i} />
+                ))}
               </div>
             ) : (
-              <div className="stack-row">
-                <HandFacedownCard />
-                <HandFacedownCard />
-                <HandFacedownCard />
-                <HandFacedownCard />
-                <HandFacedownCard />
-                <HandFacedownCard />
-                <HandFacedownCard />
+              <div className="splay-row">
+                {Array.from({ length: northHand }, (_, i) => (
+                  <HandFacedownCard key={i} />
+                ))}
               </div>
             )}
           </section>
@@ -188,27 +185,19 @@ export function App() {
             <h3 id="south-hand" className="south">
               South hand
             </h3>
-              {player === Player.South ? (
+            {player === Player.South ? (
               <div className="jiggle-row">
-                <HandBasicField />
-                <HandBasicField />
-                <HandBasicField />
-                <HandBasicField />
-                <HandBasicField />
-                <HandBasicField />
-                <HandBasicField />
+                {Array.from({ length: southHand }, (_, i) => (
+                  <HandBasicField key={i} />
+                ))}
               </div>
             ) : (
-              <div className="stack-row">
-                <HandFacedownCard />
-                <HandFacedownCard />
-                <HandFacedownCard />
-                <HandFacedownCard />
-                <HandFacedownCard />
-                <HandFacedownCard />
-                <HandFacedownCard />
+              <div className="splay-row">
+                {Array.from({ length: southHand }, (_, i) => (
+                  <HandFacedownCard key={i} />
+                ))}
               </div>
-              )}
+            )}
           </section>
         </section>
         <div className="playarea">
