@@ -1,8 +1,9 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
-import { App, INITIAL_HAND_CARD_COUNT } from './App.tsx';
+import { Phase, Player, App, INITIAL_HAND_CARD_COUNT } from './App.tsx';
 
 const FEW = 3;
+const MANY = 15;
 
 describe('the dom test environment', () => {
   it('should have a defined document', () => {
@@ -145,6 +146,17 @@ describe(App, () => {
     describe('Hands', () => {
       const withinMain = () => within(screen.getByRole('main'));
 
+      const advanceToPhase = (player: Player, phase: Phase) => {
+        const pattern = new RegExp(`${player}: ${phase}`);
+        for (let i = 0; i < MANY; i += 1) {
+          if (withinHeader().queryByLabelText(pattern)) {
+            break;
+          }
+          fireEvent.click(screen.getByText('Next phase'));
+        }
+        expect(withinHeader().queryByLabelText(pattern)).toBeVisible();
+      };
+
       it('should have the South hand before the North hand', () => {
         const south = withinMain().getByRole('region', { name: 'South hand' });
         const north = withinMain().getByRole('region', { name: 'North hand' });
@@ -174,35 +186,27 @@ describe(App, () => {
         });
 
         it('should be visible during the North turn', () => {
-          for (let i = 0; i < FEW; i += 1) {
-            if (withinHeader().queryByLabelText(/North:/)) break;
-            fireEvent.click(screen.getByText('Next phase'));
-          }
-          expect(withinHeader().queryByLabelText(/North:/)).toBeVisible();
+          for (const phase of Object.values(Phase)) {
+            advanceToPhase(Player.North, phase);
 
-          const cards = withinHand().getAllByRole('region');
-          expect(cards).toHaveLength(INITIAL_HAND_CARD_COUNT);
-          for (const c of cards) {
-            expect(c).toHaveAccessibleName('Basic Field');
+            const cards = withinHand().getAllByRole('region');
+            expect(cards).not.toHaveLength(0);
+            for (const c of cards) {
+              expect(c).toHaveAccessibleName('Basic Field');
+            }
           }
-          fireEvent.click(screen.getByText('Next phase'));
         });
 
-        it('should not be visible outside the North turn', () => {
-          for (let i = 0; i < FEW; i += 1) {
-            if (!withinHeader().queryByLabelText(/North:/)) break;
-            fireEvent.click(screen.getByText('Next phase'));
-          }
-          expect(
-            withinHeader().queryByLabelText(/North:/),
-          ).not.toBeInTheDocument();
+        it('should not be visible during the South turn', () => {
+          for (const phase of Object.values(Phase)) {
+            advanceToPhase(Player.South, phase);
 
-          const cards = withinHand().getAllByRole('region');
-          expect(cards).toHaveLength(INITIAL_HAND_CARD_COUNT);
-          for (const c of cards) {
-            expect(c).toHaveAccessibleName('Facedown card');
+            const cards = withinHand().getAllByRole('region');
+            expect(cards).not.toHaveLength(0);
+            for (const c of cards) {
+              expect(c).toHaveAccessibleName('Facedown card');
+            }
           }
-          fireEvent.click(screen.getByText('Next phase'));
         });
       });
 
@@ -217,35 +221,27 @@ describe(App, () => {
         });
 
         it('should be visible during the South turn', () => {
-          for (let i = 0; i < FEW; i += 1) {
-            if (withinHeader().queryByLabelText(/South:/)) break;
-            fireEvent.click(screen.getByText('Next phase'));
-          }
-          expect(withinHeader().queryByLabelText(/South:/)).toBeVisible();
+          for (const phase of Object.values(Phase)) {
+            advanceToPhase(Player.South, phase);
 
-          const cards = withinHand().getAllByRole('region');
-          expect(cards).toHaveLength(INITIAL_HAND_CARD_COUNT);
-          for (const c of cards) {
-            expect(c).toHaveAccessibleName('Basic Field');
+            const cards = withinHand().getAllByRole('region');
+            expect(cards).not.toHaveLength(0);
+            for (const c of cards) {
+              expect(c).toHaveAccessibleName('Basic Field');
+            }
           }
-          fireEvent.click(screen.getByText('Next phase'));
         });
 
-        it('should not be visible outside the South turn', () => {
-          for (let i = 0; i < FEW; i += 1) {
-            if (!withinHeader().queryByLabelText(/South:/)) break;
-            fireEvent.click(screen.getByText('Next phase'));
-          }
-          expect(
-            withinHeader().queryByLabelText(/South:/),
-          ).not.toBeInTheDocument();
+        it('should not be visible during the North turn', () => {
+          for (const phase of Object.values(Phase)) {
+            advanceToPhase(Player.North, phase);
 
-          const cards = withinHand().getAllByRole('region');
-          expect(cards).toHaveLength(INITIAL_HAND_CARD_COUNT);
-          for (const c of cards) {
-            expect(c).toHaveAccessibleName('Facedown card');
+            const cards = withinHand().getAllByRole('region');
+            expect(cards).not.toHaveLength(0);
+            for (const c of cards) {
+              expect(c).toHaveAccessibleName('Facedown card');
+            }
           }
-          fireEvent.click(screen.getByText('Next phase'));
         });
       });
     });

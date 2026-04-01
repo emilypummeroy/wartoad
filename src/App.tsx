@@ -4,23 +4,24 @@ import { useCallback, useId, useState } from 'react';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 
-const Phase = {
+export const Phase = {
   Draw: 'Draw',
   Main: 'Main',
   End: 'End',
 } as const;
-type Phase = (typeof Phase)[keyof typeof Phase];
+export type Phase = (typeof Phase)[keyof typeof Phase];
 const phaseAfter = {
   [Phase.Draw]: Phase.Main,
   [Phase.Main]: Phase.End,
   [Phase.End]: Phase.Draw,
 } as const;
 
-const Player = {
+export const Player = {
   South: 'South',
   North: 'North',
 } as const;
-type Player = (typeof Player)[keyof typeof Player];
+export type Player = (typeof Player)[keyof typeof Player];
+
 const playerAfter = {
   [Player.South]: Player.North,
   [Player.North]: Player.South,
