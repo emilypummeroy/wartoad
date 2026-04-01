@@ -1,6 +1,13 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
-import { Phase, Player, App, INITIAL_HAND_CARD_COUNT } from './App.tsx';
+import {
+  Phase,
+  Player,
+  App,
+  styleForHandSize,
+  INITIAL_HAND_CARD_COUNT,
+  BIG_HAND_CARD_COUNT,
+} from './App.tsx';
 
 const FEW = 3;
 const MANY = 15;
@@ -8,6 +15,34 @@ const MANY = 15;
 describe('the dom test environment', () => {
   it('should have a defined document', () => {
     expectTypeOf(document).not.toBeUndefined();
+  });
+});
+
+describe(styleForHandSize, () => {
+  it('should return an empty string for card counts', () => {
+    for (let i = 0; i <= INITIAL_HAND_CARD_COUNT; i += 1) {
+      expect(styleForHandSize(i)).toBe('');
+    }
+  });
+
+  it("should return 'compact' for medium card counts", () => {
+    for (
+      let i = INITIAL_HAND_CARD_COUNT + 1;
+      i <= BIG_HAND_CARD_COUNT;
+      i += 1
+    ) {
+      expect(styleForHandSize(i)).toBe('compact');
+    }
+  });
+
+  it("should return 'super-compact' for large card counts", () => {
+    for (
+      let i = BIG_HAND_CARD_COUNT + 1;
+      i < BIG_HAND_CARD_COUNT + MANY;
+      i += 1
+    ) {
+      expect(styleForHandSize(i)).toBe('super-compact');
+    }
   });
 });
 
@@ -54,12 +89,12 @@ describe(App, () => {
         ).not.toBeInTheDocument();
       });
 
-      it('should advance to the North Draw phase when the button is clicked twice', () => {
+      it('should advance to the North Start phase when the button is clicked twice', () => {
         fireEvent.click(screen.getByText('Next phase'));
         fireEvent.click(screen.getByText('Next phase'));
 
         expect(
-          withinHeader().getByRole('region', { name: 'North: Draw phase' }),
+          withinHeader().getByRole('region', { name: 'North: Start phase' }),
         ).toBeVisible();
         expect(
           screen.queryByLabelText('South: End phase'),
@@ -75,7 +110,7 @@ describe(App, () => {
           withinHeader().getByRole('region', { name: 'North: Main phase' }),
         ).toBeVisible();
         expect(
-          screen.queryByLabelText('North: Draw phase'),
+          screen.queryByLabelText('North: Start phase'),
         ).not.toBeInTheDocument();
       });
 
@@ -93,7 +128,7 @@ describe(App, () => {
         ).not.toBeInTheDocument();
       });
 
-      it('should advance to the South Draw phase when the button is clicked five times', () => {
+      it('should advance to the South Start phase when the button is clicked five times', () => {
         fireEvent.click(screen.getByText('Next phase'));
         fireEvent.click(screen.getByText('Next phase'));
         fireEvent.click(screen.getByText('Next phase'));
@@ -101,7 +136,7 @@ describe(App, () => {
         fireEvent.click(screen.getByText('Next phase'));
 
         expect(
-          withinHeader().getByRole('region', { name: 'South: Draw phase' }),
+          withinHeader().getByRole('region', { name: 'South: Start phase' }),
         ).toBeVisible();
         expect(
           screen.queryByLabelText('North: End phase'),
@@ -121,7 +156,7 @@ describe(App, () => {
           fireEvent.click(screen.getByText('Next phase'));
 
           expect(
-            withinHeader().getByRole('region', { name: 'North: Draw phase' }),
+            withinHeader().getByRole('region', { name: 'North: Start phase' }),
           ).toBeVisible();
           fireEvent.click(screen.getByText('Next phase'));
 
@@ -136,7 +171,7 @@ describe(App, () => {
           fireEvent.click(screen.getByText('Next phase'));
 
           expect(
-            withinHeader().getByRole('region', { name: 'South: Draw phase' }),
+            withinHeader().getByRole('region', { name: 'South: Start phase' }),
           ).toBeVisible();
           fireEvent.click(screen.getByText('Next phase'));
         }
@@ -208,6 +243,21 @@ describe(App, () => {
             }
           }
         });
+
+        it('should gain an extra card during the North Start phase', () => {
+          advanceToPhase(Player.North, Phase.Main);
+          const initialCount = withinHand().getAllByRole('region').length;
+
+          advanceToPhase(Player.South, Phase.End);
+          expect(withinHand().getAllByRole('region')).toHaveLength(
+            initialCount,
+          );
+
+          advanceToPhase(Player.North, Phase.Main);
+          expect(withinHand().getAllByRole('region')).toHaveLength(
+            initialCount + 1,
+          );
+        });
       });
 
       describe('South hand', () => {
@@ -242,6 +292,21 @@ describe(App, () => {
               expect(c).toHaveAccessibleName('Facedown card');
             }
           }
+        });
+
+        it('should gain an extra card during the South Start phase', () => {
+          advanceToPhase(Player.South, Phase.Main);
+          const initialCount = withinHand().getAllByRole('region').length;
+
+          advanceToPhase(Player.North, Phase.End);
+          expect(withinHand().getAllByRole('region')).toHaveLength(
+            initialCount,
+          );
+
+          advanceToPhase(Player.South, Phase.Main);
+          expect(withinHand().getAllByRole('region')).toHaveLength(
+            initialCount + 1,
+          );
         });
       });
     });

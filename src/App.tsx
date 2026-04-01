@@ -3,17 +3,18 @@ import { StepForward, Pyramid } from 'lucide-react';
 import { useCallback, useId, useState } from 'react';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
+export const BIG_HAND_CARD_COUNT = 12;
 
 export const Phase = {
-  Draw: 'Draw',
+  Start: 'Start',
   Main: 'Main',
   End: 'End',
 } as const;
 export type Phase = (typeof Phase)[keyof typeof Phase];
 const phaseAfter = {
-  [Phase.Draw]: Phase.Main,
+  [Phase.Start]: Phase.Main,
   [Phase.Main]: Phase.End,
-  [Phase.End]: Phase.Draw,
+  [Phase.End]: Phase.Start,
 } as const;
 
 export const Player = {
@@ -121,6 +122,12 @@ function HandBasicField() {
   );
 }
 
+export const styleForHandSize = (n: number): string => {
+  if (n <= INITIAL_HAND_CARD_COUNT) return '';
+  if (n <= BIG_HAND_CARD_COUNT) return 'compact';
+  return 'super-compact';
+};
+
 // oxlint-disable max-lines-per-function
 // oxlint-disable react/jsx-max-depth
 // To be refactored later
@@ -134,15 +141,23 @@ export function App() {
     phase: Phase.Main,
     player: Player.South,
   });
-  const [southHand] = useState(INITIAL_HAND_CARD_COUNT);
-  const [northHand] = useState(INITIAL_HAND_CARD_COUNT);
+  const [southHand, setSouthHand] = useState(INITIAL_HAND_CARD_COUNT);
+  const [northHand, setNorthHand] = useState(INITIAL_HAND_CARD_COUNT);
 
   const setNextPhase = useCallback(() => {
-    setPhase(old => ({
-      player: old.phase === Phase.End ? playerAfter[old.player] : old.player,
-      phase: phaseAfter[old.phase],
-    }));
-  }, []);
+    const next = {
+      player: phase === Phase.End ? playerAfter[player] : player,
+      phase: phaseAfter[phase],
+    };
+    setPhase(next);
+    if (next.phase === Phase.Start && next.player === Player.North) {
+      setNorthHand(northHand + 1);
+    }
+    if (next.phase === Phase.Start && next.player === Player.South) {
+      setSouthHand(southHand + 1);
+    }
+  }, [player, phase, northHand, southHand]);
+
   return (
     <>
       <header>
@@ -175,13 +190,13 @@ export function App() {
               North hand
             </h3>
             {player === Player.North ? (
-              <div className="jiggle-row">
+              <div className={`jiggle-row ${styleForHandSize(northHand)}`}>
                 {Array.from({ length: northHand }, (_, i) => (
                   <HandBasicField key={i} />
                 ))}
               </div>
             ) : (
-              <div className="splay-row">
+              <div className={`splay-row ${styleForHandSize(northHand)}`}>
                 {Array.from({ length: northHand }, (_, i) => (
                   <HandFacedownCard key={i} />
                 ))}
@@ -193,13 +208,13 @@ export function App() {
               South hand
             </h3>
             {player === Player.South ? (
-              <div className="jiggle-row">
+              <div className={`jiggle-row ${styleForHandSize(southHand)}`}>
                 {Array.from({ length: southHand }, (_, i) => (
                   <HandBasicField key={i} />
                 ))}
               </div>
             ) : (
-              <div className="splay-row">
+              <div className={`splay-row ${styleForHandSize(southHand)}`}>
                 {Array.from({ length: southHand }, (_, i) => (
                   <HandFacedownCard key={i} />
                 ))}

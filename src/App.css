@@ -138,25 +138,56 @@ main {
   display: flex;
   flex-direction: row;
 
-  margin: 0vh 2vh;
-  transition: margin 300ms ease;
+  transition: margin 300ms ease-in-out;
   .stacking {
-    margin: 0 -2vh;
-    transition: margin 300ms ease;
-
+    transition: margin 300ms ease-in-out;
     z-index: 10;
   }
 
-  @media (max-aspect-ratio: 1) {
-    margin-left: 4.3vh;
+  margin-left: 2vh;
+  .stacking {
+    margin-left: -2vh;
+  }
+  &.compact {
+    margin-left: 5vh;
     .stacking {
-      margin-left: -4.3vh;
+      margin-left: -5vh;
     }
-
     &:hover {
-      margin: 0vh 2vh;
+      margin-left: 1vh;
       .stacking {
-        margin: 0vh -2vh;
+        margin-left: -2vh;
+      }
+    }
+  }
+  &.super-compact {
+    margin-left: 6vh;
+    .stacking {
+      margin-left: -6vh;
+    }
+    &:hover {
+      margin-left: 3.5vh;
+      .stacking {
+        margin-left: -4.5vh;
+      }
+    }
+  }
+
+  @media (max-aspect-ratio: 1.1) {
+    margin-left: 6.5vh;
+    .stacking {
+      margin-left: -6.5vh;
+    }
+    &.compact {
+      margin-left: 7.2vh;
+      .stacking {
+        margin-left: -7.2vh;
+      }
+    }
+    &.super-compact {
+      margin-left: 7.7vh;
+      .stacking {
+        margin-left: -7.7vh;
       }
     }
   }
@@ -166,33 +197,88 @@ main {
   display: flex;
   flex-direction: row-reverse;
 
-  margin: 0vh 2vh;
-  transition: margin 300ms ease;
+  transition:
+    padding 300ms ease,
+    margin 300ms ease;
   .stacking {
-    margin: 0vh -2vh;
     transition:
-      margin 300ms ease,
-      padding 300ms ease;
-
+      padding 300ms ease,
+      margin 300ms ease;
     z-index: 10;
   }
 
-  @media (max-aspect-ratio: 1) {
-    margin-left: 4.3vh;
+  margin-left: 2vh;
+  .stacking {
+    margin-left: -2vh;
+  }
+  &.compact {
+    margin-left: 5vh;
     .stacking {
-      margin-left: -4.3vh;
+      margin-left: -5vh;
+    }
+  }
+  &.super-compact {
+    margin-left: 6vh;
+    .stacking {
+      margin-left: -6vh;
     }
   }
 
   &:hover {
-    margin: -3vh -3vh 0vh;
+    margin-top: -3vh;
     .stacking {
-      margin: 0 -2vh 0vh;
-      padding: 3vh 0 0;
+      padding: 3vh 0vh 0vh;
 
       &.jiggling:hover {
-        margin: 0vh 0vh 0vh;
-        padding: 0 3vh 3vh;
+        padding: 0vh 3vh 3vh;
+      }
+    }
+  }
+
+  &:hover {
+    margin-left: -1vh;
+    .stacking {
+      margin-left: -2vh;
+    }
+  }
+  &.compact:hover {
+    margin-left: -3vh;
+    .stacking {
+      margin-left: -2vh;
+      &.jiggling:hover {
+        padding-left: 3vh;
+        padding-right: 1vh;
+        margin-right: 2vh;
+      }
+    }
+  }
+  &.super-compact:hover {
+    margin-left: -0.5vh;
+    .stacking {
+      margin-left: -4.5vh;
+      &.jiggling:hover {
+        padding-left: 5vh;
+        padding-right: 1vh;
+        margin-right: 4vh;
+      }
+    }
+  }
+
+  @media (max-aspect-ratio: 1.1) {
+    margin-left: 6.5vh;
+    .stacking {
+      margin-left: -6.5vh;
+    }
+    &.compact {
+      margin-left: 7.2vh;
+      .stacking {
+        margin-left: -7.2vh;
+      }
+    }
+    &.super-compact {
+      margin-left: 7.7vh;
+      .stacking {
+        margin-left: -7.7vh;
       }
     }
   }
