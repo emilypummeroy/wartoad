@@ -1,6 +1,6 @@
 import './App.css';
 import { StepForward, Pyramid } from 'lucide-react';
-import { useId, useState } from 'react';
+import { useCallback, useId, useState } from 'react';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 
@@ -10,7 +10,7 @@ const Phase = {
   End: 'End',
 } as const;
 type Phase = (typeof Phase)[keyof typeof Phase];
-const nextPhase = {
+const phaseAfter = {
   [Phase.Draw]: Phase.Main,
   [Phase.Main]: Phase.End,
   [Phase.End]: Phase.Draw,
@@ -21,7 +21,7 @@ const Player = {
   North: 'North',
 } as const;
 type Player = (typeof Player)[keyof typeof Player];
-const nextPlayer = {
+const playerAfter = {
   [Player.South]: Player.North,
   [Player.North]: Player.South,
 } as const;
@@ -136,12 +136,12 @@ export function App() {
   const [southHand] = useState(INITIAL_HAND_CARD_COUNT);
   const [northHand] = useState(INITIAL_HAND_CARD_COUNT);
 
-  const setNextPhase = () => {
+  const setNextPhase = useCallback(() => {
     setPhase(old => ({
-      player: old.phase === Phase.End ? nextPlayer[old.player] : old.player,
-      phase: nextPhase[old.phase],
+      player: old.phase === Phase.End ? playerAfter[old.player] : old.player,
+      phase: phaseAfter[old.phase],
     }));
-  };
+  }, []);
   return (
     <>
       <header>
