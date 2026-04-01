@@ -35,14 +35,14 @@ describe(App, () => {
     });
 
     describe('Phases', () => {
-      it('should start in the south main phase', () => {
+      it('should start in the South Main phase', () => {
         expect(
           withinHeader().getByRole('region', { name: 'South: Main phase' }),
         ).toBeVisible();
         expect(screen.queryByLabelText('End Phase')).not.toBeInTheDocument();
       });
 
-      it('should advance to the south end phase when the button is clicked', () => {
+      it('should advance to the South End phase when the button is clicked', () => {
         fireEvent.click(screen.getByText('Next phase'));
 
         expect(
@@ -53,7 +53,20 @@ describe(App, () => {
         ).not.toBeInTheDocument();
       });
 
-      it('should advance to the north start phase when the button is clicked twice', () => {
+      it('should advance to the North Draw phase when the button is clicked twice', () => {
+        fireEvent.click(screen.getByText('Next phase'));
+        fireEvent.click(screen.getByText('Next phase'));
+
+        expect(
+          withinHeader().getByRole('region', { name: 'North: Draw phase' }),
+        ).toBeVisible();
+        expect(
+          screen.queryByLabelText('South: End phase'),
+        ).not.toBeInTheDocument();
+      });
+
+      it('should advance to the North Main phase when the button is clicked thrice', () => {
+        fireEvent.click(screen.getByText('Next phase'));
         fireEvent.click(screen.getByText('Next phase'));
         fireEvent.click(screen.getByText('Next phase'));
 
@@ -61,11 +74,12 @@ describe(App, () => {
           withinHeader().getByRole('region', { name: 'North: Main phase' }),
         ).toBeVisible();
         expect(
-          screen.queryByLabelText('South: End phase'),
+          screen.queryByLabelText('North: Draw phase'),
         ).not.toBeInTheDocument();
       });
 
-      it('should advance to the north end phase when the button is clicked thrice', () => {
+      it('should advance to the North End phase when the button is clicked four times', () => {
+        fireEvent.click(screen.getByText('Next phase'));
         fireEvent.click(screen.getByText('Next phase'));
         fireEvent.click(screen.getByText('Next phase'));
         fireEvent.click(screen.getByText('Next phase'));
@@ -75,6 +89,21 @@ describe(App, () => {
         ).toBeVisible();
         expect(
           screen.queryByLabelText('North: Main phase'),
+        ).not.toBeInTheDocument();
+      });
+
+      it('should advance to the South Draw phase when the button is clicked five times', () => {
+        fireEvent.click(screen.getByText('Next phase'));
+        fireEvent.click(screen.getByText('Next phase'));
+        fireEvent.click(screen.getByText('Next phase'));
+        fireEvent.click(screen.getByText('Next phase'));
+        fireEvent.click(screen.getByText('Next phase'));
+
+        expect(
+          withinHeader().getByRole('region', { name: 'South: Draw phase' }),
+        ).toBeVisible();
+        expect(
+          screen.queryByLabelText('North: End phase'),
         ).not.toBeInTheDocument();
       });
 
@@ -91,12 +120,22 @@ describe(App, () => {
           fireEvent.click(screen.getByText('Next phase'));
 
           expect(
+            withinHeader().getByRole('region', { name: 'North: Draw phase' }),
+          ).toBeVisible();
+          fireEvent.click(screen.getByText('Next phase'));
+
+          expect(
             withinHeader().getByRole('region', { name: 'North: Main phase' }),
           ).toBeVisible();
           fireEvent.click(screen.getByText('Next phase'));
 
           expect(
             withinHeader().getByRole('region', { name: 'North: End phase' }),
+          ).toBeVisible();
+          fireEvent.click(screen.getByText('Next phase'));
+
+          expect(
+            withinHeader().getByRole('region', { name: 'South: Draw phase' }),
           ).toBeVisible();
           fireEvent.click(screen.getByText('Next phase'));
         }

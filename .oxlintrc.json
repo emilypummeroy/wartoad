@@ -21,6 +21,7 @@
     "no-ternary": "allow",
     "no-magic-numbers": ["warn", { "ignore": [-1, 0, 1] }],
     "sort-keys": "allow",
+    "curly": "allow",
     "sort-imports": "allow", // Handled by fmt
     "filename-case": "error",
     "no-confusing-void-expression": [
@@ -64,7 +65,9 @@
       "plugins": ["vitest"],
       "rules": {
         "no-await-in-loop": "allow",
-        "max-lines-per-function": "allow"
+        "max-lines-per-function": "allow",
+        "max-statements": ["warn", { "max": 15 }],
+        "max-lines": ["warn", { "max": 500 }]
       },
       "env": {
         "vitest": true

@@ -5,16 +5,26 @@ import { useId, useState } from 'react';
 export const INITIAL_HAND_CARD_COUNT = 7;
 
 const Phase = {
+  Draw: 'Draw',
   Main: 'Main',
   End: 'End',
 } as const;
 type Phase = (typeof Phase)[keyof typeof Phase];
+const nextPhase = {
+  [Phase.Draw]: Phase.Main,
+  [Phase.Main]: Phase.End,
+  [Phase.End]: Phase.Draw,
+} as const;
 
 const Player = {
   South: 'South',
   North: 'North',
 } as const;
 type Player = (typeof Player)[keyof typeof Player];
+const nextPlayer = {
+  [Player.South]: Player.North,
+  [Player.North]: Player.South,
+} as const;
 
 function NorthFacedownCard() {
   const id = useId();
@@ -114,7 +124,7 @@ function HandBasicField() {
 // oxlint-disable react/jsx-max-depth
 // To be refactored later
 export function App() {
-  const [{ phase, player }, setPhasePlayer] = useState<
+  const [{ phase, player }, setPhase] = useState<
     Readonly<{
       phase: Phase;
       player: Player;
@@ -127,14 +137,10 @@ export function App() {
   const [northHand] = useState(INITIAL_HAND_CARD_COUNT);
 
   const setNextPhase = () => {
-    setPhasePlayer(old =>
-      old.phase === Phase.End
-        ? {
-            phase: Phase.Main,
-            player: old.player === Player.South ? Player.North : Player.South,
-          }
-        : { phase: Phase.End, player: old.player },
-    );
+    setPhase(old => ({
+      player: old.phase === Phase.End ? nextPlayer[old.player] : old.player,
+      phase: nextPhase[old.phase],
+    }));
   };
   return (
     <>
