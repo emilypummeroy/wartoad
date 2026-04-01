@@ -40,11 +40,20 @@
   }
 }
 
+.wartide-app {
+  width: min(100svw, 150svh);
+
+  text-align: center;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+}
+
 header {
   height: 90px;
   max-width: 100%;
-  width: 1124px;
-  position: fixed;
 
   display: flex;
   justify-content: space-between;
@@ -58,8 +67,62 @@ header {
   );
 
   @media (max-width: 1024px) {
-    height: 72px;
+    height: 5em;
   }
+
+  @media (max-height: 600px) {
+    height: 3em;
+  }
+  @media (max-height: 600px) {
+    h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+    h3 {
+      font-size: 1em;
+    }
+  }
+}
+
+main {
+  text-align: start;
+  display: flex;
+  flex-grow: 1;
+}
+
+.handarea {
+  padding: 2svh;
+
+  background: var(--bg-solid);
+
+  width: calc-size(fit-content);
+  max-width: calc(100svw - 60svh);
+
+  @media (max-aspect-ratio: 1.1) {
+    min-width: 20svh;
+  }
+
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1svh;
+}
+
+.scroll-x {
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+}
+
+.playarea {
+  min-width: fit-content;
+  margin: 0 2svh;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .title {
@@ -103,37 +166,6 @@ span.south {
   }
 }
 
-main {
-  text-align: start;
-
-  margin-top: 90px;
-  height: calc(100vh - 90px);
-
-  display: flex;
-  justify-content: space-between;
-
-  @media (max-width: 1024px) {
-    margin-top: 72px;
-    height: calc(100vh - 72px);
-  }
-}
-
-.handarea {
-  padding: 2vh;
-
-  background: var(--bg-solid);
-
-  min-width: max(180px, 20vh);
-
-  width: calc(100% - 65vh);
-
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-  justify-content: space-between;
-  gap: 1vh;
-}
-
 .splay-row {
   display: flex;
   flex-direction: row;
@@ -144,51 +176,56 @@ main {
     z-index: 10;
   }
 
-  margin-left: 2vh;
+  margin-left: 2svh;
   .stacking {
-    margin-left: -2vh;
+    margin-left: -2svh;
   }
   &.compact {
-    margin-left: 5vh;
+    margin-left: 5svh;
     .stacking {
-      margin-left: -5vh;
-    }
-    &:hover {
-      margin-left: 1vh;
-      .stacking {
-        margin-left: -2vh;
-      }
+      margin-left: -5svh;
     }
   }
   &.super-compact {
-    margin-left: 6vh;
+    margin-left: 6svh;
     .stacking {
-      margin-left: -6vh;
-    }
-    &:hover {
-      margin-left: 3.5vh;
-      .stacking {
-        margin-left: -4.5vh;
-      }
+      margin-left: -6svh;
     }
   }
-
   @media (max-aspect-ratio: 1.1) {
-    margin-left: 6.5vh;
+    margin-left: 6.5svh;
     .stacking {
-      margin-left: -6.5vh;
+      margin-left: -6.5svh;
     }
     &.compact {
-      margin-left: 7.2vh;
+      margin-left: 7.2svh;
       .stacking {
-        margin-left: -7.2vh;
+        margin-left: -7.2svh;
       }
     }
     &.super-compact {
-      margin-left: 7.7vh;
+      margin-left: 7.7svh;
       .stacking {
-        margin-left: -7.7vh;
+        margin-left: -7.7svh;
       }
+    }
+  }
+  &:hover {
+    margin-left: 2svh;
+    .stacking {
+      margin-left: -2svh;
+    }
+  }
+  &.compact:hover {
+    margin-left: 1svh;
+    .stacking {
+      margin-left: -2svh;
+    }
+  }
+  &.super-compact:hover {
+    margin-left: 3.5svh;
+    .stacking {
+      margin-left: -4.5svh;
     }
   }
 }
@@ -207,111 +244,106 @@ main {
     z-index: 10;
   }
 
-  margin-left: 2vh;
+  margin-left: 2svh;
   .stacking {
-    margin-left: -2vh;
+    margin-left: -2svh;
   }
   &.compact {
-    margin-left: 5vh;
+    margin-left: 5svh;
     .stacking {
-      margin-left: -5vh;
+      margin-left: -5svh;
     }
   }
   &.super-compact {
-    margin-left: 6vh;
+    margin-left: 6svh;
     .stacking {
-      margin-left: -6vh;
-    }
-  }
-
-  &:hover {
-    margin-top: -3vh;
-    .stacking {
-      padding: 3vh 0vh 0vh;
-
-      &.jiggling:hover {
-        padding: 0vh 3vh 3vh;
-      }
-    }
-  }
-
-  &:hover {
-    margin-left: -1vh;
-    .stacking {
-      margin-left: -2vh;
-    }
-  }
-  &.compact:hover {
-    margin-left: -3vh;
-    .stacking {
-      margin-left: -2vh;
-      &.jiggling:hover {
-        padding-left: 3vh;
-        padding-right: 1vh;
-        margin-right: 2vh;
-      }
-    }
-  }
-  &.super-compact:hover {
-    margin-left: -0.5vh;
-    .stacking {
-      margin-left: -4.5vh;
-      &.jiggling:hover {
-        padding-left: 5vh;
-        padding-right: 1vh;
-        margin-right: 4vh;
-      }
+      margin-left: -6svh;
     }
   }
 
   @media (max-aspect-ratio: 1.1) {
-    margin-left: 6.5vh;
+    margin-left: 6.5svh;
     .stacking {
-      margin-left: -6.5vh;
+      margin-left: -6.5svh;
     }
     &.compact {
-      margin-left: 7.2vh;
+      margin-left: 7.2svh;
       .stacking {
-        margin-left: -7.2vh;
+        margin-left: -7.2svh;
       }
     }
     &.super-compact {
-      margin-left: 7.7vh;
+      margin-left: 7.7svh;
       .stacking {
-        margin-left: -7.7vh;
+        margin-left: -7.7svh;
+      }
+    }
+  }
+
+  &:hover {
+    margin-top: -3svh;
+    .stacking {
+      padding: 3svh 0svh 0svh;
+
+      &.jiggling:hover {
+        padding: 0svh 3svh 3svh;
+      }
+    }
+  }
+
+  &:hover {
+    margin-left: -1svh;
+    .stacking {
+      margin-left: -2svh;
+      &.jiggling:hover {
+        padding-left: 3svh;
+        padding-right: 1svh;
+        margin-right: 2svh;
+      }
+    }
+  }
+  &.compact:hover {
+    margin-left: -2svh;
+    .stacking {
+      margin-left: -2svh;
+      &.jiggling:hover {
+        padding-left: 3svh;
+        padding-right: 1svh;
+        margin-right: 2svh;
+      }
+    }
+  }
+  &.super-compact:hover {
+    margin-left: -1.5svh;
+    .stacking {
+      margin-left: -4.5svh;
+      &.jiggling:hover {
+        padding-left: 5svh;
+        padding-right: 0.5svh;
+        margin-right: 4.5svh;
       }
     }
   }
 }
 
-.playarea {
-  margin: 3vh 1vh 1vh;
-  flex-grow: 1;
-
-  overflow: scroll;
-}
-
 .zonegrid {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1vh;
   width: fit-content;
 }
 
 .zonerow {
+  width: fit-content;
   display: flex;
-  gap: 4vh;
-  height: 13vh;
+  gap: 4svh;
+  height: 13svh;
   align-items: center;
 }
 
 .zone {
-  height: 11vh;
-  width: 13vh;
+  height: 11svh;
+  width: 13svh;
 
-  padding: 0.5vh;
-  border-radius: 0.5vh;
+  padding: 0.5svh;
+  border-radius: 0.5svh;
 
   &.south {
     border: 3px solid var(--south);
@@ -334,9 +366,9 @@ main {
 .card {
   text-align: center;
 
-  height: 11.5vh;
+  height: 11.5svh;
   aspect-ratio: 63 / 88;
-  border-radius: 0.4vh;
+  border-radius: 0.4svh;
 
   display: flex;
   flex-direction: column;
@@ -346,18 +378,18 @@ main {
   background: var(--card-front);
   color: var(--card-text);
   border: 1px solid var(--border);
-  font-size: 1.4vh;
-  line-height: 2.1vh;
+  font-size: 1.4svh;
+  line-height: 2.1svh;
 
   small {
-    font-size: 0.9vh;
+    font-size: 0.9svh;
     display: block;
   }
 
   .card-line {
     display: flex;
-    padding: 0.2vh;
-    gap: 0.2vh;
+    padding: 0.2svh;
+    gap: 0.2svh;
     justify-content: space-evenly;
     align-items: center;
 
@@ -376,8 +408,8 @@ main {
     outline: 1px solid var(--south-faint);
     svg {
       color: var(--card-south);
-      height: 3vh;
-      width: 3vh;
+      height: 3svh;
+      width: 3svh;
       transform: scaleY(-1);
     }
     &:hover {
@@ -389,8 +421,8 @@ main {
     outline: 1px solid var(--north-faint);
     svg {
       color: var(--card-north);
-      height: 3vh;
-      width: 3vh;
+      height: 3svh;
+      width: 3svh;
     }
     &:hover {
       outline: 2px solid var(--north);
@@ -408,8 +440,8 @@ main {
 
     svg {
       color: var(--card-back-symbol);
-      height: 3vh;
-      width: 3vh;
+      height: 3svh;
+      width: 3svh;
     }
   }
 }

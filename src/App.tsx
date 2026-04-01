@@ -159,7 +159,7 @@ export function App() {
   }, [player, phase, northHand, southHand]);
 
   return (
-    <>
+    <div className="wartide-app">
       <header>
         <div className="title">
           <h1>
@@ -222,77 +222,79 @@ export function App() {
             )}
           </section>
         </section>
-        <div className="playarea">
-          <div role="grid">
-            <div className="zonerow" role="row">
-              <div className="zone north" role="gridcell">
-                <NorthFacedownCard />
+        <div className="scroll-x">
+          <section className="playarea">
+            <div role="grid">
+              <div className="zonerow" role="row">
+                <div className="zone north" role="gridcell">
+                  <NorthFacedownCard />
+                </div>
+                <div className="zone north" role="gridcell">
+                  <NorthHomeBasicField />
+                </div>
+                <div className="zone north" role="gridcell">
+                  <NorthFacedownCard />
+                </div>
               </div>
-              <div className="zone north" role="gridcell">
-                <NorthHomeBasicField />
+              <div className="zonerow" role="row">
+                <div className="zone north" role="gridcell">
+                  <NorthFacedownCard />
+                </div>
+                <div className="zone north" role="gridcell">
+                  <NorthFacedownCard />
+                </div>
+                <div className="zone north" role="gridcell">
+                  <NorthFacedownCard />
+                </div>
               </div>
-              <div className="zone north" role="gridcell">
-                <NorthFacedownCard />
+              <div className="zonerow" role="row">
+                <div className="zone north" role="gridcell">
+                  <NorthFacedownCard />
+                </div>
+                <div className="zone north" role="gridcell">
+                  <NorthFacedownCard />
+                </div>
+                <div className="zone north" role="gridcell">
+                  <NorthFacedownCard />
+                </div>
+              </div>
+              <div className="zonerow" role="row">
+                <div className="zone south" role="gridcell">
+                  <SouthFacedownCard />
+                </div>
+                <div className="zone south" role="gridcell">
+                  <SouthFacedownCard />
+                </div>
+                <div className="zone south" role="gridcell">
+                  <SouthFacedownCard />
+                </div>
+              </div>
+              <div className="zonerow" role="row">
+                <div className="zone south" role="gridcell">
+                  <SouthFacedownCard />
+                </div>
+                <div className="zone south" role="gridcell">
+                  <SouthFacedownCard />
+                </div>
+                <div className="zone south" role="gridcell">
+                  <SouthFacedownCard />
+                </div>
+              </div>
+              <div className="zonerow" role="row">
+                <div className="zone south" role="gridcell">
+                  <SouthFacedownCard />
+                </div>
+                <div className="zone south" role="gridcell">
+                  <SouthHomeBasicField />
+                </div>
+                <div className="zone south" role="gridcell">
+                  <SouthFacedownCard />
+                </div>
               </div>
             </div>
-            <div className="zonerow" role="row">
-              <div className="zone north" role="gridcell">
-                <NorthFacedownCard />
-              </div>
-              <div className="zone north" role="gridcell">
-                <NorthFacedownCard />
-              </div>
-              <div className="zone north" role="gridcell">
-                <NorthFacedownCard />
-              </div>
-            </div>
-            <div className="zonerow" role="row">
-              <div className="zone north" role="gridcell">
-                <NorthFacedownCard />
-              </div>
-              <div className="zone north" role="gridcell">
-                <NorthFacedownCard />
-              </div>
-              <div className="zone north" role="gridcell">
-                <NorthFacedownCard />
-              </div>
-            </div>
-            <div className="zonerow" role="row">
-              <div className="zone south" role="gridcell">
-                <SouthFacedownCard />
-              </div>
-              <div className="zone south" role="gridcell">
-                <SouthFacedownCard />
-              </div>
-              <div className="zone south" role="gridcell">
-                <SouthFacedownCard />
-              </div>
-            </div>
-            <div className="zonerow" role="row">
-              <div className="zone south" role="gridcell">
-                <SouthFacedownCard />
-              </div>
-              <div className="zone south" role="gridcell">
-                <SouthFacedownCard />
-              </div>
-              <div className="zone south" role="gridcell">
-                <SouthFacedownCard />
-              </div>
-            </div>
-            <div className="zonerow" role="row">
-              <div className="zone south" role="gridcell">
-                <SouthFacedownCard />
-              </div>
-              <div className="zone south" role="gridcell">
-                <SouthHomeBasicField />
-              </div>
-              <div className="zone south" role="gridcell">
-                <SouthFacedownCard />
-              </div>
-            </div>
-          </div>
+          </section>
         </div>
       </main>
-    </>
+    </div>
   );
 }
