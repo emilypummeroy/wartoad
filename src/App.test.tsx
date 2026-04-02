@@ -234,6 +234,7 @@ describe(App, () => {
         );
       });
 
+      // TODO Convert to unit test
       it('should allow cards to be played until the hand is empty', () => {
         advanceToPhase(Player.North, Phase.Main);
 
@@ -348,6 +349,7 @@ describe(App, () => {
         );
       });
 
+      // TODO Convert to unit test
       // To be moved into smaller unit tests in Hands.test.tsx
       // oxlint-disable-next-line max-statements
       it('should not allow cards to played from the hand during other phases', () => {
@@ -390,6 +392,7 @@ describe(App, () => {
         ).toBeGreaterThanOrEqual(initialCount);
       });
 
+      // TODO Convert to unit test
       it('should allow cards to be played until the hand is empty', () => {
         advanceToPhase(Player.South, Phase.Main);
 

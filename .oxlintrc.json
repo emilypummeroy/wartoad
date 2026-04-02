@@ -67,6 +67,7 @@
       "rules": {
         "no-await-in-loop": "allow",
         "max-lines-per-function": "allow",
+        "prefer-readonly-parameter-types": "allow",
         "max-statements": ["warn", { "max": 15 }],
         "max-lines": ["warn", { "max": 500 }]
       },

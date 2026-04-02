@@ -1,4 +1,8 @@
+import { screen, within, render } from '@testing-library/react';
+
+import { Player } from './App';
 import {
+  Hand,
   styleForHandSize,
   INITIAL_HAND_CARD_COUNT,
   BIG_HAND_CARD_COUNT,
@@ -31,5 +35,32 @@ describe(styleForHandSize, () => {
     ) {
       expect(styleForHandSize(i)).toBe('super-compact');
     }
+  });
+});
+
+const noop = () => {};
+
+describe(Hand, () => {
+  const withinHand = () =>
+    within(screen.getByRole('region', { name: 'North hand' }));
+
+  it.for<[number, Player]>([
+    [0, Player.North],
+    [1, Player.North],
+    [INITIAL_HAND_CARD_COUNT, Player.North],
+    [INITIAL_HAND_CARD_COUNT + 1, Player.North],
+    [BIG_HAND_CARD_COUNT, Player.North],
+    [BIG_HAND_CARD_COUNT + 1, Player.North],
+  ])('should render with %i cards', ([handSize, player]) => {
+    render(
+      <Hand
+        player={player}
+        handSize={handSize}
+        isMainPhase
+        isPlayerTurn
+        playCard={noop}
+      />,
+    );
+    expect(withinHand().queryAllByRole('region')).toHaveLength(handSize);
   });
 });
