@@ -258,6 +258,30 @@ describe(App, () => {
             initialCount + 1,
           );
         });
+
+        it('should allow a card to be played from the hand by clicking during the North Main phase', () => {
+          advanceToPhase(Player.North, Phase.Main);
+          const initialCount = withinHand().getAllByRole('region').length;
+
+          fireEvent.click(withinHand().getAllByRole('button')[0]);
+
+          expect(withinHand().getAllByRole('region')).toHaveLength(
+            initialCount - 1,
+          );
+        });
+
+        it('should allow cards to be played until the hand is empty', () => {
+          advanceToPhase(Player.North, Phase.Main);
+
+          const initialCount = withinHand().getAllByRole('region').length;
+          for (let i = 0; i < initialCount; i += 1) {
+            fireEvent.click(withinHand().getAllByRole('button')[0]);
+            expect(withinHand().queryAllByRole('region')).toHaveLength(
+              initialCount - i - 1,
+            );
+          }
+          expect(withinHand().queryByRole('button')).not.toBeInTheDocument();
+        });
       });
 
       describe('South hand', () => {
@@ -307,6 +331,30 @@ describe(App, () => {
           expect(withinHand().getAllByRole('region')).toHaveLength(
             initialCount + 1,
           );
+        });
+
+        it('should allow a card to be played from the hand by clicking during the South Main phase', () => {
+          advanceToPhase(Player.South, Phase.Main);
+          const initialCount = withinHand().getAllByRole('region').length;
+
+          fireEvent.click(withinHand().getAllByRole('button')[0]);
+
+          expect(withinHand().getAllByRole('region')).toHaveLength(
+            initialCount - 1,
+          );
+        });
+
+        it('should allow cards to be played until the hand is empty', () => {
+          advanceToPhase(Player.South, Phase.Main);
+
+          const initialCount = withinHand().getAllByRole('region').length;
+          for (let i = 0; i < initialCount; i += 1) {
+            fireEvent.click(withinHand().getAllByRole('button')[0]);
+            expect(withinHand().queryAllByRole('region')).toHaveLength(
+              initialCount - i - 1,
+            );
+          }
+          expect(withinHand().queryByRole('button')).not.toBeInTheDocument();
         });
       });
     });

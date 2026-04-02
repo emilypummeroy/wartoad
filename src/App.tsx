@@ -88,22 +88,28 @@ function SouthHomeBasicField() {
   );
 }
 
-function HandCard({ isPlayerTurn }: { readonly isPlayerTurn: boolean }) {
+type HandCardProps = {
+  readonly isPlayerTurn: boolean;
+  readonly playCard: () => void;
+};
+function HandCard({ isPlayerTurn, playCard }: HandCardProps) {
   const id = useId();
   return isPlayerTurn ? (
     <div className="stacking jiggling">
-      <section aria-labelledby={id} className="card">
-        <div id={id}>Basic Field</div>
-        <div className="card-line">
-          <div>
-            <small>Cost:</small>0
+      <button className="pickable-card" onClick={playCard}>
+        <section aria-labelledby={id} className="card">
+          <div id={id}>Basic Field</div>
+          <div className="card-line">
+            <div>
+              <small>Cost:</small>0
+            </div>
+            <div>
+              <small>Gives:</small>+0
+            </div>
           </div>
-          <div>
-            <small>Gives:</small>+0
-          </div>
-        </div>
-        <div>Home field</div>
-      </section>
+          <div>Home field</div>
+        </section>
+      </button>
     </div>
   ) : (
     <div className="stacking ">
@@ -152,6 +158,14 @@ export function App() {
     }
   }, [player, phase, northHand, southHand]);
 
+  const playNorthCard = useCallback(() => {
+    setNorthHand(northHand - 1);
+  }, [northHand]);
+
+  const playSouthCard = useCallback(() => {
+    setSouthHand(southHand - 1);
+  }, [southHand]);
+
   return (
     <div className="wartide-app">
       <header>
@@ -179,7 +193,7 @@ export function App() {
       </header>
       <main>
         <section className="handarea">
-          <section aria-labelledby="north-hand">
+          <section className="hand" aria-labelledby="north-hand">
             <h3 id="north-hand" className="north">
               North hand
             </h3>
@@ -189,7 +203,7 @@ export function App() {
                 key="north-hand-cards"
               >
                 {Array.from({ length: northHand }, (_, i) => (
-                  <HandCard key={i} isPlayerTurn />
+                  <HandCard key={i} isPlayerTurn playCard={playNorthCard} />
                 ))}
               </div>
             ) : (
@@ -198,12 +212,12 @@ export function App() {
                 key="north-hand-cards"
               >
                 {Array.from({ length: northHand }, (_, i) => (
-                  <HandCard key={i} isPlayerTurn={false} />
+                  <HandCard key={i} isPlayerTurn={false} playCard={() => {}} />
                 ))}
               </div>
             )}
           </section>
-          <section aria-labelledby="south-hand">
+          <section className="hand" aria-labelledby="south-hand">
             <h3 id="south-hand" className="south">
               South hand
             </h3>
@@ -213,7 +227,7 @@ export function App() {
                 key="south-player-hand"
               >
                 {Array.from({ length: southHand }, (_, i) => (
-                  <HandCard key={i} isPlayerTurn />
+                  <HandCard key={i} isPlayerTurn playCard={playSouthCard} />
                 ))}
               </div>
             ) : (
@@ -222,7 +236,7 @@ export function App() {
                 key="south-player-hand"
               >
                 {Array.from({ length: southHand }, (_, i) => (
-                  <HandCard key={i} isPlayerTurn={false} />
+                  <HandCard key={i} isPlayerTurn={false} playCard={() => {}} />
                 ))}
               </div>
             )}

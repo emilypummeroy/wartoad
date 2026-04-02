@@ -15,28 +15,33 @@
 
   --south-accent: lch(30% 104 280);
   --north-accent: lch(51% 80 25);
-  --south-text: lch(40% 45 280);
-  --north-text: lch(58% 58.5 25);
-  --south-outline-accent: lch(30% 90 280 / 0.5);
-  --north-outline-accent: lch(51% 117 25 / 0.5);
-  --south-outline: lch(58% 50 280 / 0.5);
-  --north-outline: lch(40% 65 25 / 0.5);
-  --south-bg: lch(90% 20 280);
-  --north-bg: lch(93% 26 25);
+  --south-text: lch(40% 58.5 280);
+  --north-text: lch(48% 45 25);
+  --south-outline-accent: lch(30% 117 280 / 0.5);
+  --north-outline-accent: lch(51% 90 25 / 0.5);
+  --south-outline: lch(58% 65 280 / 0.5);
+  --north-outline: lch(40% 50 25 / 0.5);
+  --south-bg: lch(90% 26 280);
+  --north-bg: lch(93% 20 25);
+
+  --animation-smooth: 300ms ease-in-out;
+  --animation-fast: 150ms ease-out;
+
+  --z-index-hand: 10;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --south-accent: lch(80% 104 280);
     --north-accent: lch(56% 80 25);
-    --south-text: lch(80% 45 280);
-    --north-text: lch(56% 58.5 25);
-    --south-outline-accent: lch(70% 90 280 / 0.5);
-    --north-outline-accent: lch(49% 117 25 / 0.5);
-    --south-outline: lch(60% 50 280 / 0.5);
-    --north-outline: lch(42% 65 25 / 0.5);
-    --south-bg: lch(10% 20 280);
-    --north-bg: lch(7% 26 25);
+    --south-text: lch(60% 58.5 280);
+    --north-text: lch(52% 45 25);
+    --south-outline-accent: lch(70% 117 280 / 0.5);
+    --north-outline-accent: lch(49% 90 25 / 0.5);
+    --south-outline: lch(60% 65 280 / 0.5);
+    --north-outline: lch(42% 50 25 / 0.5);
+    --south-bg: lch(10% 26 280);
+    --north-bg: lch(7% 20 25);
 
     --card-shadow:
       rgba(0, 0, 0, 0.5) 0 10px 15px 0, rgba(0, 0, 0, 0.3) 0 4px 6px 0;
@@ -170,14 +175,21 @@ span.south {
   }
 }
 
+.hand {
+  height: fit-content;
+  min-height: calc(20svh + 4em);
+  display: flex;
+  flex-direction: column;
+}
+
 .splay-row {
   display: flex;
   flex-direction: row;
 
-  transition: margin 300ms ease-in-out;
+  transition: margin var(--animation-smooth);
   .stacking {
-    transition: margin 300ms ease-in-out;
-    z-index: 10;
+    transition: margin var(--animation-smooth);
+    z-index: var(--z-index-hand);
   }
 
   margin-left: 2svh;
@@ -237,15 +249,14 @@ span.south {
 .jiggle-row {
   display: flex;
   flex-direction: row-reverse;
+  width: fit-content;
 
-  transition:
-    padding 300ms ease,
-    margin 300ms ease;
+  transition: margin-left var(--animation-smooth);
   .stacking {
     transition:
-      padding 300ms ease,
-      margin 300ms ease;
-    z-index: 10;
+      padding var(--animation-smooth),
+      margin var(--animation-smooth);
+    z-index: var(--z-index-hand);
   }
 
   margin-left: 2svh;
@@ -285,12 +296,17 @@ span.south {
   }
 
   &:hover {
-    margin-top: -3svh;
     .stacking {
-      padding: 3svh 0svh 0svh;
+      padding: 4svh 0svh 0svh;
+      margin-top: -1svh;
 
       &.jiggling:hover {
-        padding: 0svh 3svh 3svh;
+        padding: 0svh 3svh 4svh;
+      }
+      &:first-child:nth-last-child(1) {
+        padding: 0svh 1svh 1svh;
+        margin-left: 0svh;
+        margin-right: 0svh;
       }
     }
   }
@@ -299,10 +315,19 @@ span.south {
     margin-left: -1svh;
     .stacking {
       margin-left: -2svh;
+      &:first-child:nth-last-child(1) {
+        margin-left: 1svh;
+      }
       &.jiggling:hover {
         padding-left: 3svh;
         padding-right: 1svh;
         margin-right: 2svh;
+        &:first-child:nth-last-child(1) {
+          padding-left: 1svh;
+          padding-right: 1svh;
+          margin-left: 0svh;
+          margin-right: 0svh;
+        }
       }
     }
   }
@@ -367,6 +392,13 @@ span.south {
   }
 }
 
+button.pickable-card {
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+}
+
 .card {
   text-align: center;
 
@@ -386,8 +418,8 @@ span.south {
   font-size: 1.4svh;
   line-height: 2.1svh;
 
-  transition: scale 100ms ease;
-  transition: translate 100ms ease;
+  transition: scale var(--animation-fast);
+  transition: translate var(--animation-fast);
   scale: 1 1;
   translate: 0;
   @starting-style {
@@ -448,7 +480,7 @@ span.south {
 
   &.facedown {
     background: var(--card-back);
-  border: none;
+    border: none;
     align-items: center;
     justify-content: center;
 
