@@ -90,13 +90,18 @@ function SouthHomeBasicField() {
 
 type HandCardProps = {
   readonly isPlayerTurn: boolean;
+  readonly isMainPhase: boolean;
   readonly playCard: () => void;
 };
-function HandCard({ isPlayerTurn, playCard }: HandCardProps) {
+function HandCard({ isPlayerTurn, isMainPhase, playCard }: HandCardProps) {
   const id = useId();
   return isPlayerTurn ? (
     <div className="stacking jiggling">
-      <button className="pickable-card" onClick={playCard}>
+      <button
+        className="pickable-card"
+        disabled={!isMainPhase}
+        onClick={playCard}
+      >
         <section aria-labelledby={id} className="card">
           <div id={id}>Basic Field</div>
           <div className="card-line">
@@ -113,11 +118,13 @@ function HandCard({ isPlayerTurn, playCard }: HandCardProps) {
     </div>
   ) : (
     <div className="stacking ">
-      <section aria-labelledby={id} className="facedown card">
-        <Pyramid>
-          <title id={id}>Facedown card</title>
-        </Pyramid>
-      </section>
+      <button className="pickable-card" disabled>
+        <section aria-labelledby={id} className="facedown card">
+          <Pyramid>
+            <title id={id}>Facedown card</title>
+          </Pyramid>
+        </section>
+      </button>
     </div>
   );
 }
@@ -203,7 +210,12 @@ export function App() {
                 key="north-hand-cards"
               >
                 {Array.from({ length: northHand }, (_, i) => (
-                  <HandCard key={i} isPlayerTurn playCard={playNorthCard} />
+                  <HandCard
+                    key={i}
+                    isPlayerTurn
+                    isMainPhase={phase === Phase.Main}
+                    playCard={playNorthCard}
+                  />
                 ))}
               </div>
             ) : (
@@ -227,7 +239,12 @@ export function App() {
                 key="south-player-hand"
               >
                 {Array.from({ length: southHand }, (_, i) => (
-                  <HandCard key={i} isPlayerTurn playCard={playSouthCard} />
+                  <HandCard
+                    key={i}
+                    isPlayerTurn
+                    isMainPhase={phase === Phase.Main}
+                    playCard={playSouthCard}
+                  />
                 ))}
               </div>
             ) : (
