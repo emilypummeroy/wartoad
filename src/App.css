@@ -1,39 +1,42 @@
 :root {
-  --south-accent: hsl(240, 85%, 50%);
-  --north-accent: hsl(0, 80%, 55%);
-  --south: hsl(240, 65%, 50%);
-  --north: hsl(0, 60%, 50%);
-  --south-faint: hsla(240, 65%, 50%, 0.5);
-  --north-faint: hsla(0, 60%, 60%, 0.5);
-  --south-bg: hsl(240, 15%, 80%);
-  --north-bg: hsl(0, 10%, 85%);
-
   --card-shadow:
     rgba(0, 0, 0, 0.2) 0 10px 15px 0, rgba(0, 0, 0, 0.1) 0 4px 6px 0;
-  --card-south: hsl(240, 65%, 50%);
-  --card-north: hsl(0, 60%, 50%);
+  --card-south: lch(60% 40 280);
+  --card-north: lch(40% 52 25);
 
-  --card-front: #6c6964;
-  --card-front-highlight: #b3aeab;
-  --card-text: white;
-  --card-back: #251726;
-  --card-outline: #3e2f3f;
-  --card-border: #5c535c;
-  --card-back-symbol: #c18b2c;
+  --card-front: lch(45% 5 180);
+  --card-text: lch(100% 5 0);
+  --card-back: lch(10% 12 320);
+  --card-outline: lch(21% 12 320);
+  --card-border: lch(36% 8 320);
+  --card-back-symbol: lch(70% 35 95);
 
   color-scheme: light dark;
+
+  --south-accent: lch(30% 104 280);
+  --north-accent: lch(51% 80 25);
+  --south-text: lch(40% 45 280);
+  --north-text: lch(58% 58.5 25);
+  --south-outline-accent: lch(30% 90 280 / 0.5);
+  --north-outline-accent: lch(51% 117 25 / 0.5);
+  --south-outline: lch(58% 50 280 / 0.5);
+  --north-outline: lch(40% 65 25 / 0.5);
+  --south-bg: lch(90% 20 280);
+  --north-bg: lch(93% 26 25);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --south-accent: hsl(240, 80%, 50%);
-    --north-accent: hsl(0, 80%, 40%);
-    --south: hsl(240, 70%, 60%);
-    --north: hsl(0, 55%, 50%);
-    --south-faint: hsla(240, 50%, 45%, 0.5);
-    --north-faint: hsla(0, 45%, 35%, 0.5);
-    --south-bg: hsl(240, 13%, 20%);
-    --north-bg: hsl(0, 10%, 15%);
+    --south-accent: lch(80% 104 280);
+    --north-accent: lch(56% 80 25);
+    --south-text: lch(80% 45 280);
+    --north-text: lch(56% 58.5 25);
+    --south-outline-accent: lch(70% 90 280 / 0.5);
+    --north-outline-accent: lch(49% 117 25 / 0.5);
+    --south-outline: lch(60% 50 280 / 0.5);
+    --north-outline: lch(42% 65 25 / 0.5);
+    --south-bg: lch(10% 20 280);
+    --north-bg: lch(7% 26 25);
 
     --card-shadow:
       rgba(0, 0, 0, 0.5) 0 10px 15px 0, rgba(0, 0, 0, 0.3) 0 4px 6px 0;
@@ -65,15 +68,15 @@ header {
     var(--accent-bg),
     rgba(0, 0, 0, 0)
   );
-
-  @media (max-width: 1024px) {
+}
+@media (max-width: 1024px) {
+  header {
     height: 5em;
   }
-
-  @media (max-height: 600px) {
+}
+@media (max-height: 600px) {
+  header {
     height: 3em;
-  }
-  @media (max-height: 600px) {
     h1 {
       margin: 0;
       font-size: 1.5em;
@@ -98,15 +101,16 @@ main {
   width: calc-size(fit-content);
   max-width: calc(100svw - 60svh);
 
-  @media (max-aspect-ratio: 1.1) {
-    min-width: 20svh;
-  }
-
   display: flex;
   flex-direction: column;
   align-items: start;
   justify-content: space-between;
   gap: 1svh;
+}
+@media (max-aspect-ratio: 1.1) {
+  .handarea {
+    min-width: 20svh;
+  }
 }
 
 .scroll-x {
@@ -144,11 +148,11 @@ span.accent {
 }
 h3.north,
 span.north {
-  color: var(--north);
+  color: var(--north-text);
 }
 h3.south,
 span.south {
-  color: var(--south);
+  color: var(--south-text);
 }
 
 .phases {
@@ -346,19 +350,19 @@ span.south {
   border-radius: 0.5svh;
 
   &.south {
-    border: 3px solid var(--south);
+    border: 1px solid var(--south-outline-accent);
     background: var(--south-bg);
 
     &:hover {
-      border: 3px solid var(--south-accent);
+      outline: 1px solid var(--south-accent);
     }
   }
 
   &.north {
-    border: 3px solid var(--north);
+    border: 1px solid var(--north-outline-accent);
     background: var(--north-bg);
     &:hover {
-      border: 3px solid var(--north-accent);
+      outline: 1px solid var(--north-accent);
     }
   }
 }
@@ -377,7 +381,8 @@ span.south {
   box-shadow: var(--card-shadow);
   background: var(--card-front);
   color: var(--card-text);
-  border: 1px solid var(--border);
+  border: 1px solid var(--card-border);
+  outline: 1px solid var(--card-outline);
   font-size: 1.4svh;
   line-height: 2.1svh;
 
@@ -405,7 +410,7 @@ span.south {
   }
 
   &.south {
-    outline: 1px solid var(--south-faint);
+    outline: 1px solid var(--south-outline);
     svg {
       color: var(--card-south);
       height: 3svh;
@@ -413,28 +418,28 @@ span.south {
       transform: scaleY(-1);
     }
     &:hover {
-      outline: 2px solid var(--south);
+      outline: 2px solid var(--south-outline-accent);
     }
   }
-
   &.north {
-    outline: 1px solid var(--north-faint);
+    outline: 1px solid var(--north-outline);
     svg {
       color: var(--card-north);
       height: 3svh;
       width: 3svh;
     }
     &:hover {
-      outline: 2px solid var(--north);
+      outline: 2px solid var(--north-outline-accent);
     }
   }
+
   &:hover {
     filter: brightness(110%);
   }
 
   &.facedown {
     background: var(--card-back);
-    border: 1px solid var(--border);
+  border: none;
     align-items: center;
     justify-content: center;
 
