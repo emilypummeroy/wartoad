@@ -1,13 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
-import {
-  Phase,
-  Player,
-  App,
-  styleForHandSize,
-  INITIAL_HAND_CARD_COUNT,
-  BIG_HAND_CARD_COUNT,
-} from './App.tsx';
+import { Phase, Player, App, INITIAL_HAND_CARD_COUNT } from './App.tsx';
 
 const FEW = 3;
 const MANY = 15;
@@ -15,34 +8,6 @@ const MANY = 15;
 describe('the dom test environment', () => {
   it('should have a defined document', () => {
     expectTypeOf(document).not.toBeUndefined();
-  });
-});
-
-describe(styleForHandSize, () => {
-  it('should return an empty string for card counts', () => {
-    for (let i = 0; i <= INITIAL_HAND_CARD_COUNT; i += 1) {
-      expect(styleForHandSize(i)).toBe('');
-    }
-  });
-
-  it("should return 'compact' for medium card counts", () => {
-    for (
-      let i = INITIAL_HAND_CARD_COUNT + 1;
-      i <= BIG_HAND_CARD_COUNT;
-      i += 1
-    ) {
-      expect(styleForHandSize(i)).toBe('compact');
-    }
-  });
-
-  it("should return 'super-compact' for large card counts", () => {
-    for (
-      let i = BIG_HAND_CARD_COUNT + 1;
-      i < BIG_HAND_CARD_COUNT + MANY;
-      i += 1
-    ) {
-      expect(styleForHandSize(i)).toBe('super-compact');
-    }
   });
 });
 
@@ -177,336 +142,334 @@ describe(App, () => {
         }
       });
     });
+  });
 
-    describe('Hands', () => {
-      const withinMain = () => within(screen.getByRole('main'));
+  describe('Hands', () => {
+    const withinMain = () => within(screen.getByRole('main'));
 
-      const advanceToPhase = (player: Player, phase: Phase) => {
-        const pattern = new RegExp(`${player}: ${phase}`);
-        for (let i = 0; i < MANY; i += 1) {
-          if (withinHeader().queryByLabelText(pattern)) {
-            break;
-          }
-          fireEvent.click(screen.getByText('Next phase'));
+    const advanceToPhase = (player: Player, phase: Phase) => {
+      const pattern = new RegExp(`${player}: ${phase}`);
+      for (let i = 0; i < MANY; i += 1) {
+        if (withinHeader().queryByLabelText(pattern)) {
+          break;
         }
-        expect(withinHeader().queryByLabelText(pattern)).toBeVisible();
-      };
+        fireEvent.click(screen.getByText('Next phase'));
+      }
+      expect(withinHeader().queryByLabelText(pattern)).toBeVisible();
+    };
 
-      it('should have the South hand before the North hand', () => {
-        const south = withinMain().getByRole('region', { name: 'South hand' });
-        const north = withinMain().getByRole('region', { name: 'North hand' });
-        expect(north).toBeVisible();
-        expect(south).toBeVisible();
-        expect(north).toAppearBefore(south);
+    it('should have the South hand before the North hand', () => {
+      const south = withinMain().getByRole('region', { name: 'South hand' });
+      const north = withinMain().getByRole('region', { name: 'North hand' });
+      expect(north).toBeVisible();
+      expect(south).toBeVisible();
+      expect(north).toAppearBefore(south);
+    });
+
+    it('should have both hands before the Play area', () => {
+      const south = withinMain().getByRole('region', { name: 'South hand' });
+      const north = withinMain().getByRole('region', { name: 'North hand' });
+      const playArea = screen.getByRole('grid');
+      expect(north).toBeVisible();
+      expect(south).toBeVisible();
+      expect(north).toAppearBefore(playArea);
+      expect(south).toAppearBefore(playArea);
+    });
+
+    describe('North hand', () => {
+      const withinHand = () =>
+        within(withinMain().getByRole('region', { name: 'North hand' }));
+
+      it('should start with 7 cards', () => {
+        expect(withinHand().getAllByRole('region')).toHaveLength(
+          INITIAL_HAND_CARD_COUNT,
+        );
       });
 
-      it('should have both hands before the Play area', () => {
-        const south = withinMain().getByRole('region', { name: 'South hand' });
-        const north = withinMain().getByRole('region', { name: 'North hand' });
-        const playArea = screen.getByRole('grid');
-        expect(north).toBeVisible();
-        expect(south).toBeVisible();
-        expect(north).toAppearBefore(playArea);
-        expect(south).toAppearBefore(playArea);
+      it('should be visible during the North turn', () => {
+        for (const phase of Object.values(Phase)) {
+          advanceToPhase(Player.North, phase);
+
+          const cards = withinHand().getAllByRole('region');
+          expect(cards).not.toHaveLength(0);
+          for (const c of cards) {
+            expect(c).toHaveAccessibleName('Basic Field');
+          }
+        }
       });
 
-      describe('North hand', () => {
-        const withinHand = () =>
-          within(withinMain().getByRole('region', { name: 'North hand' }));
+      it('should not be visible during the South turn', () => {
+        for (const phase of Object.values(Phase)) {
+          advanceToPhase(Player.South, phase);
 
-        it('should start with 7 cards', () => {
-          expect(withinHand().getAllByRole('region')).toHaveLength(
-            INITIAL_HAND_CARD_COUNT,
-          );
-        });
-
-        it('should be visible during the North turn', () => {
-          for (const phase of Object.values(Phase)) {
-            advanceToPhase(Player.North, phase);
-
-            const cards = withinHand().getAllByRole('region');
-            expect(cards).not.toHaveLength(0);
-            for (const c of cards) {
-              expect(c).toHaveAccessibleName('Basic Field');
-            }
+          const cards = withinHand().getAllByRole('region');
+          expect(cards).not.toHaveLength(0);
+          for (const c of cards) {
+            expect(c).toHaveAccessibleName('Facedown card');
           }
-        });
+        }
+      });
 
-        it('should not be visible during the South turn', () => {
-          for (const phase of Object.values(Phase)) {
-            advanceToPhase(Player.South, phase);
+      it('should gain an extra card during the North Start phase', () => {
+        advanceToPhase(Player.North, Phase.Main);
+        const initialCount = withinHand().getAllByRole('region').length;
 
-            const cards = withinHand().getAllByRole('region');
-            expect(cards).not.toHaveLength(0);
-            for (const c of cards) {
-              expect(c).toHaveAccessibleName('Facedown card');
-            }
-          }
-        });
+        advanceToPhase(Player.South, Phase.End);
+        expect(withinHand().getAllByRole('region')).toHaveLength(initialCount);
 
-        it('should gain an extra card during the North Start phase', () => {
-          advanceToPhase(Player.North, Phase.Main);
-          const initialCount = withinHand().getAllByRole('region').length;
+        advanceToPhase(Player.North, Phase.Main);
+        expect(withinHand().getAllByRole('region')).toHaveLength(
+          initialCount + 1,
+        );
+      });
 
-          advanceToPhase(Player.South, Phase.End);
-          expect(withinHand().getAllByRole('region')).toHaveLength(
-            initialCount,
-          );
+      it('should allow a card to be played from the hand by clicking during the North Main phase', () => {
+        advanceToPhase(Player.North, Phase.Main);
+        const initialCount = withinHand().getAllByRole('region').length;
 
-          advanceToPhase(Player.North, Phase.Main);
-          expect(withinHand().getAllByRole('region')).toHaveLength(
-            initialCount + 1,
-          );
-        });
+        fireEvent.click(withinHand().getAllByRole('button')[0]);
 
-        it('should allow a card to be played from the hand by clicking during the North Main phase', () => {
-          advanceToPhase(Player.North, Phase.Main);
-          const initialCount = withinHand().getAllByRole('region').length;
+        expect(withinHand().getAllByRole('region')).toHaveLength(
+          initialCount - 1,
+        );
+      });
 
+      it('should allow cards to be played until the hand is empty', () => {
+        advanceToPhase(Player.North, Phase.Main);
+
+        const initialCount = withinHand().getAllByRole('region').length;
+        for (let i = 0; i < initialCount; i += 1) {
           fireEvent.click(withinHand().getAllByRole('button')[0]);
-
-          expect(withinHand().getAllByRole('region')).toHaveLength(
-            initialCount - 1,
+          expect(withinHand().queryAllByRole('region')).toHaveLength(
+            initialCount - i - 1,
           );
-        });
-
-        it('should allow cards to be played until the hand is empty', () => {
-          advanceToPhase(Player.North, Phase.Main);
-
-          const initialCount = withinHand().getAllByRole('region').length;
-          for (let i = 0; i < initialCount; i += 1) {
-            fireEvent.click(withinHand().getAllByRole('button')[0]);
-            expect(withinHand().queryAllByRole('region')).toHaveLength(
-              initialCount - i - 1,
-            );
-          }
-          expect(withinHand().queryByRole('button')).not.toBeInTheDocument();
-        });
-
-        it('should not allow cards to played from the hand during other phases', () => {
-          const initialCount = withinHand().getAllByRole('region').length;
-          expect(initialCount).toBeGreaterThan(0);
-          let cards;
-
-          advanceToPhase(Player.North, Phase.End);
-          cards = withinHand().queryAllByRole('button');
-          if (cards.length > 0) fireEvent.click(cards[0]);
-          expect(
-            withinHand().getAllByRole('region').length,
-          ).toBeGreaterThanOrEqual(initialCount);
-
-          advanceToPhase(Player.South, Phase.Start);
-          cards = withinHand().queryAllByRole('button');
-          if (cards.length > 0) fireEvent.click(cards[0]);
-          expect(
-            withinHand().getAllByRole('region').length,
-          ).toBeGreaterThanOrEqual(initialCount);
-
-          advanceToPhase(Player.South, Phase.Main);
-          cards = withinHand().queryAllByRole('button');
-          if (cards.length > 0) fireEvent.click(cards[0]);
-          expect(
-            withinHand().getAllByRole('region').length,
-          ).toBeGreaterThanOrEqual(initialCount);
-
-          advanceToPhase(Player.South, Phase.End);
-          cards = withinHand().queryAllByRole('button');
-          if (cards.length > 0) fireEvent.click(cards[0]);
-          expect(
-            withinHand().getAllByRole('region').length,
-          ).toBeGreaterThanOrEqual(initialCount);
-
-          advanceToPhase(Player.North, Phase.Start);
-          cards = withinHand().queryAllByRole('button');
-          if (cards.length > 0) fireEvent.click(cards[0]);
-          expect(
-            withinHand().getAllByRole('region').length,
-          ).toBeGreaterThanOrEqual(initialCount);
-        });
+        }
+        expect(withinHand().queryByRole('button')).not.toBeInTheDocument();
       });
 
-      describe('South hand', () => {
-        const withinHand = () =>
-          within(withinMain().getByRole('region', { name: 'South hand' }));
+      // To be moved into smaller unit tests in Hands.test.tsx
+      // oxlint-disable-next-line max-statements
+      it('should not allow cards to played from the hand during other phases', () => {
+        const initialCount = withinHand().getAllByRole('region').length;
+        expect(initialCount).toBeGreaterThan(0);
 
-        it('should start with 7 cards', () => {
-          expect(withinHand().getAllByRole('region')).toHaveLength(
-            INITIAL_HAND_CARD_COUNT,
-          );
-        });
+        advanceToPhase(Player.North, Phase.End);
+        let cards = withinHand().queryAllByRole('button');
+        if (cards.length > 0) fireEvent.click(cards[0]);
+        expect(
+          withinHand().getAllByRole('region').length,
+        ).toBeGreaterThanOrEqual(initialCount);
 
-        it('should be visible during the South turn', () => {
-          for (const phase of Object.values(Phase)) {
-            advanceToPhase(Player.South, phase);
+        advanceToPhase(Player.South, Phase.Start);
+        cards = withinHand().queryAllByRole('button');
+        if (cards.length > 0) fireEvent.click(cards[0]);
+        expect(
+          withinHand().getAllByRole('region').length,
+        ).toBeGreaterThanOrEqual(initialCount);
 
-            const cards = withinHand().getAllByRole('region');
-            expect(cards).not.toHaveLength(0);
-            for (const c of cards) {
-              expect(c).toHaveAccessibleName('Basic Field');
-            }
-          }
-        });
+        advanceToPhase(Player.South, Phase.Main);
+        cards = withinHand().queryAllByRole('button');
+        if (cards.length > 0) fireEvent.click(cards[0]);
+        expect(
+          withinHand().getAllByRole('region').length,
+        ).toBeGreaterThanOrEqual(initialCount);
 
-        it('should not be visible during the North turn', () => {
-          for (const phase of Object.values(Phase)) {
-            advanceToPhase(Player.North, phase);
+        advanceToPhase(Player.South, Phase.End);
+        cards = withinHand().queryAllByRole('button');
+        if (cards.length > 0) fireEvent.click(cards[0]);
+        expect(
+          withinHand().getAllByRole('region').length,
+        ).toBeGreaterThanOrEqual(initialCount);
 
-            const cards = withinHand().getAllByRole('region');
-            expect(cards).not.toHaveLength(0);
-            for (const c of cards) {
-              expect(c).toHaveAccessibleName('Facedown card');
-            }
-          }
-        });
-
-        it('should gain an extra card during the South Start phase', () => {
-          advanceToPhase(Player.South, Phase.Main);
-          const initialCount = withinHand().getAllByRole('region').length;
-
-          advanceToPhase(Player.North, Phase.End);
-          expect(withinHand().getAllByRole('region')).toHaveLength(
-            initialCount,
-          );
-
-          advanceToPhase(Player.South, Phase.Main);
-          expect(withinHand().getAllByRole('region')).toHaveLength(
-            initialCount + 1,
-          );
-        });
-
-        it('should allow a card to be played from the hand by clicking during the South Main phase', () => {
-          advanceToPhase(Player.South, Phase.Main);
-          const initialCount = withinHand().getAllByRole('region').length;
-
-          fireEvent.click(withinHand().getAllByRole('button')[0]);
-
-          expect(withinHand().getAllByRole('region')).toHaveLength(
-            initialCount - 1,
-          );
-        });
-
-        it('should not allow cards to played from the hand during other phases', () => {
-          const initialCount = withinHand().getAllByRole('region').length;
-          expect(initialCount).toBeGreaterThan(0);
-          let cards;
-
-          advanceToPhase(Player.South, Phase.End);
-          cards = withinHand().queryAllByRole('button');
-          if (cards.length > 0) fireEvent.click(cards[0]);
-          expect(
-            withinHand().getAllByRole('region').length,
-          ).toBeGreaterThanOrEqual(initialCount);
-
-          advanceToPhase(Player.North, Phase.Start);
-          cards = withinHand().queryAllByRole('button');
-          if (cards.length > 0) fireEvent.click(cards[0]);
-          expect(
-            withinHand().getAllByRole('region').length,
-          ).toBeGreaterThanOrEqual(initialCount);
-
-          advanceToPhase(Player.North, Phase.Main);
-          cards = withinHand().queryAllByRole('button');
-          if (cards.length > 0) fireEvent.click(cards[0]);
-          expect(
-            withinHand().getAllByRole('region').length,
-          ).toBeGreaterThanOrEqual(initialCount);
-
-          advanceToPhase(Player.North, Phase.End);
-          cards = withinHand().queryAllByRole('button');
-          if (cards.length > 0) fireEvent.click(cards[0]);
-          expect(
-            withinHand().getAllByRole('region').length,
-          ).toBeGreaterThanOrEqual(initialCount);
-
-          advanceToPhase(Player.South, Phase.Start);
-          cards = withinHand().queryAllByRole('button');
-          if (cards.length > 0) fireEvent.click(cards[0]);
-          expect(
-            withinHand().getAllByRole('region').length,
-          ).toBeGreaterThanOrEqual(initialCount);
-        });
-
-        it('should allow cards to be played until the hand is empty', () => {
-          advanceToPhase(Player.South, Phase.Main);
-
-          const initialCount = withinHand().getAllByRole('region').length;
-          for (let i = 0; i < initialCount; i += 1) {
-            fireEvent.click(withinHand().getAllByRole('button')[0]);
-            expect(withinHand().queryAllByRole('region')).toHaveLength(
-              initialCount - i - 1,
-            );
-          }
-          expect(withinHand().queryByRole('button')).not.toBeInTheDocument();
-        });
+        advanceToPhase(Player.North, Phase.Start);
+        cards = withinHand().queryAllByRole('button');
+        if (cards.length > 0) fireEvent.click(cards[0]);
+        expect(
+          withinHand().getAllByRole('region').length,
+        ).toBeGreaterThanOrEqual(initialCount);
       });
     });
 
-    describe('Play area', () => {
-      const ROW_COUNT = 6;
-      const ROW_COUNT_PER_PLAYER = 3;
-      const FIELD_COUNT_PER_ROW = 3;
+    describe('South hand', () => {
+      const withinHand = () =>
+        within(withinMain().getByRole('region', { name: 'South hand' }));
 
-      const withinMain = () => within(screen.getByRole('main'));
-      const withinPlayArea = () => within(withinMain().getByRole('grid'));
-
-      it('should be in the main content area', () => {
-        expect(withinMain().getByRole('grid')).toBeVisible();
+      it('should start with 7 cards', () => {
+        expect(withinHand().getAllByRole('region')).toHaveLength(
+          INITIAL_HAND_CARD_COUNT,
+        );
       });
 
-      describe('The initial placement of fields', () => {
-        it('should have 18 fields in 6 rows of 3', () => {
-          const rows = withinPlayArea().getAllByRole('row');
-          expect(rows).toHaveLength(ROW_COUNT);
-          for (const row of rows) {
-            const fields = within(row).getAllByRole('gridcell');
-            expect(fields).toHaveLength(FIELD_COUNT_PER_ROW);
-            for (const field of fields) {
-              expect(field).toBeVisible();
-            }
-          }
-        });
+      it('should be visible during the South turn', () => {
+        for (const phase of Object.values(Phase)) {
+          advanceToPhase(Player.South, phase);
 
-        it('should have north fields in the top 3 rows', () => {
-          const southRows = withinPlayArea()
-            .getAllByRole('row')
-            .slice(0, ROW_COUNT_PER_PLAYER);
-          for (const row of southRows) {
-            for (const zone of within(row).getAllByRole('gridcell')) {
-              const card = within(zone).getByRole('region');
-              expect(card).toHaveAccessibleName(/North owned/);
-            }
+          const cards = withinHand().getAllByRole('region');
+          expect(cards).not.toHaveLength(0);
+          for (const c of cards) {
+            expect(c).toHaveAccessibleName('Basic Field');
           }
-        });
+        }
+      });
 
-        it('should have south fields in the bottom 3 rows', () => {
-          const southRows = withinPlayArea()
-            .getAllByRole('row')
-            .slice(ROW_COUNT_PER_PLAYER);
-          for (const row of southRows) {
-            for (const zone of within(row).getAllByRole('gridcell')) {
-              const card = within(zone).getByRole('region');
-              expect(card).toHaveAccessibleName(/South owned/);
-            }
+      it('should not be visible during the North turn', () => {
+        for (const phase of Object.values(Phase)) {
+          advanceToPhase(Player.North, phase);
+
+          const cards = withinHand().getAllByRole('region');
+          expect(cards).not.toHaveLength(0);
+          for (const c of cards) {
+            expect(c).toHaveAccessibleName('Facedown card');
           }
-        });
+        }
+      });
 
-        it('should have the north home field', () => {
-          const [_, homeZone] = within(
-            withinPlayArea().getAllByRole('row')[0],
-          ).getAllByRole('gridcell');
-          expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
-            'North owned Basic Field',
+      it('should gain an extra card during the South Start phase', () => {
+        advanceToPhase(Player.South, Phase.Main);
+        const initialCount = withinHand().getAllByRole('region').length;
+
+        advanceToPhase(Player.North, Phase.End);
+        expect(withinHand().getAllByRole('region')).toHaveLength(initialCount);
+
+        advanceToPhase(Player.South, Phase.Main);
+        expect(withinHand().getAllByRole('region')).toHaveLength(
+          initialCount + 1,
+        );
+      });
+
+      it('should allow a card to be played from the hand by clicking during the South Main phase', () => {
+        advanceToPhase(Player.South, Phase.Main);
+        const initialCount = withinHand().getAllByRole('region').length;
+
+        fireEvent.click(withinHand().getAllByRole('button')[0]);
+
+        expect(withinHand().getAllByRole('region')).toHaveLength(
+          initialCount - 1,
+        );
+      });
+
+      // To be moved into smaller unit tests in Hands.test.tsx
+      // oxlint-disable-next-line max-statements
+      it('should not allow cards to played from the hand during other phases', () => {
+        const initialCount = withinHand().getAllByRole('region').length;
+        expect(initialCount).toBeGreaterThan(0);
+
+        advanceToPhase(Player.South, Phase.End);
+        let cards = withinHand().queryAllByRole('button');
+        if (cards.length > 0) fireEvent.click(cards[0]);
+        expect(
+          withinHand().getAllByRole('region').length,
+        ).toBeGreaterThanOrEqual(initialCount);
+
+        advanceToPhase(Player.North, Phase.Start);
+        cards = withinHand().queryAllByRole('button');
+        if (cards.length > 0) fireEvent.click(cards[0]);
+        expect(
+          withinHand().getAllByRole('region').length,
+        ).toBeGreaterThanOrEqual(initialCount);
+
+        advanceToPhase(Player.North, Phase.Main);
+        cards = withinHand().queryAllByRole('button');
+        if (cards.length > 0) fireEvent.click(cards[0]);
+        expect(
+          withinHand().getAllByRole('region').length,
+        ).toBeGreaterThanOrEqual(initialCount);
+
+        advanceToPhase(Player.North, Phase.End);
+        cards = withinHand().queryAllByRole('button');
+        if (cards.length > 0) fireEvent.click(cards[0]);
+        expect(
+          withinHand().getAllByRole('region').length,
+        ).toBeGreaterThanOrEqual(initialCount);
+
+        advanceToPhase(Player.South, Phase.Start);
+        cards = withinHand().queryAllByRole('button');
+        if (cards.length > 0) fireEvent.click(cards[0]);
+        expect(
+          withinHand().getAllByRole('region').length,
+        ).toBeGreaterThanOrEqual(initialCount);
+      });
+
+      it('should allow cards to be played until the hand is empty', () => {
+        advanceToPhase(Player.South, Phase.Main);
+
+        const initialCount = withinHand().getAllByRole('region').length;
+        for (let i = 0; i < initialCount; i += 1) {
+          fireEvent.click(withinHand().getAllByRole('button')[0]);
+          expect(withinHand().queryAllByRole('region')).toHaveLength(
+            initialCount - i - 1,
           );
-        });
+        }
+        expect(withinHand().queryByRole('button')).not.toBeInTheDocument();
+      });
+    });
+  });
 
-        it('should have the south home field', () => {
-          const [_, homeZone] = within(
-            withinPlayArea().getAllByRole('row')[ROW_COUNT - 1],
-          ).getAllByRole('gridcell');
-          expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
-            'South owned Basic Field',
-          );
-        });
+  describe('Play area', () => {
+    const ROW_COUNT = 6;
+    const ROW_COUNT_PER_PLAYER = 3;
+    const FIELD_COUNT_PER_ROW = 3;
+
+    const withinMain = () => within(screen.getByRole('main'));
+    const withinPlayArea = () => within(withinMain().getByRole('grid'));
+
+    it('should be in the main content area', () => {
+      expect(withinMain().getByRole('grid')).toBeVisible();
+    });
+
+    describe('The initial placement of fields', () => {
+      it('should have 18 fields in 6 rows of 3', () => {
+        const rows = withinPlayArea().getAllByRole('row');
+        expect(rows).toHaveLength(ROW_COUNT);
+        for (const row of rows) {
+          const fields = within(row).getAllByRole('gridcell');
+          expect(fields).toHaveLength(FIELD_COUNT_PER_ROW);
+          for (const field of fields) {
+            expect(field).toBeVisible();
+          }
+        }
+      });
+
+      it('should have north fields in the top 3 rows', () => {
+        const southRows = withinPlayArea()
+          .getAllByRole('row')
+          .slice(0, ROW_COUNT_PER_PLAYER);
+        for (const row of southRows) {
+          for (const zone of within(row).getAllByRole('gridcell')) {
+            const card = within(zone).getByRole('region');
+            expect(card).toHaveAccessibleName(/North owned/);
+          }
+        }
+      });
+
+      it('should have south fields in the bottom 3 rows', () => {
+        const southRows = withinPlayArea()
+          .getAllByRole('row')
+          .slice(ROW_COUNT_PER_PLAYER);
+        for (const row of southRows) {
+          for (const zone of within(row).getAllByRole('gridcell')) {
+            const card = within(zone).getByRole('region');
+            expect(card).toHaveAccessibleName(/South owned/);
+          }
+        }
+      });
+
+      it('should have the north home field', () => {
+        const [_, homeZone] = within(
+          withinPlayArea().getAllByRole('row')[0],
+        ).getAllByRole('gridcell');
+        expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
+          'North owned Basic Field',
+        );
+      });
+
+      it('should have the south home field', () => {
+        const [_, homeZone] = within(
+          withinPlayArea().getAllByRole('row')[ROW_COUNT - 1],
+        ).getAllByRole('gridcell');
+        expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
+          'South owned Basic Field',
+        );
       });
     });
   });

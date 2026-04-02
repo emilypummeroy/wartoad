@@ -2,6 +2,8 @@ import './App.css';
 import { StepForward, Pyramid } from 'lucide-react';
 import { useCallback, useId, useState } from 'react';
 
+import { Hand } from './Hand';
+
 export const INITIAL_HAND_CARD_COUNT = 7;
 export const BIG_HAND_CARD_COUNT = 12;
 
@@ -88,53 +90,6 @@ function SouthHomeBasicField() {
   );
 }
 
-type HandCardProps = {
-  readonly isPlayerTurn: boolean;
-  readonly isMainPhase: boolean;
-  readonly playCard: () => void;
-};
-function HandCard({ isPlayerTurn, isMainPhase, playCard }: HandCardProps) {
-  const id = useId();
-  return isPlayerTurn ? (
-    <div className="stacking jiggling">
-      <button
-        className="pickable-card"
-        disabled={!isMainPhase}
-        onClick={playCard}
-      >
-        <section aria-labelledby={id} className="card">
-          <div id={id}>Basic Field</div>
-          <div className="card-line">
-            <div>
-              <small>Cost:</small>0
-            </div>
-            <div>
-              <small>Gives:</small>+0
-            </div>
-          </div>
-          <div>Home field</div>
-        </section>
-      </button>
-    </div>
-  ) : (
-    <div className="stacking ">
-      <button className="pickable-card" disabled>
-        <section aria-labelledby={id} className="facedown card">
-          <Pyramid>
-            <title id={id}>Facedown card</title>
-          </Pyramid>
-        </section>
-      </button>
-    </div>
-  );
-}
-
-export const styleForHandSize = (n: number): string => {
-  if (n <= INITIAL_HAND_CARD_COUNT) return '';
-  if (n <= BIG_HAND_CARD_COUNT) return 'compact';
-  return 'super-compact';
-};
-
 // oxlint-disable max-lines-per-function
 // oxlint-disable react/jsx-max-depth
 // To be refactored later
@@ -165,14 +120,6 @@ export function App() {
     }
   }, [player, phase, northHand, southHand]);
 
-  const playNorthCard = useCallback(() => {
-    setNorthHand(northHand - 1);
-  }, [northHand]);
-
-  const playSouthCard = useCallback(() => {
-    setSouthHand(southHand - 1);
-  }, [southHand]);
-
   return (
     <div className="wartide-app">
       <header>
@@ -200,64 +147,24 @@ export function App() {
       </header>
       <main>
         <section className="handarea">
-          <section className="hand" aria-labelledby="north-hand">
-            <h3 id="north-hand" className="north">
-              North hand
-            </h3>
-            {player === Player.North ? (
-              <div
-                className={`jiggle-row ${styleForHandSize(northHand)}`}
-                key="north-hand-cards"
-              >
-                {Array.from({ length: northHand }, (_, i) => (
-                  <HandCard
-                    key={i}
-                    isPlayerTurn
-                    isMainPhase={phase === Phase.Main}
-                    playCard={playNorthCard}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div
-                className={`splay-row ${styleForHandSize(northHand)}`}
-                key="north-hand-cards"
-              >
-                {Array.from({ length: northHand }, (_, i) => (
-                  <HandCard key={i} isPlayerTurn={false} playCard={() => {}} />
-                ))}
-              </div>
-            )}
-          </section>
-          <section className="hand" aria-labelledby="south-hand">
-            <h3 id="south-hand" className="south">
-              South hand
-            </h3>
-            {player === Player.South ? (
-              <div
-                className={`jiggle-row ${styleForHandSize(southHand)}`}
-                key="south-player-hand"
-              >
-                {Array.from({ length: southHand }, (_, i) => (
-                  <HandCard
-                    key={i}
-                    isPlayerTurn
-                    isMainPhase={phase === Phase.Main}
-                    playCard={playSouthCard}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div
-                className={`splay-row ${styleForHandSize(southHand)}`}
-                key="south-player-hand"
-              >
-                {Array.from({ length: southHand }, (_, i) => (
-                  <HandCard key={i} isPlayerTurn={false} playCard={() => {}} />
-                ))}
-              </div>
-            )}
-          </section>
+          <Hand
+            player={Player.North}
+            isMainPhase={phase === Phase.Main}
+            isPlayerTurn={player === Player.North}
+            handSize={northHand}
+            playCard={useCallback(() => {
+              setNorthHand(northHand - 1);
+            }, [northHand])}
+          />
+          <Hand
+            player={Player.South}
+            isMainPhase={phase === Phase.Main}
+            isPlayerTurn={player === Player.South}
+            handSize={southHand}
+            playCard={useCallback(() => {
+              setSouthHand(southHand - 1);
+            }, [southHand])}
+          />
         </section>
         <div className="scroll-x">
           <section className="playarea">
