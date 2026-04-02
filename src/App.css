@@ -386,6 +386,15 @@ span.south {
   font-size: 1.4svh;
   line-height: 2.1svh;
 
+  transition: scale 100ms ease;
+  transition: translate 100ms ease;
+  scale: 1 1;
+  translate: 0;
+  @starting-style {
+    scale: 0 1;
+    translate: -50svw;
+  }
+
   small {
     font-size: 0.9svh;
     display: block;

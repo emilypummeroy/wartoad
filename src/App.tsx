@@ -88,26 +88,12 @@ function SouthHomeBasicField() {
   );
 }
 
-function HandFacedownCard() {
+function HandCard({ isPlayerTurn }: { readonly isPlayerTurn: boolean }) {
   const id = useId();
-  return (
-    <div className="stacking ">
-      <section aria-labelledby={id} className="facedown card">
-        <Pyramid>
-          <title id={id}>Facedown card</title>
-        </Pyramid>
-      </section>
-    </div>
-  );
-}
-
-function HandBasicField() {
-  const nameId = useId();
-  const symbolId = useId();
-  return (
+  return isPlayerTurn ? (
     <div className="stacking jiggling">
-      <section aria-labelledby={`${symbolId} ${nameId}`} className="card">
-        <div id={nameId}>Basic Field</div>
+      <section aria-labelledby={id} className="card">
+        <div id={id}>Basic Field</div>
         <div className="card-line">
           <div>
             <small>Cost:</small>0
@@ -117,6 +103,14 @@ function HandBasicField() {
           </div>
         </div>
         <div>Home field</div>
+      </section>
+    </div>
+  ) : (
+    <div className="stacking ">
+      <section aria-labelledby={id} className="facedown card">
+        <Pyramid>
+          <title id={id}>Facedown card</title>
+        </Pyramid>
       </section>
     </div>
   );
@@ -190,15 +184,21 @@ export function App() {
               North hand
             </h3>
             {player === Player.North ? (
-              <div className={`jiggle-row ${styleForHandSize(northHand)}`}>
+              <div
+                className={`jiggle-row ${styleForHandSize(northHand)}`}
+                key="north-hand-cards"
+              >
                 {Array.from({ length: northHand }, (_, i) => (
-                  <HandBasicField key={i} />
+                  <HandCard key={i} isPlayerTurn />
                 ))}
               </div>
             ) : (
-              <div className={`splay-row ${styleForHandSize(northHand)}`}>
+              <div
+                className={`splay-row ${styleForHandSize(northHand)}`}
+                key="north-hand-cards"
+              >
                 {Array.from({ length: northHand }, (_, i) => (
-                  <HandFacedownCard key={i} />
+                  <HandCard key={i} isPlayerTurn={false} />
                 ))}
               </div>
             )}
@@ -208,15 +208,21 @@ export function App() {
               South hand
             </h3>
             {player === Player.South ? (
-              <div className={`jiggle-row ${styleForHandSize(southHand)}`}>
+              <div
+                className={`jiggle-row ${styleForHandSize(southHand)}`}
+                key="south-player-hand"
+              >
                 {Array.from({ length: southHand }, (_, i) => (
-                  <HandBasicField key={i} />
+                  <HandCard key={i} isPlayerTurn />
                 ))}
               </div>
             ) : (
-              <div className={`splay-row ${styleForHandSize(southHand)}`}>
+              <div
+                className={`splay-row ${styleForHandSize(southHand)}`}
+                key="south-player-hand"
+              >
                 {Array.from({ length: southHand }, (_, i) => (
-                  <HandFacedownCard key={i} />
+                  <HandCard key={i} isPlayerTurn={false} />
                 ))}
               </div>
             )}
