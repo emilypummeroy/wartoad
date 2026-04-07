@@ -8,7 +8,6 @@ import {
   BIG_HAND_CARD_COUNT,
 } from './Hand';
 
-const FEW = 3;
 const MANY = 15;
 
 describe(styleForHandSize, () => {
@@ -51,17 +50,23 @@ describe(Hand, () => {
     const withinHand = () =>
       within(screen.getByRole('region', { name: `${player} hand` }));
 
-    const playCard = vi.fn<() => void>();
+    const pickCard = vi.fn<() => void>();
 
-    describe.for(Object.keys(Phase))(`during the ${player} %s phase`, phase => {
+    describe.for<[Phase, boolean]>([
+      [Phase.Start, true],
+      [Phase.Main, false],
+      [Phase.Main, true],
+      [Phase.End, false],
+    ])(`during the ${player} %s phase (placing:%s)`, ([phase, isPlacing]) => {
       it(`should render with ${handSize} cards for ${player}`, () => {
         render(
           <Hand
             player={player}
             handSize={handSize}
+            isPlacing={isPlacing}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn
-            playCard={playCard}
+            pickCard={pickCard}
           />,
         );
         expect(
@@ -73,79 +78,103 @@ describe(Hand, () => {
       });
     });
 
-    it(`should allow cards to be played during the ${player} Main phase`, () => {
+    it(`should allow cards to be picked during the ${player} Main phase`, () => {
       render(
         <Hand
           player={player}
           handSize={handSize}
+          isPlacing={false}
           isMainPhase
           isPlayerTurn
-          playCard={playCard}
+          pickCard={pickCard}
         />,
       );
       const clickableCards = withinHand().getAllByRole('button');
       for (const card of clickableCards) {
         fireEvent.click(card);
-        expect(playCard).toHaveBeenCalledOnce();
-        playCard.mockClear();
+        expect(pickCard).toHaveBeenCalledOnce();
+        pickCard.mockClear();
       }
     });
 
-    it(`should not allow cards to be played during the ${player} non-Main phase`, () => {
+    it(`should not allow cards to be picked during the ${player} non-Main phase`, () => {
       render(
         <Hand
           player={player}
           handSize={handSize}
+          isPlacing={false}
           isMainPhase={false}
           isPlayerTurn
-          playCard={playCard}
+          pickCard={pickCard}
         />,
       );
       const clickableCards = withinHand().queryAllByRole('button');
       for (const card of clickableCards) {
         fireEvent.click(card);
       }
-      expect(playCard).not.toHaveBeenCalled();
+      expect(pickCard).not.toHaveBeenCalled();
     });
 
-    describe.for(Object.keys(Phase))(
-      "during the opponent's %s phase",
-      phase => {
-        it(`should show ${handSize} card backs`, () => {
-          render(
-            <Hand
-              player={player}
-              handSize={handSize}
-              isMainPhase={phase === Phase.Main}
-              isPlayerTurn={false}
-              playCard={playCard}
-            />,
-          );
-          expect(
-            withinHand().queryByRole('region', { name: 'Basic Field' }),
-          ).not.toBeInTheDocument();
-          expect(
-            withinHand().getAllByRole('region', { name: 'Facedown card' }),
-          ).toHaveLength(handSize);
-        });
+    it(`should not allow cards to be picked during the ${player} Main phase while placing a card`, () => {
+      render(
+        <Hand
+          player={player}
+          handSize={handSize}
+          isPlacing
+          isMainPhase
+          isPlayerTurn
+          pickCard={pickCard}
+        />,
+      );
+      const clickableCards = withinHand().queryAllByRole('button');
+      for (const card of clickableCards) {
+        fireEvent.click(card);
+      }
+      expect(pickCard).not.toHaveBeenCalled();
+    });
 
-        it('should not allow cards to be played', () => {
-          render(
-            <Hand
-              player={player}
-              handSize={FEW}
-              isMainPhase={phase === Phase.Main}
-              isPlayerTurn={false}
-              playCard={playCard}
-            />,
-          );
-          const clickableCards = withinHand().queryAllByRole('button');
-          for (const card of clickableCards) {
-            fireEvent.click(card);
-            expect(playCard).not.toHaveBeenCalled();
-          }
-        });
-      },
-    );
+    describe.for<[Phase, boolean]>([
+      [Phase.Start, true],
+      [Phase.Main, false],
+      [Phase.Main, true],
+      [Phase.End, false],
+    ])(`during the opponent's %s phase (placing:%s)`, ([phase, isPlacing]) => {
+      it(`should show ${handSize} card backs`, () => {
+        render(
+          <Hand
+            player={player}
+            handSize={handSize}
+            isPlacing={isPlacing}
+            isMainPhase={phase === Phase.Main}
+            isPlayerTurn={false}
+            pickCard={pickCard}
+          />,
+        );
+        expect(
+          withinHand().queryByRole('region', { name: 'Basic Field' }),
+        ).not.toBeInTheDocument();
+        expect(
+          withinHand().getAllByRole('region', { name: 'Facedown card' }),
+        ).toHaveLength(handSize);
+      });
+
+      it('should not allow cards to be picked', () => {
+        render(
+          <Hand
+            player={player}
+            handSize={handSize}
+            isPlacing={isPlacing}
+            isMainPhase={phase === Phase.Main}
+            isPlayerTurn={false}
+            pickCard={pickCard}
+          />,
+        );
+        const clickableCards = withinHand().queryAllByRole('button');
+        for (const card of clickableCards) {
+          fireEvent.click(card);
+          expect(pickCard).not.toHaveBeenCalled();
+        }
+      });
+    });
   });
 });

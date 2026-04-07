@@ -7,12 +7,6 @@ import { Player } from './App';
 export const INITIAL_HAND_CARD_COUNT = 7;
 export const BIG_HAND_CARD_COUNT = 12;
 
-type HandCardProps = {
-  readonly isPlayerTurn: boolean;
-  readonly isMainPhase: boolean;
-  readonly playCard: () => void;
-};
-
 const BasicField = () => {
   const id = useId();
   return (
@@ -42,13 +36,18 @@ const Facedown = () => {
   );
 };
 
-function HandCard({ isPlayerTurn, isMainPhase, playCard }: HandCardProps) {
+type HandCardProps = Readonly<{
+  isPlayerTurn: boolean;
+  isDisabled: boolean;
+  pickCard: () => void;
+}>;
+function HandCard({ isPlayerTurn, isDisabled, pickCard }: HandCardProps) {
   return isPlayerTurn ? (
     <div className="stacking jiggling">
       <button
         className="pickable-card"
-        disabled={!isMainPhase}
-        onClick={playCard}
+        disabled={isDisabled}
+        onClick={pickCard}
       >
         <BasicField />
       </button>
@@ -66,20 +65,22 @@ export const styleForHandSize = (n: number): string => {
   return 'super-compact';
 };
 
-type HandProps = {
-  readonly player: Player;
-  readonly isMainPhase: boolean;
-  readonly isPlayerTurn: boolean;
-  readonly handSize: number;
-  readonly playCard: () => void;
-};
+type HandProps = Readonly<{
+  player: Player;
+  isMainPhase: boolean;
+  isPlayerTurn: boolean;
+  isPlacing: boolean;
+  handSize: number;
+  pickCard: () => void;
+}>;
 
 export function Hand({
   player,
   isMainPhase,
   isPlayerTurn,
+  isPlacing,
   handSize,
-  playCard,
+  pickCard,
 }: HandProps) {
   const id = useId();
   const titleStyle = {
@@ -98,9 +99,9 @@ export function Hand({
         {Array.from({ length: handSize }, (_, i) => (
           <HandCard
             key={i}
+            isDisabled={!isMainPhase || isPlacing}
             isPlayerTurn={isPlayerTurn}
-            isMainPhase={isMainPhase}
-            playCard={playCard}
+            pickCard={pickCard}
           />
         ))}
       </div>

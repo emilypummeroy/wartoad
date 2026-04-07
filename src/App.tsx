@@ -1,11 +1,13 @@
 import './App.css';
-import { StepForward, Pyramid } from 'lucide-react';
-import { useCallback, useId, useState } from 'react';
+import { HousePlus, Replace, StepForward, Pyramid } from 'lucide-react';
+import { useCallback, useId, useState, type ReactNode } from 'react';
 
 import { Hand } from './Hand';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
-export const BIG_HAND_CARD_COUNT = 12;
+export const ROW_COUNT = 6;
+export const ROW_COUNT_PER_PLAYER = 3;
+export const FIELD_COUNT_PER_ROW = 3;
 
 export const Phase = {
   Start: 'Start',
@@ -35,7 +37,7 @@ function NorthFacedownCard() {
   return (
     <section aria-labelledby={id} className="facedown card north">
       <Pyramid>
-        <title id={id}>North owned</title>
+        <title id={id}>North controlled empty field</title>
       </Pyramid>
     </section>
   );
@@ -46,13 +48,13 @@ function SouthFacedownCard() {
   return (
     <section aria-labelledby={id} className="facedown card south">
       <Pyramid>
-        <title id={id}>South owned</title>
+        <title id={id}>South controlled empty field</title>
       </Pyramid>
     </section>
   );
 }
 
-function NorthHomeBasicField() {
+function NorthBasicField() {
   const nameId = useId();
   const symbolId = useId();
   return (
@@ -66,7 +68,25 @@ function NorthHomeBasicField() {
           <small>Gives:</small>+0
         </div>
       </div>
-      <div>Home field</div>
+      <div className="card-line" />
+    </section>
+  );
+}
+function NorthHomeBasicField() {
+  const nameId = useId();
+  const symbolId = useId();
+  return (
+    <section aria-labelledby={`${symbolId} ${nameId}`} className="card north">
+      <div id={nameId}>Basic Field</div>
+      <div className="card-line">
+        <HousePlus>
+          <title id={symbolId}>North Home</title>
+        </HousePlus>
+        <div>
+          <small>Gives:</small>+0
+        </div>
+      </div>
+      <div className="card-line" />
     </section>
   );
 }
@@ -78,17 +98,59 @@ function SouthHomeBasicField() {
     <section aria-labelledby={`${symbolId} ${nameId}`} className="card south">
       <div id={nameId}>Basic Field</div>
       <div className="card-line">
-        <Pyramid>
-          <title id={symbolId}>South owned</title>
-        </Pyramid>
+        <HousePlus>
+          <title id={symbolId}>South Home</title>
+        </HousePlus>
         <div>
           <small>Gives:</small>+0
         </div>
       </div>
-      <div>Home field</div>
+      <div className="card-line" />
     </section>
   );
 }
+
+type ZoneProps = Readonly<{
+  children: ReactNode;
+  controller: Player;
+  isPlacing: boolean;
+  onPlace: () => void;
+}>;
+
+function Zone({ children, controller, isPlacing, onPlace }: ZoneProps) {
+  const buttonId = useId();
+  return (
+    <button className="placeable-zone" disabled={!isPlacing} onClick={onPlace}>
+      <div
+        className={`zone ${controller === Player.North ? 'north' : 'south'}`}
+        role="gridcell"
+      >
+        {isPlacing && (
+          <div className="overlay-container">
+            <Replace id={buttonId}>
+              <title>Place on</title>
+            </Replace>
+          </div>
+        )}
+        {children}
+      </div>
+    </button>
+  );
+}
+
+type GridState = readonly [
+  readonly [boolean, boolean, boolean],
+  readonly [boolean, boolean, boolean],
+  readonly [boolean, boolean, boolean],
+  readonly [boolean, boolean, boolean],
+  readonly [boolean, boolean, boolean],
+  readonly [boolean, boolean, boolean],
+];
+
+const isGridState = (
+  array: readonly (readonly boolean[])[],
+): array is GridState =>
+  array.length === ROW_COUNT && array.every(row => row.length === 3);
 
 // oxlint-disable max-lines-per-function
 // oxlint-disable react/jsx-max-depth
@@ -105,6 +167,15 @@ export function App() {
   });
   const [southHand, setSouthHand] = useState(INITIAL_HAND_CARD_COUNT);
   const [northHand, setNorthHand] = useState(INITIAL_HAND_CARD_COUNT);
+  const [isPlacing, setIsPlacing] = useState(false);
+  const [placedCards, setPlacedCards] = useState<GridState>([
+    [false, true, false],
+    [false, false, false],
+    [false, false, false],
+    [false, false, false],
+    [false, false, false],
+    [false, true, false],
+  ]);
 
   const setNextPhase = useCallback(() => {
     const next = {
@@ -119,6 +190,21 @@ export function App() {
       setSouthHand(southHand + 1);
     }
   }, [player, phase, northHand, southHand]);
+
+  const handlePickCard = useCallback(() => setIsPlacing(true), [setIsPlacing]);
+  const handlePlaceCard = (zoneX: number, zoneY: number) => () => {
+    setIsPlacing(false);
+    setNorthHand(n => n - 1);
+    setPlacedCards((old: GridState) => {
+      const array = old.map((row, j) =>
+        j === zoneY ? row.map((p, i) => (i === zoneX ? true : p)) : row,
+      );
+      if (!isGridState(array)) {
+        throw new Error(`Expected a GridState but got: ${String(array)}`);
+      }
+      return array;
+    });
+  };
 
   return (
     <div className="wartide-app">
@@ -151,17 +237,17 @@ export function App() {
             player={Player.North}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.North}
+            isPlacing={isPlacing}
             handSize={northHand}
-            playCard={useCallback(() => {
-              setNorthHand(northHand - 1);
-            }, [northHand])}
+            pickCard={handlePickCard}
           />
           <Hand
             player={Player.South}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.South}
+            isPlacing={isPlacing}
             handSize={southHand}
-            playCard={useCallback(() => {
+            pickCard={useCallback(() => {
               setSouthHand(southHand - 1);
             }, [southHand])}
           />
@@ -169,39 +255,49 @@ export function App() {
         <div className="scroll-x">
           <section className="playarea">
             <div role="grid">
-              <div className="zonerow" role="row">
-                <div className="zone north" role="gridcell">
-                  <NorthFacedownCard />
-                </div>
-                <div className="zone north" role="gridcell">
-                  <NorthHomeBasicField />
-                </div>
-                <div className="zone north" role="gridcell">
-                  <NorthFacedownCard />
-                </div>
-              </div>
-              <div className="zonerow" role="row">
-                <div className="zone north" role="gridcell">
-                  <NorthFacedownCard />
-                </div>
-                <div className="zone north" role="gridcell">
-                  <NorthFacedownCard />
-                </div>
-                <div className="zone north" role="gridcell">
-                  <NorthFacedownCard />
-                </div>
-              </div>
-              <div className="zonerow" role="row">
-                <div className="zone north" role="gridcell">
-                  <NorthFacedownCard />
-                </div>
-                <div className="zone north" role="gridcell">
-                  <NorthFacedownCard />
-                </div>
-                <div className="zone north" role="gridcell">
-                  <NorthFacedownCard />
-                </div>
-              </div>
+              {placedCards
+                .slice(0, ROW_COUNT_PER_PLAYER)
+                .map(([isLeftPlaced, isMiddlePlaced, isRightPlaced], rowY) => (
+                  // The grid of field zones never gets rearranged
+                  // oxlint-disable-next-line react/no-array-index-key
+                  <div className="zonerow" role="row" key={rowY}>
+                    <Zone
+                      controller={Player.North}
+                      isPlacing={!isLeftPlaced && isPlacing}
+                      onPlace={handlePlaceCard(0, rowY)}
+                    >
+                      {isLeftPlaced ? (
+                        <NorthBasicField />
+                      ) : (
+                        <NorthFacedownCard />
+                      )}
+                    </Zone>
+                    <Zone
+                      controller={Player.North}
+                      isPlacing={!isMiddlePlaced && isPlacing}
+                      onPlace={handlePlaceCard(1, rowY)}
+                    >
+                      {!isMiddlePlaced ? (
+                        <NorthFacedownCard />
+                      ) : rowY === 0 ? (
+                        <NorthHomeBasicField />
+                      ) : (
+                        <NorthBasicField />
+                      )}
+                    </Zone>
+                    <Zone
+                      controller={Player.North}
+                      isPlacing={!isRightPlaced && isPlacing}
+                      onPlace={handlePlaceCard(2, rowY)}
+                    >
+                      {isRightPlaced ? (
+                        <NorthBasicField />
+                      ) : (
+                        <NorthFacedownCard />
+                      )}
+                    </Zone>
+                  </div>
+                ))}
               <div className="zonerow" role="row">
                 <div className="zone south" role="gridcell">
                   <SouthFacedownCard />

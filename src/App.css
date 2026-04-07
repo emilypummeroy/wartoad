@@ -24,10 +24,11 @@
   --south-bg: lch(90% 26 280);
   --north-bg: lch(93% 20 25);
 
-  --animation-smooth: 300ms ease-in-out;
+  --animation-smooth: 300ms ease-out;
   --animation-fast: 150ms ease-out;
 
   --z-index-hand: 10;
+  --z-index-playarea-overlay: 20;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -57,10 +58,23 @@
   flex-direction: column;
   box-sizing: border-box;
   border: 1px solid var(--border);
+
+  font-size: 1.5svh;
+  line-height: 1.5svh;
+  h1 {
+    font-size: 3svh;
+    line-height: 3svh;
+    margin: 1svh 0;
+  }
+  h3 {
+    font-size: 2svh;
+    line-height: 2svh;
+    margin: 1svh 0;
+  }
 }
 
 header {
-  height: 90px;
+  height: 6svh;
   max-width: 100%;
 
   display: flex;
@@ -73,22 +87,28 @@ header {
     var(--accent-bg),
     rgba(0, 0, 0, 0)
   );
-}
-@media (max-width: 1024px) {
-  header {
-    height: 5em;
+
+  button.icon-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4svh;
+    height: 4svh;
+    min-width: 4svh;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 1.5svh;
+    svg {
+      width: 3svh;
+      height: 3svh;
+    }
   }
 }
-@media (max-height: 600px) {
-  header {
-    height: 3em;
-    h1 {
-      margin: 0;
-      font-size: 1.5em;
-    }
-    h3 {
-      font-size: 1em;
-    }
+
+button.accent {
+  background: var(--accent-bg);
+
+  &:hover {
+    filter: brightness(150%);
   }
 }
 
@@ -112,7 +132,7 @@ main {
   justify-content: space-between;
   gap: 1svh;
 }
-@media (max-aspect-ratio: 1.1) {
+@media (max-aspect-ratio: 1.2) {
   .handarea {
     min-width: 20svh;
   }
@@ -126,7 +146,7 @@ main {
 
 .playarea {
   min-width: fit-content;
-  margin: 0 2svh;
+  margin: 0 1svh;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -141,10 +161,6 @@ main {
 
   h1 {
     text-align: left;
-  }
-
-  @media (max-width: 1024px) {
-    padding: 0 24px;
   }
 }
 
@@ -169,10 +185,6 @@ span.south {
   gap: 9px;
 
   padding: 0 36px;
-
-  @media (max-width: 1024px) {
-    padding: 0 24px;
-  }
 }
 
 .hand {
@@ -208,7 +220,7 @@ span.south {
       margin-left: -6svh;
     }
   }
-  @media (max-aspect-ratio: 1.1) {
+  @media (max-aspect-ratio: 1.2) {
     margin-left: 6.5svh;
     .stacking {
       margin-left: -6.5svh;
@@ -276,7 +288,7 @@ span.south {
     }
   }
 
-  @media (max-aspect-ratio: 1.1) {
+  @media (max-aspect-ratio: 1.2) {
     margin-left: 6.5svh;
     .stacking {
       margin-left: -6.5svh;
@@ -360,34 +372,37 @@ span.south {
 }
 
 .zonerow {
+  box-sizing: border-box;
+  height: 15svh;
   width: fit-content;
+
   display: flex;
-  gap: 4svh;
-  height: 13svh;
+  gap: 3svh;
   align-items: center;
 }
 
 .zone {
-  height: 11svh;
-  width: 13svh;
+  box-sizing: border-box;
+  height: 14svh;
+  width: 20svh;
 
   padding: 0.5svh;
   border-radius: 0.5svh;
 
   &.south {
-    border: 1px solid var(--south-outline-accent);
+    border: 1px solid var(--south-outline);
     background: var(--south-bg);
 
     &:hover {
-      outline: 1px solid var(--south-accent);
+      outline: 1px solid var(--south-outline-accent);
     }
   }
 
   &.north {
-    border: 1px solid var(--north-outline-accent);
+    border: 1px solid var(--north-outline);
     background: var(--north-bg);
     &:hover {
-      outline: 1px solid var(--north-accent);
+      outline: 1px solid var(--north-outline-accent);
     }
   }
 }
@@ -397,11 +412,52 @@ button.pickable-card {
   margin: 0;
   border: none;
   outline: none;
+
+  &:enabled {
+    cursor: grab;
+  }
+}
+button.placeable-zone {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+
+  &:enabled {
+    &:hover {
+      filter: brightness(130%);
+    }
+    cursor: pointer;
+
+    .overlay-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background: var(--bg-transparent);
+      opacity: 50%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      z-index: var(--z-index-playarea-overlay);
+
+      > svg {
+        color: var(--text-h);
+        height: 12svh;
+        width: 12svh;
+      }
+    }
+  }
 }
 
 .card {
   text-align: center;
 
+  box-sizing: border-box;
   height: 11.5svh;
   aspect-ratio: 63 / 88;
   border-radius: 0.4svh;
@@ -433,6 +489,7 @@ button.pickable-card {
   }
 
   .card-line {
+    box-sizing: border-box;
     display: flex;
     padding: 0.2svh;
     gap: 0.2svh;

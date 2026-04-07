@@ -19,10 +19,13 @@
     ],
     "id-length": "allow",
     "no-ternary": "allow",
+    "no-nested-ternary": "allow",
+    "unicorn/no-nested-ternary": "allow",
+    "no-negated-condition": "allow",
     "no-magic-numbers": [
       "warn",
       {
-        "ignore": [-1, 0, 1]
+        "ignore": [-1, 0, 1, 2, 3]
       }
     ],
     "consistent-type-definitions": ["error", "type"],
@@ -49,6 +52,14 @@
               "pascalCase": true
             },
             "ignore": "^main.tsx$"
+          }
+        ],
+        "prefer-readonly-parameter-types": [
+          "warn",
+          {
+            "allow": [
+              { "from": "package", "name": "ReactNode", "package": "react" }
+            ]
           }
         ],
         "react-in-jsx-scope": "allow",
