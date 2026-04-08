@@ -88,28 +88,62 @@ header {
     var(--accent-bg),
     rgba(0, 0, 0, 0)
   );
+}
 
-  button.icon-text {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4svh;
-    height: 4svh;
-    min-width: 4svh;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 1.5svh;
-    svg {
-      width: 3svh;
-      height: 3svh;
+button {
+  font-size: 1.5svh;
+  border-radius: 0.5svh;
+  border: 1px solid var(--border);
+  outline-offset: 1px;
+  &:enabled {
+    cursor: pointer;
+    &:hover {
+      outline: 1px solid var(--accent-border);
+      &.north {
+        outline: 1px solid var(--north-outline-accent);
+      }
+      &.south {
+        outline: 1px solid var(--south-outline-accent);
+      }
     }
+    &:focus {
+      outline: 2px solid var(--accent);
+      &.south {
+        outline: 2px solid var(--south-accent);
+      }
+      &.north {
+        outline: 2px solid var(--north-accent);
+      }
+    }
+  }
+}
+
+button.icon-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5svh;
+  height: 4svh;
+  min-width: 4svh;
+  svg {
+    width: 3svh;
+    height: 3svh;
   }
 }
 
 button.accent {
   background: var(--accent-bg);
+  &:enabled:hover {
+    background: var(--accent-bg-solid);
+  }
+}
 
-  &:hover {
-    filter: brightness(150%);
+button.pickable-card {
+  padding: 0;
+  margin: 0;
+  border: none;
+
+  &:enabled {
+    cursor: grab;
   }
 }
 
@@ -124,6 +158,7 @@ main {
 
   background: var(--bg-solid);
 
+  width: fit-content;
   width: calc-size(fit-content);
   max-width: calc(100svw - 60svh);
 
@@ -207,9 +242,39 @@ span.south {
     transition:
       zoom var(--animation-fast-linear),
       translate var(--animation-fast-linear);
-    &:hover {
+    &:hover,
+    &:focus {
       zoom: 200%;
       translate: -0% -35%;
+    }
+
+    outline-offset: 1px;
+    border-radius: 0.5svh;
+
+    outline: 1px solid var(--border);
+    &.north {
+      outline-color: var(--north-outline);
+    }
+    &.south {
+      outline-color: var(--south-outline);
+    }
+    &:hover {
+      outline-color: var(--outline-accent);
+      &.north {
+        outline-color: var(--north-outline-accent);
+      }
+      &.south {
+        outline-color: var(--south-outline-accent);
+      }
+    }
+    &:focus {
+      outline-color: var(--accent);
+      &.south {
+        outline-color: var(--south-accent);
+      }
+      &.north {
+        outline-color: var(--north-accent);
+      }
     }
   }
 }
@@ -280,7 +345,7 @@ span.south {
 
 .jiggle-row {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   width: fit-content;
 
   transition: margin-left var(--animation-smooth);
@@ -327,12 +392,14 @@ span.south {
     }
   }
 
-  &:hover {
+  &:hover,
+  &:focus-within {
     .stacking {
       padding: 4svh 0svh 0svh;
       margin-top: -1svh;
 
-      &.jiggling:hover {
+      &.jiggling:hover,
+      &.jiggling:focus-within {
         padding: 0svh 3svh 4svh;
       }
       &:first-child:nth-last-child(1) {
@@ -343,14 +410,16 @@ span.south {
     }
   }
 
-  &:hover {
+  &:hover,
+  &:focus-within {
     margin-left: -1svh;
     .stacking {
       margin-left: -2svh;
       &:first-child:nth-last-child(1) {
         margin-left: 1svh;
       }
-      &.jiggling:hover {
+      &.jiggling:hover,
+      &.jiggling:focus {
         padding-left: 3svh;
         padding-right: 1svh;
         margin-right: 2svh;
@@ -363,22 +432,26 @@ span.south {
       }
     }
   }
-  &.compact:hover {
+  &.compact:hover,
+  &.compact:focus-within {
     margin-left: -2svh;
     .stacking {
       margin-left: -2svh;
-      &.jiggling:hover {
+      &.jiggling:hover,
+      &.jiggling:focus-within {
         padding-left: 3svh;
         padding-right: 1svh;
         margin-right: 2svh;
       }
     }
   }
-  &.super-compact:hover {
+  &.super-compact:hover,
+  &.super-compact:focus-within {
     margin-left: -1.5svh;
     .stacking {
       margin-left: -4.5svh;
-      &.jiggling:hover {
+      &.jiggling:hover,
+      &.jiggling:focus-within {
         padding-left: 5svh;
         padding-right: 0.5svh;
         margin-right: 4.5svh;
@@ -427,26 +500,22 @@ span.south {
   }
 }
 
-button.pickable-card {
-  padding: 0;
-  margin: 0;
-  border: none;
-  outline: none;
-
-  &:enabled {
-    cursor: grab;
-  }
-}
 button.placeable-zone {
   position: relative;
   padding: 0;
   margin: 0;
   border: none;
-  outline: none;
 
   &:enabled {
     &:hover {
-      filter: brightness(130%);
+      &:not(:focus) {
+        /* The underying zone provides a hover effect. */
+        outline: none;
+      }
+      filter: brightness(120%);
+      .overlay-container {
+        opacity: 80%;
+      }
     }
     cursor: pointer;
 

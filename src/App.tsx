@@ -223,6 +223,7 @@ export function App() {
           <button
             className="icon-text accent"
             aria-label="Next phase"
+            disabled={isPlacing}
             onClick={setNextPhase}
           >
             <StepForward />
@@ -244,7 +245,7 @@ export function App() {
             <section className="card-display" aria-labelledby="picked-card">
               <h3 id="picked-card">Picked card</h3>
               <div className="zoom-row">
-                <div className="zooming">
+                <div className="zooming north" tabIndex={0}>
                   <BasicField />
                 </div>
               </div>

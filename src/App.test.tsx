@@ -81,6 +81,20 @@ describe(App, () => {
         ).not.toBeInTheDocument();
       });
 
+      // TODO implement south card playing
+      it.skip('should not advance to the South End phase when the button is clicked while placing a card', () => {
+        fireEvent.click(withinSouthHand().getAllByRole('button')[5]);
+
+        fireEvent.click(screen.getByText('Next phase'));
+
+        expect(
+          withinHeader().getByRole('region', { name: 'South: Main phase' }),
+        ).toBeVisible();
+        expect(
+          screen.queryByLabelText('South: Main phase'),
+        ).not.toBeInTheDocument();
+      });
+
       it('should advance to the North Start phase when the button is clicked twice', () => {
         fireEvent.click(screen.getByText('Next phase'));
         fireEvent.click(screen.getByText('Next phase'));
@@ -103,6 +117,20 @@ describe(App, () => {
         ).toBeVisible();
         expect(
           screen.queryByLabelText('North: Start phase'),
+        ).not.toBeInTheDocument();
+      });
+
+      it('should not advance to the North End phase when the button is clicked while placing a card', () => {
+        advanceToPhase(Player.North, Phase.Main);
+        fireEvent.click(withinNorthHand().getAllByRole('button')[5]);
+
+        fireEvent.click(screen.getByText('Next phase'));
+
+        expect(
+          withinHeader().getByRole('region', { name: 'North: Main phase' }),
+        ).toBeVisible();
+        expect(
+          screen.queryByLabelText('North: End phase'),
         ).not.toBeInTheDocument();
       });
 

@@ -37,24 +37,24 @@ const Facedown = () => {
 };
 
 type HandCardProps = Readonly<{
-  isPlayerTurn: boolean;
-  isDisabled: boolean;
+  isEnabled: boolean;
+  player: Player;
   pickCard: () => void;
 }>;
-function HandCard({ isPlayerTurn, isDisabled, pickCard }: HandCardProps) {
-  return isPlayerTurn ? (
+function HandCard({ isEnabled, player, pickCard }: HandCardProps) {
+  const playerStyle = {
+    [Player.North]: 'north',
+    [Player.South]: 'south',
+  }[player];
+  return (
     <div className="stacking jiggling">
       <button
-        className="pickable-card"
-        disabled={isDisabled}
+        className={`pickable-card ${playerStyle}`}
+        disabled={!isEnabled}
         onClick={pickCard}
       >
         <BasicField />
       </button>
-    </div>
-  ) : (
-    <div className="stacking ">
-      <Facedown />
     </div>
   );
 }
@@ -83,27 +83,33 @@ export function Hand({
   pickCard,
 }: HandProps) {
   const id = useId();
-  const titleStyle = {
+  const playerStyle = {
     [Player.North]: 'north',
     [Player.South]: 'south',
   }[player];
 
   return (
     <section className="hand" aria-labelledby={id}>
-      <h3 id={id} className={titleStyle}>
+      <h3 id={id} className={playerStyle}>
         {player} hand
       </h3>
       <div
         className={`${isPlayerTurn ? 'jiggle-row' : 'splay-row'} ${styleForHandSize(handSize)}`}
       >
-        {Array.from({ length: handSize }, (_, i) => (
-          <HandCard
-            key={i}
-            isDisabled={!isMainPhase || isPlacing}
-            isPlayerTurn={isPlayerTurn}
-            pickCard={pickCard}
-          />
-        ))}
+        {Array.from({ length: handSize }, (_, i) =>
+          isPlayerTurn ? (
+            <HandCard
+              key={i}
+              player={player}
+              isEnabled={isMainPhase && !isPlacing}
+              pickCard={pickCard}
+            />
+          ) : (
+            <div key={i} className="stacking ">
+              <Facedown />
+            </div>
+          ),
+        )}
       </div>
     </section>
   );
