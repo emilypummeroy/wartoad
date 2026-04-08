@@ -10,6 +10,13 @@
     "nursery": "warn"
   },
   "rules": {
+    "capitalized-comments": [
+      "warn",
+      "always",
+      {
+        "ignorePattern": "v8"
+      }
+    ],
     "func-style": [
       "error",
       "declaration",
@@ -25,7 +32,8 @@
     "no-magic-numbers": [
       "warn",
       {
-        "ignore": [-1, 0, 1, 2, 3]
+        // 6 Rows in the play grid
+        "ignore": [-1, 0, 1, 2, 3, 4, 5, 6]
       }
     ],
     "consistent-type-definitions": ["error", "type"],
@@ -90,12 +98,6 @@
           "warn",
           {
             "max": 15
-          }
-        ],
-        "no-magic-numbers": [
-          "warn",
-          {
-            "ignore": [-1, 0, 1, 2]
           }
         ],
         "max-lines": [

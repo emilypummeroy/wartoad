@@ -198,6 +198,7 @@ export function App() {
         j === zoneY ? row.map((p, i) => (i === zoneX ? true : p)) : row,
       );
       if (!isGridState(array)) {
+        // v8 ignore next
         throw new Error(`Expected a GridState but got: ${String(array)}`);
       }
       return array;

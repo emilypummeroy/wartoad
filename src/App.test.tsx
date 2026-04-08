@@ -30,6 +30,7 @@ describe(App, () => {
     within(screen.getByRole('region', { name: `${Player.North} hand` }));
   const withinPickedCardDisplay = () =>
     within(screen.getByRole('region', { name: `Picked card` }));
+  const withinPlayArea = () => within(withinMain().getByRole('grid'));
 
   const advanceToPhase = (player: Player, phase: Phase) => {
     const pattern = new RegExp(`${player}: ${phase}`);
@@ -179,12 +180,6 @@ describe(App, () => {
       expect(north).toAppearBefore(south);
     });
 
-    it('should not show the picked card display before picking a card', () => {
-      expect(
-        screen.queryByRole('region', { name: 'Picked card' }),
-      ).not.toBeInTheDocument();
-    });
-
     it('should have both hands before the Play area', () => {
       const south = withinMain().getByRole('region', { name: 'South hand' });
       const north = withinMain().getByRole('region', { name: 'North hand' });
@@ -193,6 +188,44 @@ describe(App, () => {
       expect(south).toBeVisible();
       expect(north).toAppearBefore(playArea);
       expect(south).toAppearBefore(playArea);
+    });
+
+    describe('Picked Card', () => {
+      it('should not appear before picking a card', () => {
+        expect(
+          screen.queryByRole('region', { name: 'Picked card' }),
+        ).not.toBeInTheDocument();
+      });
+
+      it('should show a card picked during the North Main phase', () => {
+        advanceToPhase(Player.North, Phase.Main);
+
+        fireEvent.click(withinNorthHand().getAllByRole('button')[2]);
+
+        expect(
+          screen.getByRole('region', { name: 'Picked card' }),
+        ).toBeVisible();
+        expect(
+          withinPickedCardDisplay().getByRole('region', {
+            name: 'Basic Field',
+          }),
+        ).toBeVisible();
+      });
+
+      it('should not be visible after placing a North card', () => {
+        advanceToPhase(Player.North, Phase.Main);
+
+        fireEvent.click(withinNorthHand().getAllByRole('button')[2]);
+        fireEvent.click(
+          withinPlayArea().getAllByRole('button', {
+            name: /North controlled/,
+          })[3],
+        );
+
+        expect(
+          screen.queryByRole('region', { name: 'Picked card' }),
+        ).not.toBeInTheDocument();
+      });
     });
 
     describe('North hand', () => {
@@ -357,8 +390,6 @@ describe(App, () => {
   });
 
   describe('Play area', () => {
-    const withinPlayArea = () => within(withinMain().getByRole('grid'));
-
     it('should be in the main content area', () => {
       expect(withinMain().getByRole('grid')).toBeVisible();
     });
