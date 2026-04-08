@@ -25,9 +25,11 @@ describe(App, () => {
   const withinHeader = () => within(screen.getByRole('banner'));
   const withinMain = () => within(screen.getByRole('main'));
   const withinSouthHand = () =>
-    within(withinMain().getByRole('region', { name: `${Player.South} hand` }));
+    within(screen.getByRole('region', { name: `${Player.South} hand` }));
   const withinNorthHand = () =>
-    within(withinMain().getByRole('region', { name: `${Player.North} hand` }));
+    within(screen.getByRole('region', { name: `${Player.North} hand` }));
+  const withinPickedCardDisplay = () =>
+    within(screen.getByRole('region', { name: `Picked card` }));
 
   const advanceToPhase = (player: Player, phase: Phase) => {
     const pattern = new RegExp(`${player}: ${phase}`);
@@ -177,6 +179,12 @@ describe(App, () => {
       expect(north).toAppearBefore(south);
     });
 
+    it('should not show the picked card display before picking a card', () => {
+      expect(
+        screen.queryByRole('region', { name: 'Picked card' }),
+      ).not.toBeInTheDocument();
+    });
+
     it('should have both hands before the Play area', () => {
       const south = withinMain().getByRole('region', { name: 'South hand' });
       const north = withinMain().getByRole('region', { name: 'North hand' });
@@ -229,16 +237,19 @@ describe(App, () => {
         );
       });
 
-      // TODO fix this test
-      it.skip('should allow a card to be played from the hand by clicking during the North Main phase', () => {
+      it('should allow a card to be picked from the hand by clicking during the North Main phase', () => {
         advanceToPhase(Player.North, Phase.Main);
-        const initialCount = withinNorthHand().getAllByRole('region').length;
 
-        fireEvent.click(withinNorthHand().getAllByRole('button')[0]);
+        fireEvent.click(withinNorthHand().getAllByRole('button')[2]);
 
-        expect(withinNorthHand().getAllByRole('region')).toHaveLength(
-          initialCount - 1,
-        );
+        expect(
+          screen.getByRole('region', { name: 'Picked card' }),
+        ).toBeVisible();
+        expect(
+          withinPickedCardDisplay().getByRole('region', {
+            name: 'Basic Field',
+          }),
+        ).toBeVisible();
       });
 
       it('should not allow cards to played from the hand during other phases', () => {

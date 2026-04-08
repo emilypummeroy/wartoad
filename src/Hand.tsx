@@ -7,7 +7,7 @@ import { Player } from './App';
 export const INITIAL_HAND_CARD_COUNT = 7;
 export const BIG_HAND_CARD_COUNT = 12;
 
-const BasicField = () => {
+export const BasicField = () => {
   const id = useId();
   return (
     <section aria-labelledby={id} className="card">

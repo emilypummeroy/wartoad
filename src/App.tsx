@@ -2,7 +2,7 @@ import './App.css';
 import { HousePlus, Replace, StepForward, Pyramid } from 'lucide-react';
 import { useCallback, useId, useState, type ReactNode } from 'react';
 
-import { Hand } from './Hand';
+import { Hand, BasicField } from './Hand';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 export const ROW_COUNT = 6;
@@ -112,27 +112,25 @@ function SouthHomeBasicField() {
 
 type ZoneProps = Readonly<{
   children: ReactNode;
-  controller: Player;
+  isPlaced: boolean;
   isPlacing: boolean;
   onPlace: () => void;
 }>;
 
-function Zone({ children, controller, isPlacing, onPlace }: ZoneProps) {
+function NorthZone({ children, isPlaced, isPlacing, onPlace }: ZoneProps) {
   const buttonId = useId();
+  const isDropzone = isPlacing && !isPlaced;
   return (
-    <button className="placeable-zone" disabled={!isPlacing} onClick={onPlace}>
-      <div
-        className={`zone ${controller === Player.North ? 'north' : 'south'}`}
-        role="gridcell"
-      >
-        {isPlacing && (
+    <button className="placeable-zone" disabled={!isDropzone} onClick={onPlace}>
+      <div className="zone north" role="gridcell">
+        {isDropzone && (
           <div className="overlay-container">
             <Replace id={buttonId}>
               <title>Place on</title>
             </Replace>
           </div>
         )}
-        {children}
+        {isPlaced ? children : <NorthFacedownCard />}
       </div>
     </button>
   );
@@ -241,6 +239,16 @@ export function App() {
             handSize={northHand}
             pickCard={handlePickCard}
           />
+          {isPlacing && (
+            <section className="card-display" aria-labelledby="picked-card">
+              <h3 id="picked-card">Picked card</h3>
+              <div className="zoom-row">
+                <div className="zooming">
+                  <BasicField />
+                </div>
+              </div>
+            </section>
+          )}
           <Hand
             player={Player.South}
             isMainPhase={phase === Phase.Main}
@@ -261,41 +269,31 @@ export function App() {
                   // The grid of field zones never gets rearranged
                   // oxlint-disable-next-line react/no-array-index-key
                   <div className="zonerow" role="row" key={rowY}>
-                    <Zone
-                      controller={Player.North}
-                      isPlacing={!isLeftPlaced && isPlacing}
+                    <NorthZone
+                      isPlaced={isLeftPlaced}
+                      isPlacing={isPlacing}
                       onPlace={handlePlaceCard(0, rowY)}
                     >
-                      {isLeftPlaced ? (
-                        <NorthBasicField />
-                      ) : (
-                        <NorthFacedownCard />
-                      )}
-                    </Zone>
-                    <Zone
-                      controller={Player.North}
-                      isPlacing={!isMiddlePlaced && isPlacing}
+                      <NorthBasicField />
+                    </NorthZone>
+                    <NorthZone
+                      isPlaced={isMiddlePlaced}
+                      isPlacing={isPlacing}
                       onPlace={handlePlaceCard(1, rowY)}
                     >
-                      {!isMiddlePlaced ? (
-                        <NorthFacedownCard />
-                      ) : rowY === 0 ? (
+                      {rowY === 0 ? (
                         <NorthHomeBasicField />
                       ) : (
                         <NorthBasicField />
                       )}
-                    </Zone>
-                    <Zone
-                      controller={Player.North}
-                      isPlacing={!isRightPlaced && isPlacing}
+                    </NorthZone>
+                    <NorthZone
+                      isPlaced={isRightPlaced}
+                      isPlacing={isPlacing}
                       onPlace={handlePlaceCard(2, rowY)}
                     >
-                      {isRightPlaced ? (
-                        <NorthBasicField />
-                      ) : (
-                        <NorthFacedownCard />
-                      )}
-                    </Zone>
+                      <NorthBasicField />
+                    </NorthZone>
                   </div>
                 ))}
               <div className="zonerow" role="row">
