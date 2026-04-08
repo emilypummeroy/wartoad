@@ -70,7 +70,7 @@ describe(Hand, () => {
           />,
         );
         expect(
-          withinHand().getAllByRole('region', { name: 'Basic Field' }),
+          withinHand().getAllByRole('region', { name: 'Empty Field' }),
         ).toHaveLength(handSize);
         expect(
           withinHand().queryByRole('region', { name: 'Facedown Card' }),
@@ -151,7 +151,7 @@ describe(Hand, () => {
           />,
         );
         expect(
-          withinHand().queryByRole('region', { name: 'Basic Field' }),
+          withinHand().queryByRole('region', { name: 'Empty Field' }),
         ).not.toBeInTheDocument();
         expect(
           withinHand().getAllByRole('region', { name: 'Facedown card' }),

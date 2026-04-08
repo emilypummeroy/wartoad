@@ -234,7 +234,7 @@ describe(App, () => {
         ).toBeVisible();
         expect(
           withinPickedCardDisplay().getByRole('region', {
-            name: 'Basic Field',
+            name: 'Empty Field',
           }),
         ).toBeVisible();
       });
@@ -264,7 +264,7 @@ describe(App, () => {
         ).toBeVisible();
         expect(
           withinPickedCardDisplay().getByRole('region', {
-            name: 'Basic Field',
+            name: 'Empty Field',
           }),
         ).toBeVisible();
       });
@@ -298,7 +298,7 @@ describe(App, () => {
         const cards = withinNorthHand().getAllByRole('region');
         expect(cards).not.toHaveLength(0);
         for (const c of cards) {
-          expect(c).toHaveAccessibleName('Basic Field');
+          expect(c).toHaveAccessibleName('Empty Field');
         }
       });
 
@@ -337,7 +337,7 @@ describe(App, () => {
         ).toBeVisible();
         expect(
           withinPickedCardDisplay().getByRole('region', {
-            name: 'Basic Field',
+            name: 'Empty Field',
           }),
         ).toBeVisible();
       });
@@ -414,7 +414,7 @@ describe(App, () => {
         const cards = withinSouthHand().getAllByRole('region');
         expect(cards).not.toHaveLength(0);
         for (const c of cards) {
-          expect(c).toHaveAccessibleName('Basic Field');
+          expect(c).toHaveAccessibleName('Empty Field');
         }
       });
 
@@ -453,7 +453,7 @@ describe(App, () => {
         ).toBeVisible();
         expect(
           withinPickedCardDisplay().getByRole('region', {
-            name: 'Basic Field',
+            name: 'Empty Field',
           }),
         ).toBeVisible();
       });
@@ -533,7 +533,7 @@ describe(App, () => {
         const initialBasicFieldCount = withinPlayArea().queryAllByRole(
           'region',
           {
-            name: 'South owned Basic Field',
+            name: 'South owned Empty Field',
           },
         ).length;
         const [targetField] = withinPlayArea().getAllByRole('button', {
@@ -544,7 +544,7 @@ describe(App, () => {
 
         expect(
           withinPlayArea().getAllByRole('region', {
-            name: 'South owned Basic Field',
+            name: 'South owned Empty Field',
           }),
         ).toHaveLength(initialBasicFieldCount + 1);
       });
@@ -553,7 +553,7 @@ describe(App, () => {
         const initialBasicFieldCount = withinPlayArea().queryAllByRole(
           'region',
           {
-            name: 'South owned Basic Field',
+            name: 'South owned Empty Field',
           },
         ).length;
         const [targetField] = withinPlayArea()
@@ -566,7 +566,7 @@ describe(App, () => {
 
         expect(
           withinPlayArea().getAllByRole('region', {
-            name: 'South owned Basic Field',
+            name: 'South owned Empty Field',
           }),
         ).toHaveLength(initialBasicFieldCount + 1);
       });
@@ -590,7 +590,7 @@ describe(App, () => {
         const initialBasicFieldCount = withinPlayArea().queryAllByRole(
           'region',
           {
-            name: 'North owned Basic Field',
+            name: 'North owned Empty Field',
           },
         ).length;
         const [targetField] = withinPlayArea().getAllByRole('button', {
@@ -601,7 +601,7 @@ describe(App, () => {
 
         expect(
           withinPlayArea().getAllByRole('region', {
-            name: 'North owned Basic Field',
+            name: 'North owned Empty Field',
           }),
         ).toHaveLength(initialBasicFieldCount + 1);
       });
@@ -611,7 +611,7 @@ describe(App, () => {
         const initialBasicFieldCount = withinPlayArea().queryAllByRole(
           'region',
           {
-            name: 'North owned Basic Field',
+            name: 'North owned Empty Field',
           },
         ).length;
         const [targetField] = withinPlayArea()
@@ -627,7 +627,7 @@ describe(App, () => {
         );
         expect(
           withinPlayArea().getAllByRole('region', {
-            name: 'North owned Basic Field',
+            name: 'North owned Empty Field',
           }),
         ).toHaveLength(initialBasicFieldCount + 1);
       });
@@ -687,7 +687,7 @@ describe(App, () => {
           withinPlayArea().getAllByRole('row')[0],
         ).getAllByRole('gridcell');
         expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
-          'North Home Basic Field',
+          'North Home Empty Field',
         );
       });
 
@@ -696,7 +696,7 @@ describe(App, () => {
           withinPlayArea().getAllByRole('row')[ROW_COUNT - 1],
         ).getAllByRole('gridcell');
         expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
-          'South Home Basic Field',
+          'South Home Empty Field',
         );
       });
     });

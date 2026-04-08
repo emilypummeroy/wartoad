@@ -60,7 +60,7 @@ function NorthBasicField() {
   return (
     <section aria-labelledby={`${symbolId} ${nameId}`} className="card north">
       <div className="card-title" id={nameId}>
-        Basic Field
+        Empty Field
       </div>
       <div className="card-section-row">
         <Pyramid>
@@ -80,7 +80,7 @@ function NorthHomeBasicField() {
   return (
     <section aria-labelledby={`${symbolId} ${nameId}`} className="card north">
       <div className="card-title" id={nameId}>
-        Basic Field
+        Empty Field
       </div>
       <div className="card-section-row">
         <HousePlus>
@@ -101,7 +101,7 @@ function SouthBasicField() {
   return (
     <section aria-labelledby={`${symbolId} ${nameId}`} className="card south">
       <div className="card-title" id={nameId}>
-        Basic Field
+        Empty Field
       </div>
       <div className="card-section-row">
         <Pyramid>
@@ -121,7 +121,7 @@ function SouthHomeBasicField() {
   return (
     <section aria-labelledby={`${symbolId} ${nameId}`} className="card south">
       <div className="card-title" id={nameId}>
-        Basic Field
+        Empty Field
       </div>
       <div className="card-section-row">
         <HousePlus>
@@ -359,11 +359,11 @@ export function App() {
               {placedCards
                 .slice(ROW_COUNT_PER_PLAYER, ROW_COUNT)
                 .map(([isLeftPlaced, isMiddlePlaced, isRightPlaced], rowY) => (
-                  // The grid of field zones never gets rearranged
-                  // oxlint-disable-next-line react/no-array-index-key
                   <div
                     className="zonerow"
                     role="row"
+                    // The grid of field zones never gets rearranged
+                    // oxlint-disable-next-line react/no-array-index-key
                     key={rowY + ROW_COUNT_PER_PLAYER}
                   >
                     <SouthZone
