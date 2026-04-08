@@ -11,8 +11,10 @@ export const BasicField = () => {
   const id = useId();
   return (
     <section aria-labelledby={id} className="card">
-      <div id={id}>Basic Field</div>
-      <div className="card-line">
+      <div className="card-title" id={id}>
+        Basic Field
+      </div>
+      <div className="card-section-row">
         <div>
           <small>Cost:</small>0
         </div>
@@ -20,7 +22,7 @@ export const BasicField = () => {
           <small>Gives:</small>+0
         </div>
       </div>
-      <div>Home field</div>
+      <div className="card-section-row" />
     </section>
   );
 };
