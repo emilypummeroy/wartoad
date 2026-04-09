@@ -5,9 +5,7 @@ import {
   Player,
   App,
   INITIAL_HAND_CARD_COUNT,
-  ROW_COUNT_PER_PLAYER,
   ROW_COUNT,
-  FIELD_COUNT_PER_ROW,
 } from './App.tsx';
 
 const FEW = 3;
@@ -220,12 +218,12 @@ describe(App, () => {
       });
     });
 
-    describe.for(
-      [Player.North, Player.South]
-    )('%s hand', (player) => {
+    describe.for([Player.North, Player.South])('%s hand', player => {
       const opponent = player === Player.North ? Player.South : Player.North;
-      const withinPlayerHand = player === Player.North ? withinNorthHand : withinSouthHand;
-      const withinOpponentHand = opponent === Player.North ? withinNorthHand : withinSouthHand;
+      const withinPlayerHand =
+        player === Player.North ? withinNorthHand : withinSouthHand;
+      const withinOpponentHand =
+        opponent === Player.North ? withinNorthHand : withinSouthHand;
 
       it('should start with 7 cards', () => {
         expect(withinNorthHand().getAllByRole('region')).toHaveLength(
@@ -310,7 +308,8 @@ describe(App, () => {
       it(`should lose a card when ${player} plays a card`, () => {
         advanceToPhase(player, Phase.Main);
 
-        const initialHandSize = withinPlayerHand().getAllByRole('region').length;
+        const initialHandSize =
+          withinPlayerHand().getAllByRole('region').length;
 
         fireEvent.click(withinPlayerHand().getAllByRole('button')[2]);
         fireEvent.click(
@@ -327,7 +326,8 @@ describe(App, () => {
       it(`should not lose a card when ${opponent} plays a card`, () => {
         advanceToPhase(opponent, Phase.Main);
 
-        const initialHandSize = withinPlayerHand().getAllByRole('region').length;
+        const initialHandSize =
+          withinPlayerHand().getAllByRole('region').length;
 
         fireEvent.click(withinOpponentHand().getAllByRole('button')[4]);
         fireEvent.click(
@@ -480,9 +480,7 @@ describe(App, () => {
       });
 
       it('should have north fields in the top 3 rows', () => {
-        const southRows = withinPlayArea()
-          .getAllByRole('row')
-          .slice(0, 3);
+        const southRows = withinPlayArea().getAllByRole('row').slice(0, 3);
         for (const row of southRows) {
           for (const zone of within(row).getAllByRole('gridcell')) {
             const card = within(zone).getByRole('region');
@@ -494,9 +492,7 @@ describe(App, () => {
       });
 
       it('should have south fields in the bottom 3 rows', () => {
-        const southRows = withinPlayArea()
-          .getAllByRole('row')
-          .slice(3);
+        const southRows = withinPlayArea().getAllByRole('row').slice(3);
         for (const row of southRows) {
           for (const zone of within(row).getAllByRole('gridcell')) {
             const card = within(zone).getByRole('region');

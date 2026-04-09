@@ -160,6 +160,7 @@ main {
 
   width: fit-content;
   width: calc-size(fit-content);
+  min-width: 20svw;
   max-width: calc(100svw - 60svh);
 
   display: flex;
@@ -170,7 +171,7 @@ main {
 }
 @media (max-aspect-ratio: 1.2) {
   .handarea {
-    min-width: 20svh;
+    min-width: 24svh;
   }
 }
 
