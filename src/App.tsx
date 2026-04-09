@@ -1,8 +1,9 @@
 import './App.css';
-import { HousePlus, Replace, StepForward, Pyramid } from 'lucide-react';
-import { useCallback, useId, useState, type ReactNode } from 'react';
+import { HousePlus, StepForward, Pyramid } from 'lucide-react';
+import { useCallback, useId, useState } from 'react';
 
 import { Hand, BasicField } from './Hand';
+import { NorthZone, SouthZone } from './Zone';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 export const ROW_COUNT = 6;
@@ -31,28 +32,6 @@ const playerAfter = {
   [Player.South]: Player.North,
   [Player.North]: Player.South,
 } as const;
-
-function NorthFacedownCard() {
-  const id = useId();
-  return (
-    <section aria-labelledby={id} className="facedown card north">
-      <Pyramid>
-        <title id={id}>North controlled empty field</title>
-      </Pyramid>
-    </section>
-  );
-}
-
-function SouthFacedownCard() {
-  const id = useId();
-  return (
-    <section aria-labelledby={id} className="facedown card south">
-      <Pyramid>
-        <title id={id}>South controlled empty field</title>
-      </Pyramid>
-    </section>
-  );
-}
 
 function NorthBasicField() {
   const nameId = useId();
@@ -115,6 +94,7 @@ function SouthBasicField() {
     </section>
   );
 }
+
 function SouthHomeBasicField() {
   const nameId = useId();
   const symbolId = useId();
@@ -133,61 +113,6 @@ function SouthHomeBasicField() {
       </div>
       <div className="card-section-row" />
     </section>
-  );
-}
-
-type ZoneProps = Readonly<{
-  children: ReactNode;
-  isPlaced: boolean;
-  isDropzone: boolean;
-  onPlace: () => void;
-}>;
-
-function NorthZone({
-  children,
-  isPlaced,
-  isDropzone: isPlacing,
-  onPlace,
-}: ZoneProps) {
-  const buttonId = useId();
-  const isDropzone = isPlacing && !isPlaced;
-  return (
-    <button className="placeable-zone" disabled={!isDropzone} onClick={onPlace}>
-      <div className="zone north" role="gridcell">
-        {isDropzone && (
-          <div className="overlay-container">
-            <Replace id={buttonId}>
-              <title>Place on</title>
-            </Replace>
-          </div>
-        )}
-        {isPlaced ? children : <NorthFacedownCard />}
-      </div>
-    </button>
-  );
-}
-
-function SouthZone({
-  children,
-  isPlaced,
-  isDropzone: isPlacing,
-  onPlace,
-}: ZoneProps) {
-  const buttonId = useId();
-  const isDropzone = isPlacing && !isPlaced;
-  return (
-    <button className="placeable-zone" disabled={!isDropzone} onClick={onPlace}>
-      <div className="zone south" role="gridcell">
-        {isDropzone && (
-          <div className="overlay-container">
-            <Replace id={buttonId}>
-              <title>Place on</title>
-            </Replace>
-          </div>
-        )}
-        {isPlaced ? children : <SouthFacedownCard />}
-      </div>
-    </button>
   );
 }
 
