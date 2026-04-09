@@ -26,6 +26,7 @@
     ],
     "id-length": "allow",
     "no-ternary": "allow",
+    "no-shadow": "allow",
     "no-nested-ternary": "allow",
     "unicorn/no-nested-ternary": "allow",
     "no-negated-condition": "allow",

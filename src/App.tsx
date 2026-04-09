@@ -122,9 +122,9 @@ const Substate = {
 } as const;
 type Substate = (typeof Substate)[keyof typeof Substate];
 type FlowState = {
-  player: Player;
-  phase: Phase;
-  substate: Substate;
+  readonly player: Player;
+  readonly phase: Phase;
+  readonly substate: Substate;
 };
 
 type GridState = readonly [
@@ -139,66 +139,110 @@ type GridState = readonly [
 const isGridState = (
   array: readonly (readonly boolean[])[],
 ): array is GridState =>
-  array.length === ROW_COUNT && array.every(row => row.length === 3);
+  array.length === ROW_COUNT &&
+  array.every(row => row.length === FIELD_COUNT_PER_ROW);
+
+type GameState = {
+  readonly flow: FlowState;
+  readonly grid: GridState;
+  readonly northHand: number;
+  readonly southHand: number;
+};
+
+type Position = {
+  readonly x: number;
+  readonly y: number;
+};
 
 // oxlint-disable max-lines-per-function
 // oxlint-disable react/jsx-max-depth
 // To be refactored later
 export function App() {
-  const [{ phase, player, substate }, setFlowState] = useState<
-    Readonly<FlowState>
-  >({
-    phase: Phase.Main,
-    player: Player.South,
-    substate: Substate.Idle,
-  });
-  const [southHand, setSouthHand] = useState(INITIAL_HAND_CARD_COUNT);
-  const [northHand, setNorthHand] = useState(INITIAL_HAND_CARD_COUNT);
-  const [placedCards, setPlacedCards] = useState<GridState>([
-    [false, true, false],
-    [false, false, false],
-    [false, false, false],
-    [false, false, false],
-    [false, false, false],
-    [false, true, false],
-  ]);
-
-  const setNextPhase = useCallback(() => {
-    const next = {
-      player: phase === Phase.End ? playerAfter[player] : player,
-      phase: phaseAfter[phase],
+  const [
+    {
+      flow: { phase, player, substate },
+      grid,
+      northHand,
+      southHand,
+    },
+    setGameState,
+  ] = useState<Readonly<GameState>>({
+    flow: {
+      phase: Phase.Main,
+      player: Player.South,
       substate: Substate.Idle,
-    };
-    setFlowState(next);
-    if (next.phase === Phase.Start && next.player === Player.North) {
-      setNorthHand(northHand + 1);
-    }
-    if (next.phase === Phase.Start && next.player === Player.South) {
-      setSouthHand(southHand + 1);
-    }
-  }, [player, phase, northHand, southHand]);
+    },
+    grid: [
+      [false, true, false],
+      [false, false, false],
+      [false, false, false],
+      [false, false, false],
+      [false, false, false],
+      [false, true, false],
+    ],
+    northHand: INITIAL_HAND_CARD_COUNT,
+    southHand: INITIAL_HAND_CARD_COUNT,
+  });
+
+  const setNextPhase = useCallback(
+    () =>
+      setGameState(
+        ({ flow: { player, phase }, northHand, southHand, ...rest }) => ({
+          ...rest,
+          flow: {
+            player: phase === Phase.End ? playerAfter[player] : player,
+            phase: phaseAfter[phase],
+            substate: Substate.Idle,
+          },
+          northHand:
+            phaseAfter[phase] === Phase.Start &&
+            playerAfter[player] === Player.North
+              ? northHand + 1
+              : northHand,
+          southHand:
+            phaseAfter[phase] === Phase.Start &&
+            playerAfter[player] === Player.South
+              ? southHand + 1
+              : southHand,
+        }),
+      ),
+    [],
+  );
 
   const handlePickCard = useCallback(
-    () => setFlowState(old => ({ ...old, substate: Substate.Placing })),
-    [setFlowState],
+    () =>
+      setGameState(old => ({
+        ...old,
+        flow: { ...old.flow, substate: Substate.Placing },
+      })),
+    [],
   );
 
   const handlePlaceCard =
-    (zonePlayer: Player, zoneX: number, zoneY: number) => () => {
-      setFlowState(old => ({ ...old, substate: Substate.Idle }));
-      if (zonePlayer === Player.North) setNorthHand(n => n - 1);
-      if (zonePlayer === Player.South) setSouthHand(n => n - 1);
-      setPlacedCards((old: GridState) => {
-        const array = old.map((row, j) =>
-          j === zoneY ? row.map((p, i) => (i === zoneX ? true : p)) : row,
+    ({ x, y }: Position) =>
+    () =>
+      setGameState(old => {
+        const array = old.grid.map((row, yy) =>
+          yy !== y ? row : row.map((val, xx) => (xx === x ? true : val)),
         );
         if (!isGridState(array)) {
           // v8 ignore next
           throw new Error(`Expected a GridState but got: ${String(array)}`);
         }
-        return array;
+        return {
+          ...old,
+          flow: { ...old.flow, substate: Substate.Idle },
+          northHand:
+            old.flow.player === Player.North
+              ? old.northHand - 1
+              : old.northHand,
+          southHand:
+            old.flow.player === Player.South
+              ? old.southHand - 1
+              : old.southHand,
+          grid: array,
+        };
       });
-    };
 
   return (
     <div className="wartide-app">
@@ -261,7 +305,7 @@ export function App() {
         <div className="scroll-x">
           <section className="playarea">
             <div role="grid">
-              {placedCards
+              {grid
                 .slice(0, ROW_COUNT_PER_PLAYER)
                 .map(([isLeftPlaced, isMiddlePlaced, isRightPlaced], rowY) => (
                   // The grid of field zones never gets rearranged
@@ -272,7 +316,7 @@ export function App() {
                       isDropzone={
                         player === Player.North && substate === Substate.Placing
                       }
-                      onPlace={handlePlaceCard(player, 0, rowY)}
+                      onPlace={handlePlaceCard({ x: 0, y: rowY })}
                     >
                       <NorthBasicField />
                     </NorthZone>
@@ -281,7 +325,7 @@ export function App() {
                       isDropzone={
                         player === Player.North && substate === Substate.Placing
                       }
-                      onPlace={handlePlaceCard(player, 1, rowY)}
+                      onPlace={handlePlaceCard({ x: 1, y: rowY })}
                     >
                       {rowY === 0 ? (
                         <NorthHomeBasicField />
@@ -294,13 +338,13 @@ export function App() {
                       isDropzone={
                         player === Player.North && substate === Substate.Placing
                       }
-                      onPlace={handlePlaceCard(player, 2, rowY)}
+                      onPlace={handlePlaceCard({ x: 2, y: rowY })}
                     >
                       <NorthBasicField />
                     </NorthZone>
                   </div>
                 ))}
-              {placedCards
+              {grid
                 .slice(ROW_COUNT_PER_PLAYER, ROW_COUNT)
                 .map(([isLeftPlaced, isMiddlePlaced, isRightPlaced], rowY) => (
                   <div
@@ -315,11 +359,10 @@ export function App() {
                       isDropzone={
                         player === Player.South && substate === Substate.Placing
                       }
-                      onPlace={handlePlaceCard(
-                        player,
-                        0,
-                        rowY + ROW_COUNT_PER_PLAYER,
-                      )}
+                      onPlace={handlePlaceCard({
+                        x: 0,
+                        y: rowY + ROW_COUNT_PER_PLAYER,
+                      })}
                     >
                       <SouthBasicField />
                     </SouthZone>
@@ -328,11 +371,10 @@ export function App() {
                       isDropzone={
                         player === Player.South && substate === Substate.Placing
                       }
-                      onPlace={handlePlaceCard(
-                        player,
-                        1,
-                        rowY + ROW_COUNT_PER_PLAYER,
-                      )}
+                      onPlace={handlePlaceCard({
+                        x: 1,
+                        y: rowY + ROW_COUNT_PER_PLAYER,
+                      })}
                     >
                       {rowY === 2 ? (
                         <SouthHomeBasicField />
@@ -345,11 +387,10 @@ export function App() {
                       isDropzone={
                         player === Player.South && substate === Substate.Placing
                       }
-                      onPlace={handlePlaceCard(
-                        player,
-                        2,
-                        rowY + ROW_COUNT_PER_PLAYER,
-                      )}
+                      onPlace={handlePlaceCard({
+                        x: 2,
+                        y: rowY + ROW_COUNT_PER_PLAYER,
+                      })}
                     >
                       <SouthBasicField />
                     </SouthZone>
