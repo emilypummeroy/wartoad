@@ -116,6 +116,17 @@ function SouthHomeBasicField() {
   );
 }
 
+const Substate = {
+  Idle: 'Idle',
+  Placing: 'Placing',
+} as const;
+type Substate = (typeof Substate)[keyof typeof Substate];
+type FlowState = {
+  player: Player;
+  phase: Phase;
+  substate: Substate;
+};
+
 type GridState = readonly [
   readonly [boolean, boolean, boolean],
   readonly [boolean, boolean, boolean],
@@ -134,18 +145,15 @@ const isGridState = (
 // oxlint-disable react/jsx-max-depth
 // To be refactored later
 export function App() {
-  const [{ phase, player }, setPhase] = useState<
-    Readonly<{
-      phase: Phase;
-      player: Player;
-    }>
+  const [{ phase, player, substate }, setFlowState] = useState<
+    Readonly<FlowState>
   >({
     phase: Phase.Main,
     player: Player.South,
+    substate: Substate.Idle,
   });
   const [southHand, setSouthHand] = useState(INITIAL_HAND_CARD_COUNT);
   const [northHand, setNorthHand] = useState(INITIAL_HAND_CARD_COUNT);
-  const [isPlacing, setIsPlacing] = useState(false);
   const [placedCards, setPlacedCards] = useState<GridState>([
     [false, true, false],
     [false, false, false],
@@ -159,8 +167,9 @@ export function App() {
     const next = {
       player: phase === Phase.End ? playerAfter[player] : player,
       phase: phaseAfter[phase],
+      substate: Substate.Idle,
     };
-    setPhase(next);
+    setFlowState(next);
     if (next.phase === Phase.Start && next.player === Player.North) {
       setNorthHand(northHand + 1);
     }
@@ -169,10 +178,14 @@ export function App() {
     }
   }, [player, phase, northHand, southHand]);
 
-  const handlePickCard = useCallback(() => setIsPlacing(true), [setIsPlacing]);
+  const handlePickCard = useCallback(
+    () => setFlowState(old => ({ ...old, substate: Substate.Placing })),
+    [setFlowState],
+  );
+
   const handlePlaceCard =
     (zonePlayer: Player, zoneX: number, zoneY: number) => () => {
-      setIsPlacing(false);
+      setFlowState(old => ({ ...old, substate: Substate.Idle }));
       if (zonePlayer === Player.North) setNorthHand(n => n - 1);
       if (zonePlayer === Player.South) setSouthHand(n => n - 1);
       setPlacedCards((old: GridState) => {
@@ -205,7 +218,7 @@ export function App() {
           <button
             className="icon-text accent"
             aria-label="Next phase"
-            disabled={isPlacing}
+            disabled={substate === Substate.Placing}
             onClick={setNextPhase}
           >
             <StepForward />
@@ -219,11 +232,11 @@ export function App() {
             player={Player.North}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.North}
-            isPlacing={isPlacing}
+            isPlacing={substate === Substate.Placing}
             handSize={northHand}
             pickCard={handlePickCard}
           />
-          {isPlacing && (
+          {substate === Substate.Placing && (
             <section className="card-display" aria-labelledby="picked-card">
               <h3 id="picked-card">Picked card</h3>
               <div className="zoom-row">
@@ -240,7 +253,7 @@ export function App() {
             player={Player.South}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.South}
-            isPlacing={isPlacing}
+            isPlacing={substate === Substate.Placing}
             handSize={southHand}
             pickCard={handlePickCard}
           />
@@ -256,14 +269,18 @@ export function App() {
                   <div className="zonerow" role="row" key={rowY}>
                     <NorthZone
                       isPlaced={isLeftPlaced}
-                      isDropzone={player === Player.North && isPlacing}
+                      isDropzone={
+                        player === Player.North && substate === Substate.Placing
+                      }
                       onPlace={handlePlaceCard(player, 0, rowY)}
                     >
                       <NorthBasicField />
                     </NorthZone>
                     <NorthZone
                       isPlaced={isMiddlePlaced}
-                      isDropzone={player === Player.North && isPlacing}
+                      isDropzone={
+                        player === Player.North && substate === Substate.Placing
+                      }
                       onPlace={handlePlaceCard(player, 1, rowY)}
                     >
                       {rowY === 0 ? (
@@ -274,7 +291,9 @@ export function App() {
                     </NorthZone>
                     <NorthZone
                       isPlaced={isRightPlaced}
-                      isDropzone={player === Player.North && isPlacing}
+                      isDropzone={
+                        player === Player.North && substate === Substate.Placing
+                      }
                       onPlace={handlePlaceCard(player, 2, rowY)}
                     >
                       <NorthBasicField />
@@ -293,7 +312,9 @@ export function App() {
                   >
                     <SouthZone
                       isPlaced={isLeftPlaced}
-                      isDropzone={player === Player.South && isPlacing}
+                      isDropzone={
+                        player === Player.South && substate === Substate.Placing
+                      }
                       onPlace={handlePlaceCard(
                         player,
                         0,
@@ -304,7 +325,9 @@ export function App() {
                     </SouthZone>
                     <SouthZone
                       isPlaced={isMiddlePlaced}
-                      isDropzone={player === Player.South && isPlacing}
+                      isDropzone={
+                        player === Player.South && substate === Substate.Placing
+                      }
                       onPlace={handlePlaceCard(
                         player,
                         1,
@@ -319,7 +342,9 @@ export function App() {
                     </SouthZone>
                     <SouthZone
                       isPlaced={isRightPlaced}
-                      isDropzone={player === Player.South && isPlacing}
+                      isDropzone={
+                        player === Player.South && substate === Substate.Placing
+                      }
                       onPlace={handlePlaceCard(
                         player,
                         2,
