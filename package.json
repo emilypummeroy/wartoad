@@ -15,11 +15,11 @@
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "preview": "vite preview",
-    "test": "vitest --coverage",
-    "test:once": "vitest --no-watch --coverage",
-    "test:only:once": "vitest --no-watch",
-    "test:only": "vitest",
-    "check": "bun run tsc && bun run lint && bun run fmt && bun run test:once"
+    "test": "vitest",
+    "test:once": "vitest --no-watch",
+    "test:coverage": "vitest --coverage",
+    "test:coverage:once": "vitest --coverage --no-watch",
+    "check": "bun run tsc && bun run lint && bun run fmt && bun run test:coverage:once"
   },
   "dependencies": {
     "lucide-react": "^1.7.0",
