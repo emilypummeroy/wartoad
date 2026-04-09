@@ -162,6 +162,7 @@ main {
   width: calc-size(fit-content);
   min-width: 20svw;
   max-width: calc(100svw - 60svh);
+  flex-shrink: 0;
 
   display: flex;
   flex-direction: column;
@@ -401,10 +402,10 @@ span.south {
 
       &.jiggling:hover,
       &.jiggling:focus-within {
-        padding: 0svh 3svh 4svh;
+        padding: 0svh 1svh 4svh;
       }
       &:first-child:nth-last-child(1) {
-        padding: 0svh 1svh 1svh;
+        padding-bottom: 1svh;
         margin-left: 0svh;
         margin-right: 0svh;
       }
@@ -421,13 +422,10 @@ span.south {
       }
       &.jiggling:hover,
       &.jiggling:focus {
-        padding-left: 3svh;
-        padding-right: 1svh;
+        margin-left: 0;
+
         margin-right: 2svh;
         &:first-child:nth-last-child(1) {
-          padding-left: 1svh;
-          padding-right: 1svh;
-          margin-left: 0svh;
           margin-right: 0svh;
         }
       }
@@ -440,8 +438,6 @@ span.south {
       margin-left: -2svh;
       &.jiggling:hover,
       &.jiggling:focus-within {
-        padding-left: 3svh;
-        padding-right: 1svh;
         margin-right: 2svh;
       }
     }
@@ -453,8 +449,6 @@ span.south {
       margin-left: -4.5svh;
       &.jiggling:hover,
       &.jiggling:focus-within {
-        padding-left: 5svh;
-        padding-right: 0.5svh;
         margin-right: 4.5svh;
       }
     }
