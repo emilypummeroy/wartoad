@@ -502,16 +502,6 @@ button.placeable-zone {
   border: none;
 
   &:enabled {
-    &:hover {
-      &:not(:focus) {
-        /* The underying zone provides a hover effect. */
-        outline: none;
-      }
-      filter: brightness(120%);
-      .overlay-container {
-        opacity: 80%;
-      }
-    }
     cursor: pointer;
 
     .overlay-container {
@@ -534,6 +524,20 @@ button.placeable-zone {
         height: 12svh;
         width: 12svh;
       }
+    }
+
+    &:focus,
+    &:hover {
+      .overlay-container {
+        opacity: 80%;
+      }
+    }
+    &:hover {
+      /* The underying zone provides a hover effect. */
+      &:not(:focus) {
+        outline: none;
+      }
+      filter: brightness(120%);
     }
   }
 }

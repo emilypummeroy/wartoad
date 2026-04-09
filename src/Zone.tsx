@@ -1,77 +1,122 @@
-import { Replace, Pyramid } from 'lucide-react';
-import { useId, type ReactNode } from 'react';
+import { Replace, Pyramid, HousePlus } from 'lucide-react';
+import { useId } from 'react';
 
-function NorthFacedownCard() {
+import { Player, type FlowState, Subphase } from './App';
+
+export function GreenField({
+  owner,
+  isHome = false,
+}: {
+  readonly owner: Player;
+  readonly isHome?: boolean;
+}) {
+  const playerStyle = {
+    [Player.North]: 'north',
+    [Player.South]: 'south',
+  }[owner];
+  const nameId = useId();
+  const symbolId = useId();
+  return (
+    <section
+      aria-labelledby={`${symbolId} ${nameId}`}
+      className={`card ${playerStyle}`}
+    >
+      <div className="card-title" id={nameId}>
+        Green Field
+      </div>
+      <div className="card-section-row">
+        {isHome ? (
+          <HousePlus>
+            <title id={symbolId}>{owner} Home</title>
+          </HousePlus>
+        ) : (
+          <Pyramid>
+            <title id={symbolId}>{owner} owned</title>
+          </Pyramid>
+        )}
+        <div>
+          <small>Gives:</small>+0
+        </div>
+      </div>
+      <div className="card-section-row" />
+    </section>
+  );
+}
+
+export function NorthBasicField() {
+  return <GreenField owner={Player.North} />;
+}
+
+export function NorthHomeBasicField() {
+  return <GreenField isHome owner={Player.North} />;
+}
+
+export function SouthBasicField() {
+  return <GreenField owner={Player.South} />;
+}
+
+export function SouthHomeBasicField() {
+  return <GreenField isHome owner={Player.South} />;
+}
+
+function FacedownCard({ player }: { readonly player: Player }) {
+  const playerStyle = {
+    [Player.North]: 'north',
+    [Player.South]: 'south',
+  };
   const id = useId();
   return (
-    <section aria-labelledby={id} className="facedown card north">
+    <section
+      aria-labelledby={id}
+      className={`facedown card ${playerStyle[player]}`}
+    >
       <Pyramid>
-        <title id={id}>North controlled empty field</title>
+        <title id={id}>{player} controlled empty field</title>
       </Pyramid>
     </section>
   );
 }
 
-function SouthFacedownCard() {
-  const id = useId();
-  return (
-    <section aria-labelledby={id} className="facedown card south">
-      <Pyramid>
-        <title id={id}>South controlled empty field</title>
-      </Pyramid>
-    </section>
-  );
-}
 type ZoneProps = Readonly<{
-  children: ReactNode;
-  isPlaced: boolean;
-  isDropzone: boolean;
+  flow: FlowState;
+  controller: Player;
+  isHome: boolean;
+  isUpgraded: boolean;
   onPlace: () => void;
 }>;
 
-export function NorthZone({
-  children,
-  isPlaced,
-  isDropzone: isPlacing,
+export function Zone({
+  flow: { subphase, player },
+  controller,
+  isHome,
+  isUpgraded,
   onPlace,
 }: ZoneProps) {
-  const buttonId = useId();
-  const isDropzone = isPlacing && !isPlaced;
+  const isDropzone =
+    !isUpgraded && player === controller && subphase === Subphase.Placing;
+  const playerStyle = {
+    [Player.North]: 'north',
+    [Player.South]: 'south',
+  }[controller];
   return (
-    <button className="placeable-zone" disabled={!isDropzone} onClick={onPlace}>
-      <div className="zone north" role="gridcell">
+    <button
+      className={`placeable-zone ${playerStyle}`}
+      disabled={!isDropzone}
+      onClick={onPlace}
+    >
+      <div className={`zone ${playerStyle}`} role="gridcell">
         {isDropzone && (
           <div className="overlay-container">
-            <Replace id={buttonId}>
+            <Replace>
               <title>Place on</title>
             </Replace>
           </div>
         )}
-        {isPlaced ? children : <NorthFacedownCard />}
-      </div>
-    </button>
-  );
-}
-
-export function SouthZone({
-  children,
-  isPlaced,
-  isDropzone: isPlacing,
-  onPlace,
-}: ZoneProps) {
-  const buttonId = useId();
-  const isDropzone = isPlacing && !isPlaced;
-  return (
-    <button className="placeable-zone" disabled={!isDropzone} onClick={onPlace}>
-      <div className="zone south" role="gridcell">
-        {isDropzone && (
-          <div className="overlay-container">
-            <Replace id={buttonId}>
-              <title>Place on</title>
-            </Replace>
-          </div>
+        {isUpgraded ? (
+          <GreenField isHome={isHome} owner={controller} />
+        ) : (
+          <FacedownCard player={controller} />
         )}
-        {isPlaced ? children : <SouthFacedownCard />}
       </div>
     </button>
   );

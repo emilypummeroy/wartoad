@@ -12,7 +12,7 @@ export const BasicField = () => {
   return (
     <section aria-labelledby={id} className="card">
       <div className="card-title" id={id}>
-        Empty Field
+        Green Field
       </div>
       <div className="card-section-row">
         <div>

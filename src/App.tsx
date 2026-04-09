@@ -1,9 +1,9 @@
 import './App.css';
-import { HousePlus, StepForward, Pyramid } from 'lucide-react';
-import { useCallback, useId, useState } from 'react';
+import { StepForward } from 'lucide-react';
+import { useCallback, useState } from 'react';
 
 import { Hand, BasicField } from './Hand';
-import { NorthZone, SouthZone } from './Zone';
+import { Zone } from './Zone';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 export const ROW_COUNT = 6;
@@ -33,98 +33,15 @@ const playerAfter = {
   [Player.North]: Player.South,
 } as const;
 
-function NorthBasicField() {
-  const nameId = useId();
-  const symbolId = useId();
-  return (
-    <section aria-labelledby={`${symbolId} ${nameId}`} className="card north">
-      <div className="card-title" id={nameId}>
-        Empty Field
-      </div>
-      <div className="card-section-row">
-        <Pyramid>
-          <title id={symbolId}>North owned</title>
-        </Pyramid>
-        <div>
-          <small>Gives:</small>+0
-        </div>
-      </div>
-      <div className="card-section-row" />
-    </section>
-  );
-}
-function NorthHomeBasicField() {
-  const nameId = useId();
-  const symbolId = useId();
-  return (
-    <section aria-labelledby={`${symbolId} ${nameId}`} className="card north">
-      <div className="card-title" id={nameId}>
-        Empty Field
-      </div>
-      <div className="card-section-row">
-        <HousePlus>
-          <title id={symbolId}>North Home</title>
-        </HousePlus>
-        <div>
-          <small>Gives:</small>+0
-        </div>
-      </div>
-      <div className="card-section-row" />
-    </section>
-  );
-}
-
-function SouthBasicField() {
-  const nameId = useId();
-  const symbolId = useId();
-  return (
-    <section aria-labelledby={`${symbolId} ${nameId}`} className="card south">
-      <div className="card-title" id={nameId}>
-        Empty Field
-      </div>
-      <div className="card-section-row">
-        <Pyramid>
-          <title id={symbolId}>South owned</title>
-        </Pyramid>
-        <div>
-          <small>Gives:</small>+0
-        </div>
-      </div>
-      <div className="card-section-row" />
-    </section>
-  );
-}
-
-function SouthHomeBasicField() {
-  const nameId = useId();
-  const symbolId = useId();
-  return (
-    <section aria-labelledby={`${symbolId} ${nameId}`} className="card south">
-      <div className="card-title" id={nameId}>
-        Empty Field
-      </div>
-      <div className="card-section-row">
-        <HousePlus>
-          <title id={symbolId}>South Home</title>
-        </HousePlus>
-        <div>
-          <small>Gives:</small>+0
-        </div>
-      </div>
-      <div className="card-section-row" />
-    </section>
-  );
-}
-
-const Substate = {
+export const Subphase = {
   Idle: 'Idle',
   Placing: 'Placing',
 } as const;
-type Substate = (typeof Substate)[keyof typeof Substate];
-type FlowState = {
+export type Subphase = (typeof Subphase)[keyof typeof Subphase];
+export type FlowState = {
   readonly player: Player;
   readonly phase: Phase;
-  readonly substate: Substate;
+  readonly subphase: Subphase;
 };
 
 type GridState = readonly [
@@ -160,7 +77,8 @@ type Position = {
 export function App() {
   const [
     {
-      flow: { phase, player, substate },
+      flow: { phase, player, subphase: substate },
+      flow,
       grid,
       northHand,
       southHand,
@@ -170,7 +88,7 @@ export function App() {
     flow: {
       phase: Phase.Main,
       player: Player.South,
-      substate: Substate.Idle,
+      subphase: Subphase.Idle,
     },
     grid: [
       [false, true, false],
@@ -192,7 +110,7 @@ export function App() {
           flow: {
             player: phase === Phase.End ? playerAfter[player] : player,
             phase: phaseAfter[phase],
-            substate: Substate.Idle,
+            subphase: Subphase.Idle,
           },
           northHand:
             phaseAfter[phase] === Phase.Start &&
@@ -213,11 +131,12 @@ export function App() {
     () =>
       setGameState(old => ({
         ...old,
-        flow: { ...old.flow, substate: Substate.Placing },
+        flow: { ...old.flow, subphase: Subphase.Placing },
       })),
     [],
   );
 
+  // TODO move knowledge of x/y into Zone
   const handlePlaceCard =
     ({ x, y }: Position) =>
     () =>
@@ -231,7 +150,7 @@ export function App() {
         }
         return {
           ...old,
-          flow: { ...old.flow, substate: Substate.Idle },
+          flow: { ...old.flow, subphase: Subphase.Idle },
           northHand:
             old.flow.player === Player.North
               ? old.northHand - 1
@@ -262,7 +181,7 @@ export function App() {
           <button
             className="icon-text accent"
             aria-label="Next phase"
-            disabled={substate === Substate.Placing}
+            disabled={substate === Subphase.Placing}
             onClick={setNextPhase}
           >
             <StepForward />
@@ -276,11 +195,11 @@ export function App() {
             player={Player.North}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.North}
-            isPlacing={substate === Substate.Placing}
+            isPlacing={substate === Subphase.Placing}
             handSize={northHand}
             pickCard={handlePickCard}
           />
-          {substate === Substate.Placing && (
+          {substate === Subphase.Placing && (
             <section className="card-display" aria-labelledby="picked-card">
               <h3 id="picked-card">Picked card</h3>
               <div className="zoom-row">
@@ -297,103 +216,54 @@ export function App() {
             player={Player.South}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.South}
-            isPlacing={substate === Substate.Placing}
+            isPlacing={substate === Subphase.Placing}
             handSize={southHand}
             pickCard={handlePickCard}
           />
         </section>
+        {// Move the playarea container into a HOC
+        }
         <div className="scroll-x">
           <section className="playarea">
             <div role="grid">
               {grid
-                .slice(0, ROW_COUNT_PER_PLAYER)
                 .map(([isLeftPlaced, isMiddlePlaced, isRightPlaced], rowY) => (
                   // The grid of field zones never gets rearranged
                   // oxlint-disable-next-line react/no-array-index-key
                   <div className="zonerow" role="row" key={rowY}>
-                    <NorthZone
-                      isPlaced={isLeftPlaced}
-                      isDropzone={
-                        player === Player.North && substate === Substate.Placing
+                    <Zone
+                      controller={
+                        rowY < ROW_COUNT_PER_PLAYER
+                          ? Player.North
+                          : Player.South
                       }
+                      flow={flow}
+                      isHome={false}
+                      isUpgraded={isLeftPlaced}
                       onPlace={handlePlaceCard({ x: 0, y: rowY })}
-                    >
-                      <NorthBasicField />
-                    </NorthZone>
-                    <NorthZone
-                      isPlaced={isMiddlePlaced}
-                      isDropzone={
-                        player === Player.North && substate === Substate.Placing
+                    />
+                    <Zone
+                      controller={
+                        rowY < ROW_COUNT_PER_PLAYER
+                          ? Player.North
+                          : Player.South
                       }
+                      flow={flow}
+                      isHome={rowY === 0 || rowY === ROW_COUNT - 1}
+                      isUpgraded={isMiddlePlaced}
                       onPlace={handlePlaceCard({ x: 1, y: rowY })}
-                    >
-                      {rowY === 0 ? (
-                        <NorthHomeBasicField />
-                      ) : (
-                        <NorthBasicField />
-                      )}
-                    </NorthZone>
-                    <NorthZone
-                      isPlaced={isRightPlaced}
-                      isDropzone={
-                        player === Player.North && substate === Substate.Placing
+                    />
+                    <Zone
+                      controller={
+                        rowY < ROW_COUNT_PER_PLAYER
+                          ? Player.North
+                          : Player.South
                       }
+                      flow={flow}
+                      isHome={false}
+                      isUpgraded={isRightPlaced}
                       onPlace={handlePlaceCard({ x: 2, y: rowY })}
-                    >
-                      <NorthBasicField />
-                    </NorthZone>
-                  </div>
-                ))}
-              {grid
-                .slice(ROW_COUNT_PER_PLAYER, ROW_COUNT)
-                .map(([isLeftPlaced, isMiddlePlaced, isRightPlaced], rowY) => (
-                  <div
-                    className="zonerow"
-                    role="row"
-                    // The grid of field zones never gets rearranged
-                    // oxlint-disable-next-line react/no-array-index-key
-                    key={rowY + ROW_COUNT_PER_PLAYER}
-                  >
-                    <SouthZone
-                      isPlaced={isLeftPlaced}
-                      isDropzone={
-                        player === Player.South && substate === Substate.Placing
-                      }
-                      onPlace={handlePlaceCard({
-                        x: 0,
-                        y: rowY + ROW_COUNT_PER_PLAYER,
-                      })}
-                    >
-                      <SouthBasicField />
-                    </SouthZone>
-                    <SouthZone
-                      isPlaced={isMiddlePlaced}
-                      isDropzone={
-                        player === Player.South && substate === Substate.Placing
-                      }
-                      onPlace={handlePlaceCard({
-                        x: 1,
-                        y: rowY + ROW_COUNT_PER_PLAYER,
-                      })}
-                    >
-                      {rowY === 2 ? (
-                        <SouthHomeBasicField />
-                      ) : (
-                        <SouthBasicField />
-                      )}
-                    </SouthZone>
-                    <SouthZone
-                      isPlaced={isRightPlaced}
-                      isDropzone={
-                        player === Player.South && substate === Substate.Placing
-                      }
-                      onPlace={handlePlaceCard({
-                        x: 2,
-                        y: rowY + ROW_COUNT_PER_PLAYER,
-                      })}
-                    >
-                      <SouthBasicField />
-                    </SouthZone>
+                    />
                   </div>
                 ))}
             </div>

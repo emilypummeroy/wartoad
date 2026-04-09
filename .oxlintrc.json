@@ -95,6 +95,8 @@
         "prefer-called-once": "error",
         "prefer-called-times": "allow",
         "prefer-readonly-parameter-types": "allow",
+        "no-empty-interface": "allow",
+        "consistent-type-definitions": "allow",
         "max-statements": [
           "warn",
           {
