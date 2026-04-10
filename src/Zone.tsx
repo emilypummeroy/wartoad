@@ -8,7 +8,7 @@ export type Position = {
   readonly y: number;
 };
 
-const Position = {
+export const Position = {
   equals: ({ x: x1, y: y1 }: Position, { x: x2, y: y2 }: Position) =>
     x1 === x2 && y1 === y2,
 };
