@@ -5,14 +5,6 @@ import { ROW_COUNT } from './Zone';
 
 const FEW = 3;
 const MANY = 15;
-interface CustomMatchers<R = unknown> {
-  toHaveFlow: () => R;
-}
-
-declare module 'vitest' {
-  interface Assertion<T = any> extends CustomMatchers<T> {}
-  interface AsymmetricMatchersContaining extends CustomMatchers {}
-}
 
 describe('the dom test environment', () => {
   it('should have a defined document', () => {
