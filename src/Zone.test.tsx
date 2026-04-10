@@ -10,18 +10,18 @@ describe(Zone, () => {
     [controller: Player, turnPlayer: Player, Phase, isHome: boolean]
   >([
     // Triowise all combinations: 3x2x2
-    [Player.North, Player.North,  Phase.Start, true, ],
-    [Player.South, Player.North,   Phase.Main, true, ],
-    [Player.North, Player.North,    Phase.End, true, ],
-    [Player.South, Player.North,  Phase.Start, false,],
-    [Player.North, Player.North,   Phase.Main, false,],
-    [Player.South, Player.North,    Phase.End, false,],
-    [Player.North, Player.South,  Phase.Start, true, ],
-    [Player.South, Player.South,   Phase.Main, true, ],
-    [Player.North, Player.South,    Phase.End, true, ],
-    [Player.South, Player.South,  Phase.Start, false,],
-    [Player.North, Player.South,   Phase.Main, false,],
-    [Player.South, Player.South,    Phase.End, false,],
+    [Player.North, Player.North, Phase.Start, true],
+    [Player.South, Player.North, Phase.Main, true],
+    [Player.North, Player.North, Phase.End, true],
+    [Player.South, Player.North, Phase.Start, false],
+    [Player.North, Player.North, Phase.Main, false],
+    [Player.South, Player.North, Phase.End, false],
+    [Player.North, Player.South, Phase.Start, true],
+    [Player.South, Player.South, Phase.Main, true],
+    [Player.North, Player.South, Phase.End, true],
+    [Player.South, Player.South, Phase.Start, false],
+    [Player.North, Player.South, Phase.Main, false],
+    [Player.South, Player.South, Phase.End, false],
   ])(
     'basic cases :: controlled by %s | %s %s phase | isHome %s | while idle',
     ([controller, turnPlayer, phase, isHome]) => {

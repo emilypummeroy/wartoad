@@ -144,8 +144,8 @@ export function App() {
         const array = old.grid.map((row, yy) =>
           yy !== y ? row : row.map((val, xx) => (xx === x ? true : val)),
         );
+        // v8 ignore next 2
         if (!isGridState(array)) {
-          // v8 ignore next
           throw new Error(`Expected a GridState but got: ${String(array)}`);
         }
         return {
@@ -221,13 +221,14 @@ export function App() {
             pickCard={handlePickCard}
           />
         </section>
-        {// Move the playarea container into a HOC
+        {
+          // Move the playarea container into a HOC
         }
         <div className="scroll-x">
           <section className="playarea">
             <div role="grid">
-              {grid
-                .map(([isLeftPlaced, isMiddlePlaced, isRightPlaced], rowY) => (
+              {grid.map(
+                ([isLeftPlaced, isMiddlePlaced, isRightPlaced], rowY) => (
                   // The grid of field zones never gets rearranged
                   // oxlint-disable-next-line react/no-array-index-key
                   <div className="zonerow" role="row" key={rowY}>
@@ -265,7 +266,8 @@ export function App() {
                       onPlace={handlePlaceCard({ x: 2, y: rowY })}
                     />
                   </div>
-                ))}
+                ),
+              )}
             </div>
           </section>
         </div>

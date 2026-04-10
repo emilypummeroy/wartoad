@@ -43,22 +43,6 @@ export function GreenField({
   );
 }
 
-export function NorthBasicField() {
-  return <GreenField owner={Player.North} />;
-}
-
-export function NorthHomeBasicField() {
-  return <GreenField isHome owner={Player.North} />;
-}
-
-export function SouthBasicField() {
-  return <GreenField owner={Player.South} />;
-}
-
-export function SouthHomeBasicField() {
-  return <GreenField isHome owner={Player.South} />;
-}
-
 function FacedownCard({ player }: { readonly player: Player }) {
   const playerStyle = {
     [Player.North]: 'north',
