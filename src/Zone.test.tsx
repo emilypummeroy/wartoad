@@ -1,7 +1,8 @@
 import { fireEvent, screen, render } from '@testing-library/react';
 
 import { Player, Phase, Subphase } from './App';
-import { ROW_COUNT, NORTH_HOME, SOUTH_HOME, Zone, type Position } from './Zone';
+import { ROW_COUNT, NORTH_HOME, SOUTH_HOME, type Position } from './Grid';
+import { Zone } from './Zone';
 
 const MIDDLE = 1;
 
@@ -290,6 +291,7 @@ describe(Zone, () => {
         );
 
         expect(onPlace).toHaveBeenCalledOnce();
+        expect(onPlace).toHaveBeenCalledWith(position);
       });
     },
   );

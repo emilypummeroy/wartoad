@@ -2,14 +2,14 @@ import './App.css';
 import { StepForward } from 'lucide-react';
 import { useCallback, useState } from 'react';
 
-import { Hand, BasicField } from './Hand';
 import {
   type Position,
-  Zone,
-  ROW_COUNT,
   ROW_COUNT_PER_PLAYER,
-  FIELD_COUNT_PER_ROW,
-} from './Zone';
+  INITIAL_GRID_STATE,
+  GridState,
+} from './Grid';
+import { Hand, BasicField } from './Hand';
+import { Zone } from './Zone';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 
@@ -47,21 +47,6 @@ export type FlowState = {
   readonly subphase: Subphase;
 };
 
-type GridState = readonly [
-  readonly [boolean, boolean, boolean],
-  readonly [boolean, boolean, boolean],
-  readonly [boolean, boolean, boolean],
-  readonly [boolean, boolean, boolean],
-  readonly [boolean, boolean, boolean],
-  readonly [boolean, boolean, boolean],
-];
-
-const isGridState = (
-  array: readonly (readonly boolean[])[],
-): array is GridState =>
-  array.length === ROW_COUNT &&
-  array.every(row => row.length === FIELD_COUNT_PER_ROW);
-
 type GameState = {
   readonly flow: FlowState;
   readonly grid: GridState;
@@ -88,14 +73,7 @@ export function App() {
       player: Player.South,
       subphase: Subphase.Idle,
     },
-    grid: [
-      [false, true, false],
-      [false, false, false],
-      [false, false, false],
-      [false, false, false],
-      [false, false, false],
-      [false, true, false],
-    ],
+    grid: INITIAL_GRID_STATE,
     northHand: INITIAL_HAND_CARD_COUNT,
     southHand: INITIAL_HAND_CARD_COUNT,
   });
@@ -127,39 +105,24 @@ export function App() {
 
   const handlePickCard = useCallback(
     () =>
-      setGameState(old => ({
-        ...old,
-        flow: { ...old.flow, subphase: Subphase.Placing },
+      setGameState(({ flow, ...rest }) => ({
+        ...rest,
+        flow: { ...flow, subphase: Subphase.Placing },
       })),
     [],
   );
 
-  // TODO move knowledge of x/y into Zone
-  const handlePlaceCard =
-    ({ x, y }: Position) =>
-    () =>
-      setGameState(old => {
-        const array = old.grid.map((row, yy) =>
-          yy !== y ? row : row.map((val, xx) => (xx === x ? true : val)),
-        );
-        // v8 ignore next 2
-        if (!isGridState(array)) {
-          throw new Error(`Expected a GridState but got: ${String(array)}`);
-        }
-        return {
-          ...old,
-          flow: { ...old.flow, subphase: Subphase.Idle },
-          northHand:
-            old.flow.player === Player.North
-              ? old.northHand - 1
-              : old.northHand,
-          southHand:
-            old.flow.player === Player.South
-              ? old.southHand - 1
-              : old.southHand,
-          grid: array,
-        };
-      });
+  // TODO move knowledge of x/y into Grid
+  const handlePlaceCard = useCallback(
+    (position: Position) =>
+      setGameState(({ grid, flow, northHand, southHand }) => ({
+        flow: { ...flow, subphase: Subphase.Idle },
+        northHand: flow.player === Player.North ? northHand - 1 : northHand,
+        southHand: flow.player === Player.South ? southHand - 1 : southHand,
+        grid: GridState.setAt(grid, position, true),
+      })),
+    [],
+  );
 
   return (
     <div className="wartide-app">
@@ -226,7 +189,7 @@ export function App() {
           <section className="playarea">
             <div role="grid">
               {grid.map(
-                ([isLeftPlaced, isMiddlePlaced, isRightPlaced], rowY) => (
+                ([isLeftUpgraded, isMiddleUpgraded, isRightUpgraded], rowY) => (
                   // The grid of field zones never gets rearranged
                   // oxlint-disable-next-line react/no-array-index-key
                   <div className="zonerow" role="row" key={rowY}>
@@ -238,8 +201,8 @@ export function App() {
                       }
                       flow={flow}
                       position={{ x: 0, y: rowY }}
-                      isUpgraded={isLeftPlaced}
-                      onPlace={handlePlaceCard({ x: 0, y: rowY })}
+                      isUpgraded={isLeftUpgraded}
+                      onPlace={handlePlaceCard}
                     />
                     <Zone
                       controller={
@@ -249,8 +212,8 @@ export function App() {
                       }
                       flow={flow}
                       position={{ x: 1, y: rowY }}
-                      isUpgraded={isMiddlePlaced}
-                      onPlace={handlePlaceCard({ x: 1, y: rowY })}
+                      isUpgraded={isMiddleUpgraded}
+                      onPlace={handlePlaceCard}
                     />
                     <Zone
                       controller={
@@ -260,8 +223,8 @@ export function App() {
                       }
                       flow={flow}
                       position={{ x: 2, y: rowY }}
-                      isUpgraded={isRightPlaced}
-                      onPlace={handlePlaceCard({ x: 2, y: rowY })}
+                      isUpgraded={isRightUpgraded}
+                      onPlace={handlePlaceCard}
                     />
                   </div>
                 ),

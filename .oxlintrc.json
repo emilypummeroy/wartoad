@@ -95,6 +95,9 @@
         "prefer-called-once": "error",
         "prefer-called-times": "allow",
         "prefer-readonly-parameter-types": "allow",
+        "prefer-to-be-truthy": "allow",
+        "prefer-to-be-falsy": "allow",
+        "prefer-strict-boolean-matchers": "error",
         "no-empty-interface": "allow",
         "consistent-type-definitions": "allow",
         "max-statements": [

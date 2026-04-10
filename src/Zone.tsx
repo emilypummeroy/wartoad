@@ -1,23 +1,8 @@
 import { Replace, Pyramid, HousePlus } from 'lucide-react';
-import { useId } from 'react';
+import { useId, useCallback } from 'react';
 
 import { Player, type FlowState, Subphase } from './App';
-
-export type Position = {
-  readonly x: number;
-  readonly y: number;
-};
-
-export const Position = {
-  equals: ({ x: x1, y: y1 }: Position, { x: x2, y: y2 }: Position) =>
-    x1 === x2 && y1 === y2,
-};
-
-export const ROW_COUNT = 6 as const;
-export const ROW_COUNT_PER_PLAYER = 3 as const;
-export const FIELD_COUNT_PER_ROW = 3 as const;
-export const NORTH_HOME: Position = { x: 1, y: 0 };
-export const SOUTH_HOME: Position = { x: 1, y: ROW_COUNT - 1 };
+import { Position, NORTH_HOME, SOUTH_HOME } from './Grid';
 
 function GreenField({
   owner,
@@ -82,7 +67,7 @@ type ZoneProps = Readonly<{
   controller: Player;
   position: Position;
   isUpgraded: boolean;
-  onPlace: () => void;
+  onPlace: (position: Position) => void;
 }>;
 
 export function Zone({
@@ -107,7 +92,7 @@ export function Zone({
     <button
       className={`placeable-zone ${playerStyle}`}
       disabled={!isDropzone}
-      onClick={onPlace}
+      onClick={useCallback(() => onPlace(position), [position, onPlace])}
     >
       <div className={`zone ${playerStyle}`} role="gridcell">
         {isDropzone && (
