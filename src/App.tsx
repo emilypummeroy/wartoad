@@ -3,12 +3,15 @@ import { StepForward } from 'lucide-react';
 import { useCallback, useState } from 'react';
 
 import { Hand, BasicField } from './Hand';
-import { Zone } from './Zone';
+import {
+  type Position,
+  Zone,
+  ROW_COUNT,
+  ROW_COUNT_PER_PLAYER,
+  FIELD_COUNT_PER_ROW,
+} from './Zone';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
-export const ROW_COUNT = 6;
-export const ROW_COUNT_PER_PLAYER = 3;
-export const FIELD_COUNT_PER_ROW = 3;
 
 export const Phase = {
   Start: 'Start',
@@ -64,11 +67,6 @@ type GameState = {
   readonly grid: GridState;
   readonly northHand: number;
   readonly southHand: number;
-};
-
-export type Position = {
-  readonly x: number;
-  readonly y: number;
 };
 
 // oxlint-disable max-lines-per-function
@@ -239,7 +237,7 @@ export function App() {
                           : Player.South
                       }
                       flow={flow}
-                      isHome={false}
+                      position={{ x: 0, y: rowY }}
                       isUpgraded={isLeftPlaced}
                       onPlace={handlePlaceCard({ x: 0, y: rowY })}
                     />
@@ -250,7 +248,7 @@ export function App() {
                           : Player.South
                       }
                       flow={flow}
-                      isHome={rowY === 0 || rowY === ROW_COUNT - 1}
+                      position={{ x: 1, y: rowY }}
                       isUpgraded={isMiddlePlaced}
                       onPlace={handlePlaceCard({ x: 1, y: rowY })}
                     />
@@ -261,7 +259,7 @@ export function App() {
                           : Player.South
                       }
                       flow={flow}
-                      isHome={false}
+                      position={{ x: 2, y: rowY }}
                       isUpgraded={isRightPlaced}
                       onPlace={handlePlaceCard({ x: 2, y: rowY })}
                     />

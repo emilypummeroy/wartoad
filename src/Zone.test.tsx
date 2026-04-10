@@ -1,7 +1,7 @@
 import { fireEvent, screen, render } from '@testing-library/react';
 
-import { ROW_COUNT, Player, Phase, Subphase, type Position } from './App';
-import { Zone } from './Zone';
+import { Player, Phase, Subphase } from './App';
+import { ROW_COUNT, NORTH_HOME, SOUTH_HOME, Zone, type Position } from './Zone';
 
 const MIDDLE = 1;
 
@@ -26,13 +26,12 @@ describe(Zone, () => {
         { x: 2, y: 5 },
       ])(
         `should have a ${player} Green Field if upgraded in non-home position %s`,
-        _ => {
+        position => {
           render(
             <Zone
               isUpgraded
               flow={FLOW}
-              // Make sure this is preserved when refactoring to x/y
-              isHome={false}
+              position={position}
               controller={player}
               onPlace={NOOP}
             />,
@@ -50,14 +49,13 @@ describe(Zone, () => {
     [Player.North, { x: 1, y: 0 }],
     [Player.South, { x: 1, y: ROW_COUNT - 1 }],
   ])(
-    'should have a %s Green Field if upgraded in non-home position %s',
-    ([player, _]) => {
+    'should have a %s Home Green Field if upgraded in home position %s',
+    ([player, position]) => {
       render(
         <Zone
           isUpgraded
           flow={FLOW}
-          // Make sure this is preserved when refactoring to x/y
-          isHome
+          position={position}
           controller={player}
           onPlace={NOOP}
         />,
@@ -85,8 +83,7 @@ describe(Zone, () => {
     [Player.North, Player.South, Phase.End, { x: 2, y: 3 }],
   ])(
     'basic cases :: controlled by %s | %s %s phase | %s | while idle',
-    ([controller, turnPlayer, phase, { x, y }]) => {
-      const isHome = x === MIDDLE && (y === 0 || y === ROW_COUNT - 1);
+    ([controller, turnPlayer, phase, position]) => {
       const flow = {
         player: turnPlayer,
         phase,
@@ -97,7 +94,7 @@ describe(Zone, () => {
         render(
           <Zone
             isUpgraded={false}
-            isHome={isHome}
+            position={position}
             flow={flow}
             controller={controller}
             onPlace={NOOP}
@@ -114,7 +111,7 @@ describe(Zone, () => {
           <Zone
             isUpgraded
             flow={flow}
-            isHome={isHome}
+            position={position}
             controller={controller}
             onPlace={NOOP}
           />,
@@ -126,7 +123,7 @@ describe(Zone, () => {
       it('should not have a dropzone', () => {
         render(
           <Zone
-            isHome={isHome}
+            position={position}
             flow={flow}
             isUpgraded={false}
             controller={controller}
@@ -143,7 +140,7 @@ describe(Zone, () => {
         const onPlace = vi.fn<() => void>();
         render(
           <Zone
-            isHome={isHome}
+            position={position}
             flow={flow}
             isUpgraded={false}
             controller={controller}
@@ -158,14 +155,14 @@ describe(Zone, () => {
     },
   );
 
-  describe.for<[Player, isHome: boolean]>([
-    [Player.North, true],
-    [Player.North, false],
-    [Player.South, true],
-    [Player.South, false],
+  describe.for<[Player, Position]>([
+    [Player.North, NORTH_HOME],
+    [Player.North, { x: 1, y: 3 }],
+    [Player.South, SOUTH_HOME],
+    [Player.South, { x: 2, y: 4 }],
   ])(
     'when controlled by %s while opponent is placing a card | isHome: %s',
-    ([controller, isHome]) => {
+    ([controller, position]) => {
       const flow = {
         player: controller === Player.North ? Player.South : Player.North,
         phase: Phase.Main,
@@ -175,7 +172,7 @@ describe(Zone, () => {
       it('should not have a dropzone', () => {
         render(
           <Zone
-            isHome={isHome}
+            position={position}
             flow={flow}
             isUpgraded={false}
             controller={controller}
@@ -194,7 +191,7 @@ describe(Zone, () => {
         const onPlace = vi.fn<() => void>();
         render(
           <Zone
-            isHome={isHome}
+            position={position}
             flow={flow}
             isUpgraded={false}
             controller={controller}
@@ -209,14 +206,14 @@ describe(Zone, () => {
     },
   );
 
-  describe.for<[Player, isHome: boolean]>([
-    [Player.North, true],
-    [Player.North, false],
-    [Player.South, true],
-    [Player.South, false],
+  describe.for<[Player, Position]>([
+    [Player.North, NORTH_HOME],
+    [Player.North, { x: 0, y: 0 }],
+    [Player.South, SOUTH_HOME],
+    [Player.South, { x: 2, y: 3 }],
   ])(
     'when controlled by %s while they are placing a card | isHome: %s',
-    ([player, isHome]) => {
+    ([player, position]) => {
       const flow = {
         player,
         phase: Phase.Main,
@@ -226,7 +223,7 @@ describe(Zone, () => {
       it('should not have a dropzone if upgraded', () => {
         render(
           <Zone
-            isHome={isHome}
+            position={position}
             flow={flow}
             controller={player}
             isUpgraded
@@ -245,7 +242,7 @@ describe(Zone, () => {
         const onPlace = vi.fn<() => void>();
         render(
           <Zone
-            isHome={isHome}
+            position={position}
             flow={flow}
             controller={player}
             isUpgraded
@@ -259,7 +256,7 @@ describe(Zone, () => {
       it('should have a dropzone if unupgraded', () => {
         render(
           <Zone
-            isHome={isHome}
+            position={position}
             flow={flow}
             controller={player}
             isUpgraded={false}
@@ -278,7 +275,7 @@ describe(Zone, () => {
         const onPlace = vi.fn<() => void>();
         render(
           <Zone
-            isHome={isHome}
+            position={position}
             flow={flow}
             controller={player}
             isUpgraded={false}

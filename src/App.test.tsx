@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
-import { Phase, Player, App, INITIAL_HAND_CARD_COUNT, ROW_COUNT } from './App';
+import { Phase, Player, App, INITIAL_HAND_CARD_COUNT } from './App';
+import { ROW_COUNT } from './Zone';
 
 const FEW = 3;
 const MANY = 15;

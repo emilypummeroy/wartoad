@@ -3,6 +3,22 @@ import { useId } from 'react';
 
 import { Player, type FlowState, Subphase } from './App';
 
+export type Position = {
+  readonly x: number;
+  readonly y: number;
+};
+
+const Position = {
+  equals: ({ x: x1, y: y1 }: Position, { x: x2, y: y2 }: Position) =>
+    x1 === x2 && y1 === y2,
+};
+
+export const ROW_COUNT = 6 as const;
+export const ROW_COUNT_PER_PLAYER = 3 as const;
+export const FIELD_COUNT_PER_ROW = 3 as const;
+export const NORTH_HOME: Position = { x: 1, y: 0 };
+export const SOUTH_HOME: Position = { x: 1, y: ROW_COUNT - 1 };
+
 function GreenField({
   owner,
   isHome = false,
@@ -64,7 +80,7 @@ function FacedownCard({ player }: { readonly player: Player }) {
 type ZoneProps = Readonly<{
   flow: FlowState;
   controller: Player;
-  isHome: boolean;
+  position: Position;
   isUpgraded: boolean;
   onPlace: () => void;
 }>;
@@ -72,7 +88,7 @@ type ZoneProps = Readonly<{
 export function Zone({
   flow: { subphase, player },
   controller,
-  isHome,
+  position,
   isUpgraded,
   onPlace,
 }: ZoneProps) {
@@ -82,6 +98,11 @@ export function Zone({
     [Player.North]: 'north',
     [Player.South]: 'south',
   }[controller];
+  const homePosition = {
+    [Player.North]: NORTH_HOME,
+    [Player.South]: SOUTH_HOME,
+  }[controller];
+
   return (
     <button
       className={`placeable-zone ${playerStyle}`}
@@ -97,7 +118,10 @@ export function Zone({
           </div>
         )}
         {isUpgraded ? (
-          <GreenField isHome={isHome} owner={controller} />
+          <GreenField
+            isHome={Position.equals(homePosition, position)}
+            owner={controller}
+          />
         ) : (
           <FacedownCard player={controller} />
         )}
