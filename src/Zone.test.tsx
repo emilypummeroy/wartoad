@@ -1,30 +1,92 @@
 import { fireEvent, screen, render } from '@testing-library/react';
 
-import { Player, Phase, Subphase } from './App';
+import { ROW_COUNT, Player, Phase, Subphase, type Position } from './App';
 import { Zone } from './Zone';
+
+const MIDDLE = 1;
 
 const NOOP = () => {};
 
+const FLOW = {
+  player: Player.North,
+  phase: Phase.Main,
+  subphase: Subphase.Idle,
+};
+
 describe(Zone, () => {
-  describe.for<
-    [controller: Player, turnPlayer: Player, Phase, isHome: boolean]
-  >([
-    // Triowise all combinations: 3x2x2
-    [Player.North, Player.North, Phase.Start, true],
-    [Player.South, Player.North, Phase.Main, true],
-    [Player.North, Player.North, Phase.End, true],
-    [Player.South, Player.North, Phase.Start, false],
-    [Player.North, Player.North, Phase.Main, false],
-    [Player.South, Player.North, Phase.End, false],
-    [Player.North, Player.South, Phase.Start, true],
-    [Player.South, Player.South, Phase.Main, true],
-    [Player.North, Player.South, Phase.End, true],
-    [Player.South, Player.South, Phase.Start, false],
-    [Player.North, Player.South, Phase.Main, false],
-    [Player.South, Player.South, Phase.End, false],
+  describe.for([Player.North, Player.South])(
+    'when controlled by %s',
+    player => {
+      it.each([
+        { x: 0, y: 0 },
+        { x: 1, y: 1 },
+        { x: 2, y: 2 },
+        { x: 0, y: 3 },
+        { x: 1, y: 4 },
+        { x: 2, y: 5 },
+      ])(
+        `should have a ${player} Green Field if upgraded in non-home position %s`,
+        _ => {
+          render(
+            <Zone
+              isUpgraded
+              flow={FLOW}
+              // Make sure this is preserved when refactoring to x/y
+              isHome={false}
+              controller={player}
+              onPlace={NOOP}
+            />,
+          );
+
+          expect(screen.getByRole('region')).toHaveAccessibleName(
+            `${player} owned Green Field`,
+          );
+        },
+      );
+    },
+  );
+
+  it.for<[Player, Position]>([
+    [Player.North, { x: 1, y: 0 }],
+    [Player.South, { x: 1, y: ROW_COUNT - 1 }],
   ])(
-    'basic cases :: controlled by %s | %s %s phase | isHome %s | while idle',
-    ([controller, turnPlayer, phase, isHome]) => {
+    'should have a %s Green Field if upgraded in non-home position %s',
+    ([player, _]) => {
+      render(
+        <Zone
+          isUpgraded
+          flow={FLOW}
+          // Make sure this is preserved when refactoring to x/y
+          isHome
+          controller={player}
+          onPlace={NOOP}
+        />,
+      );
+
+      expect(screen.getByRole('region')).toHaveAccessibleName(
+        `${player} Home Green Field`,
+      );
+    },
+  );
+
+  describe.for<[controller: Player, turnPlayer: Player, Phase, Position]>([
+    // 2*2*3 -- Position is incidental
+    [Player.North, Player.North, Phase.Start, { x: MIDDLE, y: 0 }],
+    [Player.South, Player.North, Phase.Main, { x: MIDDLE, y: ROW_COUNT - 1 }],
+    [Player.North, Player.North, Phase.End, { x: MIDDLE, y: 0 }],
+    [Player.South, Player.North, Phase.Start, { x: 0, y: 0 }],
+    [Player.North, Player.North, Phase.Main, { x: 2, y: 5 }],
+    [Player.South, Player.North, Phase.End, { x: 0, y: 1 }],
+    [Player.South, Player.South, Phase.Start, { x: MIDDLE, y: ROW_COUNT - 1 }],
+    [Player.North, Player.South, Phase.Main, { x: MIDDLE, y: 0 }],
+    [Player.South, Player.South, Phase.End, { x: MIDDLE, y: ROW_COUNT - 1 }],
+    [Player.North, Player.South, Phase.Start, { x: 2, y: 4 }],
+    [Player.South, Player.South, Phase.Main, { x: 0, y: 2 }],
+    [Player.North, Player.South, Phase.End, { x: 2, y: 3 }],
+  ])(
+    'basic cases :: controlled by %s | %s %s phase | %s | while idle',
+    ([controller, turnPlayer, phase, { x, y }]) => {
+      const isHome = x === MIDDLE && (y === 0 || y === ROW_COUNT - 1);
       const flow = {
         player: turnPlayer,
         phase,
@@ -47,7 +109,7 @@ describe(Zone, () => {
         );
       });
 
-      it(`should have a ${controller} ${isHome ? 'Home' : 'owned'} Green Field if upgraded`, () => {
+      it(`should have a ${controller} Green Field if upgraded`, () => {
         render(
           <Zone
             isUpgraded
@@ -58,9 +120,7 @@ describe(Zone, () => {
           />,
         );
 
-        expect(screen.getByRole('region')).toHaveAccessibleName(
-          `${controller} ${isHome ? 'Home' : 'owned'} Green Field`,
-        );
+        expect(screen.getByRole('region')).toHaveAccessibleName(/Green Field/);
       });
 
       it('should not have a dropzone', () => {
@@ -75,9 +135,7 @@ describe(Zone, () => {
         );
 
         expect(
-          screen.queryByRole('button', {
-            name: /Place on/,
-          }),
+          screen.queryByRole('button', { name: /Place on/ }),
         ).not.toBeInTheDocument();
       });
 

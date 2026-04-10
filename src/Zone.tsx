@@ -3,7 +3,7 @@ import { useId } from 'react';
 
 import { Player, type FlowState, Subphase } from './App';
 
-export function GreenField({
+function GreenField({
   owner,
   isHome = false,
 }: {

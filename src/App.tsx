@@ -66,7 +66,7 @@ type GameState = {
   readonly southHand: number;
 };
 
-type Position = {
+export type Position = {
   readonly x: number;
   readonly y: number;
 };
