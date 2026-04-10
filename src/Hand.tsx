@@ -7,7 +7,7 @@ import { Player } from './App';
 export const INITIAL_HAND_CARD_COUNT = 7;
 export const BIG_HAND_CARD_COUNT = 12;
 
-export const BasicField = () => {
+export const GreenField = () => {
   const id = useId();
   return (
     <section aria-labelledby={id} className="card">
@@ -55,7 +55,7 @@ function HandCard({ isEnabled, player, pickCard }: HandCardProps) {
         disabled={!isEnabled}
         onClick={pickCard}
       >
-        <BasicField />
+        <GreenField />
       </button>
     </div>
   );

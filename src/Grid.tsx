@@ -1,3 +1,6 @@
+import { Player, type FlowState } from './App';
+import { Zone } from './Zone';
+
 export type Position = {
   readonly x: number;
   readonly y: number;
@@ -23,7 +26,7 @@ export type GridState = readonly [
   readonly [boolean, boolean, boolean],
 ];
 
-export const INITIAL_GRID_STATE: GridState = [
+export const INITIAL_GRID: GridState = [
   [false, true, false],
   [false, false, false],
   [false, false, false],
@@ -48,3 +51,58 @@ export const GridState = {
     return array;
   },
 };
+
+export type GridProps = Readonly<{
+  grid: GridState;
+  flow: FlowState;
+  onPlaceCard: (position: Position) => void;
+}>;
+export function Grid({ grid, flow, onPlaceCard }: GridProps) {
+  const children = (rowY: number) => (
+    <>
+      <Zone
+        controller={rowY < ROW_COUNT_PER_PLAYER ? Player.North : Player.South}
+        flow={flow}
+        position={{ x: 0, y: rowY }}
+        isUpgraded={grid[rowY][0]}
+        onPlace={onPlaceCard}
+      />
+      <Zone
+        controller={rowY < ROW_COUNT_PER_PLAYER ? Player.North : Player.South}
+        flow={flow}
+        position={{ x: 1, y: rowY }}
+        isUpgraded={grid[rowY][1]}
+        onPlace={onPlaceCard}
+      />
+      <Zone
+        controller={rowY < ROW_COUNT_PER_PLAYER ? Player.North : Player.South}
+        flow={flow}
+        position={{ x: 2, y: rowY }}
+        isUpgraded={grid[rowY][2]}
+        onPlace={onPlaceCard}
+      />
+    </>
+  );
+  return (
+    <div role="grid">
+      <div className="zonerow" role="row">
+        {children(0)}
+      </div>
+      <div className="zonerow" role="row">
+        {children(1)}
+      </div>
+      <div className="zonerow" role="row">
+        {children(2)}
+      </div>
+      <div className="zonerow" role="row">
+        {children(3)}
+      </div>
+      <div className="zonerow" role="row">
+        {children(4)}
+      </div>
+      <div className="zonerow" role="row">
+        {children(5)}
+      </div>
+    </div>
+  );
+}

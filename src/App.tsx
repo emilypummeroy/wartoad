@@ -2,14 +2,8 @@ import './App.css';
 import { StepForward } from 'lucide-react';
 import { useCallback, useState } from 'react';
 
-import {
-  type Position,
-  ROW_COUNT_PER_PLAYER,
-  INITIAL_GRID_STATE,
-  GridState,
-} from './Grid';
-import { Hand, BasicField } from './Hand';
-import { Zone } from './Zone';
+import { type Position, INITIAL_GRID, GridState, Grid } from './Grid';
+import { Hand, GreenField } from './Hand';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 
@@ -73,7 +67,7 @@ export function App() {
       player: Player.South,
       subphase: Subphase.Idle,
     },
-    grid: INITIAL_GRID_STATE,
+    grid: INITIAL_GRID,
     northHand: INITIAL_HAND_CARD_COUNT,
     southHand: INITIAL_HAND_CARD_COUNT,
   });
@@ -112,7 +106,6 @@ export function App() {
     [],
   );
 
-  // TODO move knowledge of x/y into Grid
   const handlePlaceCard = useCallback(
     (position: Position) =>
       setGameState(({ grid, flow, northHand, southHand }) => ({
@@ -168,7 +161,7 @@ export function App() {
                   className={`zooming ${player === Player.North ? 'north' : 'south'}`}
                   tabIndex={0}
                 >
-                  <BasicField />
+                  <GreenField />
                 </div>
               </div>
             </section>
@@ -187,49 +180,7 @@ export function App() {
         }
         <div className="scroll-x">
           <section className="playarea">
-            <div role="grid">
-              {grid.map(
-                ([isLeftUpgraded, isMiddleUpgraded, isRightUpgraded], rowY) => (
-                  // The grid of field zones never gets rearranged
-                  // oxlint-disable-next-line react/no-array-index-key
-                  <div className="zonerow" role="row" key={rowY}>
-                    <Zone
-                      controller={
-                        rowY < ROW_COUNT_PER_PLAYER
-                          ? Player.North
-                          : Player.South
-                      }
-                      flow={flow}
-                      position={{ x: 0, y: rowY }}
-                      isUpgraded={isLeftUpgraded}
-                      onPlace={handlePlaceCard}
-                    />
-                    <Zone
-                      controller={
-                        rowY < ROW_COUNT_PER_PLAYER
-                          ? Player.North
-                          : Player.South
-                      }
-                      flow={flow}
-                      position={{ x: 1, y: rowY }}
-                      isUpgraded={isMiddleUpgraded}
-                      onPlace={handlePlaceCard}
-                    />
-                    <Zone
-                      controller={
-                        rowY < ROW_COUNT_PER_PLAYER
-                          ? Player.North
-                          : Player.South
-                      }
-                      flow={flow}
-                      position={{ x: 2, y: rowY }}
-                      isUpgraded={isRightUpgraded}
-                      onPlace={handlePlaceCard}
-                    />
-                  </div>
-                ),
-              )}
-            </div>
+            <Grid onPlaceCard={handlePlaceCard} flow={flow} grid={grid} />
           </section>
         </div>
       </main>

@@ -1,11 +1,16 @@
+import { screen, render, within, fireEvent } from '@testing-library/react';
+
+import { Phase, Player, Subphase } from './App';
 import {
-  ROW_COUNT,
-  FIELD_COUNT_PER_ROW,
+  Grid,
   GridState,
-  INITIAL_GRID_STATE,
+  INITIAL_GRID,
+  FIELD_COUNT_PER_ROW,
+  ROW_COUNT_PER_PLAYER,
+  ROW_COUNT,
 } from './Grid';
 
-const ANOTHER_GRID_STATE: GridState = [
+const ANOTHER_GRID: GridState = [
   [true, false, false],
   [true, true, true],
   [false, true, true],
@@ -13,13 +18,181 @@ const ANOTHER_GRID_STATE: GridState = [
   [true, true, false],
   [false, false, true],
 ];
+
+const EMPTY_GRID: GridState = [
+  [false, false, false],
+  [false, false, false],
+  [false, false, false],
+  [false, false, false],
+  [false, false, false],
+  [false, false, false],
+];
+
+const FULL_GRID: GridState = [
+  [true, true, true],
+  [true, true, true],
+  [true, true, true],
+  [true, true, true],
+  [true, true, true],
+  [true, true, true],
+];
+
+describe(Grid, () => {
+  const handlePlaceCard = vi.fn<() => void>();
+  const getPlayerRows = (player: Player) =>
+    player === Player.North
+      ? screen.getAllByRole('row').slice(0, ROW_COUNT_PER_PLAYER)
+      : screen.getAllByRole('row').slice(ROW_COUNT_PER_PLAYER);
+  const getOpponentRows = (player: Player) =>
+    player === Player.North
+      ? screen.getAllByRole('row').slice(ROW_COUNT_PER_PLAYER)
+      : screen.getAllByRole('row').slice(0, ROW_COUNT_PER_PLAYER);
+
+  describe.for<[name: string, GridState]>([
+    ['INITIAL_GRID_STATE', INITIAL_GRID],
+    ['EMPTY_GRID', EMPTY_GRID],
+    ['FULL_GRID', FULL_GRID],
+    ['ANOTHER_GRID', ANOTHER_GRID],
+  ])('with the grid: %s', ([_, grid]) => {
+    beforeEach(() => {
+      render(
+        <Grid
+          onPlaceCard={handlePlaceCard}
+          flow={{
+            phase: Phase.Main,
+            player: Player.North,
+            subphase: Subphase.Idle,
+          }}
+          grid={grid}
+        />,
+      );
+    });
+
+    it(`should display a grid with ${ROW_COUNT} rows of ${FIELD_COUNT_PER_ROW} fields`, () => {
+      expect(screen.getByRole('grid')).toBeVisible();
+
+      const rows = within(screen.getByRole('grid')).getAllByRole('row');
+      expect(rows).toHaveLength(ROW_COUNT);
+
+      for (const row of rows) {
+        expect(within(row).getAllByRole('region')).toHaveLength(
+          FIELD_COUNT_PER_ROW,
+        );
+      }
+    });
+
+    it.for<[Player, rowY: number]>([
+      [Player.North, 0],
+      [Player.North, 1],
+      [Player.North, 2],
+      [Player.South, 3],
+      [Player.South, 4],
+      [Player.South, 5],
+    ])(
+      'should display %s controlled fields in the %sth row',
+      ([player, rowY]) => {
+        const emptyName = new RegExp(`${player} controlled empty field`);
+        const fullName = new RegExp(`${player} (owned)|(Home) Green Field`);
+        const zones = within(screen.getAllByRole('row')[rowY]).getAllByRole(
+          'region',
+        );
+        for (let x = 0; x < zones.length; x += 1) {
+          expect(zones[x]).toHaveAccessibleName(
+            grid[rowY][x] ? fullName : emptyName,
+          );
+        }
+      },
+    );
+  });
+
+  describe.for<Player>([Player.North, Player.South])(
+    'when placing a %s card in a full grid',
+    player => {
+      beforeEach(() => {
+        render(
+          <Grid
+            onPlaceCard={handlePlaceCard}
+            flow={{
+              phase: Phase.Main,
+              player,
+              subphase: Subphase.Placing,
+            }}
+            grid={FULL_GRID}
+          />,
+        );
+      });
+
+      it('should not display any clickable fields', () => {
+        const buttons = screen.getAllByRole('button');
+        for (const button of buttons) {
+          expect(button).not.toHaveAccessibleName(/Place on/);
+          fireEvent.click(button);
+        }
+        expect(handlePlaceCard).not.toHaveBeenCalled();
+      });
+    },
+  );
+
+  describe.for<[Player, shouldReverse: boolean]>([
+    [Player.North, false],
+    [Player.South, true],
+  ])('when placing a %s card in an empty grid', ([player, shouldReverse]) => {
+    const opponentRowsAt = shouldReverse ? 'first' : 'last';
+    const playerRowsAt = shouldReverse ? 'last' : 'first';
+
+    beforeEach(() => {
+      render(
+        <Grid
+          onPlaceCard={handlePlaceCard}
+          flow={{
+            phase: Phase.Main,
+            player,
+            subphase: Subphase.Placing,
+          }}
+          grid={EMPTY_GRID}
+        />,
+      );
+    });
+
+    it(`should display ${FIELD_COUNT_PER_ROW} clickable fields in the ${playerRowsAt} rows`, () => {
+      for (const row of getPlayerRows(player)) {
+        const buttons = within(row).getAllByRole('button');
+        expect(buttons).toHaveLength(FIELD_COUNT_PER_ROW);
+
+        for (const button of buttons) {
+          fireEvent.click(button);
+          expect(button).toHaveAccessibleName(
+            `Place on ${player} controlled empty field`,
+          );
+
+          expect(handlePlaceCard).toHaveBeenCalledOnce();
+          handlePlaceCard.mockReset();
+        }
+      }
+    });
+
+    it(`should not display clickable fields in the ${opponentRowsAt} rows`, () => {
+      for (const row of getOpponentRows(player)) {
+        const buttons = within(row).getAllByRole('button');
+        expect(buttons).toHaveLength(FIELD_COUNT_PER_ROW);
+
+        for (const button of buttons) {
+          expect(button).not.toHaveAccessibleName(/Place on/);
+          fireEvent.click(button);
+        }
+      }
+      expect(handlePlaceCard).not.toHaveBeenCalled();
+    });
+  });
+});
+
 describe('the GridState type functions', () => {
   describe('GridState.setAt', () => {
     describe.for<[string, boolean, readonly (readonly boolean[])[]]>([
-      ['INITIAL_GRID_STATE', true, INITIAL_GRID_STATE],
-      ['INITIAL_GRID_STATE', false, INITIAL_GRID_STATE],
-      ['ANOTHER_GRID_STATE', true, ANOTHER_GRID_STATE],
-      ['ANOTHER_GRID_STATE', false, ANOTHER_GRID_STATE],
+      ['INITIAL_GRID_STATE', true, INITIAL_GRID],
+      ['INITIAL_GRID_STATE', false, INITIAL_GRID],
+      ['ANOTHER_GRID_STATE', true, ANOTHER_GRID],
+      ['ANOTHER_GRID_STATE', false, ANOTHER_GRID],
     ])('with known GridState: %s | new value: %s', ([_, newValue, grid]) => {
       // oxlint-disable-next-line no-null
       if (!GridState.is(grid)) {
@@ -80,8 +253,8 @@ describe('the GridState type functions', () => {
 
   describe('GridState.is', () => {
     describe.for<[string, readonly (readonly boolean[])[]]>([
-      ['INITIAL_GRID_STATE', INITIAL_GRID_STATE],
-      ['ANOTHER_GRID_STATE', ANOTHER_GRID_STATE],
+      ['INITIAL_GRID_STATE', INITIAL_GRID],
+      ['ANOTHER_GRID_STATE', ANOTHER_GRID],
     ])('with known GridState: %s', ([name, array]) => {
       it(`should verify ${name}`, () => {
         expect(GridState.is(array)).toBe(true);

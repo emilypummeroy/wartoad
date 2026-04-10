@@ -26,7 +26,7 @@ describe(Zone, () => {
         { x: 1, y: 4 },
         { x: 2, y: 5 },
       ])(
-        `should have a ${player} Green Field if upgraded in non-home position %s`,
+        `should have a ${player} Green Field if upgraded in non-home %s`,
         position => {
           render(
             <Zone
@@ -47,10 +47,10 @@ describe(Zone, () => {
   );
 
   it.for<[Player, Position]>([
-    [Player.North, { x: 1, y: 0 }],
-    [Player.South, { x: 1, y: ROW_COUNT - 1 }],
+    [Player.North, NORTH_HOME],
+    [Player.South, SOUTH_HOME],
   ])(
-    'should have a %s Home Green Field if upgraded in home position %s',
+    'should have a %s Home Green Field if upgraded in home %s',
     ([player, position]) => {
       render(
         <Zone
@@ -162,7 +162,7 @@ describe(Zone, () => {
     [Player.South, SOUTH_HOME],
     [Player.South, { x: 2, y: 4 }],
   ])(
-    'when controlled by %s while opponent is placing a card | isHome: %s',
+    'when controlled by %s while opponent is placing a card | position: %s',
     ([controller, position]) => {
       const flow = {
         player: controller === Player.North ? Player.South : Player.North,
@@ -213,7 +213,7 @@ describe(Zone, () => {
     [Player.South, SOUTH_HOME],
     [Player.South, { x: 2, y: 3 }],
   ])(
-    'when controlled by %s while they are placing a card | isHome: %s',
+    'when controlled by %s while they are placing a card | position: %s',
     ([player, position]) => {
       const flow = {
         player,

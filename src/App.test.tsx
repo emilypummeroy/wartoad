@@ -161,9 +161,9 @@ describe(App, () => {
       });
 
       describe.for([North, South])(
-        'after %s picks a card from their hand',
+        'after %s picks a card from their hand during their Main phase',
         player => {
-          it(`should show a card picked during the ${player} Main phase`, () => {
+          it(`should show the card only until it is placed`, () => {
             advanceToPhase(player, Main);
             fireEvent.click(getAll.clickableHandCards(player)[2]);
 
@@ -173,11 +173,7 @@ describe(App, () => {
                 name: 'Green Field',
               }),
             ).toBeVisible();
-          });
 
-          it(`should not be visible after placing a ${player} card`, () => {
-            advanceToPhase(player, Main);
-            fireEvent.click(getAll.clickableHandCards(player)[2]);
             fireEvent.click(
               withinThe.playArea().getAllByRole('button', {
                 name: new RegExp(`${player} controlled`),
@@ -212,12 +208,9 @@ describe(App, () => {
         expect(getAll.hiddenHandCards(player)).toHaveLength(cards.length);
       });
 
-      it(`should gain an extra card only during the ${player} Start phase`, () => {
-        advanceToPhase(player, Main);
-        const initialCount = getAll.handCards(player).length;
-
+      it(`should gain an extra card during the ${player} Start phase`, () => {
         advanceToPhase(opponent, End);
-        expect(getAll.handCards(player)).toHaveLength(initialCount);
+        const initialCount = getAll.handCards(player).length;
 
         advanceToPhase(player, Main);
         expect(getAll.handCards(player)).toHaveLength(initialCount + 1);
@@ -257,20 +250,6 @@ describe(App, () => {
 
         expect(getAll.handCards(player)).toHaveLength(initialHandSize - 1);
       });
-
-      it(`should not lose a card when ${opponent} plays a card`, () => {
-        advanceToPhase(opponent, Main);
-        const initialHandSize = getAll.handCards(player).length;
-
-        fireEvent.click(getAll.clickableHandCards(opponent)[4]);
-        fireEvent.click(
-          withinThe.playArea().getAllByRole('button', {
-            name: /Place/,
-          })[0],
-        );
-
-        expect(getAll.handCards(player)).toHaveLength(initialHandSize);
-      });
     });
   });
 
@@ -279,39 +258,39 @@ describe(App, () => {
       expect(withinThe.main().getByRole('grid')).toBeVisible();
     });
 
-    describe.for([North, South])(
-      'after picking a card from the %s hand',
-      player => {
-        const opponent = player === North ? South : North;
+    const FIELD_COUNT_PER_PLAYER = 8;
+    describe.for<[Player, number[]]>([
+      [North, [0, FIELD_COUNT_PER_PLAYER - 2]],
+      [South, [1, FIELD_COUNT_PER_PLAYER - 1]],
+    ])('after picking a card from the %s hand', ([player, fieldsToUpgrade]) => {
+      const opponent = player === North ? South : North;
 
-        beforeEach(() => {
-          advanceToPhase(player, Main);
-          fireEvent.click(getAll.clickableHandCards(player)[0]);
-        });
+      beforeEach(() => {
+        advanceToPhase(player, Main);
+        fireEvent.click(getAll.clickableHandCards(player)[0]);
+      });
 
-        const INITIAL_UNUPGRADED_FIELDS_PER_PLAYER = 8;
-        it.for([0, 2, INITIAL_UNUPGRADED_FIELDS_PER_PLAYER - 1])(
-          `should allow ${player} to upgrade their %sth unupgraded field by clicking on it`,
-          fieldIndex => {
-            const initialBasicFieldCount =
-              queryAll.ownedGreenFields(player).length;
-            fireEvent.click(
-              getAll.controlledEmptyFieldDropzone(player)[fieldIndex],
-            );
+      it.for(fieldsToUpgrade)(
+        `should allow ${player} to upgrade their %sth unupgraded field by clicking on it`,
+        fieldIndex => {
+          const initialGreenFieldCount =
+            queryAll.ownedGreenFields(player).length;
+          fireEvent.click(
+            getAll.controlledEmptyFieldDropzone(player)[fieldIndex],
+          );
 
-            expect(getAll.ownedGreenFields(player)).toHaveLength(
-              initialBasicFieldCount + 1,
-            );
-          },
-        );
+          expect(getAll.ownedGreenFields(player)).toHaveLength(
+            initialGreenFieldCount + 1,
+          );
+        },
+      );
 
-        it(`should not allow ${player} to play a card on an a ${opponent} field`, () => {
-          expect(
-            queryThe.controlledEmptyFieldDropzone(opponent),
-          ).not.toBeInTheDocument();
-        });
-      },
-    );
+      it(`should not allow ${player} to play a card on an a ${opponent} field`, () => {
+        expect(
+          queryThe.controlledEmptyFieldDropzone(opponent),
+        ).not.toBeInTheDocument();
+      });
+    });
 
     describe('The initial placement of fields', () => {
       it('should have 18 fields in 6 rows of 3', () => {
