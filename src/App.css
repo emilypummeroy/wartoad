@@ -1,53 +1,145 @@
 :root {
-  --card-shadow:
-    rgba(0, 0, 0, 0.2) 0 10px 15px 0, rgba(0, 0, 0, 0.1) 0 4px 6px 0;
-  --card-south: lch(60% 40 280);
-  --card-north: lch(40% 52 25);
+  --text: oklch(20% 0.03 200);
+  --text-transparent: oklch(20% 0.03 200 / 0.5);
+  --text-h: oklch(15% 0.05 200);
+  --bg: oklch(95% 0.01 180);
+  --bg-solid: oklch(90% 0.02 160);
+  --bg-transparent: oklch(90% 0.02 160 / 0.5);
+  --border: oklch(85% 0.02 130);
+  --accent: oklch(40% 0.16 140);
+  --accent-bg: oklch(90% 0.06 140);
+  --accent-bg-solid: oklch(80% 0.06 140);
+  --accent-border: oklch(75% 0.09 140);
 
-  --card-front: lch(45% 5 180);
-  --card-text: lch(100% 5 0);
-  --card-back: lch(10% 12 320);
-  --card-outline: lch(21% 12 320);
-  --card-border: lch(36% 8 320);
-  --card-back-symbol: lch(70% 35 95);
+  --shadow:
+    oklch(0% 0 0 / 0.15) 0 10px 15px -3px, oklch(0% 0 0 / 0.1) 0 4px 6px -2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: oklch(80% 0.02 200);
+    --text-transparent: oklch(80% 0.02 200 / 0.5);
+    --text-h: oklch(85% 0.03 200);
+    --bg: oklch(18% 0.01 180);
+    --bg-solid: oklch(12% 0.06 160);
+    --bg-transparent: oklch(12% 0.06 160 / 0.5);
+    --border: oklch(25% 0.02 130);
+    --accent: oklch(60% 0.12 140);
+    --accent-bg: oklch(20% 0.06 140);
+    --accent-bg-solid: oklch(30% 0.06 140);
+    --accent-border: oklch(35% 0.09 140);
+
+    --shadow:
+      oklch(0% 0 0 / 0.4) 0 10px 15px -3px, oklch(0% 0 0 / 0.25) 0 4px 6px -2px;
+  }
+}
+
+:root {
+  --card-south: oklch(65% 0.16 310);
+  --card-north: oklch(72% 0.22 80);
+  --card-front: oklch(40% 0.01 180);
+  --card-text: oklch(95% 0.02 20);
+  --card-back: oklch(15% 0.05 200);
+  --card-outline: oklch(50% 0.01 160);
+  --card-border: oklch(10% 0.02 160);
+  --card-back-symbol: oklch(55% 0.05 140);
 
   color-scheme: light dark;
 
-  --south-accent: lch(30% 104 280);
-  --north-accent: lch(51% 80 25);
-  --south-text: lch(40% 58.5 280);
-  --north-text: lch(48% 45 25);
-  --south-outline-accent: lch(30% 117 280 / 0.5);
-  --north-outline-accent: lch(51% 90 25 / 0.5);
-  --south-outline: lch(58% 65 280 / 0.5);
-  --north-outline: lch(40% 50 25 / 0.5);
-  --south-bg: lch(90% 26 280);
-  --north-bg: lch(93% 20 25);
+  --card-shadow:
+    oklch(0% 0 0 / 0.3) 0 6px 16px 0, oklch(0% 0 0 / 0.5) 0 4px 8px 0;
 
+  /* South 100-5x, North 100-4x */
+  --south-accent: oklch(65% 0.16 310);
+  --north-accent: oklch(72% 0.22 80);
+  --south-text: oklch(40% 0.16 310);
+  --north-text: oklch(48% 0.22 80);
+  --south-outline-accent: oklch(65% 0.16 310 / 0.5);
+  --north-outline-accent: oklch(72% 0.22 80 / 0.5);
+  --south-outline: oklch(50% 0.16 310 / 0.5);
+  --north-outline: oklch(60% 0.22 80 / 0.5);
+  --south-bg: oklch(90% 0.05 310);
+  --north-bg: oklch(92% 0.07 80);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --south-accent: oklch(55% 0.16 310);
+    --north-accent: oklch(48% 0.22 80);
+    --south-text: oklch(75% 0.16 310);
+    --north-text: oklch(66% 0.22 80);
+    --south-outline-accent: oklch(55% 0.16 310 / 0.5);
+    --north-outline-accent: oklch(48% 0.22 80 / 0.5);
+    --south-outline: oklch(70% 0.16 310 / 0.5);
+    --north-outline: oklch(60% 0.22 80 / 0.5);
+    --south-bg: oklch(30% 0.05 310);
+    --north-bg: oklch(28% 0.07 80);
+  }
+}
+
+:root {
   --animation-smooth: 300ms ease-out;
   --animation-fast: 150ms ease-out;
   --animation-fast-linear: 150ms linear;
 
   --z-index-hand: 10;
   --z-index-playarea-overlay: 20;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 18px/145% var(--sans);
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --south-accent: lch(80% 104 280);
-    --north-accent: lch(56% 80 25);
-    --south-text: lch(60% 58.5 280);
-    --north-text: lch(52% 45 25);
-    --south-outline-accent: lch(70% 117 280 / 0.5);
-    --north-outline-accent: lch(49% 90 25 / 0.5);
-    --south-outline: lch(60% 65 280 / 0.5);
-    --north-outline: lch(42% 50 25 / 0.5);
-    --south-bg: lch(10% 26 280);
-    --north-bg: lch(7% 20 25);
+#root {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+}
 
-    --card-shadow:
-      rgba(0, 0, 0, 0.5) 0 10px 15px 0, rgba(0, 0, 0, 0.3) 0 4px 6px 0;
+body {
+  margin: 0;
+}
+
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+h1 {
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  margin: 32px 0;
+  @media (max-width: 1024px) {
+    font-size: 36px;
+    margin: 20px 0;
   }
+}
+h2 {
+  font-size: 24px;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 8px;
+  @media (max-width: 1024px) {
+    font-size: 20px;
+  }
+}
+p {
+  margin: 0;
 }
 
 .wartode-app {
@@ -151,6 +243,8 @@ main {
   text-align: start;
   display: flex;
   flex-grow: 1;
+
+  background: var(--bg);
 }
 
 .handarea {
