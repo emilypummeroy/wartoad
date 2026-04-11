@@ -94,10 +94,10 @@ describe(App, () => {
   };
 
   describe('Header', () => {
-    it('should have the wartode heading', () => {
+    it('should have the wartoad heading', () => {
       const heading = screen.getByRole('heading', { level: 1 });
       const banner = screen.getByRole('banner');
-      expect(heading).toHaveTextContent('Wartode');
+      expect(heading).toHaveTextContent('Wartoad');
       expect(banner).toContainElement(heading);
     });
 

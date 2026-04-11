@@ -176,11 +176,11 @@ export function App() {
   );
 
   return (
-    <div className="wartode-app">
+    <div className="wartoad-app">
       <header>
         <div className="title">
           <h1>
-            War<span className="accent">tode</span>
+            War<span className="accent">toad</span>
           </h1>
         </div>
         <PhaseBar flow={flow} onNextPhaseClicked={handleNextPhaseClicked} />
