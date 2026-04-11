@@ -1,7 +1,7 @@
 import { fireEvent, screen, render } from '@testing-library/react';
 
-import { Player, Phase, Subphase } from './App';
-import { ROW_COUNT, NORTH_HOME, SOUTH_HOME, type Position } from './Grid';
+import { Position, ROW_COUNT } from './Grid';
+import { Phase, Player, Subphase } from './PhaseTracker';
 import { Zone } from './Zone';
 
 const MIDDLE = 1;
@@ -26,7 +26,7 @@ describe(Zone, () => {
         { x: 1, y: 4 },
         { x: 2, y: 5 },
       ])(
-        `should have a ${player} Green Field if upgraded in non-home %s`,
+        `should have a ${player} Lily Pad if upgraded in non-home %s`,
         position => {
           render(
             <Zone
@@ -39,7 +39,7 @@ describe(Zone, () => {
           );
 
           expect(screen.getByRole('region')).toHaveAccessibleName(
-            `${player} owned Green Field`,
+            `${player} owned Lily Pad`,
           );
         },
       );
@@ -47,10 +47,10 @@ describe(Zone, () => {
   );
 
   it.for<[Player, Position]>([
-    [Player.North, NORTH_HOME],
-    [Player.South, SOUTH_HOME],
+    [Player.North, Position.HOME[Player.North]],
+    [Player.South, Position.HOME[Player.South]],
   ])(
-    'should have a %s Home Green Field if upgraded in home %s',
+    'should have a %s Home Lily Pad if upgraded in home %s',
     ([player, position]) => {
       render(
         <Zone
@@ -63,7 +63,7 @@ describe(Zone, () => {
       );
 
       expect(screen.getByRole('region')).toHaveAccessibleName(
-        `${player} Home Green Field`,
+        `${player} Home Lily Pad`,
       );
     },
   );
@@ -91,7 +91,7 @@ describe(Zone, () => {
         subphase: Subphase.Idle,
       };
 
-      it(`should have a ${controller} empty field if unupgraded`, () => {
+      it(`should have a ${controller} conrolled leaf if unupgraded`, () => {
         render(
           <Zone
             isUpgraded={false}
@@ -103,11 +103,11 @@ describe(Zone, () => {
         );
 
         expect(screen.getByRole('region')).toHaveAccessibleName(
-          `${controller} controlled empty field`,
+          `${controller} controlled leaf`,
         );
       });
 
-      it(`should have a ${controller} Green Field if upgraded`, () => {
+      it(`should have a ${controller} Lily Pad if upgraded`, () => {
         render(
           <Zone
             isUpgraded
@@ -118,7 +118,7 @@ describe(Zone, () => {
           />,
         );
 
-        expect(screen.getByRole('region')).toHaveAccessibleName(/Green Field/);
+        expect(screen.getByRole('region')).toHaveAccessibleName(/Lily Pad/);
       });
 
       it('should not have a dropzone', () => {
@@ -157,9 +157,9 @@ describe(Zone, () => {
   );
 
   describe.for<[Player, Position]>([
-    [Player.North, NORTH_HOME],
+    [Player.North, Position.HOME[Player.North]],
     [Player.North, { x: 1, y: 3 }],
-    [Player.South, SOUTH_HOME],
+    [Player.South, Position.HOME[Player.South]],
     [Player.South, { x: 2, y: 4 }],
   ])(
     'when controlled by %s while opponent is placing a card | position: %s',
@@ -208,9 +208,9 @@ describe(Zone, () => {
   );
 
   describe.for<[Player, Position]>([
-    [Player.North, NORTH_HOME],
+    [Player.North, Position.HOME[Player.North]],
     [Player.North, { x: 0, y: 0 }],
-    [Player.South, SOUTH_HOME],
+    [Player.South, Position.HOME[Player.South]],
     [Player.South, { x: 2, y: 3 }],
   ])(
     'when controlled by %s while they are placing a card | position: %s',
@@ -267,7 +267,7 @@ describe(Zone, () => {
 
         expect(
           screen.getByRole('button', {
-            name: `Place on ${player} controlled empty field`,
+            name: `Place on ${player} controlled leaf`,
           }),
         ).toBeVisible();
       });
@@ -286,7 +286,7 @@ describe(Zone, () => {
 
         fireEvent.click(
           screen.getByRole('button', {
-            name: `Place on ${player} controlled empty field`,
+            name: `Place on ${player} controlled leaf`,
           }),
         );
 

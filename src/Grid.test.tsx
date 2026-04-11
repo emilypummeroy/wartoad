@@ -1,6 +1,5 @@
 import { screen, render, within, fireEvent } from '@testing-library/react';
 
-import { Phase, Player, Subphase } from './App';
 import {
   Grid,
   GridState,
@@ -9,6 +8,7 @@ import {
   ROW_COUNT_PER_PLAYER,
   ROW_COUNT,
 } from './Grid';
+import { Phase, Player, Subphase } from './PhaseTracker';
 
 const ANOTHER_GRID: GridState = [
   [true, false, false],
@@ -68,7 +68,7 @@ describe(Grid, () => {
       );
     });
 
-    it(`should display a grid with ${ROW_COUNT} rows of ${FIELD_COUNT_PER_ROW} fields`, () => {
+    it(`should display a grid with ${ROW_COUNT} rows of ${FIELD_COUNT_PER_ROW} leaves`, () => {
       expect(screen.getByRole('grid')).toBeVisible();
 
       const rows = within(screen.getByRole('grid')).getAllByRole('row');
@@ -89,10 +89,10 @@ describe(Grid, () => {
       [Player.South, 4],
       [Player.South, 5],
     ])(
-      'should display %s controlled fields in the %sth row',
+      'should display %s controlled leaves in the %sth row',
       ([player, rowY]) => {
-        const emptyName = new RegExp(`${player} controlled empty field`);
-        const fullName = new RegExp(`${player} (owned)|(Home) Green Field`);
+        const emptyName = new RegExp(`${player} controlled leaf`);
+        const fullName = new RegExp(`${player} (owned)|(Home) Lily Pad`);
         const zones = within(screen.getAllByRole('row')[rowY]).getAllByRole(
           'region',
         );
@@ -122,7 +122,7 @@ describe(Grid, () => {
         );
       });
 
-      it('should not display any clickable fields', () => {
+      it('should not display any clickable leaves', () => {
         const buttons = screen.getAllByRole('button');
         for (const button of buttons) {
           expect(button).not.toHaveAccessibleName(/Place on/);
@@ -154,7 +154,7 @@ describe(Grid, () => {
       );
     });
 
-    it(`should display ${FIELD_COUNT_PER_ROW} clickable fields in the ${playerRowsAt} rows`, () => {
+    it(`should display ${FIELD_COUNT_PER_ROW} clickable leaves in the ${playerRowsAt} rows`, () => {
       for (const row of getPlayerRows(player)) {
         const buttons = within(row).getAllByRole('button');
         expect(buttons).toHaveLength(FIELD_COUNT_PER_ROW);
@@ -162,7 +162,7 @@ describe(Grid, () => {
         for (const button of buttons) {
           fireEvent.click(button);
           expect(button).toHaveAccessibleName(
-            `Place on ${player} controlled empty field`,
+            `Place on ${player} controlled leaf`,
           );
 
           expect(handlePlaceCard).toHaveBeenCalledOnce();
@@ -171,7 +171,7 @@ describe(Grid, () => {
       }
     });
 
-    it(`should not display clickable fields in the ${opponentRowsAt} rows`, () => {
+    it(`should not display clickable leaves in the ${opponentRowsAt} rows`, () => {
       for (const row of getOpponentRows(player)) {
         const buttons = within(row).getAllByRole('button');
         expect(buttons).toHaveLength(FIELD_COUNT_PER_ROW);

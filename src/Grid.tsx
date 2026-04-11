@@ -1,5 +1,9 @@
-import { Player, type FlowState } from './App';
+import { Player, type FlowState } from './PhaseTracker';
 import { Zone } from './Zone';
+
+export const ROW_COUNT = 6 as const;
+export const ROW_COUNT_PER_PLAYER = 3 as const;
+export const FIELD_COUNT_PER_ROW = 3 as const;
 
 export type Position = {
   readonly x: number;
@@ -9,13 +13,12 @@ export type Position = {
 export const Position = {
   equals: ({ x: x1, y: y1 }: Position, { x: x2, y: y2 }: Position) =>
     x1 === x2 && y1 === y2,
-};
 
-export const ROW_COUNT = 6 as const;
-export const ROW_COUNT_PER_PLAYER = 3 as const;
-export const FIELD_COUNT_PER_ROW = 3 as const;
-export const NORTH_HOME: Position = { x: 1, y: 0 };
-export const SOUTH_HOME: Position = { x: 1, y: ROW_COUNT - 1 };
+  HOME: {
+    [Player.North]: { x: 1, y: 0 },
+    [Player.South]: { x: 1, y: ROW_COUNT - 1 },
+  },
+};
 
 export type GridState = readonly [
   readonly [boolean, boolean, boolean],

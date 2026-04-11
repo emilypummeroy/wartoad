@@ -1,7 +1,8 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
-import { Phase, Player, App, INITIAL_HAND_CARD_COUNT } from './App';
+import { App, INITIAL_HAND_CARD_COUNT } from './App';
 import { ROW_COUNT } from './Grid';
+import { Phase, Player } from './PhaseTracker';
 
 const FEW = 3;
 const MANY = 15;
@@ -40,16 +41,16 @@ describe(App, () => {
     clickableHandCards: (player: Player) =>
       withinThe.hand(player).getAllByRole('button'),
     visibleHandCards: (player: Player) =>
-      withinThe.hand(player).getAllByRole('region', { name: 'Green Field' }),
+      withinThe.hand(player).getAllByRole('region', { name: 'Lily Pad' }),
     hiddenHandCards: (player: Player) =>
       withinThe.hand(player).getAllByRole('region', { name: 'Facedown card' }),
     ownedGreenFields: (player: Player) =>
       withinThe.playArea().getAllByRole('region', {
-        name: `${player} owned Green Field`,
+        name: `${player} owned Lily Pad`,
       }),
     controlledEmptyFieldDropzone: (player: Player) =>
       withinThe.playArea().getAllByRole('button', {
-        name: `Place on ${player} controlled empty field`,
+        name: `Place on ${player} controlled leaf`,
       }),
   };
 
@@ -58,7 +59,7 @@ describe(App, () => {
       withinThe.hand(player).queryAllByRole('button'),
     ownedGreenFields: (player: Player) =>
       withinThe.playArea().queryAllByRole('region', {
-        name: `${player} owned Green Field`,
+        name: `${player} owned Lily Pad`,
       }),
   };
 
@@ -71,7 +72,7 @@ describe(App, () => {
         .queryByRole('region', { name: `${player}: ${phase} phase` }),
     controlledEmptyFieldDropzone: (player: Player) =>
       withinThe.playArea().queryByRole('button', {
-        name: `Place on ${player} controlled empty field`,
+        name: `Place on ${player} controlled leaf`,
       }),
   };
 
@@ -170,7 +171,7 @@ describe(App, () => {
             expect(getThe.pickedCardDisplay()).toBeVisible();
             expect(
               withinThe.pickedCardDisplay().getByRole('region', {
-                name: 'Green Field',
+                name: 'Lily Pad',
               }),
             ).toBeVisible();
 
@@ -196,7 +197,7 @@ describe(App, () => {
         advanceToPhase(player, Start);
         const cards = getAll.handCards(player);
         expect(cards).not.toHaveLength(0);
-        for (const c of cards) expect(c).toHaveAccessibleName('Green Field');
+        for (const c of cards) expect(c).toHaveAccessibleName('Lily Pad');
         expect(getAll.visibleHandCards(player)).toHaveLength(cards.length);
       });
 
@@ -244,7 +245,7 @@ describe(App, () => {
         fireEvent.click(getAll.clickableHandCards(player)[2]);
         fireEvent.click(
           withinThe.playArea().getAllByRole('button', {
-            name: `Place on ${player} controlled empty field`,
+            name: `Place on ${player} controlled leaf`,
           })[0],
         );
 
@@ -262,7 +263,7 @@ describe(App, () => {
     describe.for<[Player, number[]]>([
       [North, [0, FIELD_COUNT_PER_PLAYER - 2]],
       [South, [1, FIELD_COUNT_PER_PLAYER - 1]],
-    ])('after picking a card from the %s hand', ([player, fieldsToUpgrade]) => {
+    ])('after picking a card from the %s hand', ([player, leavesToUpgrade]) => {
       const opponent = player === North ? South : North;
 
       beforeEach(() => {
@@ -270,13 +271,13 @@ describe(App, () => {
         fireEvent.click(getAll.clickableHandCards(player)[0]);
       });
 
-      it.for(fieldsToUpgrade)(
-        `should allow ${player} to upgrade their %sth unupgraded field by clicking on it`,
-        fieldIndex => {
+      it.for(leavesToUpgrade)(
+        `should allow ${player} to upgrade their %sth unupgraded leaf by clicking on it`,
+        leafIndex => {
           const initialGreenFieldCount =
             queryAll.ownedGreenFields(player).length;
           fireEvent.click(
-            getAll.controlledEmptyFieldDropzone(player)[fieldIndex],
+            getAll.controlledEmptyFieldDropzone(player)[leafIndex],
           );
 
           expect(getAll.ownedGreenFields(player)).toHaveLength(
@@ -285,27 +286,27 @@ describe(App, () => {
         },
       );
 
-      it(`should not allow ${player} to play a card on an a ${opponent} field`, () => {
+      it(`should not allow ${player} to play a card on an a ${opponent} leaf`, () => {
         expect(
           queryThe.controlledEmptyFieldDropzone(opponent),
         ).not.toBeInTheDocument();
       });
     });
 
-    describe('The initial placement of fields', () => {
-      it('should have 18 fields in 6 rows of 3', () => {
+    describe('The initial placement of leaves', () => {
+      it('should have 18 leaves in 6 rows of 3', () => {
         const rows = withinThe.playArea().getAllByRole('row');
         expect(rows).toHaveLength(6);
         for (const row of rows) {
-          const fields = within(row).getAllByRole('gridcell');
-          expect(fields).toHaveLength(3);
-          for (const field of fields) {
-            expect(field).toBeVisible();
+          const leaves = within(row).getAllByRole('gridcell');
+          expect(leaves).toHaveLength(3);
+          for (const leaf of leaves) {
+            expect(leaf).toBeVisible();
           }
         }
       });
 
-      it('should have north fields in the top 3 rows', () => {
+      it('should have north leaves in the top 3 rows', () => {
         const northRows = withinThe.playArea().getAllByRole('row').slice(0, 3);
         for (const row of northRows) {
           for (const zone of within(row).getAllByRole('gridcell')) {
@@ -317,7 +318,7 @@ describe(App, () => {
         }
       });
 
-      it('should have south fields in the bottom 3 rows', () => {
+      it('should have south leaves in the bottom 3 rows', () => {
         const southRows = withinThe.playArea().getAllByRole('row').slice(3);
         for (const row of southRows) {
           for (const zone of within(row).getAllByRole('gridcell')) {
@@ -329,21 +330,21 @@ describe(App, () => {
         }
       });
 
-      it('should have the north home field', () => {
+      it('should have the north home leaf', () => {
         const [_, homeZone] = within(
           withinThe.playArea().getAllByRole('row')[0],
         ).getAllByRole('gridcell');
         expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
-          'North Home Green Field',
+          'North Home Lily Pad',
         );
       });
 
-      it('should have the south home field', () => {
+      it('should have the south home leaf', () => {
         const [_, homeZone] = within(
           withinThe.playArea().getAllByRole('row')[ROW_COUNT - 1],
         ).getAllByRole('gridcell');
         expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
-          'South Home Green Field',
+          'South Home Lily Pad',
         );
       });
     });

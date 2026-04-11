@@ -2,17 +2,17 @@ import './App.css';
 import { Leaf } from 'lucide-react';
 import { useId } from 'react';
 
-import { Player } from './App';
+import { Player } from './PhaseTracker';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 export const BIG_HAND_CARD_COUNT = 12;
 
-export const GreenField = () => {
+export const LilyPad = () => {
   const id = useId();
   return (
     <section aria-labelledby={id} className="card">
       <div className="card-title" id={id}>
-        Green Field
+        Lily Pad
       </div>
       <div className="card-section-row">
         <div>
@@ -55,7 +55,7 @@ function HandCard({ isEnabled, player, pickCard }: HandCardProps) {
         disabled={!isEnabled}
         onClick={pickCard}
       >
-        <GreenField />
+        <LilyPad />
       </button>
     </div>
   );

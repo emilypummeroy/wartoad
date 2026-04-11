@@ -1,10 +1,10 @@
 import { Replace, Leaf, Clover } from 'lucide-react';
 import { useId, useCallback } from 'react';
 
-import { Player, type FlowState, Subphase } from './App';
-import { Position, NORTH_HOME, SOUTH_HOME } from './Grid';
+import { Position } from './Grid';
+import { Player, Subphase, type FlowState } from './PhaseTracker';
 
-function GreenField({
+function LilyPad({
   owner,
   isHome = false,
 }: {
@@ -23,7 +23,7 @@ function GreenField({
       className={`card ${playerStyle}`}
     >
       <div className="card-title" id={nameId}>
-        Green Field
+        Lily Pad
       </div>
       <div className="card-section-row">
         {isHome ? (
@@ -44,19 +44,15 @@ function GreenField({
   );
 }
 
-function FacedownCard({ player }: { readonly player: Player }) {
-  const playerStyle = {
-    [Player.North]: 'north',
-    [Player.South]: 'south',
-  };
+function Facedown({ player }: { readonly player: Player }) {
   const id = useId();
   return (
     <section
       aria-labelledby={id}
-      className={`facedown card ${playerStyle[player]}`}
+      className={`facedown card ${Player.STYLES[player]}`}
     >
       <Leaf>
-        <title id={id}>{player} controlled empty field</title>
+        <title id={id}>{player} controlled leaf</title>
       </Leaf>
     </section>
   );
@@ -79,22 +75,13 @@ export function Zone({
 }: ZoneProps) {
   const isDropzone =
     !isUpgraded && player === controller && subphase === Subphase.Placing;
-  const playerStyle = {
-    [Player.North]: 'north',
-    [Player.South]: 'south',
-  }[controller];
-  const homePosition = {
-    [Player.North]: NORTH_HOME,
-    [Player.South]: SOUTH_HOME,
-  }[controller];
-
   return (
     <button
-      className={`placeable-zone ${playerStyle}`}
+      className={`placeable-zone ${Player.STYLES[controller]}`}
       disabled={!isDropzone}
       onClick={useCallback(() => onPlace(position), [position, onPlace])}
     >
-      <div className={`zone ${playerStyle}`} role="gridcell">
+      <div className={`zone ${Player.STYLES[controller]}`} role="gridcell">
         {isDropzone && (
           <div className="overlay-container">
             <Replace>
@@ -103,12 +90,12 @@ export function Zone({
           </div>
         )}
         {isUpgraded ? (
-          <GreenField
-            isHome={Position.equals(homePosition, position)}
+          <LilyPad
+            isHome={Position.equals(Position.HOME[controller], position)}
             owner={controller}
           />
         ) : (
-          <FacedownCard player={controller} />
+          <Facedown player={controller} />
         )}
       </div>
     </button>

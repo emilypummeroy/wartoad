@@ -1,12 +1,12 @@
 import { screen, within, render, fireEvent } from '@testing-library/react';
 
-import { Phase, Player } from './App';
 import {
   Hand,
   styleForHandSize,
   INITIAL_HAND_CARD_COUNT,
   BIG_HAND_CARD_COUNT,
 } from './Hand';
+import { Phase, Player } from './PhaseTracker';
 
 const MANY = 15;
 
@@ -70,7 +70,7 @@ describe(Hand, () => {
           />,
         );
         expect(
-          withinHand().getAllByRole('region', { name: 'Green Field' }),
+          withinHand().getAllByRole('region', { name: 'Lily Pad' }),
         ).toHaveLength(handSize);
         expect(
           withinHand().queryByRole('region', { name: 'Facedown Card' }),
@@ -151,7 +151,7 @@ describe(Hand, () => {
           />,
         );
         expect(
-          withinHand().queryByRole('region', { name: 'Green Field' }),
+          withinHand().queryByRole('region', { name: 'Lily Pad' }),
         ).not.toBeInTheDocument();
         expect(
           withinHand().getAllByRole('region', { name: 'Facedown card' }),
