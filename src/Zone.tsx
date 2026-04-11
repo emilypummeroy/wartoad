@@ -1,4 +1,4 @@
-import { Replace, Pyramid, HousePlus } from 'lucide-react';
+import { Replace, Leaf, Clover } from 'lucide-react';
 import { useId, useCallback } from 'react';
 
 import { Player, type FlowState, Subphase } from './App';
@@ -27,13 +27,13 @@ function GreenField({
       </div>
       <div className="card-section-row">
         {isHome ? (
-          <HousePlus>
+          <Clover>
             <title id={symbolId}>{owner} Home</title>
-          </HousePlus>
+          </Clover>
         ) : (
-          <Pyramid>
+          <Leaf>
             <title id={symbolId}>{owner} owned</title>
-          </Pyramid>
+          </Leaf>
         )}
         <div>
           <small>Gives:</small>+0
@@ -55,9 +55,9 @@ function FacedownCard({ player }: { readonly player: Player }) {
       aria-labelledby={id}
       className={`facedown card ${playerStyle[player]}`}
     >
-      <Pyramid>
+      <Leaf>
         <title id={id}>{player} controlled empty field</title>
-      </Pyramid>
+      </Leaf>
     </section>
   );
 }

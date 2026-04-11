@@ -1,5 +1,5 @@
 import './App.css';
-import { Pyramid } from 'lucide-react';
+import { Leaf } from 'lucide-react';
 import { useId } from 'react';
 
 import { Player } from './App';
@@ -31,9 +31,9 @@ const Facedown = () => {
   const id = useId();
   return (
     <section aria-labelledby={id} className="facedown card">
-      <Pyramid>
+      <Leaf>
         <title id={id}>Facedown card</title>
-      </Pyramid>
+      </Leaf>
     </section>
   );
 };
