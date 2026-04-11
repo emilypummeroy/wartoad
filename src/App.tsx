@@ -1,40 +1,50 @@
 import './App.css';
 import { StepForward } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 
 import { type Position, INITIAL_GRID, GridState, Grid } from './Grid';
 import { Hand, GreenField } from './Hand';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 
-export const Phase = {
+const _Phase = {
   Start: 'Start',
   Main: 'Main',
   End: 'End',
 } as const;
-export type Phase = (typeof Phase)[keyof typeof Phase];
-const phaseAfter = {
-  [Phase.Start]: Phase.Main,
-  [Phase.Main]: Phase.End,
-  [Phase.End]: Phase.Start,
+export const Phase = {
+  ..._Phase,
+  after: {
+    [_Phase.Start]: _Phase.Main,
+    [_Phase.Main]: _Phase.End,
+    [_Phase.End]: _Phase.Start,
+  },
 } as const;
+export type Phase = (typeof _Phase)[keyof typeof _Phase];
 
-export const Player = {
+const _Player = {
   South: 'South',
   North: 'North',
 } as const;
-export type Player = (typeof Player)[keyof typeof Player];
-
-const playerAfter = {
-  [Player.South]: Player.North,
-  [Player.North]: Player.South,
+export const Player = {
+  ..._Player,
+  styles: {
+    [_Player.North]: 'north',
+    [_Player.South]: 'south',
+  },
+  after: {
+    [_Player.North]: _Player.South,
+    [_Player.South]: _Player.North,
+  },
 } as const;
+export type Player = (typeof _Player)[keyof typeof _Player];
 
 export const Subphase = {
   Idle: 'Idle',
   Placing: 'Placing',
 } as const;
 export type Subphase = (typeof Subphase)[keyof typeof Subphase];
+
 export type FlowState = {
   readonly player: Player;
   readonly phase: Phase;
@@ -48,13 +58,93 @@ type GameState = {
   readonly southHand: number;
 };
 
-// oxlint-disable max-lines-per-function
-// oxlint-disable react/jsx-max-depth
-// To be refactored later
+function PickedCard({
+  owner,
+  children,
+}: {
+  readonly owner: Player;
+  readonly children: ReactNode;
+}) {
+  return (
+    <section className="card-display" aria-labelledby="picked-card">
+      <h3 id="picked-card">Picked card</h3>
+      <div className="zoom-row">
+        <div className={`zooming ${Player.styles[owner]}`} tabIndex={0}>
+          {children}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PhaseBar({
+  flow: { player, phase, subphase },
+  onNextPhaseClicked,
+}: {
+  readonly flow: FlowState;
+  readonly onNextPhaseClicked: () => void;
+}) {
+  return (
+    <section aria-labelledby="current-phase" className="phases">
+      <h3 id="current-phase">
+        <span className={player === Player.North ? 'north' : 'south'}>
+          {player}
+        </span>
+        : <span className="accent">{phase}</span> phase
+      </h3>
+      <button
+        className="icon-text accent"
+        aria-label="Next phase"
+        disabled={subphase === Subphase.Placing}
+        onClick={onNextPhaseClicked}
+      >
+        <StepForward />
+        Next phase
+      </button>
+    </section>
+  );
+}
+
+const gameStateForNextPhase = ({
+  flow: { player, phase },
+  northHand,
+  southHand,
+  ...rest
+}: GameState) => ({
+  ...rest,
+  flow: {
+    player: phase === Phase.End ? Player.after[player] : player,
+    phase: Phase.after[phase],
+    subphase: Subphase.Idle,
+  },
+  northHand:
+    Phase.after[phase] === Phase.Start && Player.after[player] === Player.North
+      ? northHand + 1
+      : northHand,
+  southHand:
+    Phase.after[phase] === Phase.Start && Player.after[player] === Player.South
+      ? southHand + 1
+      : southHand,
+});
+
+const gameStateForCardPicked = ({ flow, ...rest }: GameState) => ({
+  ...rest,
+  flow: { ...flow, subphase: Subphase.Placing },
+});
+
+const gameStateForCardPlaced =
+  (position: Position) =>
+  ({ grid, flow, northHand, southHand }: GameState) => ({
+    flow: { ...flow, subphase: Subphase.Idle },
+    northHand: flow.player === Player.North ? northHand - 1 : northHand,
+    southHand: flow.player === Player.South ? southHand - 1 : southHand,
+    grid: GridState.setAt(grid, position, true),
+  });
+
 export function App() {
   const [
     {
-      flow: { phase, player, subphase: substate },
+      flow: { phase, player, subphase },
       flow,
       grid,
       northHand,
@@ -72,48 +162,16 @@ export function App() {
     southHand: INITIAL_HAND_CARD_COUNT,
   });
 
-  const setNextPhase = useCallback(
-    () =>
-      setGameState(
-        ({ flow: { player, phase }, northHand, southHand, ...rest }) => ({
-          ...rest,
-          flow: {
-            player: phase === Phase.End ? playerAfter[player] : player,
-            phase: phaseAfter[phase],
-            subphase: Subphase.Idle,
-          },
-          northHand:
-            phaseAfter[phase] === Phase.Start &&
-            playerAfter[player] === Player.North
-              ? northHand + 1
-              : northHand,
-          southHand:
-            phaseAfter[phase] === Phase.Start &&
-            playerAfter[player] === Player.South
-              ? southHand + 1
-              : southHand,
-        }),
-      ),
+  const handleNextPhaseClicked = useCallback(
+    () => setGameState(gameStateForNextPhase),
     [],
   );
-
   const handlePickCard = useCallback(
-    () =>
-      setGameState(({ flow, ...rest }) => ({
-        ...rest,
-        flow: { ...flow, subphase: Subphase.Placing },
-      })),
+    () => setGameState(gameStateForCardPicked),
     [],
   );
-
   const handlePlaceCard = useCallback(
-    (position: Position) =>
-      setGameState(({ grid, flow, northHand, southHand }) => ({
-        flow: { ...flow, subphase: Subphase.Idle },
-        northHand: flow.player === Player.North ? northHand - 1 : northHand,
-        southHand: flow.player === Player.South ? southHand - 1 : southHand,
-        grid: GridState.setAt(grid, position, true),
-      })),
+    (position: Position) => setGameState(gameStateForCardPlaced(position)),
     [],
   );
 
@@ -125,23 +183,7 @@ export function App() {
             War<span className="accent">tide</span>
           </h1>
         </div>
-        <section aria-labelledby="current-phase" className="phases">
-          <h3 id="current-phase">
-            <span className={player === Player.North ? 'north' : 'south'}>
-              {player}
-            </span>
-            : <span className="accent">{phase}</span> phase
-          </h3>
-          <button
-            className="icon-text accent"
-            aria-label="Next phase"
-            disabled={substate === Subphase.Placing}
-            onClick={setNextPhase}
-          >
-            <StepForward />
-            Next phase
-          </button>
-        </section>
+        <PhaseBar flow={flow} onNextPhaseClicked={handleNextPhaseClicked} />
       </header>
       <main>
         <section className="handarea">
@@ -149,35 +191,24 @@ export function App() {
             player={Player.North}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.North}
-            isPlacing={substate === Subphase.Placing}
+            isPlacing={subphase === Subphase.Placing}
             handSize={northHand}
             pickCard={handlePickCard}
           />
-          {substate === Subphase.Placing && (
-            <section className="card-display" aria-labelledby="picked-card">
-              <h3 id="picked-card">Picked card</h3>
-              <div className="zoom-row">
-                <div
-                  className={`zooming ${player === Player.North ? 'north' : 'south'}`}
-                  tabIndex={0}
-                >
-                  <GreenField />
-                </div>
-              </div>
-            </section>
+          {subphase === Subphase.Placing && (
+            <PickedCard owner={player}>
+              <GreenField />
+            </PickedCard>
           )}
           <Hand
             player={Player.South}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.South}
-            isPlacing={substate === Subphase.Placing}
+            isPlacing={subphase === Subphase.Placing}
             handSize={southHand}
             pickCard={handlePickCard}
           />
         </section>
-        {
-          // Move the playarea container into a HOC
-        }
         <div className="scroll-x">
           <section className="playarea">
             <Grid onPlaceCard={handlePlaceCard} flow={flow} grid={grid} />
