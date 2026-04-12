@@ -98,7 +98,11 @@ const gameStateForCardPlaced =
     grid: GridState.setAt(grid, position, true),
   });
 
-export function App() {
+export function App({
+  hasFroglets = false,
+}: {
+  readonly hasFroglets?: boolean;
+}) {
   const [
     {
       flow: { phase, player, subphase },
@@ -150,7 +154,7 @@ export function App() {
             isPlayerTurn={player === Player.North}
             isPlacing={subphase === Subphase.Placing}
             handSize={northHand}
-            pickCard={handlePickCard}
+            onPick={handlePickCard}
           />
           {subphase === Subphase.Placing && (
             <PickedCard owner={player}>
@@ -163,7 +167,8 @@ export function App() {
             isPlayerTurn={player === Player.South}
             isPlacing={subphase === Subphase.Placing}
             handSize={southHand}
-            pickCard={handlePickCard}
+            hasFroglet={hasFroglets}
+            onPick={handlePickCard}
           />
         </section>
         <div className="scroll-x">

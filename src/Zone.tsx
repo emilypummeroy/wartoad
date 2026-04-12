@@ -35,11 +35,12 @@ function LilyPad({
             <title id={symbolId}>{owner} owned</title>
           </Leaf>
         )}
-        <div>
+      </div>
+      <div className="card-section-row">
+        <div className="card-item">
           <small>Gives:</small>+0
         </div>
       </div>
-      <div className="card-section-row" />
     </section>
   );
 }

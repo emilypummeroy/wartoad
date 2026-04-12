@@ -1,15 +1,15 @@
 :root {
-  --text: oklch(20% 0.03 200);
-  --text-transparent: oklch(20% 0.03 200 / 0.5);
-  --text-h: oklch(15% 0.05 200);
-  --bg: oklch(95% 0.01 180);
+  --text: oklch(35% 0.01 200);
+  --text-transparent: oklch(35% 0.01 200 / 0.5);
+  --text-h: oklch(25% 0.03 200);
+  --bg: oklch(95% 0.01 240);
   --bg-solid: oklch(90% 0.02 160);
   --bg-transparent: oklch(90% 0.02 160 / 0.5);
   --border: oklch(85% 0.02 130);
-  --accent: oklch(40% 0.16 140);
-  --accent-bg: oklch(90% 0.06 140);
+  --accent: oklch(35% 0.4 160);
+  --accent-bg: oklch(90% 0.06 160);
   --accent-bg-solid: oklch(80% 0.06 140);
-  --accent-border: oklch(75% 0.09 140);
+  --accent-border: oklch(75% 0.09 160);
 
   --shadow:
     oklch(0% 0 0 / 0.15) 0 10px 15px -3px, oklch(0% 0 0 / 0.1) 0 4px 6px -2px;
@@ -17,17 +17,17 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: oklch(80% 0.02 200);
-    --text-transparent: oklch(80% 0.02 200 / 0.5);
-    --text-h: oklch(85% 0.03 200);
-    --bg: oklch(18% 0.01 180);
+    --text: oklch(80% 0.01 200);
+    --text-transparent: oklch(80% 0.01 200 / 0.5);
+    --text-h: oklch(85% 0.02 200);
+    --bg: oklch(18% 0.01 240);
     --bg-solid: oklch(12% 0.06 160);
     --bg-transparent: oklch(12% 0.06 160 / 0.5);
     --border: oklch(25% 0.02 130);
-    --accent: oklch(60% 0.12 140);
-    --accent-bg: oklch(20% 0.06 140);
+    --accent: oklch(85% 0.12 160);
+    --accent-bg: oklch(20% 0.06 160);
     --accent-bg-solid: oklch(30% 0.06 140);
-    --accent-border: oklch(35% 0.09 140);
+    --accent-border: oklch(35% 0.09 160);
 
     --shadow:
       oklch(0% 0 0 / 0.4) 0 10px 15px -3px, oklch(0% 0 0 / 0.25) 0 4px 6px -2px;
@@ -54,10 +54,10 @@
   --north-accent: oklch(72% 0.22 80);
   --south-text: oklch(40% 0.16 310);
   --north-text: oklch(48% 0.22 80);
-  --south-outline-accent: oklch(65% 0.16 310 / 0.5);
-  --north-outline-accent: oklch(72% 0.22 80 / 0.5);
-  --south-outline: oklch(50% 0.16 310 / 0.5);
-  --north-outline: oklch(60% 0.22 80 / 0.5);
+  --south-outline-accent: oklch(50% 0.16 310 / 0.5);
+  --north-outline-accent: oklch(60% 0.22 80 / 0.5);
+  --south-outline: oklch(65% 0.16 310 / 0.5);
+  --north-outline: oklch(72% 0.22 80 / 0.5);
   --south-bg: oklch(90% 0.05 310);
   --north-bg: oklch(92% 0.07 80);
 }
@@ -67,10 +67,10 @@
     --north-accent: oklch(48% 0.22 80);
     --south-text: oklch(75% 0.16 310);
     --north-text: oklch(66% 0.22 80);
-    --south-outline-accent: oklch(55% 0.16 310 / 0.5);
-    --north-outline-accent: oklch(48% 0.22 80 / 0.5);
-    --south-outline: oklch(70% 0.16 310 / 0.5);
-    --north-outline: oklch(60% 0.22 80 / 0.5);
+    --south-outline-accent: oklch(70% 0.16 310 / 0.5);
+    --north-outline-accent: oklch(60% 0.22 80 / 0.5);
+    --south-outline: oklch(55% 0.16 310 / 0.5);
+    --north-outline: oklch(48% 0.22 80 / 0.5);
     --south-bg: oklch(30% 0.05 310);
     --north-bg: oklch(28% 0.07 80);
   }
@@ -319,10 +319,15 @@ span.south {
   padding: 0 36px;
 }
 
-.hand,
+.hand {
+  height: calc(19svh);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .card-display {
-  height: fit-content;
-  height: calc(20svh + 4em);
+  height: calc(27svh);
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -338,10 +343,13 @@ span.south {
     transition:
       zoom var(--animation-fast-linear),
       translate var(--animation-fast-linear);
+    zoom: 150%;
+    translate: 0% -3%;
+
     &:hover,
     &:focus {
       zoom: 200%;
-      translate: -0% -35%;
+      translate: 0% -35%;
     }
 
     outline-offset: 1px;
@@ -379,7 +387,9 @@ span.south {
   display: flex;
   flex-direction: row;
 
-  transition: margin var(--animation-smooth);
+  transition:
+    margin var(--animation-smooth),
+    width var(--animation-smooth);
   .stacking {
     transition: margin var(--animation-smooth);
     z-index: var(--z-index-hand);
@@ -442,9 +452,11 @@ span.south {
 .jiggle-row {
   display: flex;
   flex-direction: row;
-  width: fit-content;
 
-  transition: margin-left var(--animation-smooth);
+  transition:
+    margin-left var(--animation-smooth),
+    width var(--animation-smooth);
+
   .stacking {
     transition:
       padding var(--animation-smooth),
@@ -452,17 +464,32 @@ span.south {
     z-index: var(--z-index-hand);
   }
 
+  width: calc(0svh + 6svh * var(--hand-size));
+  &:hover,
+  &:focus-within {
+    width: calc(2.5svh + 6svh * var(--hand-size));
+  }
   margin-left: 2svh;
   .stacking {
     margin-left: -2svh;
   }
   &.compact {
+    width: calc(0svh + 3svh * var(--hand-size));
+    &:hover,
+    &:focus-within {
+      width: calc(4svh + 6svh * var(--hand-size));
+    }
     margin-left: 5svh;
     .stacking {
       margin-left: -5svh;
     }
   }
   &.super-compact {
+    width: calc(0svh + 2svh * var(--hand-size));
+    &:hover,
+    &:focus-within {
+      width: calc(13svh + 3svh * var(--hand-size));
+    }
     margin-left: 6svh;
     .stacking {
       margin-left: -6svh;
@@ -470,17 +497,32 @@ span.south {
   }
 
   @media (max-aspect-ratio: 1.2) {
+    width: calc(-4svh + 2svh * var(--hand-size));
+    &:hover,
+    &:focus-within {
+      width: calc(4.5svh + 6svh * var(--hand-size));
+    }
     margin-left: 6.5svh;
     .stacking {
       margin-left: -6.5svh;
     }
     &.compact {
+      width: calc(1svh * var(--hand-size));
+      &:hover,
+      &:focus-within {
+        width: calc(4svh + 6svh * var(--hand-size));
+      }
       margin-left: 7.2svh;
       .stacking {
         margin-left: -7.2svh;
       }
     }
     &.super-compact {
+      width: calc(-0.5svh * var(--hand-size));
+      &:hover,
+      &:focus-within {
+        width: calc(14svh + 3svh * var(--hand-size));
+      }
       margin-left: 7.7svh;
       .stacking {
         margin-left: -7.7svh;
@@ -675,6 +717,7 @@ button.placeable-zone {
 
   .card-title {
     height: 2svh;
+    flex-grow: 0;
     text-align: center;
     padding: 0.1svh;
     white-space: nowrap;
@@ -682,25 +725,91 @@ button.placeable-zone {
     overflow: hidden;
   }
 
-  .card-section-row {
-    box-sizing: border-box;
+  .card-section-split {
     display: flex;
-    padding: 0.15svh;
-    gap: 0.3svh;
-    height: 4svh;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+
+  .card-section-fill,
+  .card-section-column,
+  .card-section-row {
+    display: flex;
+    gap: 0.15svh;
     justify-content: space-evenly;
     align-items: center;
 
-    > div {
-      flex-grow: 1;
+    box-sizing: border-box;
+    margin: 0.15svh;
+
+    div {
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      border: 1px solid var(--card-border);
-      border-radius: 2px;
-      outline: 1px solid var(--card-outline);
+      box-sizing: border-box;
+    }
+
+    div.card-item {
+      padding: 0.5svh;
+    }
+  }
+
+  .card-section-row {
+    display: flex;
+    flex-direction: row;
+    height: 4svh;
+
+    div {
+      flex-direction: column;
+      flex-grow: 1;
       height: 3.7svh;
     }
+  }
+
+  .card-section-column {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+    width: fit-content;
+
+    div.card-item {
+      padding: 0.2svh;
+    }
+    div {
+      flex-direction: row;
+      justify-content: space-evenly;
+      flex-grow: 1;
+      width: 3svh;
+      height: 2svh;
+
+      svg {
+        height: 1.4svh;
+        width: 1.4svh;
+        flex-shrink: 0;
+      }
+
+      span {
+        font-size: 1.2svh;
+        line-height: 1.2svh;
+        text-align: center;
+      }
+    }
+  }
+
+  .card-section-fill {
+    flex-grow: 1;
+
+    div {
+      flex-direction: column;
+    }
+  }
+
+  .card-item {
+    border: 1px solid var(--card-border);
+    border-radius: 2px;
+    outline: 1px solid var(--card-outline);
+    padding: 0.2svh;
   }
 
   &.south {

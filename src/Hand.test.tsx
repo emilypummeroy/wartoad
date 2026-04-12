@@ -2,7 +2,7 @@ import { screen, within, render, fireEvent } from '@testing-library/react';
 
 import {
   Hand,
-  styleForHandSize,
+  classForHandSize,
   INITIAL_HAND_CARD_COUNT,
   BIG_HAND_CARD_COUNT,
 } from './Hand';
@@ -10,10 +10,10 @@ import { Phase, Player } from './PhaseTracker';
 
 const MANY = 15;
 
-describe(styleForHandSize, () => {
+describe(classForHandSize, () => {
   it('should return an empty string for low card counts', () => {
     for (let i = 0; i <= INITIAL_HAND_CARD_COUNT; i += 1) {
-      expect(styleForHandSize(i)).toBe('');
+      expect(classForHandSize(i)).toBe('');
     }
   });
 
@@ -23,7 +23,7 @@ describe(styleForHandSize, () => {
       i <= BIG_HAND_CARD_COUNT;
       i += 1
     ) {
-      expect(styleForHandSize(i)).toBe('compact');
+      expect(classForHandSize(i)).toBe('compact');
     }
   });
 
@@ -33,7 +33,7 @@ describe(styleForHandSize, () => {
       i < BIG_HAND_CARD_COUNT + MANY;
       i += 1
     ) {
-      expect(styleForHandSize(i)).toBe('super-compact');
+      expect(classForHandSize(i)).toBe('super-compact');
     }
   });
 });
@@ -66,7 +66,7 @@ describe(Hand, () => {
             isPlacing={isPlacing}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn
-            pickCard={pickCard}
+            onPick={pickCard}
           />,
         );
         expect(
@@ -86,7 +86,7 @@ describe(Hand, () => {
           isPlacing={false}
           isMainPhase
           isPlayerTurn
-          pickCard={pickCard}
+          onPick={pickCard}
         />,
       );
       const clickableCards = withinHand().getAllByRole('button');
@@ -105,7 +105,7 @@ describe(Hand, () => {
           isPlacing={false}
           isMainPhase={false}
           isPlayerTurn
-          pickCard={pickCard}
+          onPick={pickCard}
         />,
       );
       const clickableCards = withinHand().queryAllByRole('button');
@@ -123,7 +123,7 @@ describe(Hand, () => {
           isPlacing
           isMainPhase
           isPlayerTurn
-          pickCard={pickCard}
+          onPick={pickCard}
         />,
       );
       const clickableCards = withinHand().queryAllByRole('button');
@@ -147,7 +147,7 @@ describe(Hand, () => {
             isPlacing={isPlacing}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={false}
-            pickCard={pickCard}
+            onPick={pickCard}
           />,
         );
         expect(
@@ -166,7 +166,7 @@ describe(Hand, () => {
             isPlacing={isPlacing}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={false}
-            pickCard={pickCard}
+            onPick={pickCard}
           />,
         );
         const clickableCards = withinHand().queryAllByRole('button');
