@@ -102,7 +102,7 @@ describe(App, () => {
       expect(banner).toContainElement(heading);
     });
 
-    it('should have the phase indicator after the heading', () => {
+    it('should have the Phase indicator after the heading', () => {
       const indicator = getThe.phaseIndicator(South, Main);
       expect(indicator).toHaveTextContent('South: Main phase');
       expect(screen.getByRole('banner')).toContainElement(indicator);
@@ -110,7 +110,7 @@ describe(App, () => {
       expect(indicator).toAppearAfter(heading);
     });
 
-    describe('Phases', () => {
+    describe('Phase indicatar', () => {
       it('should start in the South Main phase', () => {
         expect(getThe.phaseIndicator(South, Main)).toBeVisible();
         expect(screen.queryByLabelText('End Phase')).not.toBeInTheDocument();
