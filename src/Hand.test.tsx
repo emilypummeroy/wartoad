@@ -52,31 +52,37 @@ describe(Hand, () => {
 
     const pickCard = vi.fn<() => void>();
 
-    describe.for<[Phase, boolean]>([
-      [Phase.Start, true],
-      [Phase.Main, false],
-      [Phase.Main, true],
-      [Phase.End, false],
-    ])(`during the ${player} %s phase (placing:%s)`, ([phase, isPlacing]) => {
-      it(`should render with ${handSize} cards for ${player}`, () => {
-        render(
-          <Hand
-            player={player}
-            handSize={handSize}
-            isPlacing={isPlacing}
-            isMainPhase={phase === Phase.Main}
-            isPlayerTurn
-            onPick={pickCard}
-          />,
-        );
-        expect(
-          withinHand().getAllByRole('region', { name: 'Lily Pad' }),
-        ).toHaveLength(handSize);
-        expect(
-          withinHand().queryByRole('region', { name: 'Facedown Card' }),
-        ).not.toBeInTheDocument();
-      });
-    });
+    describe.for<[Phase, isPlacing: boolean, hasFroglet: boolean]>([
+      [Phase.Start, true, true],
+      [Phase.Main, true, true],
+      [Phase.End, false, true],
+      [Phase.Start, true, false],
+      [Phase.Main, false, false],
+      [Phase.End, false, false],
+    ])(
+      `during the ${player} %s phase | placing:%s | froglet:%s`,
+      ([phase, isPlacing, hasFroglet]) => {
+        it(`should render with ${handSize} cards for ${player}`, () => {
+          render(
+            <Hand
+              player={player}
+              handSize={handSize}
+              isPlacing={isPlacing}
+              hasFroglet={hasFroglet}
+              isMainPhase={phase === Phase.Main}
+              isPlayerTurn
+              onPick={pickCard}
+            />,
+          );
+          expect(
+            withinHand().getAllByRole('region', { name: /Card face/ }),
+          ).toHaveLength(handSize);
+          expect(
+            withinHand().queryByRole('region', { name: 'Card back' }),
+          ).not.toBeInTheDocument();
+        });
+      },
+    );
 
     it(`should allow cards to be picked during the ${player} Main phase`, () => {
       render(
@@ -133,48 +139,54 @@ describe(Hand, () => {
       expect(pickCard).not.toHaveBeenCalled();
     });
 
-    describe.for<[Phase, boolean]>([
-      [Phase.Start, true],
-      [Phase.Main, false],
-      [Phase.Main, true],
-      [Phase.End, false],
-    ])(`during the opponent's %s phase (placing:%s)`, ([phase, isPlacing]) => {
-      it(`should show ${handSize} card backs`, () => {
-        render(
-          <Hand
-            player={player}
-            handSize={handSize}
-            isPlacing={isPlacing}
-            isMainPhase={phase === Phase.Main}
-            isPlayerTurn={false}
-            onPick={pickCard}
-          />,
-        );
-        expect(
-          withinHand().queryByRole('region', { name: 'Lily Pad' }),
-        ).not.toBeInTheDocument();
-        expect(
-          withinHand().getAllByRole('region', { name: 'Facedown card' }),
-        ).toHaveLength(handSize);
-      });
+    describe.for<[Phase, isPlacing: boolean, hasFroglet: boolean]>([
+      [Phase.Start, true, true],
+      [Phase.Main, false, true],
+      [Phase.End, false, true],
+      [Phase.Start, true, false],
+      [Phase.Main, true, false],
+      [Phase.End, false, false],
+    ])(
+      `during the opponent's %s phase (placing:%s)`,
+      ([phase, isPlacing, hasFroglet]) => {
+        it(`should show ${handSize} card backs`, () => {
+          render(
+            <Hand
+              player={player}
+              handSize={handSize}
+              isPlacing={isPlacing}
+              hasFroglet={hasFroglet}
+              isMainPhase={phase === Phase.Main}
+              isPlayerTurn={false}
+              onPick={pickCard}
+            />,
+          );
+          expect(
+            withinHand().queryByRole('region', { name: /Card face/ }),
+          ).not.toBeInTheDocument();
+          expect(
+            withinHand().getAllByRole('region', { name: 'Card back' }),
+          ).toHaveLength(handSize);
+        });
 
-      it('should not allow cards to be picked', () => {
-        render(
-          <Hand
-            player={player}
-            handSize={handSize}
-            isPlacing={isPlacing}
-            isMainPhase={phase === Phase.Main}
-            isPlayerTurn={false}
-            onPick={pickCard}
-          />,
-        );
-        const clickableCards = withinHand().queryAllByRole('button');
-        for (const card of clickableCards) {
-          fireEvent.click(card);
-          expect(pickCard).not.toHaveBeenCalled();
-        }
-      });
-    });
+        it('should not allow cards to be picked', () => {
+          render(
+            <Hand
+              player={player}
+              handSize={handSize}
+              isPlacing={isPlacing}
+              isMainPhase={phase === Phase.Main}
+              isPlayerTurn={false}
+              onPick={pickCard}
+            />,
+          );
+          const clickableCards = withinHand().queryAllByRole('button');
+          for (const card of clickableCards) {
+            fireEvent.click(card);
+            expect(pickCard).not.toHaveBeenCalled();
+          }
+        });
+      },
+    );
   });
 });

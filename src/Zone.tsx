@@ -76,29 +76,36 @@ export function Zone({
 }: ZoneProps) {
   const isDropzone =
     !isUpgraded && player === controller && subphase === Subphase.Placing;
-  return (
-    <button
-      className={`placeable-zone ${Player.STYLES[controller]}`}
-      disabled={!isDropzone}
-      onClick={useCallback(() => onPlace(position), [position, onPlace])}
+  const handleClick = useCallback(() => onPlace(position), [position, onPlace]);
+  return isDropzone ? (
+    <div
+      role="gridcell"
+      aria-colindex={position.x}
+      className={`placeable-zone zone ${Player.STYLES[controller]}`}
+      onClick={handleClick}
+      tabIndex={0}
     >
-      <div className={`zone ${Player.STYLES[controller]}`} role="gridcell">
-        {isDropzone && (
-          <div className="overlay-container">
-            <Replace>
-              <title>Place on</title>
-            </Replace>
-          </div>
-        )}
-        {isUpgraded ? (
-          <LilyPad
-            isHome={Position.equals(Position.HOME[controller], position)}
-            owner={controller}
-          />
-        ) : (
-          <Facedown player={controller} />
-        )}
+      <div role="button" className="overlay-container">
+        <Replace>
+          <title>Place on</title>
+        </Replace>
       </div>
-    </button>
+      <Facedown key="facedown-card" player={controller} />
+    </div>
+  ) : (
+    <div
+      className={`zone ${Player.STYLES[controller]}`}
+      role="gridcell"
+      aria-colindex={position.x}
+    >
+      {isUpgraded ? (
+        <LilyPad
+          isHome={Position.equals(Position.HOME[controller], position)}
+          owner={controller}
+        />
+      ) : (
+        <Facedown key="facedown-card" player={controller} />
+      )}
+    </div>
   );
 }

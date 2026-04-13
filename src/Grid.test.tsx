@@ -122,11 +122,12 @@ describe(Grid, () => {
         );
       });
 
-      it('should not display any clickable leaves', () => {
-        const buttons = screen.getAllByRole('button');
-        for (const button of buttons) {
-          expect(button).not.toHaveAccessibleName(/Place on/);
-          fireEvent.click(button);
+      it('should not display any clickable zones', () => {
+        expect(screen.queryByRole('button')).not.toBeInTheDocument();
+        const zones = screen.getAllByRole('gridcell');
+        for (const zone of zones) {
+          expect(zone).not.toHaveAccessibleName(/Place on/);
+          fireEvent.click(zone);
         }
         expect(handlePlaceCard).not.toHaveBeenCalled();
       });
@@ -161,7 +162,16 @@ describe(Grid, () => {
 
         for (const button of buttons) {
           fireEvent.click(button);
-          expect(button).toHaveAccessibleName(
+          expect(button).toHaveAccessibleName(/Place on/);
+
+          expect(handlePlaceCard).toHaveBeenCalledOnce();
+          handlePlaceCard.mockReset();
+        }
+        const zones = within(row).getAllByRole('gridcell');
+        expect(zones).toHaveLength(FIELD_COUNT_PER_ROW);
+        for (const zone of zones) {
+          fireEvent.click(zone);
+          expect(zone).toHaveAccessibleName(
             `Place on ${player} controlled leaf`,
           );
 
@@ -173,12 +183,13 @@ describe(Grid, () => {
 
     it(`should not display clickable leaves in the ${opponentRowsAt} rows`, () => {
       for (const row of getOpponentRows(player)) {
-        const buttons = within(row).getAllByRole('button');
-        expect(buttons).toHaveLength(FIELD_COUNT_PER_ROW);
+        const zones = within(row).getAllByRole('gridcell');
+        expect(within(row).queryByRole('button')).not.toBeInTheDocument();
+        expect(zones).toHaveLength(FIELD_COUNT_PER_ROW);
 
-        for (const button of buttons) {
-          expect(button).not.toHaveAccessibleName(/Place on/);
-          fireEvent.click(button);
+        for (const zone of zones) {
+          expect(zone).not.toHaveAccessibleName(/Place on/);
+          fireEvent.click(zone);
         }
       }
       expect(handlePlaceCard).not.toHaveBeenCalled();

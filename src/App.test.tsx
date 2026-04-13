@@ -39,25 +39,34 @@ describe(App, () => {
     handCards: (player: Player) =>
       withinThe.hand(player).getAllByRole('region'),
     clickableHandCards: (player: Player) =>
-      withinThe.hand(player).getAllByRole('button'),
+      withinThe.hand(player).getAllByRole('button', {}),
     visibleHandCards: (player: Player) =>
-      withinThe.hand(player).getAllByRole('region', { name: 'Lily Pad' }),
+      withinThe.hand(player).getAllByRole('region', { name: /Card face/ }),
     hiddenHandCards: (player: Player) =>
-      withinThe.hand(player).getAllByRole('region', { name: 'Facedown card' }),
-    ownedGreenFields: (player: Player) =>
+      withinThe.hand(player).getAllByRole('region', { name: 'Card back' }),
+    handLilyPads: (player: Player) =>
+      withinThe
+        .hand(player)
+        .getAllByRole('button', { name: 'Card face Lilly Pad' }),
+    ownedLilyPads: (player: Player) =>
       withinThe.playArea().getAllByRole('region', {
         name: `${player} owned Lily Pad`,
       }),
-    controlledEmptyFieldDropzone: (player: Player) =>
-      withinThe.playArea().getAllByRole('button', {
+    leafDropzoneControlledBy: (player: Player) =>
+      withinThe.playArea().getAllByRole('gridcell', {
         name: `Place on ${player} controlled leaf`,
       }),
+  };
+
+  const getFirst = {
+    leafDropzoneControlledBy: (player: Player) =>
+      getAll.leafDropzoneControlledBy(player)[0],
   };
 
   const queryAll = {
     clickableHandCards: (player: Player) =>
       withinThe.hand(player).queryAllByRole('button'),
-    ownedGreenFields: (player: Player) =>
+    ownedLilyPads: (player: Player) =>
       withinThe.playArea().queryAllByRole('region', {
         name: `${player} owned Lily Pad`,
       }),
@@ -166,20 +175,16 @@ describe(App, () => {
         player => {
           it(`should show the card only until it is placed`, () => {
             advanceToPhase(player, Main);
-            fireEvent.click(getAll.clickableHandCards(player)[2]);
+            fireEvent.click(getAll.clickableHandCards(player)[3]);
 
             expect(getThe.pickedCardDisplay()).toBeVisible();
             expect(
               withinThe.pickedCardDisplay().getByRole('region', {
-                name: 'Lily Pad',
+                name: 'Card face Lily Pad',
               }),
             ).toBeVisible();
 
-            fireEvent.click(
-              withinThe.playArea().getAllByRole('button', {
-                name: new RegExp(`${player} controlled`),
-              })[3],
-            );
+            fireEvent.click(getFirst.leafDropzoneControlledBy(player));
             expect(queryThe.pickedCardDisplay()).not.toBeInTheDocument();
           });
         },
@@ -197,7 +202,7 @@ describe(App, () => {
         advanceToPhase(player, Start);
         const cards = getAll.handCards(player);
         expect(cards).not.toHaveLength(0);
-        for (const c of cards) expect(c).toHaveAccessibleName('Lily Pad');
+        for (const c of cards) expect(c).toHaveAccessibleName(/Card face/);
         expect(getAll.visibleHandCards(player)).toHaveLength(cards.length);
       });
 
@@ -205,7 +210,7 @@ describe(App, () => {
         advanceToPhase(opponent, Start);
         const cards = getAll.handCards(player);
         expect(cards).not.toHaveLength(0);
-        for (const c of cards) expect(c).toHaveAccessibleName('Facedown card');
+        for (const c of cards) expect(c).toHaveAccessibleName('Card back');
         expect(getAll.hiddenHandCards(player)).toHaveLength(cards.length);
       });
 
@@ -219,7 +224,7 @@ describe(App, () => {
 
       it(`should allow a card to be picked during the ${player} Main phase`, () => {
         advanceToPhase(player, Main);
-        fireEvent.click(getAll.clickableHandCards(player)[2]);
+        fireEvent.click(getAll.clickableHandCards(player)[4]);
         expect(getThe.pickedCardDisplay()).toBeVisible();
       });
 
@@ -242,12 +247,8 @@ describe(App, () => {
         advanceToPhase(player, Main);
         const initialHandSize = getAll.handCards(player).length;
 
-        fireEvent.click(getAll.clickableHandCards(player)[2]);
-        fireEvent.click(
-          withinThe.playArea().getAllByRole('button', {
-            name: `Place on ${player} controlled leaf`,
-          })[0],
-        );
+        fireEvent.click(getAll.clickableHandCards(player)[5]);
+        fireEvent.click(getFirst.leafDropzoneControlledBy(player));
 
         expect(getAll.handCards(player)).toHaveLength(initialHandSize - 1);
       });
@@ -274,14 +275,11 @@ describe(App, () => {
       it.for(leavesToUpgrade)(
         `should allow ${player} to upgrade their %sth unupgraded leaf by clicking on it`,
         leafIndex => {
-          const initialGreenFieldCount =
-            queryAll.ownedGreenFields(player).length;
-          fireEvent.click(
-            getAll.controlledEmptyFieldDropzone(player)[leafIndex],
-          );
+          const initialLilyPadCount = queryAll.ownedLilyPads(player).length;
+          fireEvent.click(getAll.leafDropzoneControlledBy(player)[leafIndex]);
 
-          expect(getAll.ownedGreenFields(player)).toHaveLength(
-            initialGreenFieldCount + 1,
+          expect(getAll.ownedLilyPads(player)).toHaveLength(
+            initialLilyPadCount + 1,
           );
         },
       );

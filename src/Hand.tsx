@@ -51,11 +51,54 @@ import { Player } from './PhaseTracker';
 export const INITIAL_HAND_CARD_COUNT = 7;
 export const BIG_HAND_CARD_COUNT = 12;
 
-export const LilyPad = () => {
-  const id = useId();
+type UnitStats = {
+  readonly life: number;
+  readonly movement: number;
+  readonly power: number;
+  readonly range: number;
+};
+function UnitStats({ life, movement, power, range }: UnitStats) {
   return (
-    <section aria-labelledby={id} className="card">
-      <div className="card-title" id={id}>
+    <div className="card-section-column">
+      <div className="card-item">
+        <span>{life}</span>{' '}
+        <Heart>
+          <title>Life</title>
+        </Heart>
+      </div>
+      <div className="card-item">
+        <span>{movement}</span>{' '}
+        <Move>
+          <title>Movement</title>
+        </Move>
+      </div>
+      <div className="card-item">
+        <span>{power}</span>{' '}
+        <Sword>
+          <title>Power</title>
+        </Sword>
+      </div>
+      <div className="card-item">
+        <span>{range}</span>{' '}
+        <Crosshair>
+          <title>Range</title>
+        </Crosshair>
+      </div>
+    </div>
+  );
+}
+
+export function LilyPad() {
+  const id = useId();
+  const titleId = useId();
+  return (
+    <section
+      id={id}
+      aria-labelledby={`${id} ${titleId}`}
+      aria-label="Card face"
+      className="card"
+    >
+      <div className="card-title" id={titleId}>
         Lily Pad
       </div>
       <div className="card-section-row">
@@ -70,42 +113,23 @@ export const LilyPad = () => {
       </div>
     </section>
   );
-};
+}
 
-export const Froglet = () => {
+export function Froglet() {
   const id = useId();
+  const titleId = useId();
   return (
-    <section aria-labelledby={id} className="card">
-      <div className="card-title" id={id}>
+    <section
+      id={id}
+      aria-labelledby={`${id} ${titleId}`}
+      aria-label="Card face"
+      className="card"
+    >
+      <div className="card-title" id={titleId}>
         Froglet
       </div>
       <div className="card-section-split">
-        <div className="card-section-column">
-          <div className="card-item">
-            <span>1</span>{' '}
-            <Heart>
-              <title>Life</title>
-            </Heart>
-          </div>
-          <div className="card-item">
-            <span>1</span>{' '}
-            <Move>
-              <title>Movement</title>
-            </Move>
-          </div>
-          <div className="card-item">
-            <span>0</span>{' '}
-            <Sword>
-              <title>Damage</title>
-            </Sword>
-          </div>
-          <div className="card-item">
-            <span>0</span>{' '}
-            <Crosshair>
-              <title>Range</title>
-            </Crosshair>
-          </div>
-        </div>
+        <UnitStats life={1} movement={1} power={0} range={0} />
         <div className="card-section-fill">
           <div className="card-item">
             <small>Cost:</small>0
@@ -114,14 +138,14 @@ export const Froglet = () => {
       </div>
     </section>
   );
-};
+}
 
-const Facedown = () => {
+const CardBack = () => {
   const id = useId();
   return (
     <section aria-labelledby={id} className="facedown card">
       <Leaf>
-        <title id={id}>Facedown card</title>
+        <title id={id}>Card back</title>
       </Leaf>
     </section>
   );
@@ -145,13 +169,20 @@ function HandCard({
   }[player];
   return (
     <div className="stacking jiggling">
-      <button
-        className={`pickable-card ${playerStyle}`}
-        disabled={!isEnabled}
-        onClick={onPick}
-      >
-        {isFroglet ? <Froglet /> : <LilyPad />}
-      </button>
+      {isEnabled ? (
+        <div
+          role="button"
+          tabIndex={0}
+          className={`highlighting-card pickable-card ${playerStyle}`}
+          onClick={onPick}
+        >
+          {isFroglet ? <Froglet /> : <LilyPad />}
+        </div>
+      ) : (
+        <div tabIndex={0} className={`highlighting-card ${playerStyle}`}>
+          {isFroglet ? <Froglet /> : <LilyPad />}
+        </div>
+      )}
     </div>
   );
 }
@@ -205,20 +236,24 @@ export function Hand({
           '--hand-size': `${handSize + (hasFroglet ? 1 : 0)}`,
         }}
       >
-        {hasFroglet && <HandCard isFroglet player={player} onPick={() => {}} />}
-        {Array.from({ length: handSize }, (_, i) =>
-          isPlayerTurn ? (
-            <HandCard
-              key={i}
-              player={player}
-              isEnabled={isMainPhase && !isPlacing}
-              onPick={onPick}
-            />
-          ) : (
-            <div key={i} className="stacking ">
-              <Facedown />
-            </div>
-          ),
+        {isPlayerTurn && hasFroglet && (
+          <HandCard isFroglet player={player} onPick={() => {}} />
+        )}
+        {Array.from(
+          { length: isPlayerTurn && hasFroglet ? handSize - 1 : handSize },
+          (_, i) =>
+            isPlayerTurn ? (
+              <HandCard
+                key={i}
+                player={player}
+                isEnabled={isMainPhase && !isPlacing}
+                onPick={onPick}
+              />
+            ) : (
+              <div key={i} className="stacking ">
+                <CardBack />
+              </div>
+            ),
         )}
       </div>
     </section>
