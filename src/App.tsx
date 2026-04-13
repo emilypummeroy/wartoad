@@ -168,6 +168,7 @@ export function App({
             isPlayerTurn={player === Player.North}
             isPlacing={subphase === Subphase.Upgrading}
             handSize={northHand}
+            hasFroglet
             onPick={handlePickCard}
           />
           {subphase === Subphase.Upgrading && (

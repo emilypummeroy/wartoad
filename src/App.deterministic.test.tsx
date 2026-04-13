@@ -140,7 +140,7 @@ describe(`${App.name} Deterministic`, () => {
     describe('Picked Card', () => {
       describe.for<[Player, cardName: string]>([
         [North, 'Lily Pad'],
-        // TODO 8: [North, 'Froglet'],
+        [North, 'Froglet'],
         [South, 'Lily Pad'],
         [South, 'Froglet'],
       ])(

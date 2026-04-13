@@ -85,6 +85,7 @@ describe(Hand, () => {
     );
 
     it.for<[name: string, hasFroglet: boolean, isFroglet: boolean]>([
+      // TODO 8: Fill in these cases when hasFroglet becomes cards
       ['Lily Pad', handSize > 1, false],
       ['Lily Pad', false, false],
       ['Froglet', true, true],
