@@ -199,12 +199,14 @@ describe(Grid, () => {
 
 describe('the GridState type functions', () => {
   describe('GridState.setAt', () => {
-    describe.for<[string, boolean, readonly (readonly boolean[])[]]>([
+    describe.for<
+      [string, valueToSet: boolean, readonly (readonly boolean[])[]]
+    >([
       ['INITIAL_GRID_STATE', true, INITIAL_GRID],
       ['INITIAL_GRID_STATE', false, INITIAL_GRID],
       ['ANOTHER_GRID_STATE', true, ANOTHER_GRID],
       ['ANOTHER_GRID_STATE', false, ANOTHER_GRID],
-    ])('with known GridState: %s | new value: %s', ([_, newValue, grid]) => {
+    ])('with known GridState: %s | new value: %s', ([_, valueToSet, grid]) => {
       // oxlint-disable-next-line no-null
       if (!GridState.is(grid)) {
         expect.unreachable();
@@ -233,7 +235,7 @@ describe('the GridState type functions', () => {
         [2, 5],
       ])('when called for x=%s and y=%s', ([x, y]) => {
         it('should not change other zones', () => {
-          const newGrid = GridState.setAt(grid, { x, y }, newValue);
+          const newGrid = GridState.setAt(grid, { x, y }, valueToSet);
 
           for (let yy = 0; yy < y; yy += 1) {
             for (let xx = 0; xx < x; xx += 1) {
@@ -254,9 +256,9 @@ describe('the GridState type functions', () => {
           }
         });
 
-        it(`should set the value at x=${x}, y=${y} to ${newValue}`, () => {
-          const newGrid = GridState.setAt(grid, { x, y }, newValue);
-          expect(newGrid[y][x]).toBe(newValue);
+        it(`should set the value at x=${x}, y=${y} to ${valueToSet}`, () => {
+          const newGrid = GridState.setAt(grid, { x, y }, valueToSet);
+          expect(newGrid[y][x]).toBe(valueToSet);
         });
       });
     });

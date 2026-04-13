@@ -28,6 +28,10 @@ describe(App, () => {
       screen.getByRole('region', { name: `${player} hand` }),
     pickedCardDisplay: () =>
       screen.getByRole('region', { name: `Picked card` }),
+    pickedCard: () =>
+      withinThe
+        .pickedCardDisplay()
+        .getByRole('region', { name: /Card face of/ }),
     playArea: () => withinThe.main().getByRole('grid'),
     phaseIndicator: (player: Player, phase: Phase) =>
       withinThe
@@ -41,13 +45,9 @@ describe(App, () => {
     clickableHandCards: (player: Player) =>
       withinThe.hand(player).getAllByRole('button', {}),
     visibleHandCards: (player: Player) =>
-      withinThe.hand(player).getAllByRole('region', { name: /Card face/ }),
+      withinThe.hand(player).getAllByRole('region', { name: /Card face of/ }),
     hiddenHandCards: (player: Player) =>
       withinThe.hand(player).getAllByRole('region', { name: 'Card back' }),
-    handLilyPads: (player: Player) =>
-      withinThe
-        .hand(player)
-        .getAllByRole('button', { name: 'Card face Lilly Pad' }),
     ownedLilyPads: (player: Player) =>
       withinThe.playArea().getAllByRole('region', {
         name: `${player} owned Lily Pad`,
@@ -61,6 +61,7 @@ describe(App, () => {
   const getFirst = {
     leafDropzoneControlledBy: (player: Player) =>
       getAll.leafDropzoneControlledBy(player)[0],
+    clickableHandCard: (player: Player) => getAll.clickableHandCards(player)[0],
   };
 
   const queryAll = {
@@ -175,14 +176,10 @@ describe(App, () => {
         player => {
           it(`should show the card only until it is placed`, () => {
             advanceToPhase(player, Main);
-            fireEvent.click(getAll.clickableHandCards(player)[3]);
+            fireEvent.click(getFirst.clickableHandCard(player));
 
             expect(getThe.pickedCardDisplay()).toBeVisible();
-            expect(
-              withinThe.pickedCardDisplay().getByRole('region', {
-                name: 'Card face Lily Pad',
-              }),
-            ).toBeVisible();
+            expect(getThe.pickedCard()).toBeVisible();
 
             fireEvent.click(getFirst.leafDropzoneControlledBy(player));
             expect(queryThe.pickedCardDisplay()).not.toBeInTheDocument();
@@ -202,7 +199,6 @@ describe(App, () => {
         advanceToPhase(player, Start);
         const cards = getAll.handCards(player);
         expect(cards).not.toHaveLength(0);
-        for (const c of cards) expect(c).toHaveAccessibleName(/Card face/);
         expect(getAll.visibleHandCards(player)).toHaveLength(cards.length);
       });
 
@@ -260,36 +256,32 @@ describe(App, () => {
       expect(withinThe.main().getByRole('grid')).toBeVisible();
     });
 
-    const FIELD_COUNT_PER_PLAYER = 8;
-    describe.for<[Player, number[]]>([
-      [North, [0, FIELD_COUNT_PER_PLAYER - 2]],
-      [South, [1, FIELD_COUNT_PER_PLAYER - 1]],
-    ])('after picking a card from the %s hand', ([player, leavesToUpgrade]) => {
-      const opponent = player === North ? South : North;
+    describe.for<Player>([North, South])(
+      'after picking a card from the %s hand',
+      player => {
+        const opponent = player === North ? South : North;
 
-      beforeEach(() => {
-        advanceToPhase(player, Main);
-        fireEvent.click(getAll.clickableHandCards(player)[0]);
-      });
+        beforeEach(() => {
+          advanceToPhase(player, Main);
+          fireEvent.click(getFirst.clickableHandCard(player));
+        });
 
-      it.for(leavesToUpgrade)(
-        `should allow ${player} to upgrade their %sth unupgraded leaf by clicking on it`,
-        leafIndex => {
+        it(`should allow ${player} to play a card on a leaf clicking on it`, () => {
           const initialLilyPadCount = queryAll.ownedLilyPads(player).length;
-          fireEvent.click(getAll.leafDropzoneControlledBy(player)[leafIndex]);
+          fireEvent.click(getFirst.leafDropzoneControlledBy(player));
 
           expect(getAll.ownedLilyPads(player)).toHaveLength(
             initialLilyPadCount + 1,
           );
-        },
-      );
+        });
 
-      it(`should not allow ${player} to play a card on an a ${opponent} leaf`, () => {
-        expect(
-          queryThe.controlledEmptyFieldDropzone(opponent),
-        ).not.toBeInTheDocument();
-      });
-    });
+        it(`should not allow ${player} to play a card on an a ${opponent} leaf`, () => {
+          expect(
+            queryThe.controlledEmptyFieldDropzone(opponent),
+          ).not.toBeInTheDocument();
+        });
+      },
+    );
 
     describe('The initial placement of leaves', () => {
       it('should have 18 leaves in 6 rows of 3', () => {

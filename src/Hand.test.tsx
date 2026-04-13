@@ -75,7 +75,7 @@ describe(Hand, () => {
             />,
           );
           expect(
-            withinHand().getAllByRole('region', { name: /Card face/ }),
+            withinHand().getAllByRole('region', { name: /Card face of/ }),
           ).toHaveLength(handSize);
           expect(
             withinHand().queryByRole('region', { name: 'Card back' }),
@@ -84,7 +84,36 @@ describe(Hand, () => {
       },
     );
 
-    it(`should allow cards to be picked during the ${player} Main phase`, () => {
+    it.for<[name: string, hasFroglet: boolean, isFroglet: boolean]>([
+      ['Lily Pad', handSize > 1, false],
+      ['Lily Pad', false, false],
+      ['Froglet', true, true],
+    ])(
+      `should allow %ss to be picked during the ${player} Main phase | hasFroglet=%s`,
+      ([name, hasFroglet, isFroglet]) => {
+        render(
+          <Hand
+            player={player}
+            handSize={handSize}
+            isPlacing={false}
+            hasFroglet={hasFroglet}
+            isMainPhase
+            isPlayerTurn
+            onPick={pickCard}
+          />,
+        );
+        const clickableCards = withinHand().getAllByRole('button', {
+          name: `Pick ${name}`,
+        });
+        for (const card of clickableCards) {
+          fireEvent.click(card);
+          expect(pickCard).toHaveBeenCalledExactlyOnceWith(isFroglet);
+          pickCard.mockClear();
+        }
+      },
+    );
+
+    it(`should allow all cards to be picked during the ${player} Main phase`, () => {
       render(
         <Hand
           player={player}
@@ -162,7 +191,7 @@ describe(Hand, () => {
             />,
           );
           expect(
-            withinHand().queryByRole('region', { name: /Card face/ }),
+            withinHand().queryByRole('region', { name: /Card face of/ }),
           ).not.toBeInTheDocument();
           expect(
             withinHand().getAllByRole('region', { name: 'Card back' }),

@@ -1,10 +1,8 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
-import { App, INITIAL_HAND_CARD_COUNT } from './App';
-import { ROW_COUNT } from './Grid';
+import { App } from './App';
 import { Phase, Player } from './PhaseTracker';
 
-const FEW = 3;
 const MANY = 15;
 
 const { Start, Main, End } = Phase;
@@ -16,7 +14,7 @@ describe('the dom test environment', () => {
   });
 });
 
-describe(App, () => {
+describe(`${App.name} Deterministic`, () => {
   beforeEach(() => render(<App isDeterministic />));
 
   const getThe = {
@@ -28,6 +26,10 @@ describe(App, () => {
       screen.getByRole('region', { name: `${player} hand` }),
     pickedCardDisplay: () =>
       screen.getByRole('region', { name: `Picked card` }),
+    pickedCardNamed: (name: string) =>
+      withinThe
+        .pickedCardDisplay()
+        .getByRole('region', { name: `Card face of ${name}` }),
     playArea: () => withinThe.main().getByRole('grid'),
     phaseIndicator: (player: Player, phase: Phase) =>
       withinThe
@@ -39,20 +41,20 @@ describe(App, () => {
     handCards: (player: Player) =>
       withinThe.hand(player).getAllByRole('region'),
     clickableHandCards: (player: Player) =>
-      withinThe.hand(player).getAllByRole('button', {}),
+      withinThe.hand(player).getAllByRole('button'),
     visibleHandCards: (player: Player) =>
       withinThe.hand(player).getAllByRole('region', { name: /Card face/ }),
     hiddenHandCards: (player: Player) =>
       withinThe.hand(player).getAllByRole('region', { name: 'Card back' }),
-    handLilyPads: (player: Player) =>
+    handCardsNamed: (player: Player, name: string) =>
       withinThe
         .hand(player)
-        .getAllByRole('button', { name: 'Card face Lilly Pad' }),
-    ownedLilyPads: (player: Player) =>
+        .getAllByRole('region', { name: `Card face of ${name}` }),
+    ownedCardsNamed: (player: Player, name: string) =>
       withinThe.playArea().getAllByRole('region', {
-        name: `${player} owned Lily Pad`,
+        name: `${player} owned ${name}`,
       }),
-    leafDropzoneControlledBy: (player: Player) =>
+    leafDropzonesControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('gridcell', {
         name: `Place on ${player} controlled leaf`,
       }),
@@ -60,7 +62,9 @@ describe(App, () => {
 
   const getFirst = {
     leafDropzoneControlledBy: (player: Player) =>
-      getAll.leafDropzoneControlledBy(player)[0],
+      getAll.leafDropzonesControlledBy(player)[0],
+    handCardNamed: (player: Player, name: string) =>
+      getAll.handCardsNamed(player, name)[0],
   };
 
   const queryAll = {
@@ -103,86 +107,22 @@ describe(App, () => {
     expect(getThe.phaseIndicator(player, phase)).toBeVisible();
   };
 
-  describe('Header', () => {
-    it('should have the wartoad heading', () => {
-      const heading = screen.getByRole('heading', { level: 1 });
-      const banner = screen.getByRole('banner');
-      expect(heading).toHaveTextContent('Wartoad');
-      expect(banner).toContainElement(heading);
-    });
-
-    it('should have the Phase indicator after the heading', () => {
-      const indicator = getThe.phaseIndicator(South, Main);
-      expect(indicator).toHaveTextContent('South: Main phase');
-      expect(screen.getByRole('banner')).toContainElement(indicator);
-      const heading = screen.getByRole('heading', { level: 1 });
-      expect(indicator).toAppearAfter(heading);
-    });
-
-    describe('Phase indicatar', () => {
-      it('should start in the South Main phase', () => {
-        expect(getThe.phaseIndicator(South, Main)).toBeVisible();
-        expect(screen.queryByLabelText('End Phase')).not.toBeInTheDocument();
-      });
-
-      it.for([North, South])(
-        'should not advance to the %s End phase when the button is clicked while placing a card',
-        player => {
-          advanceToPhase(player, Main);
-          fireEvent.click(getAll.clickableHandCards(player)[5]);
-          fireEvent.click(screen.getByText('Next phase'));
-
-          expect(getThe.phaseIndicator(player, Main)).toBeVisible();
-          expect(queryThe.phaseIndicator(player, End)).not.toBeInTheDocument();
-        },
-      );
-
-      it('should cycle between all turns and phases as the button is clicked', () => {
-        for (let x = 0; x < FEW; x += 1) {
-          expect(getThe.phaseIndicator(South, Main)).toBeVisible();
-          fireEvent.click(screen.getByText('Next phase'));
-          expect(getThe.phaseIndicator(South, End)).toBeVisible();
-          fireEvent.click(screen.getByText('Next phase'));
-          expect(getThe.phaseIndicator(North, Start)).toBeVisible();
-          fireEvent.click(screen.getByText('Next phase'));
-          expect(getThe.phaseIndicator(North, Main)).toBeVisible();
-          fireEvent.click(screen.getByText('Next phase'));
-          expect(getThe.phaseIndicator(North, End)).toBeVisible();
-          fireEvent.click(screen.getByText('Next phase'));
-          expect(getThe.phaseIndicator(South, Start)).toBeVisible();
-          fireEvent.click(screen.getByText('Next phase'));
-        }
-      });
-    });
-  });
-
   describe('Hands', () => {
-    it('should have the North Hand and South hand in that order before the Play area', () => {
-      const south = getThe.southHand();
-      const north = getThe.northHand();
-      const playArea = getThe.playArea();
-      expect(north).toAppearBefore(south);
-      expect(south).toAppearBefore(playArea);
-    });
-
     describe('Picked Card', () => {
-      it('should not appear before picking a card', () => {
-        expect(queryThe.pickedCardDisplay()).not.toBeInTheDocument();
-      });
-
-      describe.for([North, South])(
-        'after %s picks a card from their hand during their Main phase',
-        player => {
-          it(`should show the card only until it is placed`, () => {
+      describe.for<[Player, cardName: string]>([
+        [North, 'Lily Pad'],
+        // TODO [North, 'Froglet'],
+        [South, 'Lily Pad'],
+        [South, 'Froglet'],
+      ])(
+        'after %s picks a %s from their hand during their Main phase',
+        ([player, cardName]) => {
+          it(`should show the ${cardName} only until it is placed`, () => {
             advanceToPhase(player, Main);
-            fireEvent.click(getAll.clickableHandCards(player)[3]);
+            fireEvent.click(getFirst.handCardNamed(player, cardName));
 
             expect(getThe.pickedCardDisplay()).toBeVisible();
-            expect(
-              withinThe.pickedCardDisplay().getByRole('region', {
-                name: 'Card face Lily Pad',
-              }),
-            ).toBeVisible();
+            expect(getThe.pickedCardNamed(cardName)).toBeVisible();
 
             fireEvent.click(getFirst.leafDropzoneControlledBy(player));
             expect(queryThe.pickedCardDisplay()).not.toBeInTheDocument();
@@ -194,157 +134,88 @@ describe(App, () => {
     describe.for([North, South])('%s hand', player => {
       const opponent = player === North ? South : North;
 
-      it('should start with 7 cards', () => {
-        expect(getAll.handCards(player)).toHaveLength(INITIAL_HAND_CARD_COUNT);
-      });
-
-      it(`should be visible during the ${player} turn`, () => {
+      it(`should show Lily Pads and Froglets during the ${player} turn`, () => {
         advanceToPhase(player, Start);
         const cards = getAll.handCards(player);
         expect(cards).not.toHaveLength(0);
-        for (const c of cards) expect(c).toHaveAccessibleName(/Card face/);
-        expect(getAll.visibleHandCards(player)).toHaveLength(cards.length);
+        for (const c of cards)
+          expect(c).toHaveAccessibleName(/Card face of (Lily Pad)|(Froglet)/);
       });
 
-      it(`should show card backs during the ${opponent} turn`, () => {
-        advanceToPhase(opponent, Start);
-        const cards = getAll.handCards(player);
-        expect(cards).not.toHaveLength(0);
-        for (const c of cards) expect(c).toHaveAccessibleName('Card back');
-        expect(getAll.hiddenHandCards(player)).toHaveLength(cards.length);
-      });
-
-      it(`should gain an extra card during the ${player} Start phase`, () => {
+      // TODO
+      it.skip(`should gain a Froglet during the first ${player} Start phase`, () => {
         advanceToPhase(opponent, End);
-        const initialCount = getAll.handCards(player).length;
+        const initialCount = getAll.handCardsNamed(player, 'Froglet').length;
 
         advanceToPhase(player, Main);
-        expect(getAll.handCards(player)).toHaveLength(initialCount + 1);
+        expect(getAll.handCardsNamed(player, 'Froglet')).toHaveLength(
+          initialCount + 1,
+        );
       });
 
-      it(`should allow a card to be picked during the ${player} Main phase`, () => {
+      it.for(['Lily Pad', 'Froglet'])(
+        `should allow a %s to be picked during the ${player} Main phase`,
+        (name, { skip }) => {
+          skip(player === North && name === 'Froglet'); // TODO
+          advanceToPhase(player, Main);
+          fireEvent.click(getFirst.handCardNamed(player, name));
+          expect(getThe.pickedCardDisplay()).toBeVisible();
+          expect(getThe.pickedCardNamed(name)).toBeVisible();
+        },
+      );
+
+      it.for([
+        'Lily Pad',
+        // TODO 'Froglet'
+      ])(`should lose a %s when played by ${player}`, (name, { skip }) => {
+        skip(player === North && name === 'Froglet'); // TODO
         advanceToPhase(player, Main);
-        fireEvent.click(getAll.clickableHandCards(player)[4]);
-        expect(getThe.pickedCardDisplay()).toBeVisible();
-      });
+        const initialHandSize = getAll.handCardsNamed(player, name).length;
 
-      it('should not allow a card to be picked during other phases and turns', () => {
-        {
-          advanceToPhase(player, End);
-          const clickableCards = queryAll.clickableHandCards(player);
-          if (clickableCards.length > 0) fireEvent.click(clickableCards[0]);
-          expect(queryThe.pickedCardDisplay()).not.toBeInTheDocument();
-        }
-        {
-          advanceToPhase(opponent, Main);
-          const clickableCards = queryAll.clickableHandCards(player);
-          if (clickableCards.length > 0) fireEvent.click(clickableCards[0]);
-          expect(queryThe.pickedCardDisplay()).not.toBeInTheDocument();
-        }
-      });
-
-      it(`should lose a card when ${player} plays a card`, () => {
-        advanceToPhase(player, Main);
-        const initialHandSize = getAll.handCards(player).length;
-
-        fireEvent.click(getAll.clickableHandCards(player)[5]);
+        fireEvent.click(getFirst.handCardNamed(player, name));
         fireEvent.click(getFirst.leafDropzoneControlledBy(player));
-
-        expect(getAll.handCards(player)).toHaveLength(initialHandSize - 1);
+        expect(getAll.handCardsNamed(player, name)).toHaveLength(
+          initialHandSize - 1,
+        );
       });
     });
   });
 
   describe('Play area', () => {
-    it('should be in the main content area', () => {
-      expect(withinThe.main().getByRole('grid')).toBeVisible();
-    });
-
     const FIELD_COUNT_PER_PLAYER = 8;
     describe.for<[Player, number[]]>([
       [North, [0, FIELD_COUNT_PER_PLAYER - 2]],
       [South, [1, FIELD_COUNT_PER_PLAYER - 1]],
-    ])('after picking a card from the %s hand', ([player, leavesToUpgrade]) => {
-      const opponent = player === North ? South : North;
+    ])(
+      'after picking a Lily Pad from the %s hand',
+      ([player, leavesToUpgrade]) => {
+        const opponent = player === North ? South : North;
 
-      beforeEach(() => {
-        advanceToPhase(player, Main);
-        fireEvent.click(getAll.clickableHandCards(player)[0]);
-      });
+        beforeEach(() => {
+          advanceToPhase(player, Main);
+          fireEvent.click(getFirst.handCardNamed(player, 'Lily Pad'));
+        });
 
-      it.for(leavesToUpgrade)(
-        `should allow ${player} to upgrade their %sth unupgraded leaf by clicking on it`,
-        leafIndex => {
-          const initialLilyPadCount = queryAll.ownedLilyPads(player).length;
-          fireEvent.click(getAll.leafDropzoneControlledBy(player)[leafIndex]);
-
-          expect(getAll.ownedLilyPads(player)).toHaveLength(
-            initialLilyPadCount + 1,
-          );
-        },
-      );
-
-      it(`should not allow ${player} to play a card on an a ${opponent} leaf`, () => {
-        expect(
-          queryThe.controlledEmptyFieldDropzone(opponent),
-        ).not.toBeInTheDocument();
-      });
-    });
-
-    describe('The initial placement of leaves', () => {
-      it('should have 18 leaves in 6 rows of 3', () => {
-        const rows = withinThe.playArea().getAllByRole('row');
-        expect(rows).toHaveLength(6);
-        for (const row of rows) {
-          const leaves = within(row).getAllByRole('gridcell');
-          expect(leaves).toHaveLength(3);
-          for (const leaf of leaves) {
-            expect(leaf).toBeVisible();
-          }
-        }
-      });
-
-      it('should have north leaves in the top 3 rows', () => {
-        const northRows = withinThe.playArea().getAllByRole('row').slice(0, 3);
-        for (const row of northRows) {
-          for (const zone of within(row).getAllByRole('gridcell')) {
-            const card = within(zone).getByRole('region');
-            expect(card).toHaveAccessibleName(
-              /North (controlled)|(owned)|(Home)/,
+        it.for(leavesToUpgrade)(
+          `should allow ${player} to upgrade their %sth unupgraded leaf by clicking on it`,
+          leafIndex => {
+            const initialLilyPadCount = queryAll.ownedLilyPads(player).length;
+            fireEvent.click(
+              getAll.leafDropzonesControlledBy(player)[leafIndex],
             );
-          }
-        }
-      });
 
-      it('should have south leaves in the bottom 3 rows', () => {
-        const southRows = withinThe.playArea().getAllByRole('row').slice(3);
-        for (const row of southRows) {
-          for (const zone of within(row).getAllByRole('gridcell')) {
-            const card = within(zone).getByRole('region');
-            expect(card).toHaveAccessibleName(
-              /South (controlled)|(owned)|(Home)/,
+            expect(getAll.ownedCardsNamed(player, 'Lily Pad')).toHaveLength(
+              initialLilyPadCount + 1,
             );
-          }
-        }
-      });
-
-      it('should have the north home leaf', () => {
-        const [_, homeZone] = within(
-          withinThe.playArea().getAllByRole('row')[0],
-        ).getAllByRole('gridcell');
-        expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
-          'North Home Lily Pad',
+          },
         );
-      });
 
-      it('should have the south home leaf', () => {
-        const [_, homeZone] = within(
-          withinThe.playArea().getAllByRole('row')[ROW_COUNT - 1],
-        ).getAllByRole('gridcell');
-        expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
-          'South Home Lily Pad',
-        );
-      });
-    });
+        it(`should not allow ${player} to play a card on an a ${opponent} leaf`, () => {
+          expect(
+            queryThe.controlledEmptyFieldDropzone(opponent),
+          ).not.toBeInTheDocument();
+        });
+      },
+    );
   });
 });

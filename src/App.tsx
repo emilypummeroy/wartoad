@@ -2,8 +2,9 @@ import './App.css';
 import { StepForward } from 'lucide-react';
 import { useCallback, useState, type ReactNode } from 'react';
 
+import { CardClass } from './card-types';
 import { type Position, INITIAL_GRID, GridState, Grid } from './Grid';
-import { Hand, LilyPad } from './Hand';
+import { Froglet, Hand, LilyPad } from './Hand';
 import { Phase, Player, Subphase, type FlowState } from './PhaseTracker';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
@@ -13,7 +14,11 @@ type GameState = {
   readonly grid: GridState;
   readonly northHand: number;
   readonly southHand: number;
+  readonly pickedCard?: CardClass;
 };
+
+// oxlint-disable-next-line no-unused-expressions
+CardClass.Froglet.key as 'Froglet';
 
 function PickedCard({
   owner,
@@ -84,10 +89,13 @@ const gameStateForNextPhase = ({
       : southHand,
 });
 
-const gameStateForCardPicked = ({ flow, ...rest }: GameState) => ({
-  ...rest,
-  flow: { ...flow, subphase: Subphase.Placing },
-});
+const gameStateForCardPicked =
+  (pickedCard: CardClass) =>
+  ({ flow, ...rest }: GameState) => ({
+    ...rest,
+    flow: { ...flow, subphase: Subphase.Placing },
+    pickedCard,
+  });
 
 const gameStateForCardPlaced =
   (position: Position) =>
@@ -99,7 +107,7 @@ const gameStateForCardPlaced =
   });
 
 export function App({
-  isDeterministic = false,
+  isDeterministic: _ = false,
 }: {
   readonly isDeterministic?: boolean;
 }) {
@@ -110,6 +118,7 @@ export function App({
       grid,
       northHand,
       southHand,
+      pickedCard,
     },
     setGameState,
   ] = useState<Readonly<GameState>>({
@@ -128,7 +137,12 @@ export function App({
     [],
   );
   const handlePickCard = useCallback(
-    () => setGameState(gameStateForCardPicked),
+    (isFroglet: boolean) =>
+      setGameState(
+        gameStateForCardPicked(
+          isFroglet ? CardClass.Froglet : CardClass.LilyPad,
+        ),
+      ),
     [],
   );
   const handlePlaceCard = useCallback(
@@ -158,7 +172,7 @@ export function App({
           />
           {subphase === Subphase.Placing && (
             <PickedCard owner={player}>
-              <LilyPad />
+              {pickedCard === CardClass.Froglet ? <Froglet /> : <LilyPad />}
             </PickedCard>
           )}
           <Hand
@@ -167,7 +181,7 @@ export function App({
             isPlayerTurn={player === Player.South}
             isPlacing={subphase === Subphase.Placing}
             handSize={southHand}
-            hasFroglet={!isDeterministic}
+            hasFroglet
             onPick={handlePickCard}
           />
         </section>

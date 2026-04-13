@@ -39,7 +39,7 @@ export const INITIAL_GRID: GridState = [
 ];
 
 export const GridState = {
-  is: (array: readonly (readonly boolean[])[]): array is GridState =>
+  is: (array: ReadonlyArray<ReadonlyArray<boolean>>): array is GridState =>
     array.length === ROW_COUNT &&
     array.every(row => row.length === FIELD_COUNT_PER_ROW),
 
