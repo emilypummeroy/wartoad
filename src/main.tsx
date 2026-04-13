@@ -5,6 +5,6 @@ import { App } from './App.tsx';
 
 createRoot(document.querySelector('#root')!).render(
   <StrictMode>
-    <App hasFroglets />
+    <App isDeterministic />
   </StrictMode>,
 );

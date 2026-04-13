@@ -99,9 +99,9 @@ const gameStateForCardPlaced =
   });
 
 export function App({
-  hasFroglets = false,
+  isDeterministic = false,
 }: {
-  readonly hasFroglets?: boolean;
+  readonly isDeterministic?: boolean;
 }) {
   const [
     {
@@ -167,7 +167,7 @@ export function App({
             isPlayerTurn={player === Player.South}
             isPlacing={subphase === Subphase.Placing}
             handSize={southHand}
-            hasFroglet={hasFroglets}
+            hasFroglet={!isDeterministic}
             onPick={handlePickCard}
           />
         </section>
