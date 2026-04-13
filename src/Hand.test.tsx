@@ -4,6 +4,7 @@ import {
   Hand,
   classForHandSize,
   INITIAL_HAND_CARD_COUNT,
+  SMALL_HAND_CARD_COUNT,
   BIG_HAND_CARD_COUNT,
 } from './Hand';
 import { Phase, Player } from './PhaseTracker';
@@ -11,18 +12,22 @@ import { Phase, Player } from './PhaseTracker';
 const MANY = 15;
 
 describe(classForHandSize, () => {
+  it('should return an empty string for an initial hand', () => {
+    expect(classForHandSize(INITIAL_HAND_CARD_COUNT)).toBe('');
+  });
+
+  it('should return an empty string for an initial hand plus one drawn card', () => {
+    expect(classForHandSize(INITIAL_HAND_CARD_COUNT + 1)).toBe('');
+  });
+
   it('should return an empty string for low card counts', () => {
-    for (let i = 0; i <= INITIAL_HAND_CARD_COUNT; i += 1) {
+    for (let i = 0; i <= SMALL_HAND_CARD_COUNT; i += 1) {
       expect(classForHandSize(i)).toBe('');
     }
   });
 
   it("should return 'compact' for medium card counts", () => {
-    for (
-      let i = INITIAL_HAND_CARD_COUNT + 1;
-      i <= BIG_HAND_CARD_COUNT;
-      i += 1
-    ) {
+    for (let i = SMALL_HAND_CARD_COUNT + 1; i <= BIG_HAND_CARD_COUNT; i += 1) {
       expect(classForHandSize(i)).toBe('compact');
     }
   });

@@ -51,6 +51,7 @@ export {
 import { Player } from './PhaseTracker';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
+export const SMALL_HAND_CARD_COUNT = 8;
 export const BIG_HAND_CARD_COUNT = 12;
 
 function UnitStats({
@@ -208,7 +209,7 @@ function HandCard({
 }
 
 export const classForHandSize = (n: number): string => {
-  if (n <= INITIAL_HAND_CARD_COUNT) return '';
+  if (n <= SMALL_HAND_CARD_COUNT) return '';
   if (n <= BIG_HAND_CARD_COUNT) return 'compact';
   return 'super-compact';
 };
