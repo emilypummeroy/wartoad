@@ -6,7 +6,7 @@ import { Zone } from './Zone';
 
 const { Start, Main, End } = Phase;
 const { North, South } = Player;
-const { Placing, Idle } = Subphase;
+const { Upgrading, Idle } = Subphase;
 
 const MIDDLE = 1;
 
@@ -17,6 +17,8 @@ const FLOW = {
   phase: Main,
   subphase: Idle,
 };
+
+// TODO 8: Add Dropzone tests for the Deploying Subphase
 
 describe(Zone, () => {
   describe.for([North, South])('when controlled by %s', player => {
@@ -172,7 +174,7 @@ describe(Zone, () => {
       const flow = {
         player: controller === North ? South : North,
         phase: Main,
-        subphase: Placing,
+        subphase: Upgrading,
       };
 
       it('should not have a dropzone', () => {
@@ -223,7 +225,7 @@ describe(Zone, () => {
       const flow = {
         player,
         phase: Main,
-        subphase: Placing,
+        subphase: Upgrading,
       };
 
       it('should not have a dropzone if upgraded', () => {

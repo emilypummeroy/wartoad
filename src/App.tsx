@@ -57,7 +57,7 @@ function PhaseBar({
       <button
         className="icon-text accent"
         aria-label="Next phase"
-        disabled={subphase === Subphase.Placing}
+        disabled={subphase === Subphase.Upgrading}
         onClick={onNextPhaseClicked}
       >
         <StepForward />
@@ -93,7 +93,7 @@ const gameStateForCardPicked =
   (pickedCard: CardClass) =>
   ({ flow, ...rest }: GameState) => ({
     ...rest,
-    flow: { ...flow, subphase: Subphase.Placing },
+    flow: { ...flow, subphase: Subphase.Upgrading },
     pickedCard,
   });
 
@@ -166,11 +166,11 @@ export function App({
             player={Player.North}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.North}
-            isPlacing={subphase === Subphase.Placing}
+            isPlacing={subphase === Subphase.Upgrading}
             handSize={northHand}
             onPick={handlePickCard}
           />
-          {subphase === Subphase.Placing && (
+          {subphase === Subphase.Upgrading && (
             <PickedCard owner={player}>
               {pickedCard === CardClass.Froglet ? <Froglet /> : <LilyPad />}
             </PickedCard>
@@ -179,7 +179,7 @@ export function App({
             player={Player.South}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.South}
-            isPlacing={subphase === Subphase.Placing}
+            isPlacing={subphase === Subphase.Upgrading}
             handSize={southHand}
             hasFroglet
             onPick={handlePickCard}

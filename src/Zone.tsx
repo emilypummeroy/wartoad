@@ -75,7 +75,8 @@ export function Zone({
   onPlace,
 }: ZoneProps) {
   const isDropzone =
-    !isUpgraded && player === controller && subphase === Subphase.Placing;
+    !isUpgraded && player === controller && subphase === Subphase.Upgrading;
+  // 8: TODO || (subphase === Subphase.Deploying && position.y === Position.HOME[player].y);
   const handleClick = useCallback(() => onPlace(position), [position, onPlace]);
   return isDropzone ? (
     <div

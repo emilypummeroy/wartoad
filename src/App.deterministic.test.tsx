@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { App } from './App';
+import { Position } from './Grid';
 import { Phase, Player } from './PhaseTracker';
 
 const MANY = 15;
@@ -31,6 +32,12 @@ describe(`${App.name} Deterministic`, () => {
         .pickedCardDisplay()
         .getByRole('region', { name: `Card face of ${name}` }),
     playArea: () => withinThe.main().getByRole('grid'),
+    homeRow: (player: Player) => getThe.nthRow(Position.HOME[player].y),
+    nthRow: (n: number) => withinThe.playArea().getAllByRole('row')[n],
+    homeLeafDropzone: (player: Player) =>
+      withinThe.homeRow(player).getByRole('button', {
+        name: `Place on ${player} Home Lily Pad`,
+      }),
     phaseIndicator: (player: Player, phase: Phase) =>
       withinThe
         .header()
@@ -54,9 +61,21 @@ describe(`${App.name} Deterministic`, () => {
       withinThe.playArea().getAllByRole('region', {
         name: `${player} owned ${name}`,
       }),
+    leavesControlledBy: (player: Player) =>
+      withinThe.playArea().getAllByRole('gridcell', {
+        name: `${player} controlled leaf`,
+      }),
     leafDropzonesControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('gridcell', {
         name: `Place on ${player} controlled leaf`,
+      }),
+    homeRowDropzones: (player: Player) =>
+      withinThe.homeRow(player).getAllByRole('button', {
+        name: `Place on ${player} controlled leaf`,
+      }),
+    lilyPadDropzones: () =>
+      withinThe.playArea().getAllByRole('button', {
+        name: /(owned)|(Home) LillyPad/,
       }),
   };
 
@@ -65,27 +84,35 @@ describe(`${App.name} Deterministic`, () => {
       getAll.leafDropzonesControlledBy(player)[0],
     handCardNamed: (player: Player, name: string) =>
       getAll.handCardsNamed(player, name)[0],
+    lilyPadDropzone: () => getAll.lilyPadDropzones()[0],
+    leafControlledBy: (player: Player) => getAll.leavesControlledBy(player)[0],
   };
 
   const queryAll = {
     clickableHandCards: (player: Player) =>
       withinThe.hand(player).queryAllByRole('button'),
-    ownedLilyPads: (player: Player) =>
+    ownedCardsNamed: (player: Player, name: string) =>
       withinThe.playArea().queryAllByRole('region', {
-        name: `${player} owned Lily Pad`,
+        name: `${player} owned ${name}`,
       }),
   };
 
-  const queryThe = {
+  const queryA = {
     pickedCardDisplay: () =>
       screen.queryByRole('region', { name: `Picked card` }),
     phaseIndicator: (player: Player, phase: Phase) =>
       withinThe
         .header()
         .queryByRole('region', { name: `${player}: ${phase} phase` }),
-    controlledEmptyFieldDropzone: (player: Player) =>
+    controlledLeafDropzone: (player: Player) =>
       withinThe.playArea().queryByRole('button', {
         name: `Place on ${player} controlled leaf`,
+      }),
+    nthRowDropzone: (n: number) =>
+      withinThe.nthRow(n).queryByRole('button', { name: /Place on/ }),
+    lilyPadDropzone: () =>
+      withinThe.playArea().queryByRole('button', {
+        name: /(owned)|(Home) LillyPad/,
       }),
   };
 
@@ -97,11 +124,13 @@ describe(`${App.name} Deterministic`, () => {
     hand: (player: Player) => within(getThe.hand(player)),
     pickedCardDisplay: () => within(getThe.pickedCardDisplay()),
     playArea: () => within(getThe.playArea()),
+    homeRow: (player: Player) => within(getThe.homeRow(player)),
+    nthRow: (n: number) => within(getThe.nthRow(n)),
   };
 
   const advanceToPhase = (player: Player, phase: Phase) => {
     for (let i = 0; i < MANY; i += 1) {
-      if (queryThe.phaseIndicator(player, phase)) break;
+      if (queryA.phaseIndicator(player, phase)) break;
       fireEvent.click(screen.getByText('Next phase'));
     }
     expect(getThe.phaseIndicator(player, phase)).toBeVisible();
@@ -111,7 +140,7 @@ describe(`${App.name} Deterministic`, () => {
     describe('Picked Card', () => {
       describe.for<[Player, cardName: string]>([
         [North, 'Lily Pad'],
-        // TODO [North, 'Froglet'],
+        // TODO 8: [North, 'Froglet'],
         [South, 'Lily Pad'],
         [South, 'Froglet'],
       ])(
@@ -125,7 +154,7 @@ describe(`${App.name} Deterministic`, () => {
             expect(getThe.pickedCardNamed(cardName)).toBeVisible();
 
             fireEvent.click(getFirst.leafDropzoneControlledBy(player));
-            expect(queryThe.pickedCardDisplay()).not.toBeInTheDocument();
+            expect(queryA.pickedCardDisplay()).not.toBeInTheDocument();
           });
         },
       );
@@ -142,7 +171,7 @@ describe(`${App.name} Deterministic`, () => {
           expect(c).toHaveAccessibleName(/Card face of (Lily Pad)|(Froglet)/);
       });
 
-      // TODO
+      // 8: TODO
       it.skip(`should gain a Froglet during the first ${player} Start phase`, () => {
         advanceToPhase(opponent, End);
         const initialCount = getAll.handCardsNamed(player, 'Froglet').length;
@@ -156,7 +185,7 @@ describe(`${App.name} Deterministic`, () => {
       it.for(['Lily Pad', 'Froglet'])(
         `should allow a %s to be picked during the ${player} Main phase`,
         (name, { skip }) => {
-          skip(player === North && name === 'Froglet'); // TODO
+          skip(player === North && name === 'Froglet'); // 8: TODO
           advanceToPhase(player, Main);
           fireEvent.click(getFirst.handCardNamed(player, name));
           expect(getThe.pickedCardDisplay()).toBeVisible();
@@ -166,9 +195,9 @@ describe(`${App.name} Deterministic`, () => {
 
       it.for([
         'Lily Pad',
-        // TODO 'Froglet'
+        // 8: TODO 'Froglet'
       ])(`should lose a %s when played by ${player}`, (name, { skip }) => {
-        skip(player === North && name === 'Froglet'); // TODO
+        skip(player === North && name === 'Froglet'); // 8: TODO
         advanceToPhase(player, Main);
         const initialHandSize = getAll.handCardsNamed(player, name).length;
 
@@ -182,13 +211,9 @@ describe(`${App.name} Deterministic`, () => {
   });
 
   describe('Play area', () => {
-    const FIELD_COUNT_PER_PLAYER = 8;
-    describe.for<[Player, number[]]>([
-      [North, [0, FIELD_COUNT_PER_PLAYER - 2]],
-      [South, [1, FIELD_COUNT_PER_PLAYER - 1]],
-    ])(
+    describe.for<Player>([North, South])(
       'after picking a Lily Pad from the %s hand',
-      ([player, leavesToUpgrade]) => {
+      player => {
         const opponent = player === North ? South : North;
 
         beforeEach(() => {
@@ -196,10 +221,19 @@ describe(`${App.name} Deterministic`, () => {
           fireEvent.click(getFirst.handCardNamed(player, 'Lily Pad'));
         });
 
-        it.for(leavesToUpgrade)(
+        const STARTING_UNUPGRADED_LEAVES = 8;
+        it.for([
+          0,
+          STARTING_UNUPGRADED_LEAVES / 2,
+          STARTING_UNUPGRADED_LEAVES - 1,
+        ])(
           `should allow ${player} to upgrade their %sth unupgraded leaf by clicking on it`,
           leafIndex => {
-            const initialLilyPadCount = queryAll.ownedLilyPads(player).length;
+            const initialLilyPadCount = queryAll.ownedCardsNamed(
+              player,
+              'Lily Pad',
+            ).length;
+
             fireEvent.click(
               getAll.leafDropzonesControlledBy(player)[leafIndex],
             );
@@ -210,9 +244,84 @@ describe(`${App.name} Deterministic`, () => {
           },
         );
 
-        it(`should not allow ${player} to play a card on an a ${opponent} leaf`, () => {
+        it(`should not allow ${player} to play a Lily Pad on an a ${opponent} leaf`, () => {
+          const initialLilyPadCount = queryAll.ownedCardsNamed(
+            player,
+            'Lily Pad',
+          ).length;
+
           expect(
-            queryThe.controlledEmptyFieldDropzone(opponent),
+            queryA.controlledLeafDropzone(opponent),
+          ).not.toBeInTheDocument();
+
+          fireEvent.click(getFirst.leafControlledBy(opponent));
+
+          expect(queryAll.ownedCardsNamed(player, 'Lily Pad')).toHaveLength(
+            initialLilyPadCount,
+          );
+        });
+
+        it(`should not allow ${player} to play a Lily Pad on an an upgraded leaf`, () => {
+          expect(queryA.lilyPadDropzone()).not.toBeInTheDocument();
+        });
+      },
+    );
+
+    describe.skip.each<Player>([North, South])(
+      'after picking a Froglet from the %s hand',
+      player => {
+        const opponent = player === North ? South : North;
+
+        beforeEach(() => {
+          advanceToPhase(player, Main);
+          fireEvent.click(getFirst.handCardNamed(player, 'Froglet'));
+        });
+
+        const LEFT = 0;
+        const RIGHT = 2;
+        it.for([LEFT, RIGHT])(
+          `should allow ${player} to train a Froglet on their %sth leaf in the back row`,
+          leafIndex => {
+            const initialFrogletCount = queryAll.ownedCardsNamed(
+              player,
+              'Froglet',
+            ).length;
+
+            fireEvent.click(getAll.homeRowDropzones(player)[leafIndex]);
+
+            expect(getAll.ownedCardsNamed(player, 'Froglet')).toHaveLength(
+              initialFrogletCount + 1,
+            );
+          },
+        );
+
+        it(`should allow ${player} to train a Froglet on their Home Lily Pad`, () => {
+          const initialFrogletCount = queryAll.ownedCardsNamed(
+            player,
+            'Froglet',
+          ).length;
+
+          fireEvent.click(getThe.homeLeafDropzone(player));
+
+          expect(getAll.ownedCardsNamed(player, 'Froglet')).toHaveLength(
+            initialFrogletCount + 1,
+          );
+        });
+
+        it.for([1, 2])(
+          `should not allow ${player} to play the Froglet on an a forward leaf`,
+          offset => {
+            const targetRow =
+              player === North
+                ? Position.HOME[North].y + offset
+                : Position.HOME[South].y - offset;
+            expect(queryA.nthRowDropzone(targetRow)).not.toBeInTheDocument();
+          },
+        );
+
+        it(`should not allow ${player} to play the Froglet on an a ${opponent} leaf`, () => {
+          expect(
+            queryA.controlledLeafDropzone(opponent),
           ).not.toBeInTheDocument();
         });
       },

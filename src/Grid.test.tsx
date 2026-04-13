@@ -115,7 +115,7 @@ describe(Grid, () => {
             flow={{
               phase: Phase.Main,
               player,
-              subphase: Subphase.Placing,
+              subphase: Subphase.Upgrading,
             }}
             grid={FULL_GRID}
           />,
@@ -148,7 +148,7 @@ describe(Grid, () => {
           flow={{
             phase: Phase.Main,
             player,
-            subphase: Subphase.Placing,
+            subphase: Subphase.Upgrading,
           }}
           grid={EMPTY_GRID}
         />,
