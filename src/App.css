@@ -14,7 +14,6 @@
   --shadow:
     oklch(0% 0 0 / 0.15) 0 10px 15px -3px, oklch(0% 0 0 / 0.1) 0 4px 6px -2px;
 }
-
 @media (prefers-color-scheme: dark) {
   :root {
     --text: oklch(80% 0.01 200);
@@ -103,14 +102,15 @@
   }
 }
 
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
 #root {
   display: flex;
   text-align: center;
   justify-content: center;
-}
-
-body {
-  margin: 0;
 }
 
 h1,

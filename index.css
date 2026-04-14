@@ -1,0 +1,12 @@
+:root {
+  color-scheme: light dark;
+  --bg: oklch(95% 0.01 240);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: oklch(18% 0.01 240);
+  }
+}
+body {
+  background: var(--bg);
+}
