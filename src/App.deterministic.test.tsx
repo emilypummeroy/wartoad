@@ -198,17 +198,18 @@ describe(`${App.name} Deterministic`, () => {
         },
       );
 
-      // TODO 8: Unskip when the correct card is removed from the hand
-      it.skip.for(['Lily Pad', 'Froglet'])(
+      it.for(['Lily Pad', 'Froglet'])(
         `should lose a %s when played by ${player}`,
         name => {
           advanceToPhase(player, Main);
-          const initialHandSize = getAll.handCardsNamed(player, name).length;
+          const initialNamedCount = getAll.handCardsNamed(player, name).length;
+          const initialHandCount = getAll.handCards(player).length;
 
           fireEvent.click(getFirst.handCardNamed(player, name));
           fireEvent.click(getFirst.leafDropzoneControlledBy(player));
+          expect(getAll.handCards(player)).toHaveLength(initialHandCount - 1);
           expect(getAll.handCardsNamed(player, name)).toHaveLength(
-            initialHandSize - 1,
+            initialNamedCount - 1,
           );
         },
       );

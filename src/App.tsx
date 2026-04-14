@@ -17,9 +17,6 @@ type GameState = {
   readonly pickedCard?: CardClass;
 };
 
-// oxlint-disable-next-line no-unused-expressions
-CardClass.Froglet.key as 'Froglet';
-
 function PickedCard({
   owner,
   children,
@@ -67,10 +64,24 @@ function PhaseBar({
   );
 }
 
+const shuffled = (cards: readonly CardClass[]): CardClass[] => {
+  const source = [...cards];
+  const result = [];
+  while (source.length > 0) {
+    result.push(source.splice(Math.floor(Math.random() * source.length), 1)[0]);
+  }
+  return result;
+};
+
 const randomCard = (): CardClass =>
   Object.values(CardClass)[
     Math.floor(Math.random() * Object.values(CardClass).length)
   ];
+
+const removeOne = (cards: readonly CardClass[], cardClass: CardClass) => [
+  ...cards.slice(0, cards.lastIndexOf(cardClass)),
+  ...cards.slice(cards.lastIndexOf(cardClass) + 1),
+];
 
 const gameStateForNextPhase =
   (isDeterministic: boolean) =>
@@ -103,18 +114,26 @@ const gameStateForCardPicked =
 
 const gameStateForCardPlaced =
   (position: Position) =>
-  ({ grid, flow, northHand, southHand }: GameState) => ({
+  ({ grid, flow, northHand, southHand, pickedCard }: GameState) => ({
     flow: { ...flow, subphase: Subphase.Idle },
-    northHand: flow.player === Player.North ? northHand.slice(1) : northHand,
-    southHand: flow.player === Player.South ? southHand.slice(1) : southHand,
+    northHand:
+      flow.player === Player.North && pickedCard && northHand.length > 0
+        ? removeOne(northHand, pickedCard)
+        : northHand,
+    southHand:
+      flow.player === Player.South && pickedCard && southHand.length > 0
+        ? removeOne(southHand, pickedCard)
+        : southHand,
     grid: GridState.setAt(grid, position, true),
   });
 
 const DETERMINISTIC_STARTING_HAND = [
-  ...Array.from(
-    { length: INITIAL_HAND_CARD_COUNT - 1 },
-    () => CardClass.Froglet,
-  ),
+  CardClass.LilyPad,
+  CardClass.Froglet,
+  CardClass.LilyPad,
+  CardClass.Froglet,
+  CardClass.Froglet,
+  CardClass.Froglet,
   CardClass.LilyPad,
 ];
 
@@ -141,10 +160,10 @@ export function App({
     },
     grid: INITIAL_GRID,
     northHand: isDeterministic
-      ? DETERMINISTIC_STARTING_HAND
+      ? shuffled(DETERMINISTIC_STARTING_HAND)
       : Array.from({ length: INITIAL_HAND_CARD_COUNT }, randomCard),
     southHand: isDeterministic
-      ? DETERMINISTIC_STARTING_HAND
+      ? shuffled(DETERMINISTIC_STARTING_HAND)
       : Array.from({ length: INITIAL_HAND_CARD_COUNT }, randomCard),
   });
 
