@@ -171,21 +171,26 @@ describe(`${App.name} Deterministic`, () => {
           expect(c).toHaveAccessibleName(/Card face of (Lily Pad)|(Froglet)/);
       });
 
-      // 8: TODO
-      it.skip(`should gain a Froglet during the first ${player} Start phase`, () => {
+      it(`should gain a Froglet during the first ${player} Start phase`, () => {
+        advanceToPhase(player, Main);
+        const initialFrogletCount = getAll.handCardsNamed(
+          player,
+          'Froglet',
+        ).length;
+        const initialCardCount = getAll.handCards(player).length;
+
         advanceToPhase(opponent, End);
-        const initialCount = getAll.handCardsNamed(player, 'Froglet').length;
+        expect(getAll.handCards(player).length).toBe(initialCardCount);
 
         advanceToPhase(player, Main);
         expect(getAll.handCardsNamed(player, 'Froglet')).toHaveLength(
-          initialCount + 1,
+          initialFrogletCount + 1,
         );
       });
 
       it.for(['Lily Pad', 'Froglet'])(
         `should allow a %s to be picked during the ${player} Main phase`,
-        (name, { skip }) => {
-          skip(player === North && name === 'Froglet'); // 8: TODO
+        name => {
           advanceToPhase(player, Main);
           fireEvent.click(getFirst.handCardNamed(player, name));
           expect(getThe.pickedCardDisplay()).toBeVisible();
@@ -193,20 +198,20 @@ describe(`${App.name} Deterministic`, () => {
         },
       );
 
-      it.for([
-        'Lily Pad',
-        // 8: TODO 'Froglet'
-      ])(`should lose a %s when played by ${player}`, (name, { skip }) => {
-        skip(player === North && name === 'Froglet'); // 8: TODO
-        advanceToPhase(player, Main);
-        const initialHandSize = getAll.handCardsNamed(player, name).length;
+      // TODO 8: Unskip when the correct card is removed from the hand
+      it.skip.for(['Lily Pad', 'Froglet'])(
+        `should lose a %s when played by ${player}`,
+        name => {
+          advanceToPhase(player, Main);
+          const initialHandSize = getAll.handCardsNamed(player, name).length;
 
-        fireEvent.click(getFirst.handCardNamed(player, name));
-        fireEvent.click(getFirst.leafDropzoneControlledBy(player));
-        expect(getAll.handCardsNamed(player, name)).toHaveLength(
-          initialHandSize - 1,
-        );
-      });
+          fireEvent.click(getFirst.handCardNamed(player, name));
+          fireEvent.click(getFirst.leafDropzoneControlledBy(player));
+          expect(getAll.handCardsNamed(player, name)).toHaveLength(
+            initialHandSize - 1,
+          );
+        },
+      );
     });
   });
 
@@ -267,7 +272,7 @@ describe(`${App.name} Deterministic`, () => {
       },
     );
 
-    describe.skip.each<Player>([North, South])(
+    describe.for<Player>([North, South])(
       'after picking a Froglet from the %s hand',
       player => {
         const opponent = player === North ? South : North;
@@ -279,7 +284,8 @@ describe(`${App.name} Deterministic`, () => {
 
         const LEFT = 0;
         const RIGHT = 2;
-        it.for([LEFT, RIGHT])(
+        // TODO 8: Unskip when training dropzones work
+        it.skip.for([LEFT, RIGHT])(
           `should allow ${player} to train a Froglet on their %sth leaf in the back row`,
           leafIndex => {
             const initialFrogletCount = queryAll.ownedCardsNamed(
@@ -295,7 +301,8 @@ describe(`${App.name} Deterministic`, () => {
           },
         );
 
-        it(`should allow ${player} to train a Froglet on their Home Lily Pad`, () => {
+        // TODO 8: Unskip when training dropzones work
+        it.skip(`should allow ${player} to train a Froglet on their Home Lily Pad`, () => {
           const initialFrogletCount = queryAll.ownedCardsNamed(
             player,
             'Froglet',
@@ -308,7 +315,8 @@ describe(`${App.name} Deterministic`, () => {
           );
         });
 
-        it.for([1, 2])(
+        // TODO 8: Unskip when training dropzones work
+        it.skip.for([1, 2])(
           `should not allow ${player} to play the Froglet on an a forward leaf`,
           offset => {
             const targetRow =

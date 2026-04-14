@@ -20,7 +20,12 @@ import {
 } from 'lucide-react';
 import { useCallback, useId } from 'react';
 
-import { CardClass, type UnitDetails, type LeafDetails } from './card-types';
+import {
+  CardClass,
+  type UnitStats,
+  type LeafStats,
+  type CardKey,
+} from './card-types';
 
 export {
   // Amphibeans
@@ -50,14 +55,14 @@ export {
 
 import { Player } from './PhaseTracker';
 
-export const INITIAL_HAND_CARD_COUNT = 7;
-export const SMALL_HAND_CARD_COUNT = 8;
-export const BIG_HAND_CARD_COUNT = 12;
+export const INITIAL_HAND_SIZE = 7;
+export const SMALL_HAND_SIZE = 8;
+export const BIG_HAND_HAND_SIZE = 12;
 
 function UnitStats({
   stats: { life, speed, power, range },
 }: {
-  readonly stats: UnitDetails;
+  readonly stats: UnitStats;
 }) {
   return (
     <div className="card-section-column">
@@ -89,7 +94,7 @@ function UnitStats({
   );
 }
 
-function LeafStats({ stats: { gives } }: { readonly stats: LeafDetails }) {
+function LeafStats({ stats: { gives } }: { readonly stats: LeafStats }) {
   return (
     <div className="card-section-row">
       <div className="card-item">
@@ -160,13 +165,13 @@ const CardBack = () => {
 
 type HandCardProps = Readonly<{
   isEnabled?: boolean;
-  isFroglet?: boolean;
+  cardClass: CardClass;
   player: Player;
-  onPick: (isFroglet: boolean) => void;
+  onPick: (cardKey: CardClass) => void;
 }>;
 function HandCard({
   isEnabled = false,
-  isFroglet = false,
+  cardClass,
   player,
   onPick,
 }: HandCardProps) {
@@ -174,7 +179,7 @@ function HandCard({
     [Player.North]: 'north',
     [Player.South]: 'south',
   }[player];
-  const handleClick = useCallback(() => onPick(isFroglet), [isFroglet, onPick]);
+  const handleClick = useCallback(() => onPick(cardClass), [cardClass, onPick]);
   const buttonId = useId();
   const titleId = useId();
   return (
@@ -189,7 +194,7 @@ function HandCard({
           className={`highlighting-card pickable-card ${playerStyle}`}
           onClick={handleClick}
         >
-          {isFroglet ? (
+          {cardClass === CardClass.Froglet ? (
             <Froglet titleId={titleId} />
           ) : (
             <LilyPad titleId={titleId} />
@@ -197,7 +202,7 @@ function HandCard({
         </div>
       ) : (
         <div tabIndex={0} className={`highlighting-card ${playerStyle}`}>
-          {isFroglet ? (
+          {cardClass === CardClass.Froglet ? (
             <Froglet titleId={titleId} />
           ) : (
             <LilyPad titleId={titleId} />
@@ -208,9 +213,9 @@ function HandCard({
   );
 }
 
-export const classForHandSize = (n: number): string => {
-  if (n <= SMALL_HAND_CARD_COUNT) return '';
-  if (n <= BIG_HAND_CARD_COUNT) return 'compact';
+export const classForHand = (cards: readonly CardClass[]): string => {
+  if (cards.length <= SMALL_HAND_SIZE) return '';
+  if (cards.length <= BIG_HAND_HAND_SIZE) return 'compact';
   return 'super-compact';
 };
 
@@ -219,9 +224,8 @@ type HandProps = Readonly<{
   isMainPhase: boolean;
   isPlayerTurn: boolean;
   isPlacing: boolean;
-  hasFroglet?: boolean;
-  handSize: number;
-  onPick: (isFroglet: boolean) => void;
+  handCards: readonly CardClass[];
+  onPick: (cardClass: CardClass) => void;
 }>;
 declare module 'react' {
   // oxlint-disable-next-line typescript/consistent-type-definitions
@@ -236,8 +240,7 @@ export function Hand({
   isMainPhase,
   isPlayerTurn,
   isPlacing,
-  hasFroglet = false,
-  handSize,
+  handCards,
   onPick,
 }: HandProps) {
   const id = useId();
@@ -245,6 +248,7 @@ export function Hand({
     [Player.North]: 'north',
     [Player.South]: 'south',
   }[player];
+  const countsSoFar: Partial<Record<CardKey, number>> = {};
 
   return (
     <section className="hand" aria-labelledby={id}>
@@ -252,38 +256,29 @@ export function Hand({
         {player} hand
       </h3>
       <div
-        className={`${isPlayerTurn ? 'jiggle-row' : 'splay-row'} ${classForHandSize(handSize)}`}
+        className={`${isPlayerTurn ? 'jiggle-row' : 'splay-row'} ${classForHand(handCards)}`}
         style={{
-          '--hand-size': `${handSize}`,
+          '--hand-size': `${handCards.length}`,
         }}
       >
-        {hasFroglet &&
-          (isPlayerTurn ? (
+        {handCards.map((cardClass: CardClass) => {
+          const i = countsSoFar[cardClass.key] ?? 0;
+          countsSoFar[cardClass.key] = i + 1;
+
+          return isPlayerTurn ? (
             <HandCard
-              isFroglet
+              key={`${cardClass.key} ${i}`}
+              cardClass={cardClass}
               player={player}
               isEnabled={isMainPhase && !isPlacing}
               onPick={onPick}
             />
           ) : (
-            <div className="stacking">
+            <div key={`${cardClass.key} ${i}`} className="stacking">
               <CardBack />
             </div>
-          ))}
-        {Array.from({ length: hasFroglet ? handSize - 1 : handSize }, (_, i) =>
-          isPlayerTurn ? (
-            <HandCard
-              key={i}
-              player={player}
-              isEnabled={isMainPhase && !isPlacing}
-              onPick={onPick}
-            />
-          ) : (
-            <div key={i} className="stacking">
-              <CardBack />
-            </div>
-          ),
-        )}
+          );
+        })}
       </div>
     </section>
   );

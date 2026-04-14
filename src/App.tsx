@@ -12,8 +12,8 @@ export const INITIAL_HAND_CARD_COUNT = 7;
 type GameState = {
   readonly flow: FlowState;
   readonly grid: GridState;
-  readonly northHand: number;
-  readonly southHand: number;
+  readonly northHand: readonly CardClass[];
+  readonly southHand: readonly CardClass[];
   readonly pickedCard?: CardClass;
 };
 
@@ -67,27 +67,31 @@ function PhaseBar({
   );
 }
 
-const gameStateForNextPhase = ({
-  flow: { player, phase },
-  northHand,
-  southHand,
-  ...rest
-}: GameState) => ({
-  ...rest,
-  flow: {
-    player: phase === Phase.End ? Player.AFTER[player] : player,
-    phase: Phase.AFTER[phase],
-    subphase: Subphase.Idle,
-  },
-  northHand:
-    Phase.AFTER[phase] === Phase.Start && Player.AFTER[player] === Player.North
-      ? northHand + 1
-      : northHand,
-  southHand:
-    Phase.AFTER[phase] === Phase.Start && Player.AFTER[player] === Player.South
-      ? southHand + 1
-      : southHand,
-});
+const randomCard = (): CardClass =>
+  Object.values(CardClass)[
+    Math.floor(Math.random() * Object.values(CardClass).length)
+  ];
+
+const gameStateForNextPhase =
+  (isDeterministic: boolean) =>
+  ({ flow: { player, phase }, northHand, southHand, ...rest }: GameState) => ({
+    ...rest,
+    flow: {
+      player: phase === Phase.End ? Player.AFTER[player] : player,
+      phase: Phase.AFTER[phase],
+      subphase: Subphase.Idle,
+    },
+    northHand:
+      Phase.AFTER[phase] === Phase.Start &&
+      Player.AFTER[player] === Player.North
+        ? [...northHand, isDeterministic ? CardClass.Froglet : randomCard()]
+        : northHand,
+    southHand:
+      Phase.AFTER[phase] === Phase.Start &&
+      Player.AFTER[player] === Player.South
+        ? [...southHand, isDeterministic ? CardClass.Froglet : randomCard()]
+        : southHand,
+  });
 
 const gameStateForCardPicked =
   (pickedCard: CardClass) =>
@@ -101,13 +105,21 @@ const gameStateForCardPlaced =
   (position: Position) =>
   ({ grid, flow, northHand, southHand }: GameState) => ({
     flow: { ...flow, subphase: Subphase.Idle },
-    northHand: flow.player === Player.North ? northHand - 1 : northHand,
-    southHand: flow.player === Player.South ? southHand - 1 : southHand,
+    northHand: flow.player === Player.North ? northHand.slice(1) : northHand,
+    southHand: flow.player === Player.South ? southHand.slice(1) : southHand,
     grid: GridState.setAt(grid, position, true),
   });
 
+const DETERMINISTIC_STARTING_HAND = [
+  ...Array.from(
+    { length: INITIAL_HAND_CARD_COUNT - 1 },
+    () => CardClass.Froglet,
+  ),
+  CardClass.LilyPad,
+];
+
 export function App({
-  isDeterministic: _ = false,
+  isDeterministic = false,
 }: {
   readonly isDeterministic?: boolean;
 }) {
@@ -128,21 +140,20 @@ export function App({
       subphase: Subphase.Idle,
     },
     grid: INITIAL_GRID,
-    northHand: INITIAL_HAND_CARD_COUNT,
-    southHand: INITIAL_HAND_CARD_COUNT,
+    northHand: isDeterministic
+      ? DETERMINISTIC_STARTING_HAND
+      : Array.from({ length: INITIAL_HAND_CARD_COUNT }, randomCard),
+    southHand: isDeterministic
+      ? DETERMINISTIC_STARTING_HAND
+      : Array.from({ length: INITIAL_HAND_CARD_COUNT }, randomCard),
   });
 
   const handleNextPhaseClicked = useCallback(
-    () => setGameState(gameStateForNextPhase),
-    [],
+    () => setGameState(gameStateForNextPhase(isDeterministic)),
+    [isDeterministic],
   );
   const handlePickCard = useCallback(
-    (isFroglet: boolean) =>
-      setGameState(
-        gameStateForCardPicked(
-          isFroglet ? CardClass.Froglet : CardClass.LilyPad,
-        ),
-      ),
+    (cardClass: CardClass) => setGameState(gameStateForCardPicked(cardClass)),
     [],
   );
   const handlePlaceCard = useCallback(
@@ -167,8 +178,7 @@ export function App({
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.North}
             isPlacing={subphase === Subphase.Upgrading}
-            handSize={northHand}
-            hasFroglet
+            handCards={northHand}
             onPick={handlePickCard}
           />
           {subphase === Subphase.Upgrading && (
@@ -181,8 +191,7 @@ export function App({
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.South}
             isPlacing={subphase === Subphase.Upgrading}
-            handSize={southHand}
-            hasFroglet
+            handCards={southHand}
             onPick={handlePickCard}
           />
         </section>

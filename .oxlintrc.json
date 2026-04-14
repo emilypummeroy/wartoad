@@ -14,7 +14,8 @@
       "warn",
       "always",
       {
-        "ignorePattern": "v8"
+        "ignorePattern": "v8",
+        "ignoreConsecutiveComments": true
       }
     ],
     "func-style": [
