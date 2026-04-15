@@ -52,15 +52,29 @@ describe(App, () => {
       withinThe.playArea().getAllByRole('region', {
         name: new RegExp(`${player} (controlled)|(Home) Lily Pad`),
       }),
+    basicLeavesControlledBy: (player: Player) =>
+      withinThe.playArea().getAllByRole('region', {
+        name: new RegExp(`${player} controlled leaf`),
+      }),
+    cardsControlledBy: (player: Player) =>
+      withinThe.playArea().getAllByRole('region', {
+        name: new RegExp(`${player} controlled`),
+      }),
     leafDropzoneControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('gridcell', {
         name: new RegExp(`(Upgrade)|(Deploy on) ${player} controlled leaf`),
       }),
+    dropzoneControlledBy: (player: Player) =>
+      withinThe.playArea().getAllByRole('gridcell', {
+        name: new RegExp(`(Upgrade)|(Deploy on) ${player} controlled`),
+      }),
   };
 
   const getFirst = {
+    dropzoneControlledBy: (player: Player) =>
+      getAll.dropzoneControlledBy(player)[0],
     leafDropzoneControlledBy: (player: Player) =>
-      getAll.leafDropzoneControlledBy(player)[0],
+      getAll.dropzoneControlledBy(player)[0],
     clickableHandCard: (player: Player) => getAll.clickableHandCards(player)[0],
   };
 
@@ -70,6 +84,10 @@ describe(App, () => {
     controlledLilyPads: (player: Player) =>
       withinThe.playArea().queryAllByRole('region', {
         name: `${player} controlled Lily Pad`,
+      }),
+    controlledCards: (player: Player) =>
+      withinThe.playArea().queryAllByRole('region', {
+        name: new RegExp(`${player} controlled`),
       }),
   };
 
@@ -267,13 +285,17 @@ describe(App, () => {
         });
 
         it(`should allow ${player} to play a card on a leaf clicking on it`, () => {
-          const initialLilyPadCount =
-            queryAll.controlledLilyPads(player).length;
-          fireEvent.click(getFirst.leafDropzoneControlledBy(player));
+          // Playing a leaf will make the "controlled leaf" count go down.
+          // Playing a unit will make the "controlled card" count go up.
+          const initialHeuristicCount =
+            getAll.cardsControlledBy(player).length -
+            getAll.basicLeavesControlledBy(player).length;
+          fireEvent.click(getFirst.dropzoneControlledBy(player));
 
-          expect(getAll.lilyPadsControlledBy(player)).toHaveLength(
-            initialLilyPadCount + 1,
-          );
+          const newHeuristicCount =
+            getAll.cardsControlledBy(player).length -
+            getAll.basicLeavesControlledBy(player).length;
+          expect(newHeuristicCount).toBe(initialHeuristicCount + 1);
         });
 
         it(`should not allow ${player} to play a card on an a ${opponent} leaf`, () => {
