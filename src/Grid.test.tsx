@@ -7,6 +7,7 @@ import {
   FIELD_COUNT_PER_ROW,
   ROW_COUNT_PER_PLAYER,
   ROW_COUNT,
+  Position,
 } from './Grid';
 import { Phase, Player, Subphase } from './PhaseTracker';
 import type { ZoneState } from './Zone';
@@ -51,6 +52,14 @@ describe(Grid, () => {
     player === Player.North
       ? screen.getAllByRole('row').slice(ROW_COUNT_PER_PLAYER)
       : screen.getAllByRole('row').slice(0, ROW_COUNT_PER_PLAYER);
+  const getHomeRow = (player: Player) =>
+    player === Player.North
+      ? screen.getAllByRole('row')[Position.HOME[Player.North].y]
+      : screen.getAllByRole('row')[Position.HOME[Player.South].y];
+  const getNonHomeRows = (player: Player) =>
+    player === Player.North
+      ? screen.getAllByRole('row').slice(Position.HOME[Player.North].y + 1)
+      : screen.getAllByRole('row').slice(0, Position.HOME[Player.South].y);
 
   describe.for<[name: string, GridState]>([
     ['INITIAL_GRID_STATE', INITIAL_GRID],
@@ -93,10 +102,10 @@ describe(Grid, () => {
       [Player.South, 4],
       [Player.South, 5],
     ])(
-      'should display %s controlled/owned leaves in the %sth row',
+      'should display %s controlled leaves in the %sth row',
       ([player, rowY]) => {
         const emptyName = new RegExp(`${player} controlled leaf`);
-        const fullName = new RegExp(`${player} (owned)|(Home) Lily Pad`);
+        const fullName = new RegExp(`${player} (controlled)|(Home) Lily Pad`);
         const zones = within(screen.getAllByRole('row')[rowY]).getAllByRole(
           'region',
         );
@@ -130,7 +139,7 @@ describe(Grid, () => {
         expect(screen.queryByRole('button')).not.toBeInTheDocument();
         const zones = screen.getAllByRole('gridcell');
         for (const zone of zones) {
-          expect(zone).not.toHaveAccessibleName(/Place on/);
+          expect(zone).not.toHaveAccessibleName(/Upgrade/);
           fireEvent.click(zone);
         }
         expect(handlePlaceCard).not.toHaveBeenCalled();
@@ -141,62 +150,117 @@ describe(Grid, () => {
   describe.for<[Player, shouldReverse: boolean]>([
     [Player.North, false],
     [Player.South, true],
-  ])('when placing a %s card in an empty grid', ([player, shouldReverse]) => {
-    const opponentRowsAt = shouldReverse ? 'first' : 'last';
-    const playerRowsAt = shouldReverse ? 'last' : 'first';
+  ])("during %s's Main phase in an empty grid", ([player, shouldReverse]) => {
+    const badRowsName = shouldReverse ? 'first' : 'last';
+    const goodRowsName = shouldReverse ? 'last' : 'first';
 
-    beforeEach(() => {
-      render(
-        <Grid
-          onPlaceCard={handlePlaceCard}
-          flow={{
-            phase: Phase.Main,
-            player,
-            subphase: Subphase.Upgrading,
-          }}
-          grid={EMPTY_GRID}
-        />,
-      );
+    describe(`when ${player} is Upgrading`, () => {
+      beforeEach(() => {
+        render(
+          <Grid
+            onPlaceCard={handlePlaceCard}
+            flow={{
+              phase: Phase.Main,
+              player,
+              subphase: Subphase.Upgrading,
+            }}
+            grid={EMPTY_GRID}
+          />,
+        );
+      });
+
+      it(`should display ${FIELD_COUNT_PER_ROW} clickable leaves in the ${goodRowsName} rows`, () => {
+        for (const row of getPlayerRows(player)) {
+          const buttons = within(row).getAllByRole('button');
+          expect(buttons).toHaveLength(FIELD_COUNT_PER_ROW);
+
+          for (const button of buttons) {
+            fireEvent.click(button);
+            expect(button).toHaveAccessibleName(/Upgrade/);
+
+            expect(handlePlaceCard).toHaveBeenCalledOnce();
+            handlePlaceCard.mockReset();
+          }
+          const zones = within(row).getAllByRole('gridcell');
+          expect(zones).toHaveLength(FIELD_COUNT_PER_ROW);
+          for (const zone of zones) {
+            fireEvent.click(zone);
+            expect(zone).toHaveAccessibleName(
+              `Upgrade ${player} controlled leaf`,
+            );
+
+            expect(handlePlaceCard).toHaveBeenCalledOnce();
+            handlePlaceCard.mockReset();
+          }
+        }
+      });
+
+      it(`should not display clickable leaves in the ${badRowsName} rows`, () => {
+        for (const row of getOpponentRows(player)) {
+          const zones = within(row).getAllByRole('gridcell');
+          expect(within(row).queryByRole('button')).not.toBeInTheDocument();
+          expect(zones).toHaveLength(FIELD_COUNT_PER_ROW);
+
+          for (const zone of zones) {
+            expect(zone).not.toHaveAccessibleName(/Upgrade/);
+            fireEvent.click(zone);
+          }
+        }
+        expect(handlePlaceCard).not.toHaveBeenCalled();
+      });
     });
 
-    it(`should display ${FIELD_COUNT_PER_ROW} clickable leaves in the ${playerRowsAt} rows`, () => {
-      for (const row of getPlayerRows(player)) {
+    describe(`when ${player} is Deploying`, () => {
+      beforeEach(() => {
+        render(
+          <Grid
+            onPlaceCard={handlePlaceCard}
+            flow={{
+              phase: Phase.Main,
+              player,
+              subphase: Subphase.Deploying,
+            }}
+            grid={EMPTY_GRID}
+          />,
+        );
+      });
+
+      it(`should display ${FIELD_COUNT_PER_ROW} clickable leaves in the single ${goodRowsName} row`, () => {
+        const row = getHomeRow(player);
         const buttons = within(row).getAllByRole('button');
         expect(buttons).toHaveLength(FIELD_COUNT_PER_ROW);
-
         for (const button of buttons) {
           fireEvent.click(button);
-          expect(button).toHaveAccessibleName(/Place on/);
-
+          expect(button).toHaveAccessibleName(/Deploy on/);
           expect(handlePlaceCard).toHaveBeenCalledOnce();
           handlePlaceCard.mockReset();
         }
+
         const zones = within(row).getAllByRole('gridcell');
         expect(zones).toHaveLength(FIELD_COUNT_PER_ROW);
         for (const zone of zones) {
           fireEvent.click(zone);
           expect(zone).toHaveAccessibleName(
-            `Place on ${player} controlled leaf`,
+            `Deploy on ${player} controlled leaf`,
           );
-
           expect(handlePlaceCard).toHaveBeenCalledOnce();
           handlePlaceCard.mockReset();
         }
-      }
-    });
+      });
 
-    it(`should not display clickable leaves in the ${opponentRowsAt} rows`, () => {
-      for (const row of getOpponentRows(player)) {
-        const zones = within(row).getAllByRole('gridcell');
-        expect(within(row).queryByRole('button')).not.toBeInTheDocument();
-        expect(zones).toHaveLength(FIELD_COUNT_PER_ROW);
+      it(`should not display clickable leaves in the ${badRowsName} rows`, () => {
+        for (const row of getNonHomeRows(player)) {
+          const zones = within(row).getAllByRole('gridcell');
+          expect(within(row).queryByRole('button')).not.toBeInTheDocument();
+          expect(zones).toHaveLength(FIELD_COUNT_PER_ROW);
 
-        for (const zone of zones) {
-          expect(zone).not.toHaveAccessibleName(/Place on/);
-          fireEvent.click(zone);
+          for (const zone of zones) {
+            expect(zone).not.toHaveAccessibleName(/Deploy on/);
+            fireEvent.click(zone);
+          }
         }
-      }
-      expect(handlePlaceCard).not.toHaveBeenCalled();
+        expect(handlePlaceCard).not.toHaveBeenCalled();
+      });
     });
   });
 });

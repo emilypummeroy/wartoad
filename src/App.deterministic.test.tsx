@@ -36,7 +36,7 @@ describe(`${App.name} Deterministic`, () => {
     nthRow: (n: number) => withinThe.playArea().getAllByRole('row')[n],
     homeLeafDropzone: (player: Player) =>
       withinThe.homeRow(player).getByRole('button', {
-        name: `Place on ${player} Home Lily Pad`,
+        name: `Upgrade ${player} Home Lily Pad`,
       }),
     phaseIndicator: (player: Player, phase: Phase) =>
       withinThe
@@ -57,9 +57,9 @@ describe(`${App.name} Deterministic`, () => {
       withinThe
         .hand(player)
         .getAllByRole('region', { name: `Card face of ${name}` }),
-    ownedCardsNamed: (player: Player, name: string) =>
+    controlledCardsNamed: (player: Player, name: string) =>
       withinThe.playArea().getAllByRole('region', {
-        name: `${player} owned ${name}`,
+        name: `${player} controlled ${name}`,
       }),
     leavesControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('gridcell', {
@@ -67,15 +67,15 @@ describe(`${App.name} Deterministic`, () => {
       }),
     leafDropzonesControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('gridcell', {
-        name: `Place on ${player} controlled leaf`,
+        name: new RegExp(`(Upgrade)|(Deploy on) ${player} controlled leaf`),
       }),
     homeRowDropzones: (player: Player) =>
       withinThe.homeRow(player).getAllByRole('button', {
-        name: `Place on ${player} controlled leaf`,
+        name: new RegExp(`(Upgrade)|(Deploy on) ${player} Home`),
       }),
     lilyPadDropzones: () =>
       withinThe.playArea().getAllByRole('button', {
-        name: /(owned)|(Home) LillyPad/,
+        name: new RegExp(`Lily Pad`),
       }),
   };
 
@@ -91,9 +91,9 @@ describe(`${App.name} Deterministic`, () => {
   const queryAll = {
     clickableHandCards: (player: Player) =>
       withinThe.hand(player).queryAllByRole('button'),
-    ownedCardsNamed: (player: Player, name: string) =>
+    controlledCardsNamed: (player: Player, name: string) =>
       withinThe.playArea().queryAllByRole('region', {
-        name: `${player} owned ${name}`,
+        name: `${player} controlled${name}`,
       }),
   };
 
@@ -106,13 +106,13 @@ describe(`${App.name} Deterministic`, () => {
         .queryByRole('region', { name: `${player}: ${phase} phase` }),
     controlledLeafDropzone: (player: Player) =>
       withinThe.playArea().queryByRole('button', {
-        name: `Place on ${player} controlled leaf`,
+        name: `Upgrade ${player} controlled leaf`,
       }),
     nthRowDropzone: (n: number) =>
-      withinThe.nthRow(n).queryByRole('button', { name: /Place on/ }),
+      withinThe.nthRow(n).queryByRole('button', { name: /Upgrade/ }),
     lilyPadDropzone: () =>
       withinThe.playArea().queryByRole('button', {
-        name: /(owned)|(Home) LillyPad/,
+        name: /(controlled)|(Home) Lilly Pad/,
       }),
   };
 
@@ -138,24 +138,31 @@ describe(`${App.name} Deterministic`, () => {
 
   describe('Hands', () => {
     describe('Picked Card', () => {
-      describe.for<[Player, cardName: string]>([
-        [North, 'Lily Pad'],
-        [North, 'Froglet'],
-        [South, 'Lily Pad'],
-        [South, 'Froglet'],
-      ])(
-        'after %s picks a %s from their hand during their Main phase',
-        ([player, cardName]) => {
-          it(`should show the ${cardName} only until it is placed`, () => {
-            advanceToPhase(player, Main);
-            fireEvent.click(getFirst.handCardNamed(player, cardName));
+      it.for<Player>([North, South])(
+        `should show a picked Froglet only until it is deployed`,
+        player => {
+          advanceToPhase(player, Main);
+          fireEvent.click(getFirst.handCardNamed(player, 'Froglet'));
 
-            expect(getThe.pickedCardDisplay()).toBeVisible();
-            expect(getThe.pickedCardNamed(cardName)).toBeVisible();
+          expect(getThe.pickedCardDisplay()).toBeVisible();
+          expect(getThe.pickedCardNamed('Froglet')).toBeVisible();
 
-            fireEvent.click(getFirst.leafDropzoneControlledBy(player));
-            expect(queryA.pickedCardDisplay()).not.toBeInTheDocument();
-          });
+          fireEvent.click(getFirst.leafDropzoneControlledBy(player));
+          expect(queryA.pickedCardDisplay()).not.toBeInTheDocument();
+        },
+      );
+
+      it.for<Player>([North, South])(
+        `should show a picked Lily Pad only until it is placed`,
+        player => {
+          advanceToPhase(player, Main);
+          fireEvent.click(getFirst.handCardNamed(player, 'Lily Pad'));
+
+          expect(getThe.pickedCardDisplay()).toBeVisible();
+          expect(getThe.pickedCardNamed('Lily Pad')).toBeVisible();
+
+          fireEvent.click(getFirst.leafDropzoneControlledBy(player));
+          expect(queryA.pickedCardDisplay()).not.toBeInTheDocument();
         },
       );
     });
@@ -235,7 +242,7 @@ describe(`${App.name} Deterministic`, () => {
         ])(
           `should allow ${player} to upgrade their %sth unupgraded leaf by clicking on it`,
           leafIndex => {
-            const initialLilyPadCount = queryAll.ownedCardsNamed(
+            const initialLilyPadCount = queryAll.controlledCardsNamed(
               player,
               'Lily Pad',
             ).length;
@@ -244,14 +251,14 @@ describe(`${App.name} Deterministic`, () => {
               getAll.leafDropzonesControlledBy(player)[leafIndex],
             );
 
-            expect(getAll.ownedCardsNamed(player, 'Lily Pad')).toHaveLength(
-              initialLilyPadCount + 1,
-            );
+            expect(
+              getAll.controlledCardsNamed(player, 'Lily Pad'),
+            ).toHaveLength(initialLilyPadCount + 1);
           },
         );
 
         it(`should not allow ${player} to play a Lily Pad on an a ${opponent} leaf`, () => {
-          const initialLilyPadCount = queryAll.ownedCardsNamed(
+          const initialLilyPadCount = queryAll.controlledCardsNamed(
             player,
             'Lily Pad',
           ).length;
@@ -262,9 +269,9 @@ describe(`${App.name} Deterministic`, () => {
 
           fireEvent.click(getFirst.leafControlledBy(opponent));
 
-          expect(queryAll.ownedCardsNamed(player, 'Lily Pad')).toHaveLength(
-            initialLilyPadCount,
-          );
+          expect(
+            queryAll.controlledCardsNamed(player, 'Lily Pad'),
+          ).toHaveLength(initialLilyPadCount);
         });
 
         it(`should not allow ${player} to play a Lily Pad on an an upgraded leaf`, () => {
@@ -285,39 +292,38 @@ describe(`${App.name} Deterministic`, () => {
 
         const LEFT = 0;
         const RIGHT = 2;
-        // TODO 8: Unskip when training dropzones work
+        // TODO 8: Unskip when Froglets appear on the grid
         it.skip.for([LEFT, RIGHT])(
           `should allow ${player} to train a Froglet on their %sth leaf in the back row`,
           leafIndex => {
-            const initialFrogletCount = queryAll.ownedCardsNamed(
+            const initialFrogletCount = queryAll.controlledCardsNamed(
               player,
               'Froglet',
             ).length;
 
             fireEvent.click(getAll.homeRowDropzones(player)[leafIndex]);
 
-            expect(getAll.ownedCardsNamed(player, 'Froglet')).toHaveLength(
+            expect(getAll.controlledCardsNamed(player, 'Froglet')).toHaveLength(
               initialFrogletCount + 1,
             );
           },
         );
 
-        // TODO 8: Unskip when training dropzones work
+        // TODO 8: Unskip when Froglets appear on the grid
         it.skip(`should allow ${player} to train a Froglet on their Home Lily Pad`, () => {
-          const initialFrogletCount = queryAll.ownedCardsNamed(
+          const initialFrogletCount = queryAll.controlledCardsNamed(
             player,
             'Froglet',
           ).length;
 
           fireEvent.click(getThe.homeLeafDropzone(player));
 
-          expect(getAll.ownedCardsNamed(player, 'Froglet')).toHaveLength(
+          expect(getAll.controlledCardsNamed(player, 'Froglet')).toHaveLength(
             initialFrogletCount + 1,
           );
         });
 
-        // TODO 8: Unskip when training dropzones work
-        it.skip.for([1, 2])(
+        it.for([1, 2])(
           `should not allow ${player} to play the Froglet on an a forward leaf`,
           offset => {
             const targetRow =

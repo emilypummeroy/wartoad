@@ -48,9 +48,9 @@ describe(App, () => {
       withinThe.hand(player).getAllByRole('region', { name: /Card face of/ }),
     hiddenHandCards: (player: Player) =>
       withinThe.hand(player).getAllByRole('region', { name: 'Card back' }),
-    ownedLilyPads: (player: Player) =>
+    controlledLilyPads: (player: Player) =>
       withinThe.playArea().getAllByRole('region', {
-        name: `${player} owned Lily Pad`,
+        name: `${player} controlled Lily Pad`,
       }),
     leafDropzoneControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('gridcell', {
@@ -67,9 +67,9 @@ describe(App, () => {
   const queryAll = {
     clickableHandCards: (player: Player) =>
       withinThe.hand(player).queryAllByRole('button'),
-    ownedLilyPads: (player: Player) =>
+    controlledLilyPads: (player: Player) =>
       withinThe.playArea().queryAllByRole('region', {
-        name: `${player} owned Lily Pad`,
+        name: `${player} controlled Lily Pad`,
       }),
   };
 
@@ -267,10 +267,11 @@ describe(App, () => {
         });
 
         it(`should allow ${player} to play a card on a leaf clicking on it`, () => {
-          const initialLilyPadCount = queryAll.ownedLilyPads(player).length;
+          const initialLilyPadCount =
+            queryAll.controlledLilyPads(player).length;
           fireEvent.click(getFirst.leafDropzoneControlledBy(player));
 
-          expect(getAll.ownedLilyPads(player)).toHaveLength(
+          expect(getAll.controlledLilyPads(player)).toHaveLength(
             initialLilyPadCount + 1,
           );
         });
@@ -301,9 +302,7 @@ describe(App, () => {
         for (const row of northRows) {
           for (const zone of within(row).getAllByRole('gridcell')) {
             const card = within(zone).getByRole('region');
-            expect(card).toHaveAccessibleName(
-              /North (controlled)|(owned)|(Home)/,
-            );
+            expect(card).toHaveAccessibleName(/North (controlled)|(Home)/);
           }
         }
       });
@@ -313,9 +312,7 @@ describe(App, () => {
         for (const row of southRows) {
           for (const zone of within(row).getAllByRole('gridcell')) {
             const card = within(zone).getByRole('region');
-            expect(card).toHaveAccessibleName(
-              /South (controlled)|(owned)|(Home)/,
-            );
+            expect(card).toHaveAccessibleName(/South (controlled)|(Home)/);
           }
         }
       });

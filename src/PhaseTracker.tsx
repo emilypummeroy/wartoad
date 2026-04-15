@@ -33,7 +33,7 @@ export type Player = (typeof _Player)[keyof typeof _Player];
 export const Subphase = {
   Idle: 'Idle',
   Upgrading: 'Upgrading',
-  Deploying: 'Training',
+  Deploying: 'Deploying',
 } as const;
 export type Subphase = (typeof Subphase)[keyof typeof Subphase];
 

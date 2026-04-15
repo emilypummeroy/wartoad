@@ -2,7 +2,7 @@ import './App.css';
 import { StepForward } from 'lucide-react';
 import { useCallback, useState, type ReactNode } from 'react';
 
-import { CardClass } from './card-types';
+import { CardClass, CardType } from './card-types';
 import { type Position, INITIAL_GRID, GridState, Grid } from './Grid';
 import { Froglet, Hand, LilyPad } from './Hand';
 import { Phase, Player, Subphase, type FlowState } from './PhaseTracker';
@@ -108,7 +108,13 @@ const gameStateForCardPicked =
   (pickedCard: CardClass) =>
   ({ flow, ...rest }: GameState) => ({
     ...rest,
-    flow: { ...flow, subphase: Subphase.Upgrading },
+    flow: {
+      ...flow,
+      subphase:
+        pickedCard.type === CardType.Unit
+          ? Subphase.Deploying
+          : Subphase.Upgrading,
+    },
     pickedCard,
   });
 
@@ -201,7 +207,7 @@ export function App({
             handCards={northHand}
             onPick={handlePickCard}
           />
-          {subphase === Subphase.Upgrading && (
+          {subphase !== Subphase.Idle && (
             <PickedCard owner={player}>
               {pickedCard === CardClass.Froglet ? <Froglet /> : <LilyPad />}
             </PickedCard>

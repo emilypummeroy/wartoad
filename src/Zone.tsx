@@ -38,7 +38,7 @@ function LilyPad({
           </Clover>
         ) : (
           <Leaf>
-            <title id={symbolId}>{owner} owned</title>
+            <title id={symbolId}>{owner} controlled</title>
           </Leaf>
         )}
       </div>
@@ -80,11 +80,13 @@ export function Zone({
   zone: { isUpgraded },
   onPlace,
 }: ZoneProps) {
-  const isDropzone =
-    !isUpgraded && player === controller && subphase === Subphase.Upgrading;
-  // 8: TODO || (subphase === Subphase.Deploying && position.y === Position.HOME[player].y);
   const handleClick = useCallback(() => onPlace(position), [position, onPlace]);
-  return isDropzone ? (
+  const isUpgradeDropzone =
+    subphase === Subphase.Upgrading && !isUpgraded && player === controller;
+  const isDeployDropzone =
+    subphase === Subphase.Deploying && position.y === Position.HOME[player].y;
+
+  return isUpgradeDropzone || isDeployDropzone ? (
     <div
       role="gridcell"
       aria-colindex={position.x}
@@ -94,10 +96,17 @@ export function Zone({
     >
       <div role="button" className="overlay-container">
         <Replace>
-          <title>Place on</title>
+          <title>{isUpgradeDropzone ? 'Upgrade' : 'Deploy on'}</title>
         </Replace>
       </div>
-      <Facedown key="facedown-card" player={controller} />
+      {isUpgraded ? (
+        <LilyPad
+          isHome={Position.equals(Position.HOME[controller], position)}
+          owner={controller}
+        />
+      ) : (
+        <Facedown key="facedown-card" player={controller} />
+      )}
     </div>
   ) : (
     <div

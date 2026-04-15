@@ -7,7 +7,7 @@ import { Zone } from './Zone';
 
 const { Start, Main, End } = Phase;
 const { North, South } = Player;
-const { Upgrading, Idle } = Subphase;
+const { Upgrading, Deploying, Idle } = Subphase;
 
 const MIDDLE = 1;
 
@@ -24,20 +24,19 @@ const FLOW = {
 describe(Zone, () => {
   describe.for<[Player, Position, unitCount: number]>([
     [North, { x: 0, y: 0 }, 0],
-    [North, { x: 1, y: 1 }, 0],
-    [North, { x: 2, y: 2 }, 0],
-    [North, { x: 2, y: 3 }, 0],
-    [North, { x: 0, y: 4 }, 0],
-    [North, { x: 1, y: 5 }, 0],
-    [South, { x: 1, y: 0 }, 0],
-    [South, { x: 0, y: 1 }, 0],
-    [South, { x: 2, y: 2 }, 0],
+    [North, { x: 1, y: 1 }, 1],
+    [North, { x: 2, y: 2 }, 2],
+    [North, { x: 2, y: 3 }, 3],
+    [North, { x: 0, y: 4 }, 4],
+    [North, { x: 1, y: 5 }, 5],
+    [South, { x: 1, y: 0 }, 1],
+    [South, { x: 0, y: 1 }, 3],
+    [South, { x: 2, y: 2 }, 5],
     [South, { x: 0, y: 3 }, 0],
-    [South, { x: 1, y: 4 }, 0],
-    [South, { x: 2, y: 5 }, 0],
-    // TODO 8: Add different unit combinations
+    [South, { x: 1, y: 4 }, 2],
+    [South, { x: 2, y: 5 }, 4],
   ])(
-    'when controlled by %s in non-home position',
+    'when controlled by %s in non-home position %s | unitCount:%s',
     ([player, position, unitCount]) => {
       const units = Array.from({ length: unitCount }, () => CardClass.Froglet);
       it(`should have a ${player} Lily Pad if upgraded`, () => {
@@ -51,7 +50,7 @@ describe(Zone, () => {
           />,
         );
         expect(screen.getByRole('region')).toHaveAccessibleName(
-          `${player} owned Lily Pad`,
+          `${player} controlled Lily Pad`,
         );
       });
 
@@ -66,7 +65,7 @@ describe(Zone, () => {
           />,
         );
         expect(screen.getByRole('region')).toHaveAccessibleName(
-          `${player} owned Lily Pad`,
+          `${player} controlled Lily Pad`,
         );
       });
     },
@@ -116,7 +115,7 @@ describe(Zone, () => {
     [North, South, End, { x: 2, y: 3 }, 0],
     // TODO 8: Add different unit combinations
   ])(
-    'basic cases :: controlled by %s | %s %s phase | %s | %s units | while idle',
+    'basic cases :: controlled by %s | %s %s phase | %s | %s units | while Idle',
     ([controller, turnPlayer, phase, position, unitCount]) => {
       const units = Array.from({ length: unitCount }, () => CardClass.Froglet);
       const flow = {
@@ -167,7 +166,7 @@ describe(Zone, () => {
         );
 
         expect(
-          screen.queryByRole('button', { name: /Place on/ }),
+          screen.queryByRole('button', { name: /Upgrade/ }),
         ).not.toBeInTheDocument();
       });
 
@@ -190,21 +189,19 @@ describe(Zone, () => {
     },
   );
 
-  describe.for<[Player, isUpgraded: boolean, Position, unitCount: number]>([
-    [North, false, Position.HOME[North], 0],
-    [North, true, { x: 1, y: 3 }, 0],
-    [South, false, Position.HOME[South], 0],
-    [South, true, { x: 0, y: 5 }, 0],
-    [North, true, Position.HOME[North], 0],
-    [North, false, { x: 1, y: 2 }, 0],
-    [South, true, Position.HOME[South], 0],
-    [South, false, { x: 2, y: 4 }, 0],
+  describe.for<[Player, Player, upgraded: boolean, Position, number]>([
+    [South, North, true, Position.HOME[North], 0],
+    [South, North, true, { x: 1, y: 0 }, 1],
+    [South, North, false, { x: 1, y: 2 }, 2],
+    [North, South, true, Position.HOME[South], 2],
+    [North, South, true, { x: 0, y: 5 }, 0],
+    [North, South, false, { x: 2, y: 4 }, 1],
   ])(
-    'when controlled by %s while opponent is placing a card | upgraded: %s | at %s | %s units',
-    ([controller, isUpgraded, position, unitCount]) => {
+    'while %s is upgrading but controlled by %s | upgraded: %s | at %s | %s units',
+    ([player, controller, isUpgraded, position, unitCount]) => {
       const units = Array.from({ length: unitCount }, () => CardClass.Froglet);
       const flow = {
-        player: controller === North ? South : North,
+        player,
         phase: Main,
         subphase: Upgrading,
       };
@@ -220,7 +217,7 @@ describe(Zone, () => {
           />,
         );
         expect(
-          screen.queryByRole('button', { name: /Place on/ }),
+          screen.queryByRole('button', { name: /Upgrade/ }),
         ).not.toBeInTheDocument();
         for (const button of screen.queryAllByRole('button'))
           expect(button).not.toBeEnabled();
@@ -243,13 +240,24 @@ describe(Zone, () => {
     },
   );
 
+  // TODO 8: Add different unit counts
   describe.for<[Player, Position, unitCount: number]>([
     [North, Position.HOME[North], 0],
-    [North, { x: 0, y: 0 }, 0],
-    [South, Position.HOME[South], 0],
-    [South, { x: 2, y: 3 }, 0],
+    [North, { x: 2, y: 0 }, 1],
+    [North, { x: 1, y: 1 }, 2],
+    [North, { x: 0, y: 2 }, 3],
+    [North, { x: 1, y: 3 }, 4],
+    [North, { x: 2, y: 4 }, 5],
+    [North, { x: 0, y: 5 }, 6],
+    [South, Position.HOME[South], 6],
+    [South, { x: 0, y: 0 }, 5],
+    [South, { x: 1, y: 1 }, 4],
+    [South, { x: 2, y: 2 }, 0],
+    [South, { x: 0, y: 3 }, 2],
+    [South, { x: 2, y: 4 }, 1],
+    [South, { x: 1, y: 5 }, 3],
   ])(
-    'when controlled by %s while they are placing a card | position: %s',
+    'when controlled by %s while they are upgrading | position: %s',
     ([player, position, unitCount]) => {
       const units = Array.from({ length: unitCount }, () => CardClass.Froglet);
       const flow = {
@@ -270,13 +278,13 @@ describe(Zone, () => {
         );
 
         expect(
-          screen.queryByRole('button', { name: /Place on/ }),
+          screen.queryByRole('button', { name: /Upgrade/ }),
         ).not.toBeInTheDocument();
         for (const button of screen.queryAllByRole('button'))
           expect(button).not.toBeEnabled();
       });
 
-      it('should not call onPlace if upgraded if the dropzone is clicked', () => {
+      it('should not call onPlace if upgraded when clicked', () => {
         const onPlace = vi.fn<() => void>();
         render(
           <Zone
@@ -291,6 +299,7 @@ describe(Zone, () => {
         fireEvent.click(screen.getByRole('region'));
         expect(onPlace).not.toHaveBeenCalled();
       });
+
       it('should have a dropzone if unupgraded', () => {
         render(
           <Zone
@@ -304,12 +313,12 @@ describe(Zone, () => {
 
         expect(
           screen.getByRole('button', {
-            name: /Place on/,
+            name: /Upgrade/,
           }),
         ).toBeVisible();
         expect(
           screen.getByRole('gridcell', {
-            name: `Place on ${player} controlled leaf`,
+            name: `Upgrade ${player} controlled leaf`,
           }),
         ).toBeVisible();
       });
@@ -328,7 +337,132 @@ describe(Zone, () => {
 
         fireEvent.click(
           screen.getByRole('button', {
-            name: /Place on/,
+            name: /Upgrade/,
+          }),
+        );
+
+        expect(onPlace).toHaveBeenCalledOnce();
+        expect(onPlace).toHaveBeenCalledWith(position);
+      });
+    },
+  );
+
+  describe.for<[Player, Position, _isUpgraded: boolean, _unitCount: number]>([
+    [North, { x: 0, y: 1 }, false, 0],
+    [North, { x: 1, y: 1 }, true, 1],
+    [North, { x: 2, y: 1 }, false, 2],
+    [North, { x: 0, y: 2 }, true, 3],
+    [North, { x: 1, y: 2 }, false, 4],
+    [North, { x: 2, y: 2 }, false, 5],
+    [North, { x: 0, y: 3 }, true, 3],
+    [North, { x: 1, y: 3 }, false, 4],
+    [North, { x: 2, y: 3 }, true, 4],
+    [North, { x: 0, y: 4 }, false, 0],
+    [North, { x: 1, y: 4 }, false, 1],
+    [North, { x: 2, y: 4 }, true, 2],
+    [North, { x: 0, y: 5 }, false, 3],
+    [North, { x: 1, y: 5 }, true, 4],
+    [North, { x: 2, y: 5 }, false, 5],
+    [South, { x: 0, y: 0 }, false, 0],
+    [South, { x: 1, y: 0 }, true, 1],
+    [South, { x: 2, y: 0 }, false, 2],
+    [South, { x: 0, y: 1 }, true, 3],
+    [South, { x: 1, y: 1 }, false, 4],
+    [South, { x: 2, y: 1 }, false, 5],
+    [South, { x: 0, y: 2 }, true, 3],
+    [South, { x: 1, y: 2 }, false, 4],
+    [South, { x: 2, y: 2 }, true, 4],
+    [South, { x: 0, y: 3 }, false, 0],
+    [South, { x: 1, y: 3 }, false, 1],
+    [South, { x: 2, y: 3 }, true, 2],
+    [South, { x: 0, y: 4 }, false, 3],
+    [South, { x: 1, y: 4 }, true, 4],
+    [South, { x: 2, y: 4 }, false, 5],
+  ])(
+    "in %s's non-home row position %s while deploying",
+    ([player, position, isUpgraded, unitCount]) => {
+      const units = Array.from({ length: unitCount }, () => CardClass.Froglet);
+      const flow = {
+        player,
+        phase: Main,
+        subphase: Deploying,
+      };
+      const onPlace = vi.fn<() => void>();
+      beforeEach(() =>
+        render(
+          <Zone
+            position={position}
+            flow={flow}
+            controller={player}
+            zone={{ isUpgraded, units }}
+            onPlace={onPlace}
+          />,
+        ),
+      );
+
+      it(`should not have a dropzone`, () => {
+        expect(
+          screen.queryByRole('button', { name: /Deploy on/ }),
+        ).not.toBeInTheDocument();
+        for (const button of screen.queryAllByRole('button'))
+          expect(button).not.toBeEnabled();
+      });
+
+      it('should not call onPlace ', () => {
+        fireEvent.click(screen.getByRole('region'));
+        expect(onPlace).not.toHaveBeenCalled();
+      });
+    },
+  );
+
+  describe.for<[Player, Position, isUpgraded: boolean, number, string, string]>(
+    [
+      [North, { x: 0, y: 0 }, false, 0, 'controlled', 'leaf'],
+      [North, Position.HOME.North, true, 1, 'Home', 'Lily Pad'],
+      [North, { x: 2, y: 0 }, true, 2, 'controlled', 'Lily Pad'],
+      [South, { x: 0, y: 5 }, true, 2, 'controlled', 'Lily Pad'],
+      [South, Position.HOME.South, true, 5, 'Home', 'Lily Pad'],
+      [South, { x: 2, y: 5 }, false, 6, 'controlled', 'leaf'],
+    ],
+  )(
+    "in %s's home row position %s while Deploying | isUpgraded: %s | unitCount: %s",
+    ([player, position, isUpgraded, unitCount, leafAdjective, leafName]) => {
+      const flow = {
+        player,
+        phase: Main,
+        subphase: Deploying,
+      };
+      const units = Array.from({ length: unitCount }, () => CardClass.Froglet);
+      const zone = {
+        isUpgraded,
+        units,
+      };
+      const onPlace = vi.fn<() => void>();
+      beforeEach(() =>
+        render(
+          <Zone
+            position={position}
+            flow={flow}
+            controller={player}
+            zone={zone}
+            onPlace={onPlace}
+          />,
+        ),
+      );
+
+      it('should have a dropzone', () => {
+        expect(screen.getByRole('button', { name: /Deploy on/ })).toBeVisible();
+        expect(
+          screen.getByRole('gridcell', {
+            name: `Deploy on ${player} ${leafAdjective} ${leafName}`,
+          }),
+        ).toBeVisible();
+      });
+
+      it('should call onPlace when the dropzone is clicked', () => {
+        fireEvent.click(
+          screen.getByRole('button', {
+            name: /Deploy on/,
           }),
         );
 
