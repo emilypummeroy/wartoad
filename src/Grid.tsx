@@ -61,50 +61,47 @@ export type GridProps = Readonly<{
   onPlaceCard: (position: Position) => void;
 }>;
 export function Grid({ grid, flow, onPlaceCard }: GridProps) {
-  const children = (rowY: number) => (
-    <>
-      <Zone
-        controller={rowY < ROW_COUNT_PER_PLAYER ? Player.North : Player.South}
-        flow={flow}
-        position={{ x: 0, y: rowY }}
-        isUpgraded={grid[rowY][0]}
-        onPlace={onPlaceCard}
-      />
-      <Zone
-        controller={rowY < ROW_COUNT_PER_PLAYER ? Player.North : Player.South}
-        flow={flow}
-        position={{ x: 1, y: rowY }}
-        isUpgraded={grid[rowY][1]}
-        onPlace={onPlaceCard}
-      />
-      <Zone
-        controller={rowY < ROW_COUNT_PER_PLAYER ? Player.North : Player.South}
-        flow={flow}
-        position={{ x: 2, y: rowY }}
-        isUpgraded={grid[rowY][2]}
-        onPlace={onPlaceCard}
-      />
-    </>
+  const children = (x: number, y: number) => (
+    <Zone
+      controller={y < ROW_COUNT_PER_PLAYER ? Player.North : Player.South}
+      flow={flow}
+      position={{ x, y }}
+      units={[]} // TODO 8: Wire up units for each zone
+      isUpgraded={grid[y][x]}
+      onPlace={onPlaceCard}
+    />
   );
   return (
     <div role="grid">
       <div className="zonerow" role="row">
-        {children(0)}
+        {children(0, 0)}
+        {children(1, 0)}
+        {children(2, 0)}
       </div>
       <div className="zonerow" role="row">
-        {children(1)}
+        {children(0, 1)}
+        {children(1, 1)}
+        {children(2, 1)}
       </div>
       <div className="zonerow" role="row">
-        {children(2)}
+        {children(0, 2)}
+        {children(1, 2)}
+        {children(2, 2)}
       </div>
       <div className="zonerow" role="row">
-        {children(3)}
+        {children(0, 3)}
+        {children(1, 3)}
+        {children(2, 3)}
       </div>
       <div className="zonerow" role="row">
-        {children(4)}
+        {children(0, 4)}
+        {children(1, 4)}
+        {children(2, 4)}
       </div>
       <div className="zonerow" role="row">
-        {children(5)}
+        {children(0, 5)}
+        {children(1, 5)}
+        {children(2, 5)}
       </div>
     </div>
   );

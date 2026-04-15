@@ -1,6 +1,7 @@
 import { Replace, Leaf, Clover } from 'lucide-react';
 import { useId, useCallback } from 'react';
 
+import type { UnitClass } from './card-types';
 import { Position } from './Grid';
 import { Player, Subphase, type FlowState } from './PhaseTracker';
 
@@ -64,6 +65,7 @@ type ZoneProps = Readonly<{
   controller: Player;
   position: Position;
   isUpgraded: boolean;
+  units: readonly UnitClass[];
   onPlace: (position: Position) => void;
 }>;
 
@@ -99,14 +101,17 @@ export function Zone({
       role="gridcell"
       aria-colindex={position.x}
     >
-      {isUpgraded ? (
-        <LilyPad
-          isHome={Position.equals(Position.HOME[controller], position)}
-          owner={controller}
-        />
-      ) : (
-        <Facedown key="facedown-card" player={controller} />
-      )}
+      {
+        // TODO 8: Render units as well as the leaf
+        isUpgraded ? (
+          <LilyPad
+            isHome={Position.equals(Position.HOME[controller], position)}
+            owner={controller}
+          />
+        ) : (
+          <Facedown key="facedown-card" player={controller} />
+        )
+      }
     </div>
   );
 }
