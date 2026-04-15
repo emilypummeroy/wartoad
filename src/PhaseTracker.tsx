@@ -1,3 +1,5 @@
+import { StepForward } from 'lucide-react';
+
 const _Phase = {
   Start: 'Start',
   Main: 'Main',
@@ -42,3 +44,30 @@ export type FlowState = {
   readonly phase: Phase;
   readonly subphase: Subphase;
 };
+
+export function PhaseTracker({
+  flow: { player, phase, subphase },
+  onNextPhaseClicked,
+}: {
+  readonly flow: FlowState;
+  readonly onNextPhaseClicked: () => void;
+}) {
+  return (
+    <section aria-labelledby="current-phase" className="phases">
+      <h3 id="current-phase">
+        <span className={player === Player.North ? 'north' : 'south'}>
+          {player}
+        </span>
+        : <span className="accent">{phase}</span> phase
+      </h3>
+      <button
+        className="icon-text accent"
+        disabled={subphase !== Subphase.Idle}
+        onClick={onNextPhaseClicked}
+      >
+        <StepForward />
+        Next phase
+      </button>
+    </section>
+  );
+}

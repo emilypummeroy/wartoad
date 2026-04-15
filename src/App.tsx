@@ -1,11 +1,16 @@
 import './App.css';
-import { StepForward } from 'lucide-react';
 import { useCallback, useState, type ReactNode } from 'react';
 
 import { CardClass, CardType } from './card-types';
 import { type Position, INITIAL_GRID, GridState, Grid } from './Grid';
 import { Froglet, Hand, LilyPad } from './Hand';
-import { Phase, Player, Subphase, type FlowState } from './PhaseTracker';
+import {
+  PhaseTracker,
+  Phase,
+  Player,
+  Subphase,
+  type FlowState,
+} from './PhaseTracker';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 
@@ -32,34 +37,6 @@ function PickedCard({
           {children}
         </div>
       </div>
-    </section>
-  );
-}
-
-function PhaseBar({
-  flow: { player, phase, subphase },
-  onNextPhaseClicked,
-}: {
-  readonly flow: FlowState;
-  readonly onNextPhaseClicked: () => void;
-}) {
-  return (
-    <section aria-labelledby="current-phase" className="phases">
-      <h3 id="current-phase">
-        <span className={player === Player.North ? 'north' : 'south'}>
-          {player}
-        </span>
-        : <span className="accent">{phase}</span> phase
-      </h3>
-      <button
-        className="icon-text accent"
-        aria-label="Next phase"
-        disabled={subphase === Subphase.Upgrading}
-        onClick={onNextPhaseClicked}
-      >
-        <StepForward />
-        Next phase
-      </button>
     </section>
   );
 }
@@ -120,18 +97,38 @@ const gameStateForCardPicked =
 
 const gameStateForCardPlaced =
   (position: Position) =>
-  ({ grid, flow, northHand, southHand, pickedCard }: GameState) => ({
+  ({
+    grid,
+    grid: {
+      [position.y]: {
+        [position.x]: zone,
+        [position.x]: { isUpgraded, units },
+      },
+    },
+    flow,
+    flow: { subphase, player },
+    northHand,
+    southHand,
+    pickedCard,
+  }: GameState) => ({
     flow: { ...flow, subphase: Subphase.Idle },
     northHand:
-      flow.player === Player.North && pickedCard && northHand.length > 0
+      player === Player.North && pickedCard && northHand.length > 0
         ? removeOne(northHand, pickedCard)
         : northHand,
     southHand:
-      flow.player === Player.South && pickedCard && southHand.length > 0
+      player === Player.South && pickedCard && southHand.length > 0
         ? removeOne(southHand, pickedCard)
         : southHand,
-    // TODO 8: Use real unit value
-    grid: GridState.setAt(grid, position, { isUpgraded: true, units: [] }),
+    grid: GridState.setAt(
+      grid,
+      position,
+      subphase === Subphase.Upgrading
+        ? { units, isUpgraded: true }
+        : subphase === Subphase.Deploying
+          ? { isUpgraded, units: [...units, CardClass.Froglet] }
+          : zone,
+    ),
   });
 
 const DETERMINISTIC_STARTING_HAND = [
@@ -195,7 +192,7 @@ export function App({
             War<span className="accent">toad</span>
           </h1>
         </div>
-        <PhaseBar flow={flow} onNextPhaseClicked={handleNextPhaseClicked} />
+        <PhaseTracker flow={flow} onNextPhaseClicked={handleNextPhaseClicked} />
       </header>
       <main>
         <section className="handarea">

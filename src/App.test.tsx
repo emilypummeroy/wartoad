@@ -48,13 +48,13 @@ describe(App, () => {
       withinThe.hand(player).getAllByRole('region', { name: /Card face of/ }),
     hiddenHandCards: (player: Player) =>
       withinThe.hand(player).getAllByRole('region', { name: 'Card back' }),
-    controlledLilyPads: (player: Player) =>
+    lilyPadsControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('region', {
-        name: `${player} controlled Lily Pad`,
+        name: new RegExp(`${player} (controlled)|(Home) Lily Pad`),
       }),
     leafDropzoneControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('gridcell', {
-        name: `Place on ${player} controlled leaf`,
+        name: new RegExp(`(Upgrade)|(Deploy on) ${player} controlled leaf`),
       }),
   };
 
@@ -82,7 +82,7 @@ describe(App, () => {
         .queryByRole('region', { name: `${player}: ${phase} phase` }),
     controlledEmptyFieldDropzone: (player: Player) =>
       withinThe.playArea().queryByRole('button', {
-        name: `Place on ${player} controlled leaf`,
+        name: `Ugrade ${player} controlled leaf`,
       }),
   };
 
@@ -271,7 +271,7 @@ describe(App, () => {
             queryAll.controlledLilyPads(player).length;
           fireEvent.click(getFirst.leafDropzoneControlledBy(player));
 
-          expect(getAll.controlledLilyPads(player)).toHaveLength(
+          expect(getAll.lilyPadsControlledBy(player)).toHaveLength(
             initialLilyPadCount + 1,
           );
         });
