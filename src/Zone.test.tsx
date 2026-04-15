@@ -43,11 +43,10 @@ describe(Zone, () => {
       it(`should have a ${player} Lily Pad if upgraded`, () => {
         render(
           <Zone
-            isUpgraded
             flow={FLOW}
             position={position}
             controller={player}
-            units={units}
+            zone={{ isUpgraded: true, units }}
             onPlace={NOOP}
           />,
         );
@@ -59,11 +58,10 @@ describe(Zone, () => {
       it(`should have a ${player} Lily Pad if upgraded`, () => {
         render(
           <Zone
-            isUpgraded
             flow={FLOW}
             position={position}
             controller={player}
-            units={units}
+            zone={{ isUpgraded: true, units }}
             onPlace={NOOP}
           />,
         );
@@ -86,11 +84,10 @@ describe(Zone, () => {
       const units = Array.from({ length: unitCount }, () => CardClass.Froglet);
       render(
         <Zone
-          isUpgraded
           flow={FLOW}
           position={position}
           controller={player}
-          units={units}
+          zone={{ isUpgraded: true, units }}
           onPlace={NOOP}
         />,
       );
@@ -131,11 +128,10 @@ describe(Zone, () => {
       it(`should have a ${controller} conrolled leaf if unupgraded`, () => {
         render(
           <Zone
-            isUpgraded={false}
             position={position}
             flow={flow}
             controller={controller}
-            units={units}
+            zone={{ isUpgraded: false, units }}
             onPlace={NOOP}
           />,
         );
@@ -148,11 +144,10 @@ describe(Zone, () => {
       it(`should have a ${controller} Lily Pad if upgraded`, () => {
         render(
           <Zone
-            isUpgraded
             flow={flow}
             position={position}
             controller={controller}
-            units={units}
+            zone={{ isUpgraded: true, units }}
             onPlace={NOOP}
           />,
         );
@@ -165,9 +160,8 @@ describe(Zone, () => {
           <Zone
             position={position}
             flow={flow}
-            isUpgraded={false}
             controller={controller}
-            units={units}
+            zone={{ isUpgraded: false, units }}
             onPlace={NOOP}
           />,
         );
@@ -183,9 +177,8 @@ describe(Zone, () => {
           <Zone
             position={position}
             flow={flow}
-            isUpgraded={false}
             controller={controller}
-            units={units}
+            zone={{ isUpgraded: false, units }}
             onPlace={onPlace}
           />,
         );
@@ -221,9 +214,8 @@ describe(Zone, () => {
           <Zone
             position={position}
             flow={flow}
-            isUpgraded={isUpgraded}
             controller={controller}
-            units={units}
+            zone={{ isUpgraded, units }}
             onPlace={NOOP}
           />,
         );
@@ -240,9 +232,8 @@ describe(Zone, () => {
           <Zone
             position={position}
             flow={flow}
-            isUpgraded={isUpgraded}
             controller={controller}
-            units={units}
+            zone={{ isUpgraded, units }}
             onPlace={onPlace}
           />,
         );
@@ -273,8 +264,7 @@ describe(Zone, () => {
             position={position}
             flow={flow}
             controller={player}
-            units={units}
-            isUpgraded
+            zone={{ isUpgraded: true, units }}
             onPlace={NOOP}
           />,
         );
@@ -293,8 +283,7 @@ describe(Zone, () => {
             position={position}
             flow={flow}
             controller={player}
-            units={units}
-            isUpgraded
+            zone={{ isUpgraded: true, units }}
             onPlace={onPlace}
           />,
         );
@@ -308,8 +297,7 @@ describe(Zone, () => {
             position={position}
             flow={flow}
             controller={player}
-            units={units}
-            isUpgraded={false}
+            zone={{ isUpgraded: false, units }}
             onPlace={NOOP}
           />,
         );
@@ -333,8 +321,7 @@ describe(Zone, () => {
             position={position}
             flow={flow}
             controller={player}
-            units={units}
-            isUpgraded={false}
+            zone={{ isUpgraded: false, units }}
             onPlace={onPlace}
           />,
         );

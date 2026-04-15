@@ -124,7 +124,8 @@ const gameStateForCardPlaced =
       flow.player === Player.South && pickedCard && southHand.length > 0
         ? removeOne(southHand, pickedCard)
         : southHand,
-    grid: GridState.setAt(grid, position, true),
+    // TODO 8: Use real unit value
+    grid: GridState.setAt(grid, position, { isUpgraded: true, units: [] }),
   });
 
 const DETERMINISTIC_STARTING_HAND = [

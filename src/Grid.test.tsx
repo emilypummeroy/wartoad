@@ -9,32 +9,36 @@ import {
   ROW_COUNT,
 } from './Grid';
 import { Phase, Player, Subphase } from './PhaseTracker';
+import type { ZoneState } from './Zone';
+
+const UPGRADED = { units: [], isUpgraded: true };
+const EMPTY = { units: [], isUpgraded: false };
 
 const ANOTHER_GRID: GridState = [
-  [true, false, false],
-  [true, true, true],
-  [false, true, true],
-  [false, false, false],
-  [true, true, false],
-  [false, false, true],
+  [UPGRADED, EMPTY, EMPTY],
+  [UPGRADED, UPGRADED, UPGRADED],
+  [EMPTY, UPGRADED, UPGRADED],
+  [EMPTY, EMPTY, EMPTY],
+  [UPGRADED, UPGRADED, EMPTY],
+  [EMPTY, EMPTY, UPGRADED],
 ];
 
 const EMPTY_GRID: GridState = [
-  [false, false, false],
-  [false, false, false],
-  [false, false, false],
-  [false, false, false],
-  [false, false, false],
-  [false, false, false],
+  [EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY],
 ];
 
 const FULL_GRID: GridState = [
-  [true, true, true],
-  [true, true, true],
-  [true, true, true],
-  [true, true, true],
-  [true, true, true],
-  [true, true, true],
+  [UPGRADED, UPGRADED, UPGRADED],
+  [UPGRADED, UPGRADED, UPGRADED],
+  [UPGRADED, UPGRADED, UPGRADED],
+  [UPGRADED, UPGRADED, UPGRADED],
+  [UPGRADED, UPGRADED, UPGRADED],
+  [UPGRADED, UPGRADED, UPGRADED],
 ];
 
 describe(Grid, () => {
@@ -50,8 +54,8 @@ describe(Grid, () => {
 
   describe.for<[name: string, GridState]>([
     ['INITIAL_GRID_STATE', INITIAL_GRID],
-    ['EMPTY_GRID', EMPTY_GRID],
     ['FULL_GRID', FULL_GRID],
+    ['EMPTY_GRID', EMPTY_GRID],
     ['ANOTHER_GRID', ANOTHER_GRID],
   ])('with the grid: %s', ([_, grid]) => {
     beforeEach(() => {
@@ -89,7 +93,7 @@ describe(Grid, () => {
       [Player.South, 4],
       [Player.South, 5],
     ])(
-      'should display %s controlled leaves in the %sth row',
+      'should display %s controlled/owned leaves in the %sth row',
       ([player, rowY]) => {
         const emptyName = new RegExp(`${player} controlled leaf`);
         const fullName = new RegExp(`${player} (owned)|(Home) Lily Pad`);
@@ -98,7 +102,7 @@ describe(Grid, () => {
         );
         for (let x = 0; x < zones.length; x += 1) {
           expect(zones[x]).toHaveAccessibleName(
-            grid[rowY][x] ? fullName : emptyName,
+            grid[rowY][x].isUpgraded ? fullName : emptyName,
           );
         }
       },
@@ -200,12 +204,16 @@ describe(Grid, () => {
 describe('the GridState type functions', () => {
   describe('GridState.setAt', () => {
     describe.for<
-      [string, valueToSet: boolean, readonly (readonly boolean[])[]]
+      [string, valueToSet: ZoneState, ReadonlyArray<ReadonlyArray<ZoneState>>]
     >([
-      ['INITIAL_GRID_STATE', true, INITIAL_GRID],
-      ['INITIAL_GRID_STATE', false, INITIAL_GRID],
-      ['ANOTHER_GRID_STATE', true, ANOTHER_GRID],
-      ['ANOTHER_GRID_STATE', false, ANOTHER_GRID],
+      ['INITIAL_GRID_STATE', UPGRADED, INITIAL_GRID],
+      ['INITIAL_GRID_STATE', EMPTY, INITIAL_GRID],
+      ['ANOTHER_GRID_STATE', UPGRADED, ANOTHER_GRID],
+      ['ANOTHER_GRID_STATE', EMPTY, ANOTHER_GRID],
+      ['FULL_GRID_STATE', UPGRADED, FULL_GRID],
+      ['FULL_GRID_STATE', EMPTY, FULL_GRID],
+      ['EMPTY_GRID_STATE', UPGRADED, EMPTY_GRID],
+      ['EMPTY_GRID_STATE', EMPTY, EMPTY_GRID],
     ])('with known GridState: %s | new value: %s', ([_, valueToSet, grid]) => {
       // oxlint-disable-next-line no-null
       if (!GridState.is(grid)) {
@@ -256,7 +264,7 @@ describe('the GridState type functions', () => {
           }
         });
 
-        it(`should set the value at x=${x}, y=${y} to ${valueToSet}`, () => {
+        it(`should set the value at x=${x}, y=${y} to ${JSON.stringify(valueToSet)}`, () => {
           const newGrid = GridState.setAt(grid, { x, y }, valueToSet);
           expect(newGrid[y][x]).toBe(valueToSet);
         });
@@ -265,9 +273,11 @@ describe('the GridState type functions', () => {
   });
 
   describe('GridState.is', () => {
-    describe.for<[string, readonly (readonly boolean[])[]]>([
+    describe.for<[string, ReadonlyArray<ReadonlyArray<ZoneState>>]>([
       ['INITIAL_GRID_STATE', INITIAL_GRID],
       ['ANOTHER_GRID_STATE', ANOTHER_GRID],
+      ['FULL_GRID_STATE', FULL_GRID],
+      ['EMPTY_GRID_STATE', EMPTY_GRID],
     ])('with known GridState: %s', ([name, array]) => {
       it(`should verify ${name}`, () => {
         expect(GridState.is(array)).toBe(true);
@@ -313,7 +323,7 @@ describe('the GridState type functions', () => {
       });
 
       it(`should not verify ${name} with an extra row`, () => {
-        expect(GridState.is([...array, [false, false, false]])).toBe(false);
+        expect(GridState.is([...array, INITIAL_GRID[0]])).toBe(false);
       });
 
       it(`should not verify ${name} with an extra value in a row`, () => {
@@ -321,7 +331,7 @@ describe('the GridState type functions', () => {
           expect(
             GridState.is([
               ...array.slice(0, i),
-              [...array[i], false],
+              [...array[i], EMPTY],
               ...array.slice(i + 1),
             ]),
           ).toBe(false);

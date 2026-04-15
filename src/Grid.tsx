@@ -1,5 +1,5 @@
 import { Player, type FlowState } from './PhaseTracker';
-import { Zone } from './Zone';
+import { Zone, type ZoneState } from './Zone';
 
 export const ROW_COUNT = 6 as const;
 export const ROW_COUNT_PER_PLAYER = 3 as const;
@@ -21,35 +21,41 @@ export const Position = {
 };
 
 export type GridState = readonly [
-  readonly [boolean, boolean, boolean],
-  readonly [boolean, boolean, boolean],
-  readonly [boolean, boolean, boolean],
-  readonly [boolean, boolean, boolean],
-  readonly [boolean, boolean, boolean],
-  readonly [boolean, boolean, boolean],
+  readonly [ZoneState, ZoneState, ZoneState],
+  readonly [ZoneState, ZoneState, ZoneState],
+  readonly [ZoneState, ZoneState, ZoneState],
+  readonly [ZoneState, ZoneState, ZoneState],
+  readonly [ZoneState, ZoneState, ZoneState],
+  readonly [ZoneState, ZoneState, ZoneState],
 ];
 
+const EMPTY_HOME = { units: [], isUpgraded: true };
+const EMPTY = { units: [], isUpgraded: false };
 export const INITIAL_GRID: GridState = [
-  [false, true, false],
-  [false, false, false],
-  [false, false, false],
-  [false, false, false],
-  [false, false, false],
-  [false, true, false],
+  [EMPTY, EMPTY_HOME, EMPTY],
+  [EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY_HOME, EMPTY],
 ];
 
 export const GridState = {
-  is: (array: ReadonlyArray<ReadonlyArray<boolean>>): array is GridState =>
+  is: (array: ReadonlyArray<ReadonlyArray<ZoneState>>): array is GridState =>
     array.length === ROW_COUNT &&
     array.every(row => row.length === FIELD_COUNT_PER_ROW),
 
-  setAt: (old: GridState, { x, y }: Position, newValue: boolean): GridState => {
+  setAt: (
+    old: GridState,
+    { x, y }: Position,
+    newValue: ZoneState,
+  ): GridState => {
     const array = old.map((row, yy) =>
       row.map((oldValue, xx) => (yy === y && xx === x ? newValue : oldValue)),
     );
     // v8 ignore next 2
     if (!GridState.is(array)) {
-      throw new Error(`Expected a GridState but got: ${String(array)}`);
+      throw new Error(`Expected a GridState but got: ${JSON.stringify(array)}`);
     }
     return array;
   },
@@ -66,8 +72,7 @@ export function Grid({ grid, flow, onPlaceCard }: GridProps) {
       controller={y < ROW_COUNT_PER_PLAYER ? Player.North : Player.South}
       flow={flow}
       position={{ x, y }}
-      units={[]} // TODO 8: Wire up units for each zone
-      isUpgraded={grid[y][x]}
+      zone={grid[y][x]}
       onPlace={onPlaceCard}
     />
   );

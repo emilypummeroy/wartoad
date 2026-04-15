@@ -5,6 +5,11 @@ import type { UnitClass } from './card-types';
 import { Position } from './Grid';
 import { Player, Subphase, type FlowState } from './PhaseTracker';
 
+export type ZoneState = Readonly<{
+  units: readonly UnitClass[];
+  isUpgraded: boolean;
+}>;
+
 function LilyPad({
   owner,
   isHome = false,
@@ -64,8 +69,7 @@ type ZoneProps = Readonly<{
   flow: FlowState;
   controller: Player;
   position: Position;
-  isUpgraded: boolean;
-  units: readonly UnitClass[];
+  zone: ZoneState;
   onPlace: (position: Position) => void;
 }>;
 
@@ -73,7 +77,7 @@ export function Zone({
   flow: { subphase, player },
   controller,
   position,
-  isUpgraded,
+  zone: { isUpgraded },
   onPlace,
 }: ZoneProps) {
   const isDropzone =
