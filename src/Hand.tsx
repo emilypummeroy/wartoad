@@ -60,24 +60,12 @@ export const SMALL_HAND_SIZE = 8;
 export const BIG_HAND_HAND_SIZE = 12;
 
 function UnitStats({
-  stats: { life, speed, power, range },
+  stats: { power, range, speed, life },
 }: {
   readonly stats: UnitStats;
 }) {
   return (
     <div className="card-section-column">
-      <div className="card-item">
-        <span>{life}</span>{' '}
-        <Heart>
-          <title>Life</title>
-        </Heart>
-      </div>
-      <div className="card-item">
-        <span>{speed}</span>{' '}
-        <Move>
-          <title>Speed</title>
-        </Move>
-      </div>
       <div className="card-item">
         <span>{power}</span>{' '}
         <Sword>
@@ -89,6 +77,18 @@ function UnitStats({
         <Crosshair>
           <title>Range</title>
         </Crosshair>
+      </div>
+      <div className="card-item">
+        <span>{speed}</span>{' '}
+        <Move>
+          <title>Speed</title>
+        </Move>
+      </div>
+      <div className="card-item">
+        <span>{life}</span>{' '}
+        <Heart>
+          <title>Life</title>
+        </Heart>
       </div>
     </div>
   );
