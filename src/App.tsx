@@ -101,7 +101,6 @@ const gameStateForCardPlaced =
     grid,
     grid: {
       [position.y]: {
-        [position.x]: zone,
         [position.x]: { isUpgraded, units },
       },
     },
@@ -125,9 +124,7 @@ const gameStateForCardPlaced =
       position,
       subphase === Subphase.Upgrading
         ? { units, isUpgraded: true }
-        : subphase === Subphase.Deploying
-          ? { isUpgraded, units: [...units, CardClass.Froglet] }
-          : zone,
+        : { isUpgraded, units: [...units, CardClass.Froglet] },
     ),
   });
 
