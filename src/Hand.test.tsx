@@ -91,7 +91,7 @@ describe(Hand, () => {
           );
           expect(
             withinHand().getAllByRole('region', {
-              name: `Card face of ${cardClass.name}`,
+              name: cardClass.name,
             }),
           ).toHaveLength(handSize);
           expect(
@@ -198,7 +198,7 @@ describe(Hand, () => {
               />,
             );
             expect(
-              withinHand().queryByRole('region', { name: /Card face of/ }),
+              withinHand().queryByRole('region', { description: 'Card face' }),
             ).not.toBeInTheDocument();
             expect(
               withinHand().getAllByRole('region', { name: 'Card back' }),

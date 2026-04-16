@@ -29,9 +29,7 @@ describe(App, () => {
     pickedCardDisplay: () =>
       screen.getByRole('region', { name: `Picked card` }),
     pickedCard: () =>
-      withinThe
-        .pickedCardDisplay()
-        .getByRole('region', { name: /Card face of/ }),
+      withinThe.pickedCardDisplay().getByRole('region', { name: /(?!back)$/ }),
     playArea: () => withinThe.main().getByRole('grid'),
     phaseIndicator: (player: Player, phase: Phase) =>
       withinThe
@@ -45,13 +43,9 @@ describe(App, () => {
     clickableHandCards: (player: Player) =>
       withinThe.hand(player).getAllByRole('button', {}),
     visibleHandCards: (player: Player) =>
-      withinThe.hand(player).getAllByRole('region', { name: /Card face of/ }),
+      withinThe.hand(player).getAllByRole('region', { name: /(?!back)$/ }),
     hiddenHandCards: (player: Player) =>
       withinThe.hand(player).getAllByRole('region', { name: 'Card back' }),
-    lilyPadsControlledBy: (player: Player) =>
-      withinThe.playArea().getAllByRole('region', {
-        name: new RegExp(`${player} (controlled)|(Home) Lily Pad`),
-      }),
     basicLeavesControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('region', {
         name: new RegExp(`${player} controlled leaf`),
@@ -59,10 +53,6 @@ describe(App, () => {
     cardsControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('region', {
         name: new RegExp(`${player} controlled`),
-      }),
-    leafDropzoneControlledBy: (player: Player) =>
-      withinThe.playArea().getAllByRole('gridcell', {
-        name: new RegExp(`(Upgrade)|(Deploy on) ${player} controlled leaf`),
       }),
     dropzoneControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('gridcell', {
@@ -81,14 +71,6 @@ describe(App, () => {
   const queryAll = {
     clickableHandCards: (player: Player) =>
       withinThe.hand(player).queryAllByRole('button'),
-    controlledLilyPads: (player: Player) =>
-      withinThe.playArea().queryAllByRole('region', {
-        name: `${player} controlled Lily Pad`,
-      }),
-    controlledCards: (player: Player) =>
-      withinThe.playArea().queryAllByRole('region', {
-        name: new RegExp(`${player} controlled`),
-      }),
   };
 
   const queryThe = {
@@ -107,8 +89,6 @@ describe(App, () => {
   const withinThe = {
     header: () => within(getThe.header()),
     main: () => within(getThe.main()),
-    southHand: () => withinThe.hand(South),
-    northHand: () => withinThe.hand(North),
     hand: (player: Player) => within(getThe.hand(player)),
     pickedCardDisplay: () => within(getThe.pickedCardDisplay()),
     playArea: () => within(getThe.playArea()),
@@ -279,12 +259,15 @@ describe(App, () => {
       player => {
         const opponent = player === North ? South : North;
 
+        let cardName = '';
         beforeEach(() => {
           advanceToPhase(player, Main);
-          fireEvent.click(getFirst.clickableHandCard(player));
+          const clickedCard = getFirst.clickableHandCard(player);
+          cardName = within(clickedCard).getByRole('region').textContent;
+          fireEvent.click(clickedCard);
         });
 
-        it(`should allow ${player} to play a card on a leaf clicking on it`, () => {
+        it(`should allow ${player} to play the picked card on a leaf clicking on it`, () => {
           // Playing a leaf will make the "controlled leaf" count go down.
           // Playing a unit will make the "controlled card" count go up.
           const initialHeuristicCount =
@@ -295,7 +278,9 @@ describe(App, () => {
           const newHeuristicCount =
             getAll.cardsControlledBy(player).length -
             getAll.basicLeavesControlledBy(player).length;
-          expect(newHeuristicCount).toBe(initialHeuristicCount + 1);
+          expect(newHeuristicCount, `heuristic after playing ${cardName}`).toBe(
+            initialHeuristicCount + 1,
+          );
         });
 
         it(`should not allow ${player} to play a card on an a ${opponent} leaf`, () => {

@@ -110,8 +110,8 @@ export function LilyPad({ titleId }: { readonly titleId?: string }) {
   return (
     <section
       id={id}
-      aria-labelledby={`${id} ${titleId ?? titleIdFallback}`}
-      aria-label="Card face of"
+      aria-labelledby={titleId ?? titleIdFallback}
+      aria-label="Card"
       className="card"
     >
       <div className="card-title" id={titleId ?? titleIdFallback}>
@@ -133,8 +133,8 @@ export function Froglet({ titleId }: { readonly titleId?: string }) {
   return (
     <section
       id={id}
-      aria-labelledby={`${id} ${titleId ?? titleIdFallback}`}
-      aria-label="Card face of"
+      aria-labelledby={titleId ?? titleIdFallback}
+      aria-label="Card"
       className="card"
     >
       <div className="card-title" id={titleId ?? titleIdFallback}>
@@ -182,32 +182,33 @@ function HandCard({
   const handleClick = useCallback(() => onPick(cardClass), [cardClass, onPick]);
   const buttonId = useId();
   const titleId = useId();
-  return (
-    <div className="stacking jiggling">
-      {isEnabled ? (
-        <div
-          role="button"
-          aria-labelledby={`${buttonId} ${titleId}`}
-          id={buttonId}
-          aria-label="Pick"
-          tabIndex={0}
-          className={`highlighting-card pickable-card ${playerStyle}`}
-          onClick={handleClick}
-        >
-          {cardClass === CardClass.Froglet ? (
-            <Froglet titleId={titleId} />
-          ) : (
-            <LilyPad titleId={titleId} />
-          )}
-        </div>
+  return isEnabled ? (
+    <div
+      role="button"
+      aria-labelledby={`${buttonId} ${titleId}`}
+      id={buttonId}
+      aria-label="Pick"
+      tabIndex={0}
+      className={`highlighting-card pickable-card ${playerStyle}`}
+      onClick={handleClick}
+    >
+      {cardClass === CardClass.Froglet ? (
+        <Froglet titleId={titleId} />
       ) : (
-        <div tabIndex={0} className={`highlighting-card ${playerStyle}`}>
-          {cardClass === CardClass.Froglet ? (
-            <Froglet titleId={titleId} />
-          ) : (
-            <LilyPad titleId={titleId} />
-          )}
-        </div>
+        <LilyPad titleId={titleId} />
+      )}
+    </div>
+  ) : (
+    <div
+      role="listitem"
+      aria-labelledby={titleId}
+      tabIndex={0}
+      className={`highlighting-card ${playerStyle}`}
+    >
+      {cardClass === CardClass.Froglet ? (
+        <Froglet titleId={titleId} />
+      ) : (
+        <LilyPad titleId={titleId} />
       )}
     </div>
   );
@@ -249,6 +250,7 @@ export function Hand({
     [Player.South]: 'south',
   }[player];
   const countsSoFar: Partial<Record<CardKey, number>> = {};
+  const isJiggling = isMainPhase && !isPlacing && isPlayerTurn;
 
   return (
     <section className="hand" aria-labelledby={id}>
@@ -256,7 +258,8 @@ export function Hand({
         {player} hand
       </h3>
       <div
-        className={`${isPlayerTurn ? 'jiggle-row' : 'splay-row'} ${classForHand(handCards)}`}
+        role={isJiggling ? 'listbox' : 'list'}
+        className={`${isJiggling ? 'jiggle-row' : 'splay-row'} ${classForHand(handCards)}`}
         style={{
           '--hand-size': `${handCards.length}`,
         }}
@@ -266,13 +269,17 @@ export function Hand({
           countsSoFar[cardClass.key] = i + 1;
 
           return isPlayerTurn ? (
-            <HandCard
+            <div
               key={`${cardClass.key} ${i}`}
-              cardClass={cardClass}
-              player={player}
-              isEnabled={isMainPhase && !isPlacing}
-              onPick={onPick}
-            />
+              className={`stacking ${isJiggling ? 'jiggling' : ''}`}
+            >
+              <HandCard
+                cardClass={cardClass}
+                player={player}
+                isEnabled={isMainPhase && !isPlacing}
+                onPick={onPick}
+              />
+            </div>
           ) : (
             <div key={`${cardClass.key} ${i}`} className="stacking">
               <CardBack />

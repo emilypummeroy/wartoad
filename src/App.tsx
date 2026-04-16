@@ -185,7 +185,7 @@ export function App({
   );
 
   return (
-    <div className="wartoad-app">
+    <div role="application" aria-label="Wartoad" className="wartoad-app">
       <header>
         <div className="title">
           <h1>
@@ -200,7 +200,7 @@ export function App({
             player={Player.North}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.North}
-            isPlacing={subphase === Subphase.Upgrading}
+            isPlacing={subphase !== Subphase.Idle}
             handCards={northHand}
             onPick={handlePickCard}
           />
@@ -213,7 +213,7 @@ export function App({
             player={Player.South}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.South}
-            isPlacing={subphase === Subphase.Upgrading}
+            isPlacing={subphase !== Subphase.Idle}
             handCards={southHand}
             onPick={handlePickCard}
           />

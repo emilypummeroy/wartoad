@@ -21,16 +21,12 @@ describe(`${App.name} Deterministic`, () => {
   const getThe = {
     header: () => screen.getByRole('banner'),
     main: () => screen.getByRole('main'),
-    southHand: () => getThe.hand(South),
-    northHand: () => getThe.hand(North),
     hand: (player: Player) =>
       screen.getByRole('region', { name: `${player} hand` }),
     pickedCardDisplay: () =>
       screen.getByRole('region', { name: `Picked card` }),
     pickedCardNamed: (name: string) =>
-      withinThe
-        .pickedCardDisplay()
-        .getByRole('region', { name: `Card face of ${name}` }),
+      withinThe.pickedCardDisplay().getByRole('region', { name }),
     playArea: () => withinThe.main().getByRole('grid'),
     homeRow: (player: Player) => getThe.nthRow(Position.HOME[player].y),
     nthRow: (n: number) => withinThe.playArea().getAllByRole('row')[n],
@@ -47,16 +43,8 @@ describe(`${App.name} Deterministic`, () => {
   const getAll = {
     handCards: (player: Player) =>
       withinThe.hand(player).getAllByRole('region'),
-    clickableHandCards: (player: Player) =>
-      withinThe.hand(player).getAllByRole('button'),
-    visibleHandCards: (player: Player) =>
-      withinThe.hand(player).getAllByRole('region', { name: /Card face/ }),
-    hiddenHandCards: (player: Player) =>
-      withinThe.hand(player).getAllByRole('region', { name: 'Card back' }),
     handCardsNamed: (player: Player, name: string) =>
-      withinThe
-        .hand(player)
-        .getAllByRole('region', { name: `Card face of ${name}` }),
+      withinThe.hand(player).getAllByRole('region', { name }),
     controlledCardsNamed: (player: Player, name: string) =>
       withinThe.playArea().getAllByRole('region', {
         name: `${player} controlled ${name}`,
@@ -73,10 +61,6 @@ describe(`${App.name} Deterministic`, () => {
       withinThe.homeRow(player).getAllByRole('button', {
         name: new RegExp(`(Upgrade)|(Deploy on) ${player} Home`),
       }),
-    lilyPadDropzones: () =>
-      withinThe.playArea().getAllByRole('button', {
-        name: new RegExp(`Lily Pad`),
-      }),
   };
 
   const getFirst = {
@@ -84,13 +68,10 @@ describe(`${App.name} Deterministic`, () => {
       getAll.leafDropzonesControlledBy(player)[0],
     handCardNamed: (player: Player, name: string) =>
       getAll.handCardsNamed(player, name)[0],
-    lilyPadDropzone: () => getAll.lilyPadDropzones()[0],
     leafControlledBy: (player: Player) => getAll.leavesControlledBy(player)[0],
   };
 
   const queryAll = {
-    clickableHandCards: (player: Player) =>
-      withinThe.hand(player).queryAllByRole('button'),
     controlledCardsNamed: (player: Player, name: string) =>
       withinThe.playArea().queryAllByRole('region', {
         name: `${player} controlled${name}`,
@@ -119,8 +100,6 @@ describe(`${App.name} Deterministic`, () => {
   const withinThe = {
     header: () => within(getThe.header()),
     main: () => within(getThe.main()),
-    southHand: () => withinThe.hand(South),
-    northHand: () => withinThe.hand(North),
     hand: (player: Player) => within(getThe.hand(player)),
     pickedCardDisplay: () => within(getThe.pickedCardDisplay()),
     playArea: () => within(getThe.playArea()),
@@ -175,7 +154,7 @@ describe(`${App.name} Deterministic`, () => {
         const cards = getAll.handCards(player);
         expect(cards).not.toHaveLength(0);
         for (const c of cards)
-          expect(c).toHaveAccessibleName(/Card face of (Lily Pad)|(Froglet)/);
+          expect(c).toHaveAccessibleName(/(Lily Pad)|(Froglet)/);
       });
 
       it(`should gain a Froglet during the first ${player} Start phase`, () => {
