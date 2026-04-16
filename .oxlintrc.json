@@ -26,6 +26,7 @@
       }
     ],
     "id-length": "allow",
+    "no-inline-comments": "allow",
     "no-ternary": "allow",
     "no-shadow": "allow",
     "array-type": ["allow", { "default": "array-simple" }],

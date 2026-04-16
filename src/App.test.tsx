@@ -169,17 +169,22 @@ describe(App, () => {
         expect(queryThe.pickedCardDisplay()).not.toBeInTheDocument();
       });
 
-      describe.for([North, South])(
-        'after %s picks a card from their hand during their Main phase',
-        player => {
+      describe.for<[Player, number]>([
+        [North, 0],
+        [North, 2],
+        [South, 4],
+        [South, 6],
+      ])(
+        'after %s picks the %sth card from their hand during their Main phase',
+        ([player, cardIndex]) => {
           it(`should show the card only until it is placed`, () => {
             advanceToPhase(player, Main);
-            fireEvent.click(getFirst.clickableHandCard(player));
+            fireEvent.click(getAll.clickableHandCards(player)[cardIndex]);
 
             expect(getThe.pickedCardDisplay()).toBeVisible();
             expect(getThe.pickedCard()).toBeVisible();
 
-            fireEvent.click(getFirst.leafDropzoneControlledBy(player));
+            fireEvent.click(getFirst.dropzoneControlledBy(player));
             expect(queryThe.pickedCardDisplay()).not.toBeInTheDocument();
           });
         },
@@ -267,7 +272,7 @@ describe(App, () => {
           fireEvent.click(clickedCard);
         });
 
-        it(`should allow ${player} to play the picked card on a leaf clicking on it`, () => {
+        it(`should allow ${player} to play the picked card on a leaf by clicking on it`, () => {
           // Playing a leaf will make the "controlled leaf" count go down.
           // Playing a unit will make the "controlled card" count go up.
           const initialHeuristicCount =

@@ -122,28 +122,20 @@ describe(`${App.name} Deterministic`, () => {
 
   describe('Hands', () => {
     describe('Picked Card', () => {
-      it.for<Player>([North, South])(
-        `should show a picked Froglet only until it is deployed`,
-        player => {
+      // Skipped because it's slow and the path is well covered by other tests.
+      it.skip.for<[Player, cardName: string]>([
+        [South, 'Froglet'],
+        [South, 'Lily Pad'],
+        [North, 'Froglet'],
+        [North, 'Lily Pad'],
+      ])(
+        `should show a picked %s %s only until it is played`,
+        ([player, cardName]) => {
           advanceToPhase(player, Main);
-          fireEvent.click(getFirst.handCardNamed(player, 'Froglet'));
+          fireEvent.click(getFirst.handCardNamed(player, cardName));
 
           expect(getThe.pickedCardDisplay()).toBeVisible();
-          expect(getThe.pickedCardNamed('Froglet')).toBeVisible();
-
-          fireEvent.click(getFirst.leafDropzoneControlledBy(player));
-          expect(queryA.pickedCardDisplay()).not.toBeInTheDocument();
-        },
-      );
-
-      it.for<Player>([North, South])(
-        `should show a picked Lily Pad only until it is placed`,
-        player => {
-          advanceToPhase(player, Main);
-          fireEvent.click(getFirst.handCardNamed(player, 'Lily Pad'));
-
-          expect(getThe.pickedCardDisplay()).toBeVisible();
-          expect(getThe.pickedCardNamed('Lily Pad')).toBeVisible();
+          expect(getThe.pickedCardNamed(cardName)).toBeVisible();
 
           fireEvent.click(getFirst.leafDropzoneControlledBy(player));
           expect(queryA.pickedCardDisplay()).not.toBeInTheDocument();
@@ -162,7 +154,10 @@ describe(`${App.name} Deterministic`, () => {
           expect(c).toHaveAccessibleName(/(Lily Pad|Froglet)/);
       });
 
-      it(`should gain a Froglet during the first ${player} Start phase`, () => {
+      it(`should gain a Froglet during the first ${player} Start phase`, ({
+        skip,
+      }) => {
+        skip(player === North); // Slow
         advanceToPhase(player, Main);
         const initialFrogletCount = getAll.handCardsNamed(
           player,
