@@ -1,104 +1,15 @@
-import { Replace, Leaf, Clover, Eye } from 'lucide-react';
+import { Replace } from 'lucide-react';
 import { useId, useCallback } from 'react';
 
-import { CardClass, type UnitClass } from './card-types';
+import { type UnitClass } from './card-types';
+import { ZoneFacedown, ZoneFroglet, ZoneLilyPad } from './Cards';
 import { Position } from './Grid';
-import { UnitStatsDisplay } from './Hand';
 import { Player, Subphase, type FlowState } from './PhaseTracker';
 
 export type ZoneState = Readonly<{
   units: readonly UnitClass[];
   isUpgraded: boolean;
 }>;
-
-function LilyPad({
-  owner,
-  isHome = false,
-  nameId,
-  symbolId,
-}: {
-  readonly owner: Player;
-  readonly nameId: string;
-  readonly symbolId: string;
-  readonly isHome?: boolean;
-}) {
-  const playerStyle = {
-    [Player.North]: 'north',
-    [Player.South]: 'south',
-  }[owner];
-  return (
-    <section
-      aria-labelledby={`${symbolId} ${nameId}`}
-      className={`card ${playerStyle}`}
-    >
-      <div className="card-title" id={nameId}>
-        Lily Pad
-      </div>
-      <div className="card-section-row">
-        {isHome ? (
-          <Clover>
-            <title id={symbolId}>{owner} Home</title>
-          </Clover>
-        ) : (
-          <Leaf>
-            <title id={symbolId}>{owner} controlled</title>
-          </Leaf>
-        )}
-      </div>
-      <div className="card-section-row">
-        <div className="card-item">
-          <small>Gives:</small>+0
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export function Froglet({ owner }: { readonly owner: Player }) {
-  const playerStyle = {
-    [Player.North]: 'north',
-    [Player.South]: 'south',
-  }[owner];
-  const nameId = useId();
-  const symbolId = useId();
-  return (
-    <section
-      aria-labelledby={`${symbolId} ${nameId}`}
-      className={`card ${playerStyle}`}
-    >
-      <div className="card-title" id={nameId}>
-        Froglet
-      </div>
-      <div className="card-section-split">
-        <UnitStatsDisplay stats={CardClass.Froglet.details} />
-        <div className="card-section-fill">
-          <Eye>
-            <title id={symbolId}>{owner} controlled</title>
-          </Eye>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Facedown({
-  player,
-  id,
-}: {
-  readonly id: string;
-  readonly player: Player;
-}) {
-  return (
-    <section
-      aria-labelledby={id}
-      className={`facedown card ${Player.STYLES[player]}`}
-    >
-      <Leaf>
-        <title id={id}>{player} controlled leaf</title>
-      </Leaf>
-    </section>
-  );
-}
 
 type ZoneProps = Readonly<{
   flow: FlowState;
@@ -153,7 +64,7 @@ export function Zone({
       >
         {isUpgraded ? (
           <div className="stacking peeking">
-            <LilyPad
+            <ZoneLilyPad
               symbolId={leafSymbolId}
               nameId={leafNameid}
               isHome={isHome}
@@ -162,7 +73,7 @@ export function Zone({
           </div>
         ) : (
           <div className="stacking">
-            <Facedown
+            <ZoneFacedown
               id={leafSymbolId}
               key="facedown-card"
               player={controller}
@@ -171,7 +82,7 @@ export function Zone({
         )}
         {units.map((_, i) => (
           <div key={i} className="stacking peeking">
-            <Froglet owner={controller} />
+            <ZoneFroglet owner={controller} />
           </div>
         ))}
       </div>
@@ -193,7 +104,7 @@ export function Zone({
         {isUpgraded ? (
           // TODO 9: Implement a non-splay-row hack to display cards on leaves
           <div className="stacking peeking">
-            <LilyPad
+            <ZoneLilyPad
               symbolId={leafSymbolId}
               nameId={leafNameid}
               isHome={isHome}
@@ -202,7 +113,7 @@ export function Zone({
           </div>
         ) : (
           <div className="stacking">
-            <Facedown
+            <ZoneFacedown
               id={leafSymbolId}
               key="facedown-card"
               player={controller}
@@ -211,7 +122,7 @@ export function Zone({
         )}
         {units.map((_, i) => (
           <div key={i} className="stacking peeking">
-            <Froglet owner={controller} />
+            <ZoneFroglet owner={controller} />
           </div>
         ))}
       </div>

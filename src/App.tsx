@@ -2,8 +2,9 @@ import './App.css';
 import { useCallback, useState, type ReactNode } from 'react';
 
 import { CardClass, CardType } from './card-types';
+import { HandFroglet, HandLilyPad } from './Cards';
 import { type Position, INITIAL_GRID, GridState, Grid } from './Grid';
-import { Froglet, Hand, LilyPad } from './Hand';
+import { Hand } from './Hand';
 import {
   PhaseTracker,
   Phase,
@@ -203,7 +204,11 @@ export function App({
           />
           {subphase !== Subphase.Idle && (
             <PickedCard owner={player}>
-              {pickedCard === CardClass.Froglet ? <Froglet /> : <LilyPad />}
+              {pickedCard === CardClass.Froglet ? (
+                <HandFroglet />
+              ) : (
+                <HandLilyPad />
+              )}
             </PickedCard>
           )}
           <Hand

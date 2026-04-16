@@ -1,167 +1,13 @@
 import './App.css';
-import {
-  Leaf,
-  Heart,
-  Move,
-  Crosshair,
-  Sword,
-  Book,
-  BookPlus,
-  Diamond,
-  DiamondPlus,
-  Battery,
-  BatteryPlus,
-  Package,
-  PackagePlus,
-  Circle,
-  CirclePlus,
-  ListFilter,
-  ListFilterPlus,
-} from 'lucide-react';
 import { useCallback, useId } from 'react';
 
-import {
-  CardClass,
-  type UnitStats,
-  type LeafStats,
-  type CardKey,
-} from './card-types';
-
-export {
-  // Amphibeans
-  // Tadpoles
-  Circle,
-  CirclePlus,
-  // Research
-  Book,
-  BookPlus,
-  // Food
-  Diamond,
-  DiamondPlus,
-
-  // Bugs
-  // Energy
-  Battery,
-  BatteryPlus,
-  // Matter
-  Package,
-  PackagePlus,
-
-  // Deep ones
-  // Zeal
-  ListFilter,
-  ListFilterPlus,
-};
-
+import { CardClass, type CardKey } from './card-types';
+import { HandCardBack, HandFroglet, HandLilyPad } from './Cards';
 import { Player } from './PhaseTracker';
 
 export const INITIAL_HAND_SIZE = 7;
 export const SMALL_HAND_SIZE = 8;
 export const BIG_HAND_HAND_SIZE = 12;
-
-export function UnitStatsDisplay({
-  stats: { power, range, speed, life },
-}: {
-  readonly stats: UnitStats;
-}) {
-  return (
-    <div className="card-section-column">
-      <div className="card-item">
-        <span>{power}</span>{' '}
-        <Sword>
-          <title>Power</title>
-        </Sword>
-      </div>
-      <div className="card-item">
-        <span>{range}</span>{' '}
-        <Crosshair>
-          <title>Range</title>
-        </Crosshair>
-      </div>
-      <div className="card-item">
-        <span>{speed}</span>{' '}
-        <Move>
-          <title>Speed</title>
-        </Move>
-      </div>
-      <div className="card-item">
-        <span>{life}</span>{' '}
-        <Heart>
-          <title>Life</title>
-        </Heart>
-      </div>
-    </div>
-  );
-}
-
-function LeafStats({ stats: { gives } }: { readonly stats: LeafStats }) {
-  return (
-    <div className="card-section-row">
-      <div className="card-item">
-        <small>Gives:</small>+{gives}
-      </div>
-    </div>
-  );
-}
-
-export function LilyPad({ titleId }: { readonly titleId?: string }) {
-  const id = useId();
-  const titleIdFallback = useId();
-  return (
-    <section
-      id={id}
-      aria-labelledby={titleId ?? titleIdFallback}
-      aria-label="Card"
-      className="card"
-    >
-      <div className="card-title" id={titleId ?? titleIdFallback}>
-        Lily Pad
-      </div>
-      <div className="card-section-row">
-        <div className="card-item">
-          <small>Cost:</small>0
-        </div>
-      </div>
-      <LeafStats stats={CardClass.LilyPad.details} />
-    </section>
-  );
-}
-
-export function Froglet({ titleId }: { readonly titleId?: string }) {
-  const id = useId();
-  const titleIdFallback = useId();
-  return (
-    <section
-      id={id}
-      aria-labelledby={titleId ?? titleIdFallback}
-      aria-label="Card"
-      className="card"
-    >
-      <div className="card-title" id={titleId ?? titleIdFallback}>
-        Froglet
-      </div>
-      <div className="card-section-split">
-        <UnitStatsDisplay stats={CardClass.Froglet.details} />
-        <div className="card-section-fill">
-          <div className="card-item">
-            <small>Cost:</small>0
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-const CardBack = () => {
-  const id = useId();
-  return (
-    <section aria-labelledby={id} className="facedown card">
-      <Leaf>
-        <title id={id}>Card back</title>
-      </Leaf>
-    </section>
-  );
-};
 
 type HandCardProps = Readonly<{
   isEnabled?: boolean;
@@ -193,9 +39,9 @@ function HandCard({
       onClick={handleClick}
     >
       {cardClass === CardClass.Froglet ? (
-        <Froglet titleId={titleId} />
+        <HandFroglet titleId={titleId} />
       ) : (
-        <LilyPad titleId={titleId} />
+        <HandLilyPad titleId={titleId} />
       )}
     </div>
   ) : (
@@ -206,9 +52,9 @@ function HandCard({
       className={`highlighting-card ${playerStyle}`}
     >
       {cardClass === CardClass.Froglet ? (
-        <Froglet titleId={titleId} />
+        <HandFroglet titleId={titleId} />
       ) : (
-        <LilyPad titleId={titleId} />
+        <HandLilyPad titleId={titleId} />
       )}
     </div>
   );
@@ -279,7 +125,7 @@ export function Hand({
             </div>
           ) : (
             <div key={`${cardClass.key} ${i}`} className="stacking">
-              <CardBack />
+              <HandCardBack />
             </div>
           );
         })}
