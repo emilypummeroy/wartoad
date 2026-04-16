@@ -465,17 +465,29 @@ span.south {
     .stacking {
       margin-left: -2svh;
     }
+    .peeking:hover,
+    .peeking:focus-within {
+      margin-right: 2svh;
+    }
   }
   &.compact:hover {
     margin-left: 1svh;
     .stacking {
       margin-left: -2svh;
     }
+    .peeking:hover,
+    .peeking:focus-within {
+      margin-right: 2svh;
+    }
   }
   &.super-compact:hover {
     margin-left: 3.5svh;
     .stacking {
       margin-left: -4.5svh;
+    }
+    .peeking:hover,
+    .peeking:focus-within {
+      margin-right: 4.5svh;
     }
   }
 }
@@ -640,6 +652,9 @@ span.south {
   box-sizing: border-box;
   height: 14svh;
   width: 20svh;
+  display: flex;
+  flex-direction: row;
+  overflow: visible;
 
   padding: 0.5svh;
   border-radius: 0.5svh;
@@ -722,6 +737,7 @@ span.south {
 .card {
   text-align: center;
 
+  flex-shrink: 0;
   box-sizing: border-box;
   height: 11svh;
   width: 8svh;
@@ -855,7 +871,8 @@ span.south {
 
   &.south {
     outline: 1px solid var(--south-outline);
-    svg {
+    .card-section-row svg,
+    .card-section-fill svg {
       color: var(--card-south);
       height: 3svh;
       width: 3svh;
@@ -867,7 +884,8 @@ span.south {
   }
   &.north {
     outline: 1px solid var(--north-outline);
-    svg {
+    .card-section-row svg,
+    .card-section-fill svg {
       color: var(--card-north);
       height: 3svh;
       width: 3svh;

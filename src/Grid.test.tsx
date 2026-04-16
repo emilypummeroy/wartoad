@@ -105,7 +105,7 @@ describe(Grid, () => {
       'should display %s controlled leaves in the %sth row',
       ([player, rowY]) => {
         const emptyName = new RegExp(`${player} controlled leaf`);
-        const fullName = new RegExp(`${player} (controlled)|(Home) Lily Pad`);
+        const fullName = new RegExp(`${player} (controlled|Home) Lily Pad`);
         const zones = within(screen.getAllByRole('row')[rowY]).getAllByRole(
           'region',
         );

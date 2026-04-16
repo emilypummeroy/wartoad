@@ -59,7 +59,7 @@ export const INITIAL_HAND_SIZE = 7;
 export const SMALL_HAND_SIZE = 8;
 export const BIG_HAND_HAND_SIZE = 12;
 
-function UnitStats({
+export function UnitStatsDisplay({
   stats: { power, range, speed, life },
 }: {
   readonly stats: UnitStats;
@@ -141,7 +141,7 @@ export function Froglet({ titleId }: { readonly titleId?: string }) {
         Froglet
       </div>
       <div className="card-section-split">
-        <UnitStats stats={CardClass.Froglet.details} />
+        <UnitStatsDisplay stats={CardClass.Froglet.details} />
         <div className="card-section-fill">
           <div className="card-item">
             <small>Cost:</small>0
@@ -261,7 +261,7 @@ export function Hand({
         role={isJiggling ? 'listbox' : 'list'}
         className={`${isJiggling ? 'jiggle-row' : 'splay-row'} ${classForHand(handCards)}`}
         style={{
-          '--hand-size': `${handCards.length}`,
+          '--hand-size': handCards.length,
         }}
       >
         {handCards.map((cardClass: CardClass) => {
@@ -269,10 +269,7 @@ export function Hand({
           countsSoFar[cardClass.key] = i + 1;
 
           return isPlayerTurn ? (
-            <div
-              key={`${cardClass.key} ${i}`}
-              className={`stacking ${isJiggling ? 'jiggling' : ''}`}
-            >
+            <div key={`${cardClass.key} ${i}`} className="stacking jiggling">
               <HandCard
                 cardClass={cardClass}
                 player={player}

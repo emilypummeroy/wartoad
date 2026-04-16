@@ -56,7 +56,7 @@ describe(App, () => {
       }),
     dropzoneControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('gridcell', {
-        name: new RegExp(`(Upgrade)|(Deploy on) ${player} controlled`),
+        name: new RegExp(`(Upgrade|Deploy on) ${player} controlled`),
       }),
   };
 
@@ -309,7 +309,7 @@ describe(App, () => {
         for (const row of northRows) {
           for (const zone of within(row).getAllByRole('gridcell')) {
             const card = within(zone).getByRole('region');
-            expect(card).toHaveAccessibleName(/North (controlled)|(Home)/);
+            expect(card).toHaveAccessibleName(/North (controlled|Home)/);
           }
         }
       });
@@ -319,7 +319,7 @@ describe(App, () => {
         for (const row of southRows) {
           for (const zone of within(row).getAllByRole('gridcell')) {
             const card = within(zone).getByRole('region');
-            expect(card).toHaveAccessibleName(/South (controlled)|(Home)/);
+            expect(card).toHaveAccessibleName(/South (controlled|Home)/);
           }
         }
       });

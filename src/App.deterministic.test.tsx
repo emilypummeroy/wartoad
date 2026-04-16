@@ -32,7 +32,7 @@ describe(`${App.name} Deterministic`, () => {
     nthRow: (n: number) => withinThe.playArea().getAllByRole('row')[n],
     homeLeafDropzone: (player: Player) =>
       withinThe.homeRow(player).getByRole('button', {
-        name: `Upgrade ${player} Home Lily Pad`,
+        name: new RegExp(`(Upgrade|Deploy on) ${player} Home Lily Pad`),
       }),
     phaseIndicator: (player: Player, phase: Phase) =>
       withinThe
@@ -55,11 +55,15 @@ describe(`${App.name} Deterministic`, () => {
       }),
     leafDropzonesControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('gridcell', {
-        name: new RegExp(`(Upgrade)|(Deploy on) ${player} controlled leaf`),
+        name: new RegExp(`(Upgrade|Deploy on) ${player} controlled leaf`),
       }),
     homeRowDropzones: (player: Player) =>
       withinThe.homeRow(player).getAllByRole('button', {
-        name: new RegExp(`(Upgrade)|(Deploy on) ${player} Home`),
+        name: new RegExp(`(Upgrade|Deploy on) ${player} (controlled|Home)`),
+      }),
+    cardsControlledByWithName: (player: Player, name: string) =>
+      withinThe.playArea().getAllByRole('region', {
+        name: new RegExp(`${player} (controlled|Home) ${name}`),
       }),
   };
 
@@ -69,12 +73,14 @@ describe(`${App.name} Deterministic`, () => {
     handCardNamed: (player: Player, name: string) =>
       getAll.handCardsNamed(player, name)[0],
     leafControlledBy: (player: Player) => getAll.leavesControlledBy(player)[0],
+    cardControlledByWithName: (player: Player, name: string) =>
+      getAll.cardsControlledByWithName(player, name)[0],
   };
 
   const queryAll = {
-    controlledCardsNamed: (player: Player, name: string) =>
+    cardsControlledByWithName: (player: Player, name: string) =>
       withinThe.playArea().queryAllByRole('region', {
-        name: `${player} controlled${name}`,
+        name: `${player} controlled ${name}`,
       }),
   };
 
@@ -85,15 +91,14 @@ describe(`${App.name} Deterministic`, () => {
       withinThe
         .header()
         .queryByRole('region', { name: `${player}: ${phase} phase` }),
-    controlledLeafDropzone: (player: Player) =>
+    upgradeDropzoneControlledBy: (player: Player) =>
       withinThe.playArea().queryByRole('button', {
         name: `Upgrade ${player} controlled leaf`,
       }),
-    nthRowDropzone: (n: number) =>
-      withinThe.nthRow(n).queryByRole('button', { name: /Upgrade/ }),
-    lilyPadDropzone: () =>
+    nthRowDropzone: (n: number) => withinThe.nthRow(n).queryByRole('button'),
+    upgradeDropzoneOnLeafNamed: (name: string) =>
       withinThe.playArea().queryByRole('button', {
-        name: /(controlled)|(Home) Lilly Pad/,
+        name: new RegExp(`(controlled|Home) ${name}`),
       }),
   };
 
@@ -154,7 +159,7 @@ describe(`${App.name} Deterministic`, () => {
         const cards = getAll.handCards(player);
         expect(cards).not.toHaveLength(0);
         for (const c of cards)
-          expect(c).toHaveAccessibleName(/(Lily Pad)|(Froglet)/);
+          expect(c).toHaveAccessibleName(/(Lily Pad|Froglet)/);
       });
 
       it(`should gain a Froglet during the first ${player} Start phase`, () => {
@@ -221,7 +226,7 @@ describe(`${App.name} Deterministic`, () => {
         ])(
           `should allow ${player} to upgrade their %sth unupgraded leaf by clicking on it`,
           leafIndex => {
-            const initialLilyPadCount = queryAll.controlledCardsNamed(
+            const initialLilyPadCount = queryAll.cardsControlledByWithName(
               player,
               'Lily Pad',
             ).length;
@@ -236,25 +241,38 @@ describe(`${App.name} Deterministic`, () => {
           },
         );
 
-        it(`should not allow ${player} to play a Lily Pad on an a ${opponent} leaf`, () => {
-          const initialLilyPadCount = queryAll.controlledCardsNamed(
+        it(`should not allow ${player} to upgrade an a ${opponent} leaf`, () => {
+          const initialLilyPadCount = queryAll.cardsControlledByWithName(
             player,
             'Lily Pad',
           ).length;
 
           expect(
-            queryA.controlledLeafDropzone(opponent),
+            queryA.upgradeDropzoneControlledBy(opponent),
           ).not.toBeInTheDocument();
 
           fireEvent.click(getFirst.leafControlledBy(opponent));
-
           expect(
-            queryAll.controlledCardsNamed(player, 'Lily Pad'),
+            queryAll.cardsControlledByWithName(player, 'Lily Pad'),
           ).toHaveLength(initialLilyPadCount);
         });
 
-        it(`should not allow ${player} to play a Lily Pad on an an upgraded leaf`, () => {
-          expect(queryA.lilyPadDropzone()).not.toBeInTheDocument();
+        it(`should not allow ${player} to upgrade an upgraded leaf`, () => {
+          const initialLilyPadCount = getAll.cardsControlledByWithName(
+            player,
+            'Lily Pad',
+          ).length;
+
+          expect(
+            queryA.upgradeDropzoneOnLeafNamed('Lily Pad'),
+          ).not.toBeInTheDocument();
+
+          fireEvent.click(
+            getFirst.cardControlledByWithName(player, 'Lily Pad'),
+          );
+          expect(
+            getAll.cardsControlledByWithName(player, 'Lily Pad'),
+          ).toHaveLength(initialLilyPadCount);
         });
       },
     );
@@ -271,11 +289,10 @@ describe(`${App.name} Deterministic`, () => {
 
         const LEFT = 0;
         const RIGHT = 2;
-        // TODO 8: Unskip when Froglets appear on the grid
-        it.skip.for([LEFT, RIGHT])(
+        it.for([LEFT, RIGHT])(
           `should allow ${player} to train a Froglet on their %sth leaf in the back row`,
           leafIndex => {
-            const initialFrogletCount = queryAll.controlledCardsNamed(
+            const initialFrogletCount = queryAll.cardsControlledByWithName(
               player,
               'Froglet',
             ).length;
@@ -288,9 +305,8 @@ describe(`${App.name} Deterministic`, () => {
           },
         );
 
-        // TODO 8: Unskip when Froglets appear on the grid
-        it.skip(`should allow ${player} to train a Froglet on their Home Lily Pad`, () => {
-          const initialFrogletCount = queryAll.controlledCardsNamed(
+        it(`should allow ${player} to train a Froglet on their Home Lily Pad`, () => {
+          const initialFrogletCount = queryAll.cardsControlledByWithName(
             player,
             'Froglet',
           ).length;
@@ -315,7 +331,7 @@ describe(`${App.name} Deterministic`, () => {
 
         it(`should not allow ${player} to play the Froglet on an a ${opponent} leaf`, () => {
           expect(
-            queryA.controlledLeafDropzone(opponent),
+            queryA.upgradeDropzoneControlledBy(opponent),
           ).not.toBeInTheDocument();
         });
       },
