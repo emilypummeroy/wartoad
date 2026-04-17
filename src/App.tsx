@@ -34,7 +34,10 @@ function PickedCard({
     <section className="card-display" aria-labelledby="picked-card">
       <h3 id="picked-card">Picked card</h3>
       <div className="zoom-row">
-        <div className={`zooming ${Player.STYLES[owner]}`} tabIndex={0}>
+        <div
+          className={`zooming highlighting-card ${Player.STYLES[owner]}`}
+          tabIndex={0}
+        >
           {children}
         </div>
       </div>

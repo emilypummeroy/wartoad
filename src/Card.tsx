@@ -47,7 +47,7 @@ export function LilyPad({
   return (
     <section
       aria-labelledby={`${symbolId} ${nameId}`}
-      className={`card ${player && Player.STYLES[player]}`}
+      className={`card ${isLeaf && player ? Player.STYLES[player] : ''}`}
     >
       <div className="card-title" id={nameId}>
         Lily Pad
@@ -121,7 +121,7 @@ export const CardBack = ({
   return (
     <section
       aria-labelledby={iconId}
-      className={`${isLeaf ? Player.STYLES[player] : ''} facedown card`}
+      className={`${isLeaf ? Player.STYLES[player] : ''} cardback card`}
     >
       <Leaf role="img">
         <title id={iconId}>

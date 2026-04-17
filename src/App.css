@@ -214,38 +214,53 @@ button:enabled {
   }
 }
 
+div.shadowed-card {
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0.2svh;
+  box-shadow: var(--card-shadow);
+}
+
 div.highlighting-card {
   padding: 0;
   margin: 0;
   border: none;
-  border-radius: 0.5svh;
+  border-radius: 0.2svh;
+  box-shadow: var(--card-shadow);
+  outline-offset: 2px;
 
-  &:hover,
-  &:focus {
+  &:hover {
     outline: 1px solid;
-    outline-offset: 2px;
   }
   &:focus {
-    outline-width: 2px;
-    outline-style: solid;
+    outline: 2px solid;
   }
   &.north {
     outline-color: var(--north-outline);
+    &.pickable-card,
+    &:focus {
+      outline-color: var(--north-outline-accent);
+    }
+    &.pickable-card:focus {
+      outline-color: var(--north-accent);
+    }
   }
   &.south {
     outline-color: var(--south-outline);
+    &.pickable-card,
+    &:focus {
+      outline-color: var(--south-outline-accent);
+    }
+    &.pickable-card:focus {
+      outline-color: var(--south-accent);
+    }
   }
 
   &.pickable-card {
     cursor: grab;
     &:hover {
       filter: brightness(120%);
-    }
-    &.north {
-      outline-color: var(--north-outline-accent);
-    }
-    &.south {
-      outline-color: var(--south-outline-accent);
     }
   }
 }
@@ -375,41 +390,12 @@ span.south {
       zoom var(--animation-fast-linear),
       translate var(--animation-fast-linear);
     zoom: 150%;
-    translate: 0% -3%;
+    translate: 0% -5%;
 
     &:hover,
     &:focus {
       zoom: 200%;
-      translate: 0% -35%;
-    }
-
-    outline-offset: 1px;
-    border-radius: 0.5svh;
-
-    outline: 1px solid var(--border);
-    &.north {
-      outline-color: var(--north-outline);
-    }
-    &.south {
-      outline-color: var(--south-outline);
-    }
-    &:hover {
-      outline-color: var(--outline-accent);
-      &.north {
-        outline-color: var(--north-outline-accent);
-      }
-      &.south {
-        outline-color: var(--south-outline-accent);
-      }
-    }
-    &:focus {
-      outline-color: var(--accent);
-      &.south {
-        outline-color: var(--south-accent);
-      }
-      &.north {
-        outline-color: var(--north-accent);
-      }
+      translate: 0% -25%;
     }
   }
 }
@@ -743,13 +729,12 @@ span.south {
   width: 8svh;
   /* Real world cards are 63mmx88mm */
   /* aspect-ratio: 64 / 88;  */
-  border-radius: 0.4svh;
+  border-radius: 0.2svh;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
-  box-shadow: var(--card-shadow);
   background: var(--card-front);
   color: var(--card-text);
   border: 1px solid var(--card-border);
@@ -766,10 +751,44 @@ span.south {
     translate: -50svw;
   }
 
-  small {
-    font-size: 0.7svh;
-    line-height: 0.9svh;
-    display: block;
+  &:hover {
+    filter: brightness(110%);
+  }
+
+  > svg,
+  .card-section-row svg,
+  .card-section-fill svg {
+    height: 3svh;
+    width: 3svh;
+  }
+
+  &.south {
+    > svg,
+    .card-section-row svg,
+    .card-section-fill svg {
+      color: var(--card-south);
+      transform: scaleY(-1);
+    }
+  }
+  &.north {
+    > svg,
+    .card-section-row svg,
+    .card-section-fill svg {
+      color: var(--card-north);
+    }
+  }
+
+  &.cardback {
+    background: var(--card-back);
+    border: none;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      color: var(--card-back-symbol);
+      height: 3svh;
+      width: 3svh;
+    }
   }
 
   .card-title {
@@ -807,7 +826,7 @@ span.south {
       box-sizing: border-box;
     }
 
-    div.card-item {
+    .card-item {
       padding: 0.5svh;
     }
   }
@@ -817,7 +836,7 @@ span.south {
     flex-direction: row;
     height: 4svh;
 
-    div {
+    .card-item {
       flex-direction: column;
       flex-grow: 1;
       height: 3.7svh;
@@ -830,10 +849,8 @@ span.south {
     flex-grow: 0;
     width: fit-content;
 
-    div.card-item {
+    .card-item {
       padding: 0.2svh;
-    }
-    div {
       flex-direction: row;
       justify-content: space-evenly;
       flex-grow: 1;
@@ -842,15 +859,16 @@ span.south {
 
       svg {
         height: 1.2svh;
-        width: 1.2svh;
+        width: 1.4svh;
         flex-shrink: 0;
       }
 
       span {
-        width: 1.6svh;
+        width: 1.4svh;
         font-size: 1.2svh;
         line-height: 1.2svh;
         text-align: center;
+        flex-shrink: 1;
       }
     }
   }
@@ -858,6 +876,9 @@ span.south {
   .card-section-fill {
     flex-grow: 1;
     flex-direction: column;
+    .card-item {
+      flex-direction: column;
+    }
   }
 
   .card-item {
@@ -865,50 +886,11 @@ span.south {
     border-radius: 2px;
     outline: 1px solid var(--card-outline);
     padding: 0.2svh;
-  }
 
-  &.south {
-    outline: 1px solid var(--south-outline);
-    > svg,
-    .card-section-row svg,
-    .card-section-fill svg {
-      color: var(--card-south);
-      height: 3svh;
-      width: 3svh;
-      transform: scaleY(-1);
-    }
-    &:hover {
-      outline: 2px solid var(--south-outline);
-    }
-  }
-  &.north {
-    outline: 1px solid var(--north-outline);
-    > svg,
-    .card-section-row svg,
-    .card-section-fill svg {
-      color: var(--card-north);
-      height: 3svh;
-      width: 3svh;
-    }
-    &:hover {
-      outline: 2px solid var(--north-outline);
-    }
-  }
-
-  &:hover {
-    filter: brightness(110%);
-  }
-
-  &.facedown {
-    background: var(--card-back);
-    border: none;
-    align-items: center;
-    justify-content: center;
-
-    svg {
-      color: var(--card-back-symbol);
-      height: 3svh;
-      width: 3svh;
+    small {
+      font-size: 0.7svh;
+      line-height: 0.9svh;
+      display: block;
     }
   }
 }

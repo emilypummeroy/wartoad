@@ -33,7 +33,7 @@ export function Zone({
     subphase === Subphase.Deploying && position.y === Position.HOME[player].y;
   const isHome = Position.equals(Position.HOME[controller], position);
   const buttonId = useId();
-  const leafNameid = useId();
+  const leafNameId = useId();
   const leafSymbolId = useId();
   const isDropzone = isUpgradeDropzone || isDeployDropzone;
 
@@ -48,7 +48,7 @@ export function Zone({
       {isDropzone && (
         <div
           id={buttonId}
-          aria-labelledby={`${buttonId} ${leafSymbolId} ${leafNameid}`}
+          aria-labelledby={`${buttonId} ${leafSymbolId} ${leafNameId}`}
           role="button"
           className="overlay-container"
         >
@@ -66,15 +66,20 @@ export function Zone({
         }}
       >
         {isUpgraded ? (
-          // TODO 9: Implement a non-splay-row hack to display cards on leaves
+          // TODO 11: Implement a non-splay-row hack to display cards on leaves
           <div className="stacking peeking">
-            <LilyPad
-              symbolId={leafSymbolId}
-              nameId={leafNameid}
-              isHome={isHome}
-              player={controller}
-              isLeaf
-            />
+            <div
+              role="listitem"
+              className={`highlighting-card ${Player.STYLES[controller]}`}
+            >
+              <LilyPad
+                symbolId={leafSymbolId}
+                nameId={leafNameId}
+                isHome={isHome}
+                player={controller}
+                isLeaf
+              />
+            </div>
           </div>
         ) : (
           <div className="stacking">
@@ -87,8 +92,14 @@ export function Zone({
           </div>
         )}
         {units.map((_, i) => (
+          // TODO 9: Click to activate a unit
           <div key={`Froglet-${i}`} className="stacking peeking">
-            <Froglet player={controller} isOnLeaf />
+            <div
+              role="listitem"
+              className={`highlighting-card pickable-card ${Player.STYLES[controller]}`}
+            >
+              <Froglet player={controller} isOnLeaf />
+            </div>
           </div>
         ))}
       </div>

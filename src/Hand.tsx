@@ -21,10 +21,6 @@ function HandCard({
   player,
   onPick,
 }: HandCardProps) {
-  const playerStyle = {
-    [Player.North]: 'north',
-    [Player.South]: 'south',
-  }[player];
   const handleClick = useCallback(() => onPick(cardClass), [cardClass, onPick]);
   const buttonId = useId();
   const titleId = useId();
@@ -35,7 +31,7 @@ function HandCard({
       id={buttonId}
       aria-label="Pick"
       tabIndex={0}
-      className={`highlighting-card pickable-card ${playerStyle}`}
+      className={`highlighting-card pickable-card ${Player.STYLES[player]}`}
       onClick={handleClick}
     >
       {cardClass === CardClass.Froglet ? (
@@ -49,7 +45,7 @@ function HandCard({
       role="listitem"
       aria-labelledby={titleId}
       tabIndex={0}
-      className={`highlighting-card ${playerStyle}`}
+      className={`highlighting-card ${Player.STYLES[player]}`}
     >
       {cardClass === CardClass.Froglet ? (
         <Froglet nameId={titleId} />
