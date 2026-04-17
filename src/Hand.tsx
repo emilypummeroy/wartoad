@@ -125,7 +125,7 @@ export function Hand({
             </div>
           ) : (
             <div key={`${cardClass.key} ${i}`} className="stacking">
-              <CardBack />
+              <CardBack player={player} />
             </div>
           );
         })}

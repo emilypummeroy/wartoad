@@ -113,7 +113,7 @@ export const CardBack = ({
   iconId,
   player,
   isLeaf = false,
-}: Readonly<{ iconId?: string; player?: Player; isLeaf?: boolean }>) => {
+}: Readonly<{ iconId?: string; player: Player; isLeaf?: boolean }>) => {
   {
     const _iconId = useId();
     iconId ??= _iconId;
@@ -121,11 +121,11 @@ export const CardBack = ({
   return (
     <section
       aria-labelledby={iconId}
-      className={`${isLeaf && player ? Player.STYLES[player] : ''} facedown card`}
+      className={`${isLeaf ? Player.STYLES[player] : ''} facedown card`}
     >
       <Leaf role="img">
         <title id={iconId}>
-          {isLeaf ? `${player ?? ''} controlled leaf` : 'Card back'}
+          {isLeaf ? `${player} controlled leaf` : 'Card back'}
         </title>
       </Leaf>
     </section>

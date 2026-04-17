@@ -103,7 +103,7 @@ describe(App, () => {
   };
 
   describe('Header', () => {
-    it('should have the wartoad heading', () => {
+    it('should have the Wartoad heading', () => {
       const heading = screen.getByRole('heading', { level: 1 });
       const banner = screen.getByRole('banner');
       expect(heading).toHaveTextContent('Wartoad');
