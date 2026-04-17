@@ -55,8 +55,8 @@ export const CardClass = {
     cost: 0,
     type: CardType.Unit,
     details: {
-      life: 0,
-      speed: 0,
+      life: 1,
+      speed: 1,
       power: 0,
       range: 0,
     },

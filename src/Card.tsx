@@ -25,13 +25,13 @@ import { CardClass, type LeafStats, type UnitStats } from './card-types';
 import { Player } from './PhaseTracker';
 
 export function LilyPad({
-  owner,
+  player,
   isHome = false,
   isLeaf = false,
   nameId,
   symbolId,
 }: Readonly<{
-  owner?: Player;
+  player?: Player;
   nameId?: string;
   symbolId?: string;
   isHome?: boolean;
@@ -43,26 +43,27 @@ export function LilyPad({
     const _nameId = useId();
     nameId ??= _nameId;
   }
+  const costId = useId();
   return (
     <section
       aria-labelledby={`${symbolId} ${nameId}`}
-      className={`card ${owner && Player.STYLES[owner]}`}
+      className={`card ${player && Player.STYLES[player]}`}
     >
       <div className="card-title" id={nameId}>
         Lily Pad
       </div>
       <div className="card-section-row">
         {!isLeaf ? (
-          <div className="card-item">
-            <small>Cost:</small>0
+          <div role="group" aria-labelledby={costId} className="card-item">
+            <small id={costId}>Cost</small>0
           </div>
         ) : isHome ? (
           <Clover role="img">
-            <title id={symbolId}>{owner} Home</title>
+            <title id={symbolId}>{player} Home</title>
           </Clover>
         ) : (
           <Leaf role="img">
-            <title id={symbolId}>{owner} controlled</title>
+            <title id={symbolId}>{player} controlled</title>
           </Leaf>
         )}
       </div>
@@ -72,19 +73,20 @@ export function LilyPad({
 }
 
 export function Froglet({
-  owner,
+  player,
   isOnLeaf = false,
   nameId,
-}: Readonly<{ isOnLeaf?: boolean; nameId?: string; owner?: Player }>) {
+}: Readonly<{ isOnLeaf?: boolean; nameId?: string; player?: Player }>) {
   const symbolId = useId();
   {
     const _nameId = useId();
     nameId ??= _nameId;
   }
+  const costId = useId();
   return (
     <section
       aria-labelledby={`${isOnLeaf ? symbolId : ''} ${nameId}`}
-      className={`card ${isOnLeaf && owner ? Player.STYLES[owner] : ''}`}
+      className={`card ${isOnLeaf && player ? Player.STYLES[player] : ''}`}
     >
       <div className="card-title" id={nameId}>
         Froglet
@@ -94,11 +96,11 @@ export function Froglet({
         <div className="card-section-fill">
           {isOnLeaf ? (
             <Torus role="img">
-              <title id={symbolId}>{owner} unit</title>
+              <title id={symbolId}>{player} unit</title>
             </Torus>
           ) : (
-            <div className="card-item">
-              <small>Cost:</small>0
+            <div role="group" aria-labelledby={costId} className="card-item">
+              <small id={costId}>Cost</small>0
             </div>
           )}
         </div>
@@ -108,21 +110,21 @@ export function Froglet({
 }
 
 export const CardBack = ({
-  id,
+  iconId,
   player,
   isLeaf = false,
-}: Readonly<{ id?: string; player?: Player; isLeaf?: boolean }>) => {
+}: Readonly<{ iconId?: string; player?: Player; isLeaf?: boolean }>) => {
   {
-    const _id = useId();
-    id ??= _id;
+    const _iconId = useId();
+    iconId ??= _iconId;
   }
   return (
     <section
-      aria-labelledby={id}
+      aria-labelledby={iconId}
       className={`${isLeaf && player ? Player.STYLES[player] : ''} facedown card`}
     >
       <Leaf role="img">
-        <title id={id}>
+        <title id={iconId}>
           {isLeaf ? `${player ?? ''} controlled leaf` : 'Card back'}
         </title>
       </Leaf>
@@ -136,29 +138,29 @@ function UnitStatsDisplay({
   readonly stats: UnitStats;
 }) {
   return (
-    <div className="card-section-column">
+    <div role="group" aria-label="Stats" className="card-section-column">
       <div className="card-item">
-        <span>{power}</span>{' '}
+        <span role="presentation">{power}</span>
         <Sword role="img">
-          <title>Power</title>
+          <title> Power </title>
         </Sword>
       </div>
       <div className="card-item">
-        <span>{range}</span>{' '}
+        <span role="presentation">{range}</span>
         <Crosshair role="img">
-          <title>Range</title>
+          <title> Range </title>
         </Crosshair>
       </div>
       <div className="card-item">
-        <span>{speed}</span>{' '}
+        <span role="presentation">{speed}</span>
         <Move role="img">
-          <title>Speed</title>
+          <title> Speed </title>
         </Move>
       </div>
       <div className="card-item">
-        <span>{life}</span>{' '}
+        <span role="presentation">{life}</span>
         <Heart role="img">
-          <title>Life</title>
+          <title> Life </title>
         </Heart>
       </div>
     </div>
@@ -166,10 +168,11 @@ function UnitStatsDisplay({
 }
 
 function LeafStatsDisplay({ stats: { gives } }: { readonly stats: LeafStats }) {
+  const givesId = useId();
   return (
-    <div className="card-section-row">
+    <div role="group" aria-labelledby={givesId} className="card-section-row">
       <div className="card-item">
-        <small>Gives:</small>+{gives}
+        <small id={givesId}>Gives</small>+{gives}
       </div>
     </div>
   );

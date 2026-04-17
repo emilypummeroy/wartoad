@@ -72,14 +72,14 @@ export function Zone({
               symbolId={leafSymbolId}
               nameId={leafNameid}
               isHome={isHome}
-              owner={controller}
+              player={controller}
               isLeaf
             />
           </div>
         ) : (
           <div className="stacking">
             <CardBack
-              id={leafSymbolId}
+              iconId={leafSymbolId}
               key="facedown-card"
               player={controller}
               isLeaf
@@ -88,7 +88,7 @@ export function Zone({
         )}
         {units.map((_, i) => (
           <div key={`Froglet-${i}`} className="stacking peeking">
-            <Froglet owner={controller} isOnLeaf />
+            <Froglet player={controller} isOnLeaf />
           </div>
         ))}
       </div>

@@ -841,12 +841,13 @@ span.south {
       height: 2svh;
 
       svg {
-        height: 1.4svh;
-        width: 1.4svh;
+        height: 1.2svh;
+        width: 1.2svh;
         flex-shrink: 0;
       }
 
       span {
+        width: 1.6svh;
         font-size: 1.2svh;
         line-height: 1.2svh;
         text-align: center;
@@ -856,10 +857,7 @@ span.south {
 
   .card-section-fill {
     flex-grow: 1;
-
-    div {
-      flex-direction: column;
-    }
+    flex-direction: column;
   }
 
   .card-item {
