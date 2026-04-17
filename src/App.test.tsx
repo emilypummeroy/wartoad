@@ -50,10 +50,6 @@ describe(App, () => {
       withinThe.playArea().getAllByRole('region', {
         name: new RegExp(`${player} controlled leaf`),
       }),
-    cardsControlledBy: (player: Player) =>
-      withinThe.playArea().getAllByRole('region', {
-        name: new RegExp(`${player} controlled`),
-      }),
     dropzoneControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('gridcell', {
         name: new RegExp(`(Upgrade|Deploy on) ${player} controlled`),
@@ -71,6 +67,10 @@ describe(App, () => {
   const queryAll = {
     clickableHandCards: (player: Player) =>
       withinThe.hand(player).queryAllByRole('button'),
+    unitsControlledBy: (player: Player) =>
+      withinThe.playArea().queryAllByRole('img', {
+        name: new RegExp(`${player} unit`),
+      }),
   };
 
   const queryThe = {
@@ -273,15 +273,15 @@ describe(App, () => {
         });
 
         it(`should allow ${player} to play the picked card on a leaf by clicking on it`, () => {
-          // Playing a leaf will make the "controlled leaf" count go down.
-          // Playing a unit will make the "controlled card" count go up.
+          // Playing a leaf will make the "basic leaf" count go down.
+          // Playing a unit will make the unit count go up.
           const initialHeuristicCount =
-            getAll.cardsControlledBy(player).length -
+            queryAll.unitsControlledBy(player).length -
             getAll.basicLeavesControlledBy(player).length;
           fireEvent.click(getFirst.dropzoneControlledBy(player));
 
           const newHeuristicCount =
-            getAll.cardsControlledBy(player).length -
+            queryAll.unitsControlledBy(player).length -
             getAll.basicLeavesControlledBy(player).length;
           expect(newHeuristicCount, `heuristic after playing ${cardName}`).toBe(
             initialHeuristicCount + 1,

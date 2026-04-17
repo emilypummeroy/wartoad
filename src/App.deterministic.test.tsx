@@ -49,6 +49,10 @@ describe(`${App.name} Deterministic`, () => {
       withinThe.playArea().getAllByRole('region', {
         name: `${player} controlled ${name}`,
       }),
+    unitsControlledBy: (player: Player) =>
+      withinThe.playArea().getAllByRole('img', {
+        name: `${player} unit`,
+      }),
     leavesControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('gridcell', {
         name: `${player} controlled leaf`,
@@ -81,6 +85,10 @@ describe(`${App.name} Deterministic`, () => {
     cardsControlledByWithName: (player: Player, name: string) =>
       withinThe.playArea().queryAllByRole('region', {
         name: `${player} controlled ${name}`,
+      }),
+    unitsControlledBy: (player: Player) =>
+      withinThe.playArea().queryAllByRole('img', {
+        name: `${player} unit`,
       }),
   };
 
@@ -287,29 +295,23 @@ describe(`${App.name} Deterministic`, () => {
         it.for([LEFT, RIGHT])(
           `should allow ${player} to train a Froglet on their %sth leaf in the back row`,
           leafIndex => {
-            const initialFrogletCount = queryAll.cardsControlledByWithName(
-              player,
-              'Froglet',
-            ).length;
+            const initialCount = queryAll.unitsControlledBy(player).length;
 
             fireEvent.click(getAll.homeRowDropzones(player)[leafIndex]);
 
-            expect(getAll.controlledCardsNamed(player, 'Froglet')).toHaveLength(
-              initialFrogletCount + 1,
+            expect(getAll.unitsControlledBy(player)).toHaveLength(
+              initialCount + 1,
             );
           },
         );
 
         it(`should allow ${player} to train a Froglet on their Home Lily Pad`, () => {
-          const initialFrogletCount = queryAll.cardsControlledByWithName(
-            player,
-            'Froglet',
-          ).length;
+          const initialCount = queryAll.unitsControlledBy(player).length;
 
           fireEvent.click(getThe.homeLeafDropzone(player));
 
-          expect(getAll.controlledCardsNamed(player, 'Froglet')).toHaveLength(
-            initialFrogletCount + 1,
+          expect(getAll.unitsControlledBy(player)).toHaveLength(
+            initialCount + 1,
           );
         });
 

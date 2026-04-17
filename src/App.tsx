@@ -1,8 +1,8 @@
 import './App.css';
 import { useCallback, useState, type ReactNode } from 'react';
 
+import { Froglet, LilyPad } from './Card';
 import { CardClass, CardType } from './card-types';
-import { Froglet, LilyPad } from './Cards';
 import { type Position, INITIAL_GRID, GridState, Grid } from './Grid';
 import { Hand } from './Hand';
 import {

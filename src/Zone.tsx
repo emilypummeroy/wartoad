@@ -1,8 +1,8 @@
 import { Replace } from 'lucide-react';
 import { useId, useCallback } from 'react';
 
+import { CardBack, Froglet, LilyPad } from './Card';
 import { type UnitClass } from './card-types';
-import { CardBack, Froglet, LilyPad } from './Cards';
 import { Position } from './Grid';
 import { Player, Subphase, type FlowState } from './PhaseTracker';
 

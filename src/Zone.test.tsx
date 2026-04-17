@@ -77,7 +77,7 @@ describe(Zone, () => {
         );
         expect(
           screen.queryAllByRole('region', {
-            name: `${controller} controlled Froglet`,
+            name: `${controller} unit Froglet`,
           }),
         ).toHaveLength(unitCount);
       });

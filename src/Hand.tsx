@@ -1,8 +1,8 @@
 import './App.css';
 import { useCallback, useId } from 'react';
 
+import { CardBack, Froglet, LilyPad } from './Card';
 import { CardClass, type CardKey } from './card-types';
-import { CardBack, Froglet, LilyPad } from './Cards';
 import { Player } from './PhaseTracker';
 
 export const INITIAL_HAND_SIZE = 7;

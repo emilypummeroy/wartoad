@@ -57,11 +57,11 @@ export function LilyPad({
             <small>Cost:</small>0
           </div>
         ) : isHome ? (
-          <Clover>
+          <Clover role="img">
             <title id={symbolId}>{owner} Home</title>
           </Clover>
         ) : (
-          <Leaf>
+          <Leaf role="img">
             <title id={symbolId}>{owner} controlled</title>
           </Leaf>
         )}
@@ -93,8 +93,8 @@ export function Froglet({
         <UnitStatsDisplay stats={CardClass.Froglet.details} />
         <div className="card-section-fill">
           {isOnLeaf ? (
-            <Torus>
-              <title id={symbolId}>{owner} controlled</title>
+            <Torus role="img">
+              <title id={symbolId}>{owner} unit</title>
             </Torus>
           ) : (
             <div className="card-item">
@@ -121,7 +121,7 @@ export const CardBack = ({
       aria-labelledby={id}
       className={`${isLeaf && player ? Player.STYLES[player] : ''} facedown card`}
     >
-      <Leaf>
+      <Leaf role="img">
         <title id={id}>
           {isLeaf ? `${player ?? ''} controlled leaf` : 'Card back'}
         </title>
@@ -139,25 +139,25 @@ function UnitStatsDisplay({
     <div className="card-section-column">
       <div className="card-item">
         <span>{power}</span>{' '}
-        <Sword>
+        <Sword role="img">
           <title>Power</title>
         </Sword>
       </div>
       <div className="card-item">
         <span>{range}</span>{' '}
-        <Crosshair>
+        <Crosshair role="img">
           <title>Range</title>
         </Crosshair>
       </div>
       <div className="card-item">
         <span>{speed}</span>{' '}
-        <Move>
+        <Move role="img">
           <title>Speed</title>
         </Move>
       </div>
       <div className="card-item">
         <span>{life}</span>{' '}
-        <Heart>
+        <Heart role="img">
           <title>Life</title>
         </Heart>
       </div>
