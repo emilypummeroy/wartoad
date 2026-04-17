@@ -19,7 +19,6 @@ type ZoneProps = Readonly<{
   onPlace: (position: Position) => void;
 }>;
 
-// oxlint-disable-next-line max-lines-per-function
 export function Zone({
   flow: { subphase, player },
   controller,
@@ -36,65 +35,28 @@ export function Zone({
   const buttonId = useId();
   const leafNameid = useId();
   const leafSymbolId = useId();
-  return isUpgradeDropzone || isDeployDropzone ? (
+  const isDropzone = isUpgradeDropzone || isDeployDropzone;
+
+  return (
     <div
       role="gridcell"
       aria-colindex={position.x}
-      className={`placeable-zone zone ${Player.STYLES[controller]}`}
-      onClick={handleClick}
-      tabIndex={0}
+      className={`${isDropzone ? 'dropzone' : ''} zone ${Player.STYLES[controller]}`}
+      onClick={isDropzone ? handleClick : undefined}
+      tabIndex={isDropzone ? 0 : undefined}
     >
-      <div
-        id={buttonId}
-        aria-labelledby={`${buttonId} ${leafSymbolId} ${leafNameid}`}
-        role="button"
-        className="overlay-container"
-      >
-        <Replace>
-          <title>{isUpgradeDropzone ? 'Upgrade' : 'Deploy on'}</title>
-        </Replace>
-      </div>
-      <div
-        key="card-list"
-        role="list"
-        className="splay-row in-zone"
-        style={{
-          '--hand-size': 0,
-        }}
-      >
-        {isUpgraded ? (
-          <div className="stacking peeking">
-            <LilyPad
-              symbolId={leafSymbolId}
-              nameId={leafNameid}
-              isHome={isHome}
-              owner={controller}
-              isLeaf
-            />
-          </div>
-        ) : (
-          <div className="stacking">
-            <CardBack
-              id={leafSymbolId}
-              key="facedown-card"
-              player={controller}
-              isLeaf
-            />
-          </div>
-        )}
-        {units.map((_, i) => (
-          <div key={i} className="stacking peeking">
-            <Froglet owner={controller} isOnLeaf />
-          </div>
-        ))}
-      </div>
-    </div>
-  ) : (
-    <div
-      className={`zone ${Player.STYLES[controller]}`}
-      role="gridcell"
-      aria-colindex={position.x}
-    >
+      {isDropzone && (
+        <div
+          id={buttonId}
+          aria-labelledby={`${buttonId} ${leafSymbolId} ${leafNameid}`}
+          role="button"
+          className="overlay-container"
+        >
+          <Replace>
+            <title>{isUpgradeDropzone ? 'Upgrade' : 'Deploy on'}</title>
+          </Replace>
+        </div>
+      )}
       <div
         key="card-list"
         role="list"
@@ -125,7 +87,7 @@ export function Zone({
           </div>
         )}
         {units.map((_, i) => (
-          <div key={i} className="stacking peeking">
+          <div key={`Froglet-${i}`} className="stacking peeking">
             <Froglet owner={controller} isOnLeaf />
           </div>
         ))}
