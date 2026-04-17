@@ -869,6 +869,7 @@ span.south {
 
   &.south {
     outline: 1px solid var(--south-outline);
+    > svg,
     .card-section-row svg,
     .card-section-fill svg {
       color: var(--card-south);
@@ -882,6 +883,7 @@ span.south {
   }
   &.north {
     outline: 1px solid var(--north-outline);
+    > svg,
     .card-section-row svg,
     .card-section-fill svg {
       color: var(--card-north);
