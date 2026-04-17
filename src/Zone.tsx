@@ -2,7 +2,7 @@ import { Replace } from 'lucide-react';
 import { useId, useCallback } from 'react';
 
 import { type UnitClass } from './card-types';
-import { ZoneFacedown, ZoneFroglet, ZoneLilyPad } from './Cards';
+import { CardBack, Froglet, LilyPad } from './Cards';
 import { Position } from './Grid';
 import { Player, Subphase, type FlowState } from './PhaseTracker';
 
@@ -64,25 +64,27 @@ export function Zone({
       >
         {isUpgraded ? (
           <div className="stacking peeking">
-            <ZoneLilyPad
+            <LilyPad
               symbolId={leafSymbolId}
               nameId={leafNameid}
               isHome={isHome}
               owner={controller}
+              isLeaf
             />
           </div>
         ) : (
           <div className="stacking">
-            <ZoneFacedown
+            <CardBack
               id={leafSymbolId}
               key="facedown-card"
               player={controller}
+              isLeaf
             />
           </div>
         )}
         {units.map((_, i) => (
           <div key={i} className="stacking peeking">
-            <ZoneFroglet owner={controller} />
+            <Froglet owner={controller} isOnLeaf />
           </div>
         ))}
       </div>
@@ -104,25 +106,27 @@ export function Zone({
         {isUpgraded ? (
           // TODO 9: Implement a non-splay-row hack to display cards on leaves
           <div className="stacking peeking">
-            <ZoneLilyPad
+            <LilyPad
               symbolId={leafSymbolId}
               nameId={leafNameid}
               isHome={isHome}
               owner={controller}
+              isLeaf
             />
           </div>
         ) : (
           <div className="stacking">
-            <ZoneFacedown
+            <CardBack
               id={leafSymbolId}
               key="facedown-card"
               player={controller}
+              isLeaf
             />
           </div>
         )}
         {units.map((_, i) => (
           <div key={i} className="stacking peeking">
-            <ZoneFroglet owner={controller} />
+            <Froglet owner={controller} isOnLeaf />
           </div>
         ))}
       </div>

@@ -2,7 +2,7 @@ import './App.css';
 import { useCallback, useId } from 'react';
 
 import { CardClass, type CardKey } from './card-types';
-import { HandCardBack, HandFroglet, HandLilyPad } from './Cards';
+import { CardBack, Froglet, LilyPad } from './Cards';
 import { Player } from './PhaseTracker';
 
 export const INITIAL_HAND_SIZE = 7;
@@ -39,9 +39,9 @@ function HandCard({
       onClick={handleClick}
     >
       {cardClass === CardClass.Froglet ? (
-        <HandFroglet titleId={titleId} />
+        <Froglet nameId={titleId} />
       ) : (
-        <HandLilyPad titleId={titleId} />
+        <LilyPad nameId={titleId} />
       )}
     </div>
   ) : (
@@ -52,9 +52,9 @@ function HandCard({
       className={`highlighting-card ${playerStyle}`}
     >
       {cardClass === CardClass.Froglet ? (
-        <HandFroglet titleId={titleId} />
+        <Froglet nameId={titleId} />
       ) : (
-        <HandLilyPad titleId={titleId} />
+        <LilyPad nameId={titleId} />
       )}
     </div>
   );
@@ -125,7 +125,7 @@ export function Hand({
             </div>
           ) : (
             <div key={`${cardClass.key} ${i}`} className="stacking">
-              <HandCardBack />
+              <CardBack />
             </div>
           );
         })}

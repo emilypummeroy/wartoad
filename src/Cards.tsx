@@ -1,6 +1,6 @@
 import {
   Clover,
-  Eye,
+  Torus,
   Book,
   BookPlus,
   Diamond,
@@ -24,31 +24,39 @@ import { useId } from 'react';
 import { CardClass, type LeafStats, type UnitStats } from './card-types';
 import { Player } from './PhaseTracker';
 
-export function ZoneLilyPad({
+export function LilyPad({
   owner,
   isHome = false,
+  isLeaf = false,
   nameId,
   symbolId,
-}: {
-  readonly owner: Player;
-  readonly nameId: string;
-  readonly symbolId: string;
-  readonly isHome?: boolean;
-}) {
-  const playerStyle = {
-    [Player.North]: 'north',
-    [Player.South]: 'south',
-  }[owner];
+}: Readonly<{
+  owner?: Player;
+  nameId?: string;
+  symbolId?: string;
+  isHome?: boolean;
+  isLeaf?: boolean;
+}>) {
+  {
+    const _symbolId = useId();
+    symbolId ??= _symbolId;
+    const _nameId = useId();
+    nameId ??= _nameId;
+  }
   return (
     <section
       aria-labelledby={`${symbolId} ${nameId}`}
-      className={`card ${playerStyle}`}
+      className={`card ${owner && Player.STYLES[owner]}`}
     >
       <div className="card-title" id={nameId}>
         Lily Pad
       </div>
       <div className="card-section-row">
-        {isHome ? (
+        {!isLeaf ? (
+          <div className="card-item">
+            <small>Cost:</small>0
+          </div>
+        ) : isHome ? (
           <Clover>
             <title id={symbolId}>{owner} Home</title>
           </Clover>
@@ -58,26 +66,25 @@ export function ZoneLilyPad({
           </Leaf>
         )}
       </div>
-      <div className="card-section-row">
-        <div className="card-item">
-          <small>Gives:</small>+0
-        </div>
-      </div>
+      <LeafStatsDisplay stats={CardClass.LilyPad.details} />
     </section>
   );
 }
 
-export function ZoneFroglet({ owner }: { readonly owner: Player }) {
-  const playerStyle = {
-    [Player.North]: 'north',
-    [Player.South]: 'south',
-  }[owner];
-  const nameId = useId();
+export function Froglet({
+  owner,
+  isOnLeaf = false,
+  nameId,
+}: Readonly<{ isOnLeaf?: boolean; nameId?: string; owner?: Player }>) {
   const symbolId = useId();
+  {
+    const _nameId = useId();
+    nameId ??= _nameId;
+  }
   return (
     <section
-      aria-labelledby={`${symbolId} ${nameId}`}
-      className={`card ${playerStyle}`}
+      aria-labelledby={`${isOnLeaf ? symbolId : ''} ${nameId}`}
+      className={`card ${isOnLeaf && owner ? Player.STYLES[owner] : ''}`}
     >
       <div className="card-title" id={nameId}>
         Froglet
@@ -85,94 +92,45 @@ export function ZoneFroglet({ owner }: { readonly owner: Player }) {
       <div className="card-section-split">
         <UnitStatsDisplay stats={CardClass.Froglet.details} />
         <div className="card-section-fill">
-          <Eye>
-            <title id={symbolId}>{owner} controlled</title>
-          </Eye>
+          {isOnLeaf ? (
+            <Torus>
+              <title id={symbolId}>{owner} controlled</title>
+            </Torus>
+          ) : (
+            <div className="card-item">
+              <small>Cost:</small>0
+            </div>
+          )}
         </div>
       </div>
     </section>
   );
 }
 
-export function ZoneFacedown({
-  player,
+export const CardBack = ({
   id,
-}: {
-  readonly id: string;
-  readonly player: Player;
-}) {
+  player,
+  isLeaf = false,
+}: Readonly<{ id?: string; player?: Player; isLeaf?: boolean }>) => {
+  {
+    const _id = useId();
+    id ??= _id;
+  }
   return (
     <section
       aria-labelledby={id}
-      className={`facedown card ${Player.STYLES[player]}`}
+      className={`${isLeaf && player ? Player.STYLES[player] : ''} facedown card`}
     >
       <Leaf>
-        <title id={id}>{player} controlled leaf</title>
-      </Leaf>
-    </section>
-  );
-}
-
-export function HandLilyPad({ titleId }: { readonly titleId?: string }) {
-  const id = useId();
-  const titleIdFallback = useId();
-  return (
-    <section
-      id={id}
-      aria-labelledby={titleId ?? titleIdFallback}
-      aria-label="Card"
-      className="card"
-    >
-      <div className="card-title" id={titleId ?? titleIdFallback}>
-        Lily Pad
-      </div>
-      <div className="card-section-row">
-        <div className="card-item">
-          <small>Cost:</small>0
-        </div>
-      </div>
-      <LeafStatsDisplay stats={CardClass.LilyPad.details} />
-    </section>
-  );
-}
-
-export function HandFroglet({ titleId }: { readonly titleId?: string }) {
-  const id = useId();
-  const titleIdFallback = useId();
-  return (
-    <section
-      id={id}
-      aria-labelledby={titleId ?? titleIdFallback}
-      aria-label="Card"
-      className="card"
-    >
-      <div className="card-title" id={titleId ?? titleIdFallback}>
-        Froglet
-      </div>
-      <div className="card-section-split">
-        <UnitStatsDisplay stats={CardClass.Froglet.details} />
-        <div className="card-section-fill">
-          <div className="card-item">
-            <small>Cost:</small>0
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export const HandCardBack = () => {
-  const id = useId();
-  return (
-    <section aria-labelledby={id} className="facedown card">
-      <Leaf>
-        <title id={id}>Card back</title>
+        <title id={id}>
+          {isLeaf ? `${player ?? ''} controlled leaf` : 'Card back'}
+        </title>
       </Leaf>
     </section>
   );
 };
 
-export function UnitStatsDisplay({
+function UnitStatsDisplay({
   stats: { power, range, speed, life },
 }: {
   readonly stats: UnitStats;
@@ -207,11 +165,7 @@ export function UnitStatsDisplay({
   );
 }
 
-export function LeafStatsDisplay({
-  stats: { gives },
-}: {
-  readonly stats: LeafStats;
-}) {
+function LeafStatsDisplay({ stats: { gives } }: { readonly stats: LeafStats }) {
   return (
     <div className="card-section-row">
       <div className="card-item">
