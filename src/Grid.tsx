@@ -53,7 +53,7 @@ export const GridState = {
     const array = old.map((row, yy) =>
       row.map((oldValue, xx) => (yy === y && xx === x ? newValue : oldValue)),
     );
-    // v8 ignore next 2
+    // v8 ignore if
     if (!GridState.is(array)) {
       throw new Error(`Expected a GridState but got: ${JSON.stringify(array)}`);
     }

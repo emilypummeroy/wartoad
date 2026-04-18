@@ -27,6 +27,7 @@
     ],
     "id-length": "allow",
     "no-inline-comments": "allow",
+    "switch-case-braces": ["error", "avoid"],
     "no-ternary": "allow",
     "no-shadow": "allow",
     "array-type": ["allow", { "default": "array-simple" }],

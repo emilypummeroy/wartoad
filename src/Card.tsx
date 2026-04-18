@@ -67,7 +67,7 @@ export function LilyPad({
           </Leaf>
         )}
       </div>
-      <LeafStatsDisplay stats={CardClass.LilyPad.details} />
+      <LeafStatsDisplay stats={CardClass.LilyPad.stats} />
     </section>
   );
 }
@@ -92,7 +92,7 @@ export function Froglet({
         Froglet
       </div>
       <div className="card-section-split">
-        <UnitStatsDisplay stats={CardClass.Froglet.details} />
+        <UnitStatsDisplay stats={CardClass.Froglet.stats} />
         <div className="card-section-fill">
           {isOnLeaf ? (
             <Torus role="img">

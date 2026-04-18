@@ -36,6 +36,7 @@ export const Subphase = {
   Idle: 'Idle',
   Upgrading: 'Upgrading',
   Deploying: 'Deploying',
+  Activating: 'Activating',
 } as const;
 export type Subphase = (typeof Subphase)[keyof typeof Subphase];
 
