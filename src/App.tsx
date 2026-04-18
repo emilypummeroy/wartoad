@@ -18,8 +18,11 @@ export const INITIAL_HAND_CARD_COUNT = 7;
 type GameState = {
   readonly flow: FlowState;
   readonly grid: GridState;
+  // TODO 11: Card[]
   readonly northHand: readonly CardClass[];
+  // TODO 11: Card[]
   readonly southHand: readonly CardClass[];
+  // TODO 11: Card
   readonly pickedCard?: CardClass;
 };
 
@@ -45,6 +48,7 @@ function PickedCard({
   );
 }
 
+// TODO 11: Make generic
 const shuffled = (cards: readonly CardClass[]): CardClass[] => {
   const source = [...cards];
   const result = [];
@@ -54,11 +58,13 @@ const shuffled = (cards: readonly CardClass[]): CardClass[] => {
   return result;
 };
 
+// TODO 11: Rename to random card class
 const randomCard = (): CardClass =>
   Object.values(CardClass)[
     Math.floor(Math.random() * Object.values(CardClass).length)
   ];
 
+// TODO 11: Remove the particular card
 const removeOne = (cards: readonly CardClass[], cardClass: CardClass) => [
   ...cards.slice(0, cards.lastIndexOf(cardClass)),
   ...cards.slice(cards.lastIndexOf(cardClass) + 1),
@@ -73,11 +79,13 @@ const gameStateForNextPhase =
       phase: Phase.AFTER[phase],
       subphase: Subphase.Idle,
     },
+    // TODO 11: Extract to draw function
     northHand:
       Phase.AFTER[phase] === Phase.Start &&
       Player.AFTER[player] === Player.North
         ? [...northHand, isDeterministic ? CardClass.Froglet : randomCard()]
         : northHand,
+    // TODO 11: Extract to draw function
     southHand:
       Phase.AFTER[phase] === Phase.Start &&
       Player.AFTER[player] === Player.South
@@ -92,6 +100,7 @@ const gameStateForCardPicked =
     flow: {
       ...flow,
       subphase:
+        // TODO 11: pickedCard.type
         pickedCard.type === CardType.Unit
           ? Subphase.Deploying
           : Subphase.Upgrading,
@@ -127,8 +136,10 @@ const gameStateForCardPlaced =
       grid,
       position,
       subphase === Subphase.Upgrading
-        ? { units, isUpgraded: true }
-        : { isUpgraded, units: [...units, CardClass.Froglet] },
+        ? // TODO 10: Make it create a card for leaves too
+          { units, isUpgraded: true }
+        : // TODO 9: Make it create a card for new units only
+          { isUpgraded, units: [...units, CardClass.Froglet] },
     ),
   });
 
@@ -143,6 +154,7 @@ const DETERMINISTIC_STARTING_HAND = [
 ];
 
 export function App({
+  // TODO 9: Move into a context
   isDeterministic = false,
 }: {
   readonly isDeterministic?: boolean;
@@ -176,6 +188,7 @@ export function App({
     () => setGameState(gameStateForNextPhase(isDeterministic)),
     [isDeterministic],
   );
+  // TODO 11: Make it operate on a card instead of a card class
   const handlePickCard = useCallback(
     (cardClass: CardClass) => setGameState(gameStateForCardPicked(cardClass)),
     [],
@@ -206,6 +219,7 @@ export function App({
             onPick={handlePickCard}
           />
           {subphase !== Subphase.Idle && (
+            // TODO 18: Make cards zoomable/inspectable/something outside of deploys and upgrades
             <PickedCard owner={player}>
               {pickedCard === CardClass.Froglet ? <Froglet /> : <LilyPad />}
             </PickedCard>

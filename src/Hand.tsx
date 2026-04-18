@@ -11,8 +11,10 @@ export const BIG_HAND_HAND_SIZE = 12;
 
 type HandCardProps = Readonly<{
   isEnabled?: boolean;
+  // TODO 9: use card: Card
   cardClass: CardClass;
   player: Player;
+  // TODO 9: use onPick(Card), fix parameter name
   onPick: (cardKey: CardClass) => void;
 }>;
 function HandCard({
@@ -67,7 +69,9 @@ type HandProps = Readonly<{
   isMainPhase: boolean;
   isPlayerTurn: boolean;
   isPlacing: boolean;
+  // TODO 9: use Card[]
   handCards: readonly CardClass[];
+  // TODO 9: use onPick(Card)
   onPick: (cardClass: CardClass) => void;
 }>;
 declare module 'react' {
@@ -87,10 +91,12 @@ export function Hand({
   onPick,
 }: HandProps) {
   const id = useId();
+  // TODO 9: use central Player.STYLES
   const playerStyle = {
     [Player.North]: 'north',
     [Player.South]: 'south',
   }[player];
+  // TODO 9: use card.key instead of counts, can remove the record
   const countsSoFar: Partial<Record<CardKey, number>> = {};
   const isJiggling = isMainPhase && !isPlacing && isPlayerTurn;
 
@@ -107,9 +113,12 @@ export function Hand({
         }}
       >
         {handCards.map((cardClass: CardClass) => {
+          // TODO 9: cards instead of cardClasses
           const i = countsSoFar[cardClass.key] ?? 0;
           countsSoFar[cardClass.key] = i + 1;
 
+          // TODO 9: card.key
+          // TODO 9: card.owner
           return isPlayerTurn ? (
             <div key={`${cardClass.key} ${i}`} className="stacking jiggling">
               <HandCard
@@ -120,6 +129,8 @@ export function Hand({
               />
             </div>
           ) : (
+            // TODO 9: card.key
+            // TODO 9: card.owner
             <div key={`${cardClass.key} ${i}`} className="stacking">
               <CardBack player={player} />
             </div>

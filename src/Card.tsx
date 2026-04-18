@@ -37,6 +37,12 @@ export function LilyPad({
   isHome?: boolean;
   isLeaf?: boolean;
 }>) {
+  // TODO 16: Wire in card.class:
+  // .stats
+  // .name
+  // .cost
+  // card:
+  // .owner
   {
     const _symbolId = useId();
     symbolId ??= _symbolId;
@@ -83,6 +89,13 @@ export function Froglet({
     nameId ??= _nameId;
   }
   const costId = useId();
+  // TODO 17: Wire in card.class:
+  // .stats
+  // .name
+  // .cost
+  // card:
+  // .owner
+  // .damage
   return (
     <section
       aria-labelledby={`${isOnLeaf ? symbolId : ''} ${nameId}`}

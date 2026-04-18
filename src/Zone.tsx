@@ -7,8 +7,10 @@ import { Position } from './Grid';
 import { Player, Subphase, type FlowState } from './PhaseTracker';
 
 export type ZoneState = Readonly<{
+  // TODO 9: UnitCard[]
   units: readonly UnitClass[];
   isUpgraded: boolean;
+  // TODO 10: Controller in ZoneState
 }>;
 
 type ZoneProps = Readonly<{
@@ -31,6 +33,7 @@ export function Zone({
     subphase === Subphase.Upgrading && !isUpgraded && player === controller;
   const isDeployDropzone =
     subphase === Subphase.Deploying && position.y === Position.HOME[player].y;
+  // 9: Activation dropzone
   const isHome = Position.equals(Position.HOME[controller], position);
   const buttonId = useId();
   const leafNameId = useId();
@@ -67,6 +70,7 @@ export function Zone({
       >
         {isUpgraded ? (
           // TODO 11: Implement a non-splay-row hack to display cards on leaves
+          // TODO 10: Controller based on ZoneState not on position
           <div className="stacking peeking">
             <div
               role="listitem"
@@ -98,6 +102,9 @@ export function Zone({
               role="listitem"
               className={`highlighting-card pickable-card ${Player.STYLES[controller]}`}
             >
+              {
+                // TODO 9: controller based on card not on zone position
+              }
               <Froglet player={controller} isOnLeaf />
             </div>
           </div>

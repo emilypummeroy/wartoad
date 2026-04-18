@@ -5,7 +5,7 @@ import type { Player } from './PhaseTracker';
 // Cards have a key to uniquely identify them among instances
 // of the same CardClass.
 //
-// TODO 9: They exist in a Space such as the aforementioned Hand, Pond, etc.
+// TODO 10: Maybe They exist in a Space such as the aforementioned Hand, Pond, etc.
 //
 // They are owned by a particular player.
 // Some cards track additional details like how much damage they've taken.
