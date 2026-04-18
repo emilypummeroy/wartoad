@@ -16,7 +16,7 @@ export type CardOf<T extends CardType> = {
   readonly type: T;
   readonly key: number;
   readonly owner: Player;
-  readonly class: T extends Unit
+  readonly cardClass: T extends Unit
     ? UnitClass
     : T extends Leaf
       ? LeafClass
@@ -106,11 +106,11 @@ export const LeafClass = {
 
 export const Card = {
   new: ({
-    class: cardClass,
+    cardClass,
     ...baseData
   }: {
     readonly key: number;
-    readonly class: CardClass;
+    readonly cardClass: CardClass;
     readonly owner: Player;
   }): Card => {
     switch (cardClass.type) {
@@ -118,14 +118,14 @@ export const Card = {
         return {
           ...baseData,
           type: CardType.Unit,
-          class: cardClass,
+          cardClass: cardClass,
           values: initialValues[cardClass.key],
         };
       case CardType.Leaf:
         return {
           ...baseData,
           type: CardType.Leaf,
-          class: cardClass,
+          cardClass: cardClass,
           values: initialValues[cardClass.key],
         };
       // v8 ignore start

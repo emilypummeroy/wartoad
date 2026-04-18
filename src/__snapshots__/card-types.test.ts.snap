@@ -2,7 +2,7 @@
 
 exports[`for cards owned by North with key 0 > Card.new > should produce a stable value for Froglet 1`] = `
 {
-  "class": {
+  "cardClass": {
     "cost": 0,
     "key": "Froglet",
     "name": "Froglet",
@@ -25,7 +25,7 @@ exports[`for cards owned by North with key 0 > Card.new > should produce a stabl
 
 exports[`for cards owned by North with key 0 > Card.new > should produce a stable value for LilyPad 1`] = `
 {
-  "class": {
+  "cardClass": {
     "cost": 0,
     "key": "LilyPad",
     "name": "Lily Pad",
@@ -43,7 +43,7 @@ exports[`for cards owned by North with key 0 > Card.new > should produce a stabl
 
 exports[`for cards owned by South with key 1 > Card.new > should produce a stable value for Froglet 1`] = `
 {
-  "class": {
+  "cardClass": {
     "cost": 0,
     "key": "Froglet",
     "name": "Froglet",
@@ -66,7 +66,7 @@ exports[`for cards owned by South with key 1 > Card.new > should produce a stabl
 
 exports[`for cards owned by South with key 1 > Card.new > should produce a stable value for LilyPad 1`] = `
 {
-  "class": {
+  "cardClass": {
     "cost": 0,
     "key": "LilyPad",
     "name": "Lily Pad",

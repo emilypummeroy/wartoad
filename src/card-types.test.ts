@@ -68,7 +68,7 @@ describe.for<[Player, number]>(
     )('should allow %s with %s damage', ([_, damage, cardClass]) => {
       const card: Card = {
         key,
-        class: cardClass,
+        cardClass: cardClass,
         type: CardType.Unit,
         owner,
         values: { damage },
@@ -82,7 +82,7 @@ describe.for<[Player, number]>(
       ([_, cardClass]) => {
         const card: Card = {
           key,
-          class: cardClass,
+          cardClass: cardClass,
           type: CardType.Leaf,
           owner,
           values: NoneValues,
@@ -99,7 +99,7 @@ describe.for<[Player, number]>(
       ([_, cardClass]) => {
         const card: Card = {
           key,
-          class: cardClass,
+          cardClass: cardClass,
           type: CardType.Leaf,
           owner,
           values: NoneValues,
@@ -114,7 +114,7 @@ describe.for<[Player, number]>(
     )('should filter %s with %s damage', ([_, damage, cardClass]) => {
       const card: Card = {
         key,
-        class: cardClass,
+        cardClass: cardClass,
         type: CardType.Unit,
         owner,
         values: { damage },
@@ -128,14 +128,16 @@ describe.for<[Player, number]>(
     it.for<[string, CardClass]>(Object.entries(CardClass))(
       'should produce a stable value for %s',
       ([_, cardClass]) => {
-        expect(Card.new({ key, class: cardClass, owner })).toMatchSnapshot();
+        expect(
+          Card.new({ key, cardClass: cardClass, owner }),
+        ).toMatchSnapshot();
       },
     );
 
     it.for<[string, UnitClass]>([CardClass.Froglet].map(x => [x.key, x]))(
       'should create a %s with 0 damage',
       ([_, cardClass]) => {
-        const card = Card.new({ key, class: cardClass, owner });
+        const card = Card.new({ key, cardClass: cardClass, owner });
         expect(card.type).toBe(CardType.Unit);
         if (card.type !== CardType.Unit) expect.fail();
         card satisfies UnitCard;
@@ -151,7 +153,7 @@ describe.for<[Player, number]>(
       ([_, cardClass, keyAdd]) => {
         const card = Card.new({
           key: key + keyAdd,
-          class: cardClass,
+          cardClass: cardClass,
           owner,
         });
         expect(LeafCard.is(card)).not.toBe(UnitCard.is(card));
