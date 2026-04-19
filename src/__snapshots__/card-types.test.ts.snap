@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`for cards owned by North with key 0 > Card.new > should produce a stable value for Froglet 1`] = `
+exports[`for cards owned by North with key 0 > Card.create > should produce a stable value for Froglet 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -23,7 +23,7 @@ exports[`for cards owned by North with key 0 > Card.new > should produce a stabl
 }
 `;
 
-exports[`for cards owned by North with key 0 > Card.new > should produce a stable value for LilyPad 1`] = `
+exports[`for cards owned by North with key 0 > Card.create > should produce a stable value for LilyPad 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -41,7 +41,130 @@ exports[`for cards owned by North with key 0 > Card.new > should produce a stabl
 }
 `;
 
-exports[`for cards owned by South with key 1 > Card.new > should produce a stable value for Froglet 1`] = `
+exports[`for cards owned by North with key 0 > LeafCard.create > for the card LilyPad > should produce a stable value for %s 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "LilyPad",
+    "name": "Lily Pad",
+    "stats": {
+      "gives": 0,
+    },
+    "type": "Leaf",
+  },
+  "key": 0,
+  "owner": "North",
+  "type": "Leaf",
+  "values": "None",
+}
+`;
+
+exports[`for cards owned by North with key 0 > UnitCard.create > for the card Froglet > should produce a stable value for %s 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "Froglet",
+    "name": "Froglet",
+    "stats": {
+      "life": 1,
+      "power": 0,
+      "range": 0,
+      "speed": 1,
+    },
+    "type": "Unit",
+  },
+  "key": 0,
+  "owner": "North",
+  "type": "Unit",
+  "values": {
+    "damage": 0,
+  },
+}
+`;
+
+exports[`for cards owned by North with key 3 > Card.create > should produce a stable value for Froglet 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "Froglet",
+    "name": "Froglet",
+    "stats": {
+      "life": 1,
+      "power": 0,
+      "range": 0,
+      "speed": 1,
+    },
+    "type": "Unit",
+  },
+  "key": 3,
+  "owner": "North",
+  "type": "Unit",
+  "values": {
+    "damage": 0,
+  },
+}
+`;
+
+exports[`for cards owned by North with key 3 > Card.create > should produce a stable value for LilyPad 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "LilyPad",
+    "name": "Lily Pad",
+    "stats": {
+      "gives": 0,
+    },
+    "type": "Leaf",
+  },
+  "key": 3,
+  "owner": "North",
+  "type": "Leaf",
+  "values": "None",
+}
+`;
+
+exports[`for cards owned by North with key 3 > LeafCard.create > for the card LilyPad > should produce a stable value for %s 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "LilyPad",
+    "name": "Lily Pad",
+    "stats": {
+      "gives": 0,
+    },
+    "type": "Leaf",
+  },
+  "key": 3,
+  "owner": "North",
+  "type": "Leaf",
+  "values": "None",
+}
+`;
+
+exports[`for cards owned by North with key 3 > UnitCard.create > for the card Froglet > should produce a stable value for %s 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "Froglet",
+    "name": "Froglet",
+    "stats": {
+      "life": 1,
+      "power": 0,
+      "range": 0,
+      "speed": 1,
+    },
+    "type": "Unit",
+  },
+  "key": 3,
+  "owner": "North",
+  "type": "Unit",
+  "values": {
+    "damage": 0,
+  },
+}
+`;
+
+exports[`for cards owned by South with key 1 > Card.create > should produce a stable value for Froglet 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -64,7 +187,7 @@ exports[`for cards owned by South with key 1 > Card.new > should produce a stabl
 }
 `;
 
-exports[`for cards owned by South with key 1 > Card.new > should produce a stable value for LilyPad 1`] = `
+exports[`for cards owned by South with key 1 > Card.create > should produce a stable value for LilyPad 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -79,5 +202,128 @@ exports[`for cards owned by South with key 1 > Card.new > should produce a stabl
   "owner": "South",
   "type": "Leaf",
   "values": "None",
+}
+`;
+
+exports[`for cards owned by South with key 1 > LeafCard.create > for the card LilyPad > should produce a stable value for %s 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "LilyPad",
+    "name": "Lily Pad",
+    "stats": {
+      "gives": 0,
+    },
+    "type": "Leaf",
+  },
+  "key": 1,
+  "owner": "South",
+  "type": "Leaf",
+  "values": "None",
+}
+`;
+
+exports[`for cards owned by South with key 1 > UnitCard.create > for the card Froglet > should produce a stable value for %s 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "Froglet",
+    "name": "Froglet",
+    "stats": {
+      "life": 1,
+      "power": 0,
+      "range": 0,
+      "speed": 1,
+    },
+    "type": "Unit",
+  },
+  "key": 1,
+  "owner": "South",
+  "type": "Unit",
+  "values": {
+    "damage": 0,
+  },
+}
+`;
+
+exports[`for cards owned by South with key 2 > Card.create > should produce a stable value for Froglet 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "Froglet",
+    "name": "Froglet",
+    "stats": {
+      "life": 1,
+      "power": 0,
+      "range": 0,
+      "speed": 1,
+    },
+    "type": "Unit",
+  },
+  "key": 2,
+  "owner": "South",
+  "type": "Unit",
+  "values": {
+    "damage": 0,
+  },
+}
+`;
+
+exports[`for cards owned by South with key 2 > Card.create > should produce a stable value for LilyPad 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "LilyPad",
+    "name": "Lily Pad",
+    "stats": {
+      "gives": 0,
+    },
+    "type": "Leaf",
+  },
+  "key": 2,
+  "owner": "South",
+  "type": "Leaf",
+  "values": "None",
+}
+`;
+
+exports[`for cards owned by South with key 2 > LeafCard.create > for the card LilyPad > should produce a stable value for %s 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "LilyPad",
+    "name": "Lily Pad",
+    "stats": {
+      "gives": 0,
+    },
+    "type": "Leaf",
+  },
+  "key": 2,
+  "owner": "South",
+  "type": "Leaf",
+  "values": "None",
+}
+`;
+
+exports[`for cards owned by South with key 2 > UnitCard.create > for the card Froglet > should produce a stable value for %s 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "Froglet",
+    "name": "Froglet",
+    "stats": {
+      "life": 1,
+      "power": 0,
+      "range": 0,
+      "speed": 1,
+    },
+    "type": "Unit",
+  },
+  "key": 2,
+  "owner": "South",
+  "type": "Unit",
+  "values": {
+    "damage": 0,
+  },
 }
 `;

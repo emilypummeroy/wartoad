@@ -1,70 +1,24 @@
 import {
-  UnitClass,
-  LeafClass,
   UnitCard,
   LeafCard,
   Card,
   CardClass,
   CardType,
   NoneValues,
+  UnitClass,
+  LeafClass,
 } from './card-types';
 import { Player } from './PhaseTracker';
 
-describe('UnitClass.is', () => {
-  it.for<[string, CardClass]>([CardClass.Froglet].map(x => [x.key, x]))(
-    'should allow %s',
-    ([_, cardClass]) => {
-      expect(UnitClass.is(cardClass)).toBe(true);
-      if (!UnitClass.is(cardClass)) expect.fail();
-      cardClass satisfies UnitClass;
-    },
-  );
-
-  it.for<[string, CardClass]>([CardClass.LilyPad].map(x => [x.key, x]))(
-    'should filter %s',
-    ([_, cardClass]) => {
-      expect(UnitClass.is(cardClass)).toBe(false);
-      if (!UnitClass.is(cardClass)) cardClass satisfies LeafClass;
-    },
-  );
-});
-
-describe('LeafClass.is', () => {
-  it.for<[string, CardClass]>([CardClass.LilyPad].map(x => [x.key, x]))(
-    'should allow %s',
-    ([_, cardClass]) => {
-      expect(LeafClass.is(cardClass)).toBe(true);
-      if (LeafClass.is(cardClass)) cardClass satisfies LeafClass;
-    },
-  );
-
-  it.for<[string, CardClass]>([CardClass.Froglet].map(x => [x.key, x]))(
-    'should filter %s',
-    ([_, cardClass]) => {
-      expect(LeafClass.is(cardClass)).toBe(false);
-      if (!LeafClass.is(cardClass)) cardClass satisfies UnitClass;
-    },
-  );
-});
-
-describe('LeafClass.is and UnitClass.is', () => {
-  it.for<[string, CardClass]>(Object.entries(CardClass))(
-    'should together have exhaustive branch coverage for %s',
-    ([_, cardClass]) => {
-      expect(LeafClass.is(cardClass)).not.toBe(UnitClass.is(cardClass));
-      expect(LeafClass.is(cardClass) || UnitClass.is(cardClass)).toBe(true);
-      if (!LeafClass.is(cardClass) && !UnitClass.is(cardClass))
-        cardClass satisfies never;
-    },
-  );
-});
-
-describe.for<[Player, number]>(
-  [Player.North, Player.South].map((x, i) => [x, i]),
-)('for cards owned by %s with key %s', ([owner, key]) => {
+describe.for<[Player, number]>([
+  [Player.North, 0],
+  [Player.South, 1],
+  [Player.South, 2],
+  [Player.North, 3],
+])('for cards owned by %s with key %s', ([owner, key]) => {
   describe('UnitCard.is', () => {
     it.for<[string, number, UnitClass]>(
-      [CardClass.Froglet].map((x, i) => [x.key, i, x]),
+      Object.values(UnitClass).map((x, i) => [x.key, i, x]),
     )('should allow %s with %s damage', ([_, damage, cardClass]) => {
       const card: Card = {
         key,
@@ -77,7 +31,7 @@ describe.for<[Player, number]>(
       if (UnitCard.is(card)) card satisfies UnitCard;
     });
 
-    it.for<[string, LeafClass]>([CardClass.LilyPad].map(x => [x.key, x]))(
+    it.for<[string, LeafClass]>(Object.entries(LeafClass))(
       'should filter %s',
       ([_, cardClass]) => {
         const card: Card = {
@@ -94,7 +48,7 @@ describe.for<[Player, number]>(
   });
 
   describe('LeafCard.is', () => {
-    it.for<[string, LeafClass]>([CardClass.LilyPad].map(x => [x.key, x]))(
+    it.for<[string, LeafClass]>(Object.entries(LeafClass))(
       'should allow %s',
       ([_, cardClass]) => {
         const card: Card = {
@@ -108,9 +62,8 @@ describe.for<[Player, number]>(
         if (LeafCard.is(card)) card satisfies LeafCard;
       },
     );
-
     it.for<[string, number, UnitClass]>(
-      [CardClass.Froglet, CardClass.Froglet].map((x, i) => [x.key, i, x]),
+      Object.values(UnitClass).map((x, i) => [x.key, i, x]),
     )('should filter %s with %s damage', ([_, damage, cardClass]) => {
       const card: Card = {
         key,
@@ -124,20 +77,53 @@ describe.for<[Player, number]>(
     });
   });
 
-  describe('Card.new', () => {
+  describe('UnitCard.create', () => {
+    describe.for<[string, UnitClass]>(Object.entries(UnitClass))(
+      'for the card %s',
+      ([_, cardClass]) => {
+        it('should produce a stable value for %s', () => {
+          expect(
+            Card.create({ key, cardClass: cardClass, owner }),
+          ).toMatchSnapshot();
+        });
+
+        it('should create it with 0 damage', () => {
+          const card = Card.create({ key, cardClass: cardClass, owner });
+          expect(card.type).toBe(CardType.Unit);
+          if (card.type !== CardType.Unit) expect.fail();
+          card satisfies UnitCard;
+        });
+      },
+    );
+  });
+
+  describe('LeafCard.create', () => {
+    describe.for<[string, LeafClass]>(Object.entries(LeafClass))(
+      'for the card %s',
+      ([_, cardClass]) => {
+        it('should produce a stable value for %s', () => {
+          expect(
+            Card.create({ key, cardClass: cardClass, owner }),
+          ).toMatchSnapshot();
+        });
+      },
+    );
+  });
+
+  describe('Card.create', () => {
     it.for<[string, CardClass]>(Object.entries(CardClass))(
       'should produce a stable value for %s',
       ([_, cardClass]) => {
         expect(
-          Card.new({ key, cardClass: cardClass, owner }),
+          Card.create({ key, cardClass: cardClass, owner }),
         ).toMatchSnapshot();
       },
     );
 
-    it.for<[string, UnitClass]>([CardClass.Froglet].map(x => [x.key, x]))(
+    it.for<[string, UnitClass]>(Object.entries(UnitClass))(
       'should create a %s with 0 damage',
       ([_, cardClass]) => {
-        const card = Card.new({ key, cardClass: cardClass, owner });
+        const card = Card.create({ key, cardClass: cardClass, owner });
         expect(card.type).toBe(CardType.Unit);
         if (card.type !== CardType.Unit) expect.fail();
         card satisfies UnitCard;
@@ -145,13 +131,13 @@ describe.for<[Player, number]>(
     );
   });
 
-  describe('LeafCard.is, UnitCard.is, and Card.new', () => {
+  describe('LeafCard.is, UnitCard.is, and Card.create', () => {
     it.for<[string, CardClass, number]>(
       Object.entries(CardClass).map(([k, c], i) => [k, c, i]),
     )(
       'should together have exhaustive branch coverage for %s',
       ([_, cardClass, keyAdd]) => {
-        const card = Card.new({
+        const card = Card.create({
           key: key + keyAdd,
           cardClass: cardClass,
           owner,

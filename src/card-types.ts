@@ -67,8 +67,8 @@ export type CardClassOf<T extends CardType> = {
 
 // CardKey is the canonical key for a CardClass
 export type CardKey = UnitKey | LeafKey;
-export type UnitKey = keyof typeof _UnitClass;
-export type LeafKey = keyof typeof _LeafClass;
+export type UnitKey = keyof typeof UnitClass;
+export type LeafKey = keyof typeof LeafClass;
 export type CardKeyOf<T extends CardType> = T extends Unit
   ? UnitKey
   : T extends Leaf
@@ -86,63 +86,8 @@ export type CardValuesOf<T extends CardType> = T extends Unit
     ? LeafValues
     : never;
 
-export const NoneValues = 'None' as const;
-
-export const UnitCard = {
-  is: (card: Card): card is UnitCard =>
-    card.type === CardType.Unit && Boolean(card satisfies UnitCard),
-};
-
-export const LeafCard = {
-  is: (card: Card): card is LeafCard =>
-    card.type === CardType.Leaf && Boolean(card satisfies LeafCard),
-};
-
+// All the classes of cards.
 export const UnitClass = {
-  is: (cardClass: CardClass): cardClass is UnitClass =>
-    cardClass.type === CardType.Unit && Boolean(cardClass satisfies UnitClass),
-};
-
-export const LeafClass = {
-  is: (cardClass: CardClass): cardClass is LeafClass =>
-    cardClass.type === CardType.Leaf && Boolean(cardClass satisfies LeafClass),
-};
-
-export const Card = {
-  new: ({
-    cardClass,
-    ...baseData
-  }: {
-    readonly key: number;
-    readonly cardClass: CardClass;
-    readonly owner: Player;
-  }): Card => {
-    switch (cardClass.type) {
-      case CardType.Unit:
-        return {
-          ...baseData,
-          type: CardType.Unit,
-          cardClass: cardClass,
-          values: initialValues[cardClass.key],
-        };
-      case CardType.Leaf:
-        return {
-          ...baseData,
-          type: CardType.Leaf,
-          cardClass: cardClass,
-          values: initialValues[cardClass.key],
-        };
-      // v8 ignore start
-      default:
-        cardClass satisfies never;
-        throw new Error('Inexhaustive branch coverage');
-      // v8 ignore stop
-    }
-  },
-};
-
-// All the classes of unit cards
-const _UnitClass = {
   Froglet: {
     key: 'Froglet',
     name: 'Froglet',
@@ -154,12 +99,11 @@ const _UnitClass = {
       power: 0,
       range: 0,
     },
-  },
-} as const;
-_UnitClass satisfies Record<UnitKey, UnitClass>;
+  } as const,
+};
+UnitClass satisfies Record<UnitKey, UnitClass>;
 
-// All the classes of leaf cards
-const _LeafClass = {
+export const LeafClass = {
   LilyPad: {
     key: 'LilyPad',
     name: 'Lily Pad',
@@ -168,9 +112,55 @@ const _LeafClass = {
     stats: { gives: 0 },
   },
 } as const;
-_LeafClass satisfies Record<LeafKey, LeafClass>;
+LeafClass satisfies Record<LeafKey, LeafClass>;
 
-export const CardClass = { ..._UnitClass, ..._LeafClass } as const;
+export const NoneValues = 'None' as const;
+const INITIAL_VALUES = {
+  [CardType.Leaf]: NoneValues,
+  [CardType.Unit]: { damage: 0 },
+} as const satisfies Record<Unit, UnitValues> & Record<Leaf, LeafValues>;
+
+export const UnitCard = {
+  is: (card: Card): card is UnitCard =>
+    card.type === CardType.Unit && Boolean(card satisfies UnitCard),
+
+  create: ({
+    cardClass,
+    ...baseData
+  }: {
+    readonly key: number;
+    readonly cardClass: UnitClass;
+    readonly owner: Player;
+  }): UnitCard => ({
+    type: CardType.Unit,
+    cardClass,
+    values: INITIAL_VALUES[CardType.Unit],
+    ...baseData,
+  }),
+} as const;
+
+// All the classes of leaf cards
+
+export const LeafCard = {
+  is: (card: Card): card is LeafCard =>
+    card.type === CardType.Leaf && Boolean(card satisfies LeafCard),
+
+  create: ({
+    cardClass,
+    ...baseData
+  }: {
+    readonly key: number;
+    readonly cardClass: LeafClass;
+    readonly owner: Player;
+  }): LeafCard => ({
+    type: CardType.Leaf,
+    cardClass,
+    values: INITIAL_VALUES[CardType.Leaf],
+    ...baseData,
+  }),
+} as const;
+
+export const CardClass = { ...UnitClass, ...LeafClass } as const;
 CardClass satisfies Record<UnitKey, UnitClass>;
 CardClass satisfies Record<LeafKey, LeafClass>;
 CardClass satisfies Record<CardKey, CardClass>;
@@ -181,13 +171,24 @@ CardClass satisfies {
   };
 };
 
-const initialValues: {
-  [K in CardKey]: K extends UnitKey
-    ? UnitValues
-    : K extends LeafKey
-      ? LeafValues
-      : never;
-} = {
-  [CardClass.Froglet.key]: { damage: 0 },
-  [CardClass.LilyPad.key]: NoneValues,
+type BaseData = {
+  readonly key: number;
+  readonly cardClass: CardClass;
+  readonly owner: Player;
 };
+
+export const Card = {
+  create: ({ cardClass, ...baseData }: BaseData): Card => {
+    switch (cardClass.type) {
+      case CardType.Unit:
+        return UnitCard.create({ ...baseData, cardClass });
+      case CardType.Leaf:
+        return LeafCard.create({ ...baseData, cardClass });
+      // v8 ignore start
+      default:
+        cardClass satisfies never;
+        throw new Error('Inexhaustive branch coverage');
+      // v8 ignore stop
+    }
+  },
+} as const;
