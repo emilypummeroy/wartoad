@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
-import { App } from './App';
+import { DeterministicApp } from './App';
 import { Position } from './Grid';
 import { Phase, Player } from './PhaseTracker';
 
@@ -15,8 +15,8 @@ describe('the dom test environment', () => {
   });
 });
 
-describe(`${App.name} Deterministic`, () => {
-  beforeEach(() => render(<App isDeterministic />));
+describe(DeterministicApp, () => {
+  beforeEach(() => render(<DeterministicApp />));
 
   const getThe = {
     header: () => screen.getByRole('banner'),
