@@ -9,8 +9,8 @@ import { CardClass } from './types/card-class';
 import { Phase, Player, PLAYER_CLASSNAME, Subphase } from './types/gameflow';
 
 export function Game() {
-  const {
-    state: {
+  const [
+    {
       flow: { phase, player, subphase },
       flow,
       grid,
@@ -18,10 +18,8 @@ export function Game() {
       southHand,
       pickedCard,
     },
-    endPhase,
-    pickCard,
-    placeCard,
-  } = useContext(GameContext);
+    { endPhase, pickCard, placeCard },
+  ] = useContext(GameContext);
 
   return (
     <div role="application" aria-label="Wartoad" className="wartoad-app">

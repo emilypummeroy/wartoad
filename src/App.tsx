@@ -2,13 +2,14 @@ import './App.css';
 import { useCallback, useRef, useState } from 'react';
 
 import {
+  DEFAULT_GAME_STATE,
   GameContext,
   shuffledDeterministicStartingHand,
   type GameState,
 } from './context/GameContext';
 import { Game } from './Game';
 import { createUnit } from './state/card';
-import { INITIAL_POND, setPondStateAt } from './state/pond';
+import { setPondStateAt } from './state/pond';
 import { CardClass, CardType, UnitClass } from './types/card-class';
 import {
   Phase,
@@ -153,28 +154,26 @@ const useCardKeys = () => {
 
 export function DeterministicApp() {
   const [state, setGameState] = useState<Readonly<GameState>>({
-    flow: {
-      phase: Phase.Main,
-      player: Player.South,
-      subphase: Subphase.Idle,
-    },
-    grid: INITIAL_POND,
+    ...DEFAULT_GAME_STATE,
     northHand: shuffledDeterministicStartingHand(),
     southHand: shuffledDeterministicStartingHand(),
   });
+
   const { getNext } = useCardKeys();
-  const context: GameContext = {
+  const context: GameContext = [
     state,
-    endPhase: useCallback(() => setGameState(endPhaseDeterministic), []),
-    pickCard: useCallback(
-      (cardClass: CardClass) => setGameState(pickCard(cardClass)),
-      [],
-    ),
-    placeCard: useCallback(
-      (position: Position) => setGameState(placeCard(position, getNext)),
-      [getNext],
-    ),
-  };
+    {
+      endPhase: useCallback(() => setGameState(endPhaseDeterministic), []),
+      pickCard: useCallback(
+        (cardClass: CardClass) => setGameState(pickCard(cardClass)),
+        [],
+      ),
+      placeCard: useCallback(
+        (position: Position) => setGameState(placeCard(position, getNext)),
+        [getNext],
+      ),
+    },
+  ];
 
   return (
     <GameContext value={context}>
@@ -185,28 +184,26 @@ export function DeterministicApp() {
 
 export function App() {
   const [state, setGameState] = useState<Readonly<GameState>>({
-    flow: {
-      phase: Phase.Main,
-      player: Player.South,
-      subphase: Subphase.Idle,
-    },
-    grid: INITIAL_POND,
+    ...DEFAULT_GAME_STATE,
     northHand: Array.from({ length: INITIAL_HAND_CARD_COUNT }, randomCard),
     southHand: Array.from({ length: INITIAL_HAND_CARD_COUNT }, randomCard),
   });
+
   const { getNext } = useCardKeys();
-  const context: GameContext = {
+  const context: GameContext = [
     state,
-    endPhase: useCallback(() => setGameState(nextPhaseRandom), []),
-    pickCard: useCallback(
-      (cardClass: CardClass) => setGameState(pickCard(cardClass)),
-      [],
-    ),
-    placeCard: useCallback(
-      (position: Position) => setGameState(placeCard(position, getNext)),
-      [getNext],
-    ),
-  };
+    {
+      endPhase: useCallback(() => setGameState(nextPhaseRandom), []),
+      pickCard: useCallback(
+        (cardClass: CardClass) => setGameState(pickCard(cardClass)),
+        [],
+      ),
+      placeCard: useCallback(
+        (position: Position) => setGameState(placeCard(position, getNext)),
+        [getNext],
+      ),
+    },
+  ];
 
   return (
     <GameContext value={context}>
