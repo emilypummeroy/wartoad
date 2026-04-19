@@ -8,8 +8,9 @@ import {
   shuffledDeterministicStartingHand,
   type GameState,
 } from './Game';
-import { type Position, INITIAL_GRID, GridState } from './Grid';
+import { INITIAL_GRID, GridState } from './Grid';
 import { Phase, Player, Subphase } from './PhaseTracker';
+import type { Position } from './position';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 

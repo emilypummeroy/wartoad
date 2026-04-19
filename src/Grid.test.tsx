@@ -6,10 +6,9 @@ import {
   INITIAL_GRID,
   FIELD_COUNT_PER_ROW,
   ROW_COUNT_PER_PLAYER,
-  ROW_COUNT,
-  HOME,
 } from './Grid';
 import { Phase, Player, Subphase } from './PhaseTracker';
+import { HOME, ROW_COUNT } from './position';
 import type { ZoneState } from './Zone';
 
 const UPGRADED = { units: [], isUpgraded: true };

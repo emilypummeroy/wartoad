@@ -1,8 +1,8 @@
 import { fireEvent, screen, render } from '@testing-library/react';
 
 import { createUnit, UnitClass } from './card-types';
-import { HOME, type Position } from './Grid';
 import { Subphase, Phase, Player } from './PhaseTracker';
+import { HOME, type Position } from './position';
 import { Zone } from './Zone';
 
 const { Start, Main, End } = Phase;

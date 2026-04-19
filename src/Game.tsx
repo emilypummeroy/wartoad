@@ -2,7 +2,7 @@ import { createContext, useContext, type ReactNode } from 'react';
 
 import { Froglet, LilyPad } from './Card';
 import { CardClass } from './card-types';
-import { Grid, INITIAL_GRID, type GridState, type Position } from './Grid';
+import { Grid, INITIAL_GRID, type GridState } from './Grid';
 import { Hand } from './Hand';
 import {
   Phase,
@@ -11,6 +11,7 @@ import {
   Subphase,
   type FlowState,
 } from './PhaseTracker';
+import type { Position } from './position';
 
 export type GameState = {
   readonly flow: FlowState;

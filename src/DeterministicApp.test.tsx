@@ -1,8 +1,8 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { DeterministicApp } from './App';
-import { HOME } from './Grid';
 import { Phase, Player } from './PhaseTracker';
+import { HOME } from './position';
 
 const MANY = 15;
 

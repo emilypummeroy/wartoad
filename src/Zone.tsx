@@ -3,8 +3,8 @@ import { useId, useCallback } from 'react';
 
 import { CardBack, Froglet, LilyPad } from './Card';
 import { type UnitCard } from './card-types';
-import { type Position, HOME, positionsEqual } from './Grid';
 import { Player, Subphase, type FlowState } from './PhaseTracker';
+import { type Position, HOME, positionsEqual } from './position';
 
 export type ZoneState = Readonly<{
   units: readonly UnitCard[];

@@ -1,24 +1,9 @@
 import { Player, type FlowState } from './PhaseTracker';
+import { ROW_COUNT, type Position } from './position';
 import { Zone, type ZoneState } from './Zone';
 
-export const ROW_COUNT = 6 as const;
 export const ROW_COUNT_PER_PLAYER = 3 as const;
 export const FIELD_COUNT_PER_ROW = 3 as const;
-
-// TODO 9: Extract to position.ts
-// It should handle distance calculation as well.
-export type Position = {
-  readonly x: number;
-  readonly y: number;
-};
-export const positionsEqual = (
-  { x: x1, y: y1 }: Position,
-  { x: x2, y: y2 }: Position,
-) => x1 === x2 && y1 === y2;
-export const HOME = {
-  [Player.North]: { x: 1, y: 0 },
-  [Player.South]: { x: 1, y: ROW_COUNT - 1 },
-};
 
 export type GridState = readonly [
   readonly [ZoneState, ZoneState, ZoneState],
