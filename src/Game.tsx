@@ -8,28 +8,6 @@ import { GameContext } from './context/GameContext';
 import { CardClass } from './types/card-class';
 import { Phase, Player, PLAYER_CLASSNAME, Subphase } from './types/gameflow';
 
-function PickedCard({
-  owner,
-  children,
-}: {
-  readonly owner: Player;
-  readonly children: ReactNode;
-}) {
-  return (
-    <section className="card-display" aria-labelledby="picked-card">
-      <h3 id="picked-card">Picked card</h3>
-      <div className="zoom-row">
-        <div
-          className={`zooming highlighting-card ${PLAYER_CLASSNAME[owner]}`}
-          tabIndex={0}
-        >
-          {children}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export function Game() {
   const {
     state: {
@@ -87,5 +65,27 @@ export function Game() {
         </div>
       </main>
     </div>
+  );
+}
+
+function PickedCard({
+  owner,
+  children,
+}: {
+  readonly owner: Player;
+  readonly children: ReactNode;
+}) {
+  return (
+    <section className="card-display" aria-labelledby="picked-card">
+      <h3 id="picked-card">Picked card</h3>
+      <div className="zoom-row">
+        <div
+          className={`zooming highlighting-card ${PLAYER_CLASSNAME[owner]}`}
+          tabIndex={0}
+        >
+          {children}
+        </div>
+      </div>
+    </section>
   );
 }
