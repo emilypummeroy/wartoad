@@ -60,6 +60,7 @@ const shuffled = (cards: readonly CardClass[]): CardClass[] => {
 export const shuffledDeterministicStartingHand = () =>
   shuffled(DETERMINISTIC_STARTING_HAND);
 
+// TODO 10: Unit test the context and default values
 export const GameContext = createContext<GameContext>({
   state: {
     flow: {

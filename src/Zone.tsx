@@ -4,7 +4,7 @@ import { useId, useCallback } from 'react';
 import { CardBack, Froglet, LilyPad } from './Card';
 import { type UnitCard } from './card-types';
 import { Player, Subphase, type FlowState } from './PhaseTracker';
-import { type Position, HOME, positionsEqual } from './position';
+import { type Position, HOME, positionsAreEqual } from './position';
 
 export type ZoneState = Readonly<{
   units: readonly UnitCard[];
@@ -35,7 +35,7 @@ export function Zone({
   const isDeployDropzone =
     subphase === Subphase.Deploying && position.y === HOME[player].y;
   // TODO 9: Activation dropzone
-  const isHome = positionsEqual(HOME[controller], position);
+  const isHome = positionsAreEqual(HOME[controller], position);
   const buttonId = useId();
   const leafNameId = useId();
   const leafSymbolId = useId();
