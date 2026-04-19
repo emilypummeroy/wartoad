@@ -16,16 +16,8 @@ export type CardOf<T extends CardType> = {
   readonly type: T;
   readonly key: number;
   readonly owner: Player;
-  readonly cardClass: T extends Unit
-    ? UnitClass
-    : T extends Leaf
-      ? LeafClass
-      : never;
-  readonly values: T extends Unit
-    ? UnitValues
-    : T extends Leaf
-      ? LeafValues
-      : never;
+  readonly cardClass: CardClassOf<T>;
+  readonly values: CardValuesOf<T>;
 };
 
 // All cards are either Leaves or Units.
@@ -51,6 +43,11 @@ export type UnitStats = {
 export type LeafStats = {
   readonly gives: number;
 };
+export type CardStatsOf<T extends CardType> = T extends Unit
+  ? UnitStats
+  : T extends Leaf
+    ? LeafStats
+    : never;
 
 // A card class is the category of cards with a particular set of details.
 // An individual card is an instance of a card class.
@@ -62,26 +59,33 @@ export type UnitClass = CardClassOf<Unit>;
 export type LeafClass = CardClassOf<Leaf>;
 export type CardClassOf<T extends CardType> = {
   readonly type: T;
-  readonly key: T extends Unit ? UnitKey : T extends Leaf ? LeafKey : never;
+  readonly key: CardKeyOf<T>;
   readonly name: string;
   readonly cost: number;
-  readonly stats: T extends Unit
-    ? UnitStats
-    : T extends Leaf
-      ? LeafStats
-      : never;
+  readonly stats: CardStatsOf<T>;
 };
 
 // CardKey is the canonical key for a CardClass
 export type CardKey = UnitKey | LeafKey;
 export type UnitKey = keyof typeof _UnitClass;
 export type LeafKey = keyof typeof _LeafClass;
+export type CardKeyOf<T extends CardType> = T extends Unit
+  ? UnitKey
+  : T extends Leaf
+    ? LeafKey
+    : never;
 
 // Individual cards have values attached to them which change over time.
 // For example, units take damage.
 export type CardValues = UnitValues | LeafValues;
 export type UnitValues = { readonly damage: number };
 export type LeafValues = typeof NoneValues;
+export type CardValuesOf<T extends CardType> = T extends Unit
+  ? UnitValues
+  : T extends Leaf
+    ? LeafValues
+    : never;
+
 export const NoneValues = 'None' as const;
 
 export const UnitCard = {
