@@ -2,7 +2,7 @@ import './App.css';
 import { useCallback, useRef, useState, type ReactNode } from 'react';
 
 import { Froglet, LilyPad } from './Card';
-import { CardClass, CardType, UnitCard, UnitClass } from './card-types';
+import { CardClass, CardType, createUnit, UnitClass } from './card-types';
 import { type Position, INITIAL_GRID, GridState, Grid } from './Grid';
 import { Hand } from './Hand';
 import {
@@ -142,7 +142,7 @@ const gameStateForCardPlaced =
             isUpgraded,
             units: [
               ...units,
-              UnitCard.create({
+              createUnit({
                 cardClass: UnitClass.Froglet,
                 owner: player,
                 key: getNextCardKey(),
@@ -171,8 +171,9 @@ const useCardKeys = () => {
   }, [previousCardKey]);
 };
 
+// TODO 9: Split into App and Game
 export function App({
-  // TODO 9: Move into a context
+  // TODO 10: Move into a context
   isDeterministic = false,
 }: {
   readonly isDeterministic?: boolean;

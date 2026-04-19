@@ -1,6 +1,6 @@
 import { fireEvent, screen, render } from '@testing-library/react';
 
-import { UnitCard, UnitClass } from './card-types';
+import { createUnit, UnitClass } from './card-types';
 import { Position } from './Grid';
 import { Subphase, Phase, Player } from './PhaseTracker';
 import { Zone } from './Zone';
@@ -18,7 +18,7 @@ const NOOP = () => {};
 
 const nFrogletsOwnedBy = (n: number, owner: Player) =>
   Array.from({ length: n }, (_, i) =>
-    UnitCard.create({
+    createUnit({
       cardClass: UnitClass.Froglet,
       key: i,
       owner,
@@ -27,7 +27,7 @@ const nFrogletsOwnedBy = (n: number, owner: Player) =>
 
 const nFrogletsOwnedByAlternating = (n: number, firstPlayer: Player) =>
   Array.from({ length: n }, (_, i) =>
-    UnitCard.create({
+    createUnit({
       cardClass: UnitClass.Froglet,
       key: i,
       owner: [firstPlayer, Player.AFTER[firstPlayer]][i % 2],

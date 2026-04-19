@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`for cards owned by North with key 0 > Card.create > should produce a stable value for Froglet 1`] = `
+exports[`for cards owned by North with key 0 > createCard > should produce a stable value for Froglet 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -23,7 +23,7 @@ exports[`for cards owned by North with key 0 > Card.create > should produce a st
 }
 `;
 
-exports[`for cards owned by North with key 0 > Card.create > should produce a stable value for LilyPad 1`] = `
+exports[`for cards owned by North with key 0 > createCard > should produce a stable value for LilyPad 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -41,7 +41,7 @@ exports[`for cards owned by North with key 0 > Card.create > should produce a st
 }
 `;
 
-exports[`for cards owned by North with key 0 > LeafCard.create > for the card LilyPad > should produce a stable value for %s 1`] = `
+exports[`for cards owned by North with key 0 > createLeaf > for the card LilyPad > should produce a stable value for %s 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -59,7 +59,7 @@ exports[`for cards owned by North with key 0 > LeafCard.create > for the card Li
 }
 `;
 
-exports[`for cards owned by North with key 0 > UnitCard.create > for the card Froglet > should produce a stable value for %s 1`] = `
+exports[`for cards owned by North with key 0 > createUnit > for the card Froglet > should produce a stable value for %s 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -82,7 +82,7 @@ exports[`for cards owned by North with key 0 > UnitCard.create > for the card Fr
 }
 `;
 
-exports[`for cards owned by North with key 3 > Card.create > should produce a stable value for Froglet 1`] = `
+exports[`for cards owned by North with key 3 > createCard > should produce a stable value for Froglet 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -105,7 +105,7 @@ exports[`for cards owned by North with key 3 > Card.create > should produce a st
 }
 `;
 
-exports[`for cards owned by North with key 3 > Card.create > should produce a stable value for LilyPad 1`] = `
+exports[`for cards owned by North with key 3 > createCard > should produce a stable value for LilyPad 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -123,7 +123,7 @@ exports[`for cards owned by North with key 3 > Card.create > should produce a st
 }
 `;
 
-exports[`for cards owned by North with key 3 > LeafCard.create > for the card LilyPad > should produce a stable value for %s 1`] = `
+exports[`for cards owned by North with key 3 > createLeaf > for the card LilyPad > should produce a stable value for %s 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -141,7 +141,7 @@ exports[`for cards owned by North with key 3 > LeafCard.create > for the card Li
 }
 `;
 
-exports[`for cards owned by North with key 3 > UnitCard.create > for the card Froglet > should produce a stable value for %s 1`] = `
+exports[`for cards owned by North with key 3 > createUnit > for the card Froglet > should produce a stable value for %s 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -164,7 +164,7 @@ exports[`for cards owned by North with key 3 > UnitCard.create > for the card Fr
 }
 `;
 
-exports[`for cards owned by South with key 1 > Card.create > should produce a stable value for Froglet 1`] = `
+exports[`for cards owned by South with key 1 > createCard > should produce a stable value for Froglet 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -187,7 +187,7 @@ exports[`for cards owned by South with key 1 > Card.create > should produce a st
 }
 `;
 
-exports[`for cards owned by South with key 1 > Card.create > should produce a stable value for LilyPad 1`] = `
+exports[`for cards owned by South with key 1 > createCard > should produce a stable value for LilyPad 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -205,7 +205,7 @@ exports[`for cards owned by South with key 1 > Card.create > should produce a st
 }
 `;
 
-exports[`for cards owned by South with key 1 > LeafCard.create > for the card LilyPad > should produce a stable value for %s 1`] = `
+exports[`for cards owned by South with key 1 > createLeaf > for the card LilyPad > should produce a stable value for %s 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -223,7 +223,7 @@ exports[`for cards owned by South with key 1 > LeafCard.create > for the card Li
 }
 `;
 
-exports[`for cards owned by South with key 1 > UnitCard.create > for the card Froglet > should produce a stable value for %s 1`] = `
+exports[`for cards owned by South with key 1 > createUnit > for the card Froglet > should produce a stable value for %s 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -246,7 +246,7 @@ exports[`for cards owned by South with key 1 > UnitCard.create > for the card Fr
 }
 `;
 
-exports[`for cards owned by South with key 2 > Card.create > should produce a stable value for Froglet 1`] = `
+exports[`for cards owned by South with key 2 > createCard > should produce a stable value for Froglet 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -269,7 +269,7 @@ exports[`for cards owned by South with key 2 > Card.create > should produce a st
 }
 `;
 
-exports[`for cards owned by South with key 2 > Card.create > should produce a stable value for LilyPad 1`] = `
+exports[`for cards owned by South with key 2 > createCard > should produce a stable value for LilyPad 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -287,7 +287,7 @@ exports[`for cards owned by South with key 2 > Card.create > should produce a st
 }
 `;
 
-exports[`for cards owned by South with key 2 > LeafCard.create > for the card LilyPad > should produce a stable value for %s 1`] = `
+exports[`for cards owned by South with key 2 > createLeaf > for the card LilyPad > should produce a stable value for %s 1`] = `
 {
   "cardClass": {
     "cost": 0,
@@ -305,7 +305,7 @@ exports[`for cards owned by South with key 2 > LeafCard.create > for the card Li
 }
 `;
 
-exports[`for cards owned by South with key 2 > UnitCard.create > for the card Froglet > should produce a stable value for %s 1`] = `
+exports[`for cards owned by South with key 2 > createUnit > for the card Froglet > should produce a stable value for %s 1`] = `
 {
   "cardClass": {
     "cost": 0,
