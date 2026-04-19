@@ -46,6 +46,9 @@ export type FlowState = {
   readonly subphase: Subphase;
 };
 
+// TODO 25 ActivationStep
+
+// TODO 9: Tests for Activation subphase
 export function PhaseTracker({
   flow: { player, phase, subphase },
   onNextPhaseClicked,

@@ -1,7 +1,7 @@
 import { fireEvent, screen, render } from '@testing-library/react';
 
 import { createUnit, UnitClass } from './card-types';
-import { Position } from './Grid';
+import { HOME, type Position } from './Grid';
 import { Subphase, Phase, Player } from './PhaseTracker';
 import { Zone } from './Zone';
 
@@ -136,7 +136,7 @@ describe(Zone, () => {
     "when upgraded in their %s's home position with %s %s units",
     ([controller, unitCount, unitOwner]) => {
       beforeEach(() => {
-        const position = Position.HOME[controller];
+        const position = HOME[controller];
         const units = nFrogletsOwnedBy(unitCount, unitOwner);
         render(
           <Zone
@@ -168,10 +168,10 @@ describe(Zone, () => {
   describe.for<
     [turn: Player, zone: Player, upgraded: boolean, Position, units: number]
   >([
-    [South, North, true, Position.HOME[North], 0],
+    [South, North, true, HOME[North], 0],
     [South, North, true, { x: 1, y: 0 }, 1],
     [South, North, false, { x: 1, y: 2 }, 2],
-    [North, South, true, Position.HOME[South], 2],
+    [North, South, true, HOME[South], 2],
     [North, South, true, { x: 0, y: 5 }, 0],
     [North, South, false, { x: 2, y: 4 }, 1],
   ])(
@@ -215,14 +215,14 @@ describe(Zone, () => {
   );
 
   describe.for<[Player, Position, units: number]>([
-    [North, Position.HOME[North], 0],
+    [North, HOME[North], 0],
     [North, { x: 2, y: 0 }, 1],
     [North, { x: 1, y: 1 }, 2],
     [North, { x: 0, y: 2 }, 3],
     [North, { x: 1, y: 3 }, 4],
     [North, { x: 2, y: 4 }, 5],
     [North, { x: 0, y: 5 }, 6],
-    [South, Position.HOME[South], 6],
+    [South, HOME[South], 6],
     [South, { x: 0, y: 0 }, 5],
     [South, { x: 1, y: 1 }, 4],
     [South, { x: 2, y: 2 }, 0],
@@ -358,10 +358,10 @@ describe(Zone, () => {
     [Player, Position, isUpgraded: boolean, units: number, string, string]
   >([
     [North, { x: 0, y: 0 }, false, 0, 'controlled', 'leaf'],
-    [North, Position.HOME.North, true, 1, 'Home', 'Lily Pad'],
+    [North, HOME.North, true, 1, 'Home', 'Lily Pad'],
     [North, { x: 2, y: 0 }, true, 2, 'controlled', 'Lily Pad'],
     [South, { x: 0, y: 5 }, true, 2, 'controlled', 'Lily Pad'],
-    [South, Position.HOME.South, true, 5, 'Home', 'Lily Pad'],
+    [South, HOME.South, true, 5, 'Home', 'Lily Pad'],
     [South, { x: 2, y: 5 }, false, 6, 'controlled', 'leaf'],
   ])(
     "in %s's home row position %s while Deploying | isUpgraded: %s | unitCount: %s",

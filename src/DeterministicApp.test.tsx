@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { DeterministicApp } from './App';
-import { Position } from './Grid';
+import { HOME } from './Grid';
 import { Phase, Player } from './PhaseTracker';
 
 const MANY = 15;
@@ -28,7 +28,7 @@ describe(DeterministicApp, () => {
     pickedCardNamed: (name: string) =>
       withinThe.pickedCardDisplay().getByRole('region', { name }),
     playArea: () => withinThe.main().getByRole('grid'),
-    homeRow: (player: Player) => getThe.nthRow(Position.HOME[player].y),
+    homeRow: (player: Player) => getThe.nthRow(HOME[player].y),
     nthRow: (n: number) => withinThe.playArea().getAllByRole('row')[n],
     homeLeafDropzone: (player: Player) =>
       withinThe.homeRow(player).getByRole('button', {
@@ -320,8 +320,8 @@ describe(DeterministicApp, () => {
           offset => {
             const targetRow =
               player === North
-                ? Position.HOME[North].y + offset
-                : Position.HOME[South].y - offset;
+                ? HOME[North].y + offset
+                : HOME[South].y - offset;
             expect(queryA.nthRowDropzone(targetRow)).not.toBeInTheDocument();
           },
         );

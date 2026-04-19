@@ -3,7 +3,7 @@ import { useId, useCallback } from 'react';
 
 import { CardBack, Froglet, LilyPad } from './Card';
 import { type UnitCard } from './card-types';
-import { Position } from './Grid';
+import { type Position, HOME, positionsEqual } from './Grid';
 import { Player, Subphase, type FlowState } from './PhaseTracker';
 
 export type ZoneState = Readonly<{
@@ -17,6 +17,8 @@ type ZoneProps = Readonly<{
   controller: Player;
   position: Position;
   zone: ZoneState;
+  // TODO 9: Get from context
+  // TODO 9: onUpgrade, onDeploy, onCommitActivation
   onPlace: (position: Position) => void;
 }>;
 
@@ -31,9 +33,9 @@ export function Zone({
   const isUpgradeDropzone =
     subphase === Subphase.Upgrading && !isUpgraded && player === controller;
   const isDeployDropzone =
-    subphase === Subphase.Deploying && position.y === Position.HOME[player].y;
-  // 9: Activation dropzone
-  const isHome = Position.equals(Position.HOME[controller], position);
+    subphase === Subphase.Deploying && position.y === HOME[player].y;
+  // TODO 9: Activation dropzone
+  const isHome = positionsEqual(HOME[controller], position);
   const buttonId = useId();
   const leafNameId = useId();
   const leafSymbolId = useId();

@@ -7,7 +7,7 @@ import {
   FIELD_COUNT_PER_ROW,
   ROW_COUNT_PER_PLAYER,
   ROW_COUNT,
-  Position,
+  HOME,
 } from './Grid';
 import { Phase, Player, Subphase } from './PhaseTracker';
 import type { ZoneState } from './Zone';
@@ -54,12 +54,12 @@ describe(Grid, () => {
       : screen.getAllByRole('row').slice(0, ROW_COUNT_PER_PLAYER);
   const getHomeRow = (player: Player) =>
     player === Player.North
-      ? screen.getAllByRole('row')[Position.HOME[Player.North].y]
-      : screen.getAllByRole('row')[Position.HOME[Player.South].y];
+      ? screen.getAllByRole('row')[HOME[Player.North].y]
+      : screen.getAllByRole('row')[HOME[Player.South].y];
   const getNonHomeRows = (player: Player) =>
     player === Player.North
-      ? screen.getAllByRole('row').slice(Position.HOME[Player.North].y + 1)
-      : screen.getAllByRole('row').slice(0, Position.HOME[Player.South].y);
+      ? screen.getAllByRole('row').slice(HOME[Player.North].y + 1)
+      : screen.getAllByRole('row').slice(0, HOME[Player.South].y);
 
   describe.for<[name: string, GridState]>([
     ['INITIAL_GRID_STATE', INITIAL_GRID],

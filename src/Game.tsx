@@ -36,8 +36,14 @@ export const DETERMINISTIC_STARTING_HAND = [
 export type GameContext = {
   readonly state: GameState;
   readonly endPhase: () => void;
+  // No different pickUnit, pickLeaf, etc.
+  // The difference between activation and upgrading is not the concern of
+  // Hand or Card.
   readonly pickCard: (_: CardClass) => void;
+  // TODO 10: onUpgrade, onDeploy,
   readonly placeCard: (_: Position) => void;
+  // TODO 9: activate(card)
+  // TODO 9: commitActivation(position)
 };
 
 // TODO 11: Make generic
