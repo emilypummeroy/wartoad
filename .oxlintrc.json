@@ -55,7 +55,7 @@
   },
   "overrides": [
     {
-      "files": ["**/*.tsx"],
+      "files": ["**/*.tsx", "src/context/*Context.ts"],
       "plugins": ["react"],
       "rules": {
         "filename-case": [

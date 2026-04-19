@@ -1,9 +1,8 @@
-import './App.css';
 import { useCallback, useId } from 'react';
 
-import { CardBack, Froglet, LilyPad } from './Card';
-import { CardClass, type CardKey } from './card-types';
-import { Player } from './PhaseTracker';
+import { CardBack, Froglet, LilyPad } from '../base/Card';
+import { CardClass, type CardKey } from '../types/card-class';
+import { Player, PLAYER_CLASSNAME } from '../types/gameflow';
 
 export const INITIAL_HAND_SIZE = 7;
 export const SMALL_HAND_SIZE = 8;
@@ -33,7 +32,7 @@ function HandCard({
       id={buttonId}
       aria-label="Pick"
       tabIndex={0}
-      className={`highlighting-card pickable-card ${Player.STYLES[player]}`}
+      className={`highlighting-card pickable-card ${PLAYER_CLASSNAME[player]}`}
       onClick={handleClick}
     >
       {cardClass === CardClass.Froglet ? (
@@ -47,7 +46,7 @@ function HandCard({
       role="listitem"
       aria-labelledby={titleId}
       tabIndex={0}
-      className={`highlighting-card ${Player.STYLES[player]}`}
+      className={`highlighting-card ${PLAYER_CLASSNAME[player]}`}
     >
       {cardClass === CardClass.Froglet ? (
         <Froglet nameId={titleId} />

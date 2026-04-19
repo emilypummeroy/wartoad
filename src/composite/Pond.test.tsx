@@ -1,47 +1,18 @@
 import { screen, render, within, fireEvent } from '@testing-library/react';
 
-import { Phase, Player, Subphase } from './PhaseTracker';
 import {
-  Pond,
-  INITIAL_GRID,
-  FIELD_COUNT_PER_ROW,
+  LEAF_COUNT_PER_RANK,
+  HOME,
+  ROW_COUNT,
   ROW_COUNT_PER_PLAYER,
   type PondState,
-  isPond,
-  setPondAt,
-} from './Pond';
-import { HOME, ROW_COUNT } from './position';
-import type { ZoneState } from './Zone';
-
-const UPGRADED = { units: [], isUpgraded: true };
-const EMPTY = { units: [], isUpgraded: false };
-
-const ANOTHER_GRID: PondState = [
-  [UPGRADED, EMPTY, EMPTY],
-  [UPGRADED, UPGRADED, UPGRADED],
-  [EMPTY, UPGRADED, UPGRADED],
-  [EMPTY, EMPTY, EMPTY],
-  [UPGRADED, UPGRADED, EMPTY],
-  [EMPTY, EMPTY, UPGRADED],
-];
-
-const EMPTY_GRID: PondState = [
-  [EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY],
-];
-
-const FULL_GRID: PondState = [
-  [UPGRADED, UPGRADED, UPGRADED],
-  [UPGRADED, UPGRADED, UPGRADED],
-  [UPGRADED, UPGRADED, UPGRADED],
-  [UPGRADED, UPGRADED, UPGRADED],
-  [UPGRADED, UPGRADED, UPGRADED],
-  [UPGRADED, UPGRADED, UPGRADED],
-];
+  INITIAL_POND,
+  FULL_GRID,
+  EMPTY_GRID,
+  ANOTHER_GRID,
+} from '../state/pond';
+import { Phase, Player, Subphase } from '../types/gameflow';
+import { Pond } from './Pond';
 
 describe(Pond, () => {
   const handlePlaceCard = vi.fn<() => void>();
@@ -63,7 +34,7 @@ describe(Pond, () => {
       : screen.getAllByRole('row').slice(0, HOME[Player.South].y);
 
   describe.for<[name: string, PondState]>([
-    ['INITIAL_GRID_STATE', INITIAL_GRID],
+    ['INITIAL_GRID_STATE', INITIAL_POND],
     ['FULL_GRID', FULL_GRID],
     ['EMPTY_GRID', EMPTY_GRID],
     ['ANOTHER_GRID', ANOTHER_GRID],
@@ -82,7 +53,7 @@ describe(Pond, () => {
       );
     });
 
-    it(`should display a grid with ${ROW_COUNT} rows of ${FIELD_COUNT_PER_ROW} leaves`, () => {
+    it(`should display a grid with ${ROW_COUNT} rows of ${LEAF_COUNT_PER_RANK} leaves`, () => {
       expect(screen.getByRole('grid')).toBeVisible();
 
       const rows = within(screen.getByRole('grid')).getAllByRole('row');
@@ -90,7 +61,7 @@ describe(Pond, () => {
 
       for (const row of rows) {
         expect(within(row).getAllByRole('region')).toHaveLength(
-          FIELD_COUNT_PER_ROW,
+          LEAF_COUNT_PER_RANK,
         );
       }
     });
@@ -170,10 +141,10 @@ describe(Pond, () => {
         );
       });
 
-      it(`should display ${FIELD_COUNT_PER_ROW} clickable leaves in the ${goodRowsName} rows`, () => {
+      it(`should display ${LEAF_COUNT_PER_RANK} clickable leaves in the ${goodRowsName} rows`, () => {
         for (const row of getPlayerRows(player)) {
           const buttons = within(row).getAllByRole('button');
-          expect(buttons).toHaveLength(FIELD_COUNT_PER_ROW);
+          expect(buttons).toHaveLength(LEAF_COUNT_PER_RANK);
 
           for (const button of buttons) {
             fireEvent.click(button);
@@ -183,7 +154,7 @@ describe(Pond, () => {
             handlePlaceCard.mockReset();
           }
           const zones = within(row).getAllByRole('gridcell');
-          expect(zones).toHaveLength(FIELD_COUNT_PER_ROW);
+          expect(zones).toHaveLength(LEAF_COUNT_PER_RANK);
           for (const zone of zones) {
             fireEvent.click(zone);
             expect(zone).toHaveAccessibleName(
@@ -200,7 +171,7 @@ describe(Pond, () => {
         for (const row of getOpponentRows(player)) {
           const zones = within(row).getAllByRole('gridcell');
           expect(within(row).queryByRole('button')).not.toBeInTheDocument();
-          expect(zones).toHaveLength(FIELD_COUNT_PER_ROW);
+          expect(zones).toHaveLength(LEAF_COUNT_PER_RANK);
 
           for (const zone of zones) {
             expect(zone).not.toHaveAccessibleName(/Upgrade/);
@@ -226,10 +197,10 @@ describe(Pond, () => {
         );
       });
 
-      it(`should display ${FIELD_COUNT_PER_ROW} clickable leaves in the single ${goodRowsName} row`, () => {
+      it(`should display ${LEAF_COUNT_PER_RANK} clickable leaves in the single ${goodRowsName} row`, () => {
         const row = getHomeRow(player);
         const buttons = within(row).getAllByRole('button');
-        expect(buttons).toHaveLength(FIELD_COUNT_PER_ROW);
+        expect(buttons).toHaveLength(LEAF_COUNT_PER_RANK);
         for (const button of buttons) {
           fireEvent.click(button);
           expect(button).toHaveAccessibleName(/Deploy on/);
@@ -238,7 +209,7 @@ describe(Pond, () => {
         }
 
         const zones = within(row).getAllByRole('gridcell');
-        expect(zones).toHaveLength(FIELD_COUNT_PER_ROW);
+        expect(zones).toHaveLength(LEAF_COUNT_PER_RANK);
         for (const zone of zones) {
           fireEvent.click(zone);
           expect(zone).toHaveAccessibleName(
@@ -253,7 +224,7 @@ describe(Pond, () => {
         for (const row of getNonHomeRows(player)) {
           const zones = within(row).getAllByRole('gridcell');
           expect(within(row).queryByRole('button')).not.toBeInTheDocument();
-          expect(zones).toHaveLength(FIELD_COUNT_PER_ROW);
+          expect(zones).toHaveLength(LEAF_COUNT_PER_RANK);
 
           for (const zone of zones) {
             expect(zone).not.toHaveAccessibleName(/Deploy on/);
@@ -261,146 +232,6 @@ describe(Pond, () => {
           }
         }
         expect(handlePlaceCard).not.toHaveBeenCalled();
-      });
-    });
-  });
-});
-
-describe('the GridState type functions', () => {
-  describe(setPondAt, () => {
-    describe.for<
-      [string, valueToSet: ZoneState, ReadonlyArray<ReadonlyArray<ZoneState>>]
-    >([
-      ['INITIAL_GRID_STATE', UPGRADED, INITIAL_GRID],
-      ['INITIAL_GRID_STATE', EMPTY, INITIAL_GRID],
-      ['ANOTHER_GRID_STATE', UPGRADED, ANOTHER_GRID],
-      ['ANOTHER_GRID_STATE', EMPTY, ANOTHER_GRID],
-      ['FULL_GRID_STATE', UPGRADED, FULL_GRID],
-      ['FULL_GRID_STATE', EMPTY, FULL_GRID],
-      ['EMPTY_GRID_STATE', UPGRADED, EMPTY_GRID],
-      ['EMPTY_GRID_STATE', EMPTY, EMPTY_GRID],
-    ])('with known GridState: %s | new value: %s', ([_, valueToSet, grid]) => {
-      // oxlint-disable-next-line no-null
-      if (!isPond(grid)) {
-        expect.unreachable();
-        return;
-      }
-      grid satisfies PondState;
-
-      describe.for([
-        [0, 0],
-        [0, 1],
-        [0, 2],
-        [0, 3],
-        [0, 4],
-        [0, 5],
-        [1, 0],
-        [1, 1],
-        [1, 2],
-        [1, 3],
-        [1, 4],
-        [1, 5],
-        [2, 0],
-        [2, 1],
-        [2, 2],
-        [2, 3],
-        [2, 4],
-        [2, 5],
-      ])('when called for x=%s and y=%s', ([x, y]) => {
-        it('should not change other zones', () => {
-          const newGrid = setPondAt(grid, { x, y }, valueToSet);
-
-          for (let yy = 0; yy < y; yy += 1) {
-            for (let xx = 0; xx < x; xx += 1) {
-              expect(newGrid[yy][xx]).toBe(grid[yy][xx]);
-            }
-            for (let xx = x + 1; xx < FIELD_COUNT_PER_ROW; xx += 1) {
-              expect(newGrid[yy][xx]).toBe(grid[yy][xx]);
-            }
-          }
-
-          for (let yy = y + 1; yy < ROW_COUNT; yy += 1) {
-            for (let xx = 0; xx < x; xx += 1) {
-              expect(newGrid[yy][xx]).toBe(grid[yy][xx]);
-            }
-            for (let xx = x + 1; xx < FIELD_COUNT_PER_ROW; xx += 1) {
-              expect(newGrid[yy][xx]).toBe(grid[yy][xx]);
-            }
-          }
-        });
-
-        it(`should set the value at x=${x}, y=${y} to ${JSON.stringify(valueToSet)}`, () => {
-          const newGrid = setPondAt(grid, { x, y }, valueToSet);
-          expect(newGrid[y][x]).toBe(valueToSet);
-        });
-      });
-    });
-  });
-
-  describe(isPond, () => {
-    describe.for<[string, ReadonlyArray<ReadonlyArray<ZoneState>>]>([
-      ['INITIAL_GRID_STATE', INITIAL_GRID],
-      ['ANOTHER_GRID_STATE', ANOTHER_GRID],
-      ['FULL_GRID_STATE', FULL_GRID],
-      ['EMPTY_GRID_STATE', EMPTY_GRID],
-    ])('with known GridState: %s', ([name, array]) => {
-      it(`should verify ${name}`, () => {
-        expect(isPond(array)).toBe(true);
-        if (isPond(array)) {
-          array satisfies PondState;
-        } else expect.unreachable();
-      });
-
-      it(`should verify ${name} reversed`, () => {
-        const reversed = array.toReversed();
-        expect(isPond(reversed)).toBe(true);
-        if (isPond(reversed)) {
-          reversed satisfies PondState;
-        } else expect.unreachable();
-      });
-
-      it(`should verify ${name} with rows reversed`, () => {
-        const reversed = array.map(x => x.toReversed());
-        expect(isPond(reversed)).toBe(true);
-        if (isPond(reversed)) {
-          reversed satisfies PondState;
-        } else expect.unreachable();
-      });
-
-      const PRIME = 83;
-
-      it(`should verify ${name} shuffled`, () => {
-        const shuffled = array.map((_, i) => array[(i * PRIME) % array.length]);
-        expect(isPond(shuffled)).toBe(true);
-        if (isPond(shuffled)) {
-          shuffled satisfies PondState;
-        } else expect.unreachable();
-      });
-
-      it(`should verify ${name} with rows shuffled`, () => {
-        const shuffled = array.map(row =>
-          row.map((_, i) => row[(i * PRIME) % row.length]),
-        );
-        expect(isPond(shuffled)).toBe(true);
-        if (isPond(shuffled)) {
-          shuffled satisfies PondState;
-        } else expect.unreachable();
-      });
-
-      it(`should not verify ${name} with an extra row`, () => {
-        expect(isPond([...array, INITIAL_GRID[0]])).toBe(false);
-      });
-
-      it(`should not verify ${name} with an extra value in a row`, () => {
-        for (let i = 0; i < array.length; i += 1) {
-          expect(
-            isPond([
-              ...array.slice(0, i),
-              [...array[i], EMPTY],
-              ...array.slice(i + 1),
-            ]),
-          ).toBe(false);
-        }
       });
     });
   });

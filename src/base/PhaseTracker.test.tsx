@@ -1,21 +1,26 @@
 import { screen, fireEvent, render } from '@testing-library/react';
 
-import { Phase, PhaseTracker, Player, Subphase } from './PhaseTracker';
+import { Phase, Player, Subphase } from '../types/gameflow';
+import { PhaseTracker } from './PhaseTracker';
 
 const NOOP = () => {};
 
+const { North, South } = Player;
+const { Start, Main, End } = Phase;
+const { Idle, Upgrading, Deploying } = Subphase;
+
 describe(PhaseTracker, () => {
   it.for<[Player, Phase, Subphase]>([
-    [Player.North, Phase.Start, Subphase.Idle],
-    [Player.North, Phase.Main, Subphase.Idle],
-    [Player.North, Phase.Main, Subphase.Deploying],
-    [Player.North, Phase.Main, Subphase.Upgrading],
-    [Player.North, Phase.End, Subphase.Idle],
-    [Player.South, Phase.Start, Subphase.Idle],
-    [Player.South, Phase.Main, Subphase.Idle],
-    [Player.South, Phase.Main, Subphase.Deploying],
-    [Player.South, Phase.Main, Subphase.Upgrading],
-    [Player.South, Phase.End, Subphase.Idle],
+    [North, Start, Idle],
+    [North, Main, Idle],
+    [North, Main, Deploying],
+    [North, Main, Upgrading],
+    [North, End, Idle],
+    [South, Start, Idle],
+    [South, Main, Idle],
+    [South, Main, Deploying],
+    [South, Main, Upgrading],
+    [South, End, Idle],
   ])(
     'should show the %s %s phase during %s subphase',
     ([player, phase, subphase]) => {
@@ -28,19 +33,19 @@ describe(PhaseTracker, () => {
   );
 
   it.for<[Player, Phase]>([
-    [Player.North, Phase.Start],
-    [Player.North, Phase.Main],
-    [Player.North, Phase.End],
-    [Player.South, Phase.Start],
-    [Player.South, Phase.Main],
-    [Player.South, Phase.End],
+    [North, Start],
+    [North, Main],
+    [North, End],
+    [South, Start],
+    [South, Main],
+    [South, End],
   ])(
     'should allow clicking to progress phase when Idle in the %s %s phase',
     ([player, phase]) => {
       const onNextPhaseClicked = vi.fn<() => void>();
       render(
         <PhaseTracker
-          flow={{ player, phase, subphase: Subphase.Idle }}
+          flow={{ player, phase, subphase: Idle }}
           onNextPhaseClicked={onNextPhaseClicked}
         />,
       );
@@ -50,17 +55,17 @@ describe(PhaseTracker, () => {
   );
 
   it.for<[Subphase, Player]>([
-    [Subphase.Deploying, Player.North],
-    [Subphase.Upgrading, Player.North],
-    [Subphase.Deploying, Player.South],
-    [Subphase.Upgrading, Player.South],
+    [Deploying, North],
+    [Upgrading, North],
+    [Deploying, South],
+    [Upgrading, South],
   ])(
     'should not allow clicking to progress phase when Idle in the %s %s phase',
     ([subphase, player]) => {
       const onNextPhaseClicked = vi.fn<() => void>();
       render(
         <PhaseTracker
-          flow={{ player, phase: Phase.Main, subphase }}
+          flow={{ player, phase: Main, subphase }}
           onNextPhaseClicked={onNextPhaseClicked}
         />,
       );

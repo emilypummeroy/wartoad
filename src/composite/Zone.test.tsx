@@ -1,8 +1,10 @@
 import { fireEvent, screen, render } from '@testing-library/react';
 
-import { createUnit, UnitClass } from './card-types';
-import { Subphase, Phase, Player } from './PhaseTracker';
-import { HOME, type Position } from './position';
+import { createUnit } from '../state/card';
+import { HOME } from '../state/pond';
+import { UnitClass } from '../types/card-class';
+import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import type { Position } from '../types/position';
 import { Zone } from './Zone';
 
 const { Start, Main, End } = Phase;
@@ -30,7 +32,7 @@ const nFrogletsOwnedByAlternating = (n: number, firstPlayer: Player) =>
     createUnit({
       cardClass: UnitClass.Froglet,
       key: i,
-      owner: [firstPlayer, Player.AFTER[firstPlayer]][i % 2],
+      owner: [firstPlayer, PLAYER_AFTER[firstPlayer]][i % 2],
     }),
   );
 

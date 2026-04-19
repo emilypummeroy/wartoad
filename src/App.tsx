@@ -1,16 +1,23 @@
 import './App.css';
 import { useCallback, useRef, useState } from 'react';
 
-import { CardClass, CardType, createUnit, UnitClass } from './card-types';
 import {
-  Game,
   GameContext,
   shuffledDeterministicStartingHand,
   type GameState,
-} from './Game';
-import { Phase, Player, Subphase } from './PhaseTracker';
-import { INITIAL_GRID, setPondAt } from './Pond';
-import type { Position } from './position';
+} from './context/GameContext';
+import { Game } from './Game';
+import { createUnit } from './state/card';
+import { INITIAL_POND, setPondStateAt } from './state/pond';
+import { CardClass, CardType, UnitClass } from './types/card-class';
+import {
+  Phase,
+  PHASE_AFTER,
+  Player,
+  PLAYER_AFTER,
+  Subphase,
+} from './types/gameflow';
+import type { Position } from './types/position';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 
@@ -34,18 +41,18 @@ const nextPhaseRandom = ({
 }: GameState) => ({
   ...rest,
   flow: {
-    player: phase === Phase.End ? Player.AFTER[player] : player,
-    phase: Phase.AFTER[phase],
+    player: phase === Phase.End ? PLAYER_AFTER[player] : player,
+    phase: PHASE_AFTER[phase],
     subphase: Subphase.Idle,
   },
   // TODO 11: Extract to draw function
   northHand:
-    Phase.AFTER[phase] === Phase.Start && Player.AFTER[player] === Player.North
+    PHASE_AFTER[phase] === Phase.Start && PLAYER_AFTER[player] === Player.North
       ? [...northHand, randomCard()]
       : northHand,
   // TODO 11: Extract to draw function
   southHand:
-    Phase.AFTER[phase] === Phase.Start && Player.AFTER[player] === Player.South
+    PHASE_AFTER[phase] === Phase.Start && PLAYER_AFTER[player] === Player.South
       ? [...southHand, randomCard()]
       : southHand,
 });
@@ -58,18 +65,18 @@ const endPhaseDeterministic = ({
 }: GameState) => ({
   ...rest,
   flow: {
-    player: phase === Phase.End ? Player.AFTER[player] : player,
-    phase: Phase.AFTER[phase],
+    player: phase === Phase.End ? PLAYER_AFTER[player] : player,
+    phase: PHASE_AFTER[phase],
     subphase: Subphase.Idle,
   },
   // TODO 11: Extract to draw function
   northHand:
-    Phase.AFTER[phase] === Phase.Start && Player.AFTER[player] === Player.North
+    PHASE_AFTER[phase] === Phase.Start && PLAYER_AFTER[player] === Player.North
       ? [...northHand, CardClass.Froglet]
       : northHand,
   // TODO 11: Extract to draw function
   southHand:
-    Phase.AFTER[phase] === Phase.Start && Player.AFTER[player] === Player.South
+    PHASE_AFTER[phase] === Phase.Start && PLAYER_AFTER[player] === Player.South
       ? [...southHand, CardClass.Froglet]
       : southHand,
 });
@@ -113,7 +120,7 @@ const placeCard =
       player === Player.South && pickedCard && southHand.length > 0
         ? removeOne(southHand, pickedCard)
         : southHand,
-    grid: setPondAt(
+    grid: setPondStateAt(
       grid,
       position,
       subphase === Subphase.Upgrading
@@ -151,7 +158,7 @@ export function DeterministicApp() {
       player: Player.South,
       subphase: Subphase.Idle,
     },
-    grid: INITIAL_GRID,
+    grid: INITIAL_POND,
     northHand: shuffledDeterministicStartingHand(),
     southHand: shuffledDeterministicStartingHand(),
   });
@@ -183,7 +190,7 @@ export function App() {
       player: Player.South,
       subphase: Subphase.Idle,
     },
-    grid: INITIAL_GRID,
+    grid: INITIAL_POND,
     northHand: Array.from({ length: INITIAL_HAND_CARD_COUNT }, randomCard),
     southHand: Array.from({ length: INITIAL_HAND_CARD_COUNT }, randomCard),
   });

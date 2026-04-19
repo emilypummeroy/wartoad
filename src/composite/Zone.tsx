@@ -1,16 +1,15 @@
 import { Replace } from 'lucide-react';
 import { useId, useCallback } from 'react';
 
-import { CardBack, Froglet, LilyPad } from './Card';
-import { type UnitCard } from './card-types';
-import { Player, Subphase, type FlowState } from './PhaseTracker';
-import { type Position, HOME, positionsAreEqual } from './position';
-
-export type ZoneState = Readonly<{
-  units: readonly UnitCard[];
-  isUpgraded: boolean;
-  // TODO 10: Controller in ZoneState
-}>;
+import { CardBack, Froglet, LilyPad } from '../base/Card';
+import { HOME, type ZoneState } from '../state/pond';
+import {
+  PLAYER_CLASSNAME,
+  Subphase,
+  type Player,
+  type FlowState,
+} from '../types/gameflow';
+import { positionsAreEqual, type Position } from '../types/position';
 
 type ZoneProps = Readonly<{
   flow: FlowState;
@@ -45,7 +44,7 @@ export function Zone({
     <div
       role="gridcell"
       aria-colindex={position.x}
-      className={`${isDropzone ? 'dropzone' : ''} zone ${Player.STYLES[controller]}`}
+      className={`${isDropzone ? 'dropzone' : ''} zone ${PLAYER_CLASSNAME[controller]}`}
       onClick={isDropzone ? handleClick : undefined}
       tabIndex={isDropzone ? 0 : undefined}
     >
@@ -75,7 +74,7 @@ export function Zone({
           <div className="stacking peeking">
             <div
               role="listitem"
-              className={`highlighting-card ${Player.STYLES[controller]}`}
+              className={`highlighting-card ${PLAYER_CLASSNAME[controller]}`}
             >
               <LilyPad
                 symbolId={leafSymbolId}
@@ -101,7 +100,7 @@ export function Zone({
           <div key={key} className="stacking peeking">
             <div
               role="listitem"
-              className={`highlighting-card pickable-card ${Player.STYLES[controller]}`}
+              className={`highlighting-card pickable-card ${PLAYER_CLASSNAME[controller]}`}
             >
               <Froglet player={owner} isOnLeaf />
             </div>

@@ -1,9 +1,9 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { DeterministicApp } from './App';
-import { CardClass } from './card-types';
-import { Phase, Player } from './PhaseTracker';
-import { HOME } from './position';
+import { HOME } from './state/pond';
+import { CardClass } from './types/card-class';
+import { Phase, Player } from './types/gameflow';
 
 const MANY = 15;
 

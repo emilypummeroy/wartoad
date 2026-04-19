@@ -1,7 +1,7 @@
 import { screen, within, render } from '@testing-library/react';
 
+import { Player } from '../types/gameflow';
 import { CardBack, Froglet, LilyPad } from './Card';
-import { Player } from './PhaseTracker';
 
 describe(CardBack, () => {
   beforeEach(() => {});
@@ -86,7 +86,7 @@ describe(LilyPad, () => {
     'when belonging to %s',
     player => {
       it.for([true, false, undefined])(
-        // TODO do something about isHome && !isLeaf
+        // TODO 14: do something about isHome && !isLeaf
         'should have LilyPad cost if not a leaf | home: %s',
         isHome => {
           render(<LilyPad player={player} isHome={isHome} />);

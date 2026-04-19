@@ -21,8 +21,8 @@ import {
 } from 'lucide-react';
 import { useId } from 'react';
 
-import { CardClass, type LeafStats, type UnitStats } from './card-types';
-import { Player } from './PhaseTracker';
+import { CardClass, type LeafStats, type UnitStats } from '../types/card-class';
+import { type Player, PLAYER_CLASSNAME } from '../types/gameflow';
 
 export function LilyPad({
   player,
@@ -53,7 +53,7 @@ export function LilyPad({
   return (
     <section
       aria-labelledby={`${symbolId} ${nameId}`}
-      className={`card ${isLeaf && player ? Player.STYLES[player] : ''}`}
+      className={`card ${isLeaf && player ? PLAYER_CLASSNAME[player] : ''}`}
     >
       <div className="card-title" id={nameId}>
         Lily Pad
@@ -99,7 +99,7 @@ export function Froglet({
   return (
     <section
       aria-labelledby={`${isOnLeaf ? symbolId : ''} ${nameId}`}
-      className={`card ${isOnLeaf && player ? Player.STYLES[player] : ''}`}
+      className={`card ${isOnLeaf && player ? PLAYER_CLASSNAME[player] : ''}`}
     >
       <div className="card-title" id={nameId}>
         Froglet
@@ -134,7 +134,7 @@ export const CardBack = ({
   return (
     <section
       aria-labelledby={iconId}
-      className={`${isLeaf ? Player.STYLES[player] : ''} cardback card`}
+      className={`${isLeaf ? PLAYER_CLASSNAME[player] : ''} cardback card`}
     >
       <Leaf role="img">
         <title id={iconId}>

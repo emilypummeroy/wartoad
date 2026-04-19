@@ -1,19 +1,13 @@
+import type { Card, LeafCard, UnitCard } from '../state-types/card';
 import {
-  createUnit,
-  createLeaf,
-  isUnit,
-  isLeaf,
-  createCard,
   CardClass,
   CardType,
+  LeafClass,
   NoneValues,
   UnitClass,
-  LeafClass,
-  type Card,
-  type UnitCard,
-  type LeafCard,
-} from './card-types';
-import { Player } from './PhaseTracker';
+} from '../types/card-class';
+import { Player } from '../types/gameflow';
+import { createUnit, createLeaf, isUnit, isLeaf, createCard } from './card';
 
 describe.for<[Player, number]>([
   [Player.North, 0],
