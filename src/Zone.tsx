@@ -94,10 +94,9 @@ export function Zone({
             />
           </div>
         )}
-        {units.map(({ owner }, i) => (
+        {units.map(({ key, owner }) => (
           // TODO 9: Click to activate a unit
-          // TODO 9: use real key
-          <div key={`Froglet-${i}`} className="stacking peeking">
+          <div key={key} className="stacking peeking">
             <div
               role="listitem"
               className={`highlighting-card pickable-card ${Player.STYLES[controller]}`}

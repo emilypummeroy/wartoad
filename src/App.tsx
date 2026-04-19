@@ -1,5 +1,5 @@
 import './App.css';
-import { useCallback, useState, type ReactNode } from 'react';
+import { useCallback, useRef, useState, type ReactNode } from 'react';
 
 import { Froglet, LilyPad } from './Card';
 import { CardClass, CardType, UnitCard, UnitClass } from './card-types';
@@ -109,7 +109,7 @@ const gameStateForCardPicked =
   });
 
 const gameStateForCardPlaced =
-  (position: Position) =>
+  (position: Position, getNextCardKey: () => number) =>
   ({
     grid,
     grid: {
@@ -138,15 +138,14 @@ const gameStateForCardPlaced =
       subphase === Subphase.Upgrading
         ? // TODO 10: Make it create a card for leaves too
           { units, isUpgraded: true }
-        : // TODO 9: Use a real key
-          {
+        : {
             isUpgraded,
             units: [
               ...units,
               UnitCard.create({
                 cardClass: UnitClass.Froglet,
                 owner: player,
-                key: 0,
+                key: getNextCardKey(),
               }),
             ],
           },
@@ -162,6 +161,15 @@ const DETERMINISTIC_STARTING_HAND = [
   CardClass.Froglet,
   CardClass.LilyPad,
 ];
+
+const useCardKeys = () => {
+  const previousCardKey = useRef(0);
+  return useCallback(() => {
+    const cardKey = previousCardKey.current + 1;
+    previousCardKey.current = cardKey;
+    return cardKey;
+  }, [previousCardKey]);
+};
 
 export function App({
   // TODO 9: Move into a context
@@ -194,6 +202,8 @@ export function App({
       : Array.from({ length: INITIAL_HAND_CARD_COUNT }, randomCard),
   });
 
+  const getNextCardKey = useCardKeys();
+
   const handleNextPhaseClicked = useCallback(
     () => setGameState(gameStateForNextPhase(isDeterministic)),
     [isDeterministic],
@@ -204,8 +214,9 @@ export function App({
     [],
   );
   const handlePlaceCard = useCallback(
-    (position: Position) => setGameState(gameStateForCardPlaced(position)),
-    [],
+    (position: Position) =>
+      setGameState(gameStateForCardPlaced(position, getNextCardKey)),
+    [getNextCardKey],
   );
 
   return (
