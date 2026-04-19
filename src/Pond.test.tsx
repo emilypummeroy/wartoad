@@ -1,20 +1,22 @@
 import { screen, render, within, fireEvent } from '@testing-library/react';
 
+import { Phase, Player, Subphase } from './PhaseTracker';
 import {
-  Grid,
-  GridState,
+  Pond,
   INITIAL_GRID,
   FIELD_COUNT_PER_ROW,
   ROW_COUNT_PER_PLAYER,
-} from './Grid';
-import { Phase, Player, Subphase } from './PhaseTracker';
+  type PondState,
+  isPond,
+  setPondAt,
+} from './Pond';
 import { HOME, ROW_COUNT } from './position';
 import type { ZoneState } from './Zone';
 
 const UPGRADED = { units: [], isUpgraded: true };
 const EMPTY = { units: [], isUpgraded: false };
 
-const ANOTHER_GRID: GridState = [
+const ANOTHER_GRID: PondState = [
   [UPGRADED, EMPTY, EMPTY],
   [UPGRADED, UPGRADED, UPGRADED],
   [EMPTY, UPGRADED, UPGRADED],
@@ -23,7 +25,7 @@ const ANOTHER_GRID: GridState = [
   [EMPTY, EMPTY, UPGRADED],
 ];
 
-const EMPTY_GRID: GridState = [
+const EMPTY_GRID: PondState = [
   [EMPTY, EMPTY, EMPTY],
   [EMPTY, EMPTY, EMPTY],
   [EMPTY, EMPTY, EMPTY],
@@ -32,7 +34,7 @@ const EMPTY_GRID: GridState = [
   [EMPTY, EMPTY, EMPTY],
 ];
 
-const FULL_GRID: GridState = [
+const FULL_GRID: PondState = [
   [UPGRADED, UPGRADED, UPGRADED],
   [UPGRADED, UPGRADED, UPGRADED],
   [UPGRADED, UPGRADED, UPGRADED],
@@ -41,7 +43,7 @@ const FULL_GRID: GridState = [
   [UPGRADED, UPGRADED, UPGRADED],
 ];
 
-describe(Grid, () => {
+describe(Pond, () => {
   const handlePlaceCard = vi.fn<() => void>();
   const getPlayerRows = (player: Player) =>
     player === Player.North
@@ -60,7 +62,7 @@ describe(Grid, () => {
       ? screen.getAllByRole('row').slice(HOME[Player.North].y + 1)
       : screen.getAllByRole('row').slice(0, HOME[Player.South].y);
 
-  describe.for<[name: string, GridState]>([
+  describe.for<[name: string, PondState]>([
     ['INITIAL_GRID_STATE', INITIAL_GRID],
     ['FULL_GRID', FULL_GRID],
     ['EMPTY_GRID', EMPTY_GRID],
@@ -68,7 +70,7 @@ describe(Grid, () => {
   ])('with the grid: %s', ([_, grid]) => {
     beforeEach(() => {
       render(
-        <Grid
+        <Pond
           onPlaceCard={handlePlaceCard}
           flow={{
             phase: Phase.Main,
@@ -122,7 +124,7 @@ describe(Grid, () => {
     player => {
       beforeEach(() => {
         render(
-          <Grid
+          <Pond
             onPlaceCard={handlePlaceCard}
             flow={{
               phase: Phase.Main,
@@ -156,7 +158,7 @@ describe(Grid, () => {
     describe(`when ${player} is Upgrading`, () => {
       beforeEach(() => {
         render(
-          <Grid
+          <Pond
             onPlaceCard={handlePlaceCard}
             flow={{
               phase: Phase.Main,
@@ -212,7 +214,7 @@ describe(Grid, () => {
     describe(`when ${player} is Deploying`, () => {
       beforeEach(() => {
         render(
-          <Grid
+          <Pond
             onPlaceCard={handlePlaceCard}
             flow={{
               phase: Phase.Main,
@@ -265,7 +267,7 @@ describe(Grid, () => {
 });
 
 describe('the GridState type functions', () => {
-  describe('GridState.setAt', () => {
+  describe(setPondAt, () => {
     describe.for<
       [string, valueToSet: ZoneState, ReadonlyArray<ReadonlyArray<ZoneState>>]
     >([
@@ -279,11 +281,11 @@ describe('the GridState type functions', () => {
       ['EMPTY_GRID_STATE', EMPTY, EMPTY_GRID],
     ])('with known GridState: %s | new value: %s', ([_, valueToSet, grid]) => {
       // oxlint-disable-next-line no-null
-      if (!GridState.is(grid)) {
+      if (!isPond(grid)) {
         expect.unreachable();
         return;
       }
-      grid satisfies GridState;
+      grid satisfies PondState;
 
       describe.for([
         [0, 0],
@@ -306,7 +308,7 @@ describe('the GridState type functions', () => {
         [2, 5],
       ])('when called for x=%s and y=%s', ([x, y]) => {
         it('should not change other zones', () => {
-          const newGrid = GridState.setAt(grid, { x, y }, valueToSet);
+          const newGrid = setPondAt(grid, { x, y }, valueToSet);
 
           for (let yy = 0; yy < y; yy += 1) {
             for (let xx = 0; xx < x; xx += 1) {
@@ -328,14 +330,14 @@ describe('the GridState type functions', () => {
         });
 
         it(`should set the value at x=${x}, y=${y} to ${JSON.stringify(valueToSet)}`, () => {
-          const newGrid = GridState.setAt(grid, { x, y }, valueToSet);
+          const newGrid = setPondAt(grid, { x, y }, valueToSet);
           expect(newGrid[y][x]).toBe(valueToSet);
         });
       });
     });
   });
 
-  describe('GridState.is', () => {
+  describe(isPond, () => {
     describe.for<[string, ReadonlyArray<ReadonlyArray<ZoneState>>]>([
       ['INITIAL_GRID_STATE', INITIAL_GRID],
       ['ANOTHER_GRID_STATE', ANOTHER_GRID],
@@ -343,25 +345,25 @@ describe('the GridState type functions', () => {
       ['EMPTY_GRID_STATE', EMPTY_GRID],
     ])('with known GridState: %s', ([name, array]) => {
       it(`should verify ${name}`, () => {
-        expect(GridState.is(array)).toBe(true);
-        if (GridState.is(array)) {
-          array satisfies GridState;
+        expect(isPond(array)).toBe(true);
+        if (isPond(array)) {
+          array satisfies PondState;
         } else expect.unreachable();
       });
 
       it(`should verify ${name} reversed`, () => {
         const reversed = array.toReversed();
-        expect(GridState.is(reversed)).toBe(true);
-        if (GridState.is(reversed)) {
-          reversed satisfies GridState;
+        expect(isPond(reversed)).toBe(true);
+        if (isPond(reversed)) {
+          reversed satisfies PondState;
         } else expect.unreachable();
       });
 
       it(`should verify ${name} with rows reversed`, () => {
         const reversed = array.map(x => x.toReversed());
-        expect(GridState.is(reversed)).toBe(true);
-        if (GridState.is(reversed)) {
-          reversed satisfies GridState;
+        expect(isPond(reversed)).toBe(true);
+        if (isPond(reversed)) {
+          reversed satisfies PondState;
         } else expect.unreachable();
       });
 
@@ -369,9 +371,9 @@ describe('the GridState type functions', () => {
 
       it(`should verify ${name} shuffled`, () => {
         const shuffled = array.map((_, i) => array[(i * PRIME) % array.length]);
-        expect(GridState.is(shuffled)).toBe(true);
-        if (GridState.is(shuffled)) {
-          shuffled satisfies GridState;
+        expect(isPond(shuffled)).toBe(true);
+        if (isPond(shuffled)) {
+          shuffled satisfies PondState;
         } else expect.unreachable();
       });
 
@@ -379,20 +381,20 @@ describe('the GridState type functions', () => {
         const shuffled = array.map(row =>
           row.map((_, i) => row[(i * PRIME) % row.length]),
         );
-        expect(GridState.is(shuffled)).toBe(true);
-        if (GridState.is(shuffled)) {
-          shuffled satisfies GridState;
+        expect(isPond(shuffled)).toBe(true);
+        if (isPond(shuffled)) {
+          shuffled satisfies PondState;
         } else expect.unreachable();
       });
 
       it(`should not verify ${name} with an extra row`, () => {
-        expect(GridState.is([...array, INITIAL_GRID[0]])).toBe(false);
+        expect(isPond([...array, INITIAL_GRID[0]])).toBe(false);
       });
 
       it(`should not verify ${name} with an extra value in a row`, () => {
         for (let i = 0; i < array.length; i += 1) {
           expect(
-            GridState.is([
+            isPond([
               ...array.slice(0, i),
               [...array[i], EMPTY],
               ...array.slice(i + 1),

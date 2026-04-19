@@ -5,7 +5,7 @@ import { Zone, type ZoneState } from './Zone';
 export const ROW_COUNT_PER_PLAYER = 3 as const;
 export const FIELD_COUNT_PER_ROW = 3 as const;
 
-export type GridState = readonly [
+export type PondState = readonly [
   readonly [ZoneState, ZoneState, ZoneState],
   readonly [ZoneState, ZoneState, ZoneState],
   readonly [ZoneState, ZoneState, ZoneState],
@@ -16,7 +16,7 @@ export type GridState = readonly [
 
 const EMPTY_HOME = { units: [], isUpgraded: true };
 const EMPTY = { units: [], isUpgraded: false };
-export const INITIAL_GRID: GridState = [
+export const INITIAL_GRID: PondState = [
   [EMPTY, EMPTY_HOME, EMPTY],
   [EMPTY, EMPTY, EMPTY],
   [EMPTY, EMPTY, EMPTY],
@@ -25,33 +25,33 @@ export const INITIAL_GRID: GridState = [
   [EMPTY, EMPTY_HOME, EMPTY],
 ];
 
-export const GridState = {
-  is: (array: ReadonlyArray<ReadonlyArray<ZoneState>>): array is GridState =>
-    array.length === ROW_COUNT &&
-    array.every(row => row.length === FIELD_COUNT_PER_ROW),
+export const isPond = (
+  array: ReadonlyArray<ReadonlyArray<ZoneState>>,
+): array is PondState =>
+  array.length === ROW_COUNT &&
+  array.every(row => row.length === FIELD_COUNT_PER_ROW);
 
-  setAt: (
-    old: GridState,
-    { x, y }: Position,
-    newValue: ZoneState,
-  ): GridState => {
-    const array = old.map((row, yy) =>
-      row.map((oldValue, xx) => (yy === y && xx === x ? newValue : oldValue)),
-    );
-    // v8 ignore if
-    if (!GridState.is(array)) {
-      throw new Error(`Expected a GridState but got: ${JSON.stringify(array)}`);
-    }
-    return array;
-  },
+export const setPondAt = (
+  old: PondState,
+  { x, y }: Position,
+  newValue: ZoneState,
+): PondState => {
+  const array = old.map((row, yy) =>
+    row.map((oldValue, xx) => (yy === y && xx === x ? newValue : oldValue)),
+  );
+  // v8 ignore if
+  if (!isPond(array)) {
+    throw new Error(`Expected a PondState but got: ${JSON.stringify(array)}`);
+  }
+  return array;
 };
 
-export type GridProps = Readonly<{
-  grid: GridState;
+export type PondProps = Readonly<{
+  grid: PondState;
   flow: FlowState;
   onPlaceCard: (position: Position) => void;
 }>;
-export function Grid({ grid, flow, onPlaceCard }: GridProps) {
+export function Pond({ grid, flow, onPlaceCard }: PondProps) {
   const children = (x: number, y: number) => (
     <Zone
       controller={y < ROW_COUNT_PER_PLAYER ? Player.North : Player.South}

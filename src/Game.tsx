@@ -2,7 +2,6 @@ import { createContext, useContext, type ReactNode } from 'react';
 
 import { Froglet, LilyPad } from './Card';
 import { CardClass } from './card-types';
-import { Grid, INITIAL_GRID, type GridState } from './Grid';
 import { Hand } from './Hand';
 import {
   Phase,
@@ -11,11 +10,12 @@ import {
   Subphase,
   type FlowState,
 } from './PhaseTracker';
+import { Pond, INITIAL_GRID, type PondState } from './Pond';
 import type { Position } from './position';
 
 export type GameState = {
   readonly flow: FlowState;
-  readonly grid: GridState;
+  readonly grid: PondState;
   // TODO 11: Card[]
   readonly northHand: readonly CardClass[];
   // TODO 11: Card[]
@@ -159,7 +159,7 @@ export function Game() {
         </section>
         <div className="scroll-x">
           <section className="playarea">
-            <Grid onPlaceCard={placeCard} flow={flow} grid={grid} />
+            <Pond onPlaceCard={placeCard} flow={flow} grid={grid} />
           </section>
         </div>
       </main>

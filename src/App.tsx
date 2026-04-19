@@ -8,8 +8,8 @@ import {
   shuffledDeterministicStartingHand,
   type GameState,
 } from './Game';
-import { INITIAL_GRID, GridState } from './Grid';
 import { Phase, Player, Subphase } from './PhaseTracker';
+import { INITIAL_GRID, setPondAt } from './Pond';
 import type { Position } from './position';
 
 export const INITIAL_HAND_CARD_COUNT = 7;
@@ -113,7 +113,7 @@ const placeCard =
       player === Player.South && pickedCard && southHand.length > 0
         ? removeOne(southHand, pickedCard)
         : southHand,
-    grid: GridState.setAt(
+    grid: setPondAt(
       grid,
       position,
       subphase === Subphase.Upgrading
