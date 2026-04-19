@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
-import { App, INITIAL_HAND_CARD_COUNT } from './App';
+import { App } from './App';
+import { INITIAL_HAND_CARD_COUNT } from './context/GameContext';
 import { ROW_COUNT } from './state/pond';
 import { Phase, Player } from './types/gameflow';
 
