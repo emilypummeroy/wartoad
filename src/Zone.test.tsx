@@ -1,6 +1,6 @@
 import { fireEvent, screen, render } from '@testing-library/react';
 
-import { CardClass } from './card-types';
+import { UnitCard, UnitClass } from './card-types';
 import { Position } from './Grid';
 import { Subphase, Phase, Player } from './PhaseTracker';
 import { Zone } from './Zone';
@@ -16,25 +16,53 @@ const FLOW = {
 };
 const NOOP = () => {};
 
+const nFrogletsOwnedBy = (n: number, owner: Player) =>
+  Array.from({ length: n }, (_, i) =>
+    UnitCard.create({
+      cardClass: UnitClass.Froglet,
+      key: i,
+      owner,
+    }),
+  );
+
+const nFrogletsOwnedByAlternating = (n: number, firstPlayer: Player) =>
+  Array.from({ length: n }, (_, i) =>
+    UnitCard.create({
+      cardClass: UnitClass.Froglet,
+      key: i,
+      owner: [firstPlayer, Player.AFTER[firstPlayer]][i % 2],
+    }),
+  );
+
 describe(Zone, () => {
-  describe.for<[controlledBy: Player, Position, units: number, Player, Phase]>([
-    [North, { x: 0, y: 0 }, 0, North, Start],
-    [North, { x: 1, y: 1 }, 1, North, Main],
-    [North, { x: 2, y: 2 }, 2, North, End],
-    [North, { x: 2, y: 3 }, 3, South, Main],
-    [North, { x: 0, y: 4 }, 4, South, End],
-    [North, { x: 1, y: 5 }, 5, South, Start],
-    [South, { x: 1, y: 0 }, 1, South, Main],
-    [South, { x: 0, y: 1 }, 3, South, Start],
-    [South, { x: 2, y: 2 }, 5, South, End],
-    [South, { x: 0, y: 3 }, 0, North, End],
-    [South, { x: 1, y: 4 }, 2, North, Main],
-    [South, { x: 2, y: 5 }, 4, North, Start],
+  describe.for<
+    [
+      controlledBy: Player,
+      at: Position,
+      withUnits: number,
+      ownBy: Player,
+      turnOf: Player,
+      Phase,
+    ]
+  >([
+    [North, { x: 0, y: 0 }, 0, North, North, Start],
+    [North, { x: 1, y: 1 }, 1, South, North, Main],
+    [North, { x: 2, y: 2 }, 2, North, North, End],
+    [North, { x: 2, y: 3 }, 3, South, South, Main],
+    [North, { x: 0, y: 4 }, 4, North, South, End],
+    [North, { x: 1, y: 5 }, 5, South, South, Start],
+    [South, { x: 1, y: 0 }, 1, South, South, Main],
+    [South, { x: 0, y: 1 }, 3, North, South, Start],
+    [South, { x: 2, y: 2 }, 5, South, South, End],
+    [South, { x: 0, y: 3 }, 0, North, North, End],
+    [South, { x: 1, y: 4 }, 2, South, North, Main],
+    [South, { x: 2, y: 5 }, 4, North, North, Start],
   ])(
-    'when controlled by %s in non-home position %s with %s Froglets while Idle in %s %s phase',
-    ([controller, position, unitCount, turnPlayer, phase]) => {
-      const units = Array.from({ length: unitCount }, () => CardClass.Froglet);
+    'when controlled by %s in non-home position %s with %s %s Froglets while Idle in %s %s phase',
+    ([controller, position, unitCount, unitOwner, turnPlayer, phase]) => {
+      const units = nFrogletsOwnedBy(unitCount, unitOwner);
       const flow = { player: turnPlayer, phase, subphase: Idle };
+
       it(`should have a ${controller} controlled leaf if unupgraded`, () => {
         render(
           <Zone
@@ -65,7 +93,7 @@ describe(Zone, () => {
         );
       });
 
-      it(`should have ${unitCount} ${controller} controlled Froglets`, () => {
+      it(`should have ${unitCount} ${unitOwner} owned Froglets`, () => {
         render(
           <Zone
             flow={flow}
@@ -77,7 +105,7 @@ describe(Zone, () => {
         );
         expect(
           screen.queryAllByRole('region', {
-            name: `${controller} unit Froglet`,
+            name: `${unitOwner} unit Froglet`,
           }),
         ).toHaveLength(unitCount);
       });
@@ -97,32 +125,49 @@ describe(Zone, () => {
     },
   );
 
-  it.for<[Player, Position, unitCount: number]>([
-    [North, Position.HOME[North], 0],
-    [North, Position.HOME[North], 2],
-    [South, Position.HOME[South], 0],
-    [South, Position.HOME[South], 3],
+  describe.for<[Player, units: number, units: Player]>([
+    [North, 0, North],
+    [North, 1, South],
+    [North, 2, North],
+    [South, 0, South],
+    [South, 3, North],
+    [South, 4, South],
   ])(
-    'should have a %s Home Lily Pad if upgraded in home %s with %s units',
-    ([player, position, unitCount]) => {
-      const units = Array.from({ length: unitCount }, () => CardClass.Froglet);
-      render(
-        <Zone
-          flow={FLOW}
-          position={position}
-          controller={player}
-          zone={{ isUpgraded: true, units }}
-          onPlace={NOOP}
-        />,
-      );
+    "when upgraded in their %s's home position with %s %s units",
+    ([controller, unitCount, unitOwner]) => {
+      beforeEach(() => {
+        const position = Position.HOME[controller];
+        const units = nFrogletsOwnedBy(unitCount, unitOwner);
+        render(
+          <Zone
+            flow={FLOW}
+            position={position}
+            controller={controller}
+            zone={{ isUpgraded: true, units }}
+            onPlace={NOOP}
+          />,
+        );
+      });
 
-      expect(screen.getByRole('region', { name: /Home/ })).toHaveAccessibleName(
-        `${player} Home Lily Pad`,
-      );
+      it(`should have a ${controller} Home Lily Pad`, () => {
+        expect(
+          screen.getByRole('region', { name: /Home/ }),
+        ).toHaveAccessibleName(`${controller} Home Lily Pad`);
+      });
+
+      it(`should have ${unitCount} ${unitOwner} Froglets`, () => {
+        expect(
+          screen.queryAllByRole('region', {
+            name: `${unitOwner} unit Froglet`,
+          }),
+        ).toHaveLength(unitCount);
+      });
     },
   );
 
-  describe.for<[Player, Player, upgraded: boolean, Position, number]>([
+  describe.for<
+    [turn: Player, zone: Player, upgraded: boolean, Position, units: number]
+  >([
     [South, North, true, Position.HOME[North], 0],
     [South, North, true, { x: 1, y: 0 }, 1],
     [South, North, false, { x: 1, y: 2 }, 2],
@@ -130,9 +175,9 @@ describe(Zone, () => {
     [North, South, true, { x: 0, y: 5 }, 0],
     [North, South, false, { x: 2, y: 4 }, 1],
   ])(
-    'while %s is upgrading but controlled by %s | upgraded: %s | at %s | %s units',
+    'while %s is upgrading but controlled by %s | upgraded: %s | at %s | %s %s units',
     ([player, controller, isUpgraded, position, unitCount]) => {
-      const units = Array.from({ length: unitCount }, () => CardClass.Froglet);
+      const units = nFrogletsOwnedByAlternating(unitCount, player);
       const flow = {
         player,
         phase: Main,
@@ -169,7 +214,7 @@ describe(Zone, () => {
     },
   );
 
-  describe.for<[Player, Position, unitCount: number]>([
+  describe.for<[Player, Position, units: number]>([
     [North, Position.HOME[North], 0],
     [North, { x: 2, y: 0 }, 1],
     [North, { x: 1, y: 1 }, 2],
@@ -187,7 +232,7 @@ describe(Zone, () => {
   ])(
     'when controlled by %s while they are upgrading | position: %s',
     ([player, position, unitCount]) => {
-      const units = Array.from({ length: unitCount }, () => CardClass.Froglet);
+      const units = nFrogletsOwnedByAlternating(unitCount, player);
       const flow = {
         player,
         phase: Main,
@@ -245,7 +290,7 @@ describe(Zone, () => {
     },
   );
 
-  describe.for<[Player, Position, _isUpgraded: boolean, _unitCount: number]>([
+  describe.for<[Player, Position, _isUpgraded: boolean, _units: number]>([
     [North, { x: 0, y: 1 }, false, 0],
     [North, { x: 1, y: 1 }, true, 1],
     [North, { x: 2, y: 1 }, false, 2],
@@ -279,7 +324,7 @@ describe(Zone, () => {
   ])(
     "in %s's non-home row position %s while deploying",
     ([player, position, isUpgraded, unitCount]) => {
-      const units = Array.from({ length: unitCount }, () => CardClass.Froglet);
+      const units = nFrogletsOwnedByAlternating(unitCount, player);
       const flow = {
         player,
         phase: Main,
@@ -309,16 +354,16 @@ describe(Zone, () => {
     },
   );
 
-  describe.for<[Player, Position, isUpgraded: boolean, number, string, string]>(
-    [
-      [North, { x: 0, y: 0 }, false, 0, 'controlled', 'leaf'],
-      [North, Position.HOME.North, true, 1, 'Home', 'Lily Pad'],
-      [North, { x: 2, y: 0 }, true, 2, 'controlled', 'Lily Pad'],
-      [South, { x: 0, y: 5 }, true, 2, 'controlled', 'Lily Pad'],
-      [South, Position.HOME.South, true, 5, 'Home', 'Lily Pad'],
-      [South, { x: 2, y: 5 }, false, 6, 'controlled', 'leaf'],
-    ],
-  )(
+  describe.for<
+    [Player, Position, isUpgraded: boolean, units: number, string, string]
+  >([
+    [North, { x: 0, y: 0 }, false, 0, 'controlled', 'leaf'],
+    [North, Position.HOME.North, true, 1, 'Home', 'Lily Pad'],
+    [North, { x: 2, y: 0 }, true, 2, 'controlled', 'Lily Pad'],
+    [South, { x: 0, y: 5 }, true, 2, 'controlled', 'Lily Pad'],
+    [South, Position.HOME.South, true, 5, 'Home', 'Lily Pad'],
+    [South, { x: 2, y: 5 }, false, 6, 'controlled', 'leaf'],
+  ])(
     "in %s's home row position %s while Deploying | isUpgraded: %s | unitCount: %s",
     ([player, position, isUpgraded, unitCount, leafAdjective, leafName]) => {
       const flow = {
@@ -326,7 +371,7 @@ describe(Zone, () => {
         phase: Main,
         subphase: Deploying,
       };
-      const units = Array.from({ length: unitCount }, () => CardClass.Froglet);
+      const units = nFrogletsOwnedByAlternating(unitCount, player);
       const zone = {
         isUpgraded,
         units,

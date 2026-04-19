@@ -2,13 +2,12 @@ import { Replace } from 'lucide-react';
 import { useId, useCallback } from 'react';
 
 import { CardBack, Froglet, LilyPad } from './Card';
-import { type UnitClass } from './card-types';
+import { type UnitCard } from './card-types';
 import { Position } from './Grid';
 import { Player, Subphase, type FlowState } from './PhaseTracker';
 
 export type ZoneState = Readonly<{
-  // TODO 9: UnitCard[]
-  units: readonly UnitClass[];
+  units: readonly UnitCard[];
   isUpgraded: boolean;
   // TODO 10: Controller in ZoneState
 }>;
@@ -95,17 +94,15 @@ export function Zone({
             />
           </div>
         )}
-        {units.map((_, i) => (
+        {units.map(({ owner }, i) => (
           // TODO 9: Click to activate a unit
+          // TODO 9: use real key
           <div key={`Froglet-${i}`} className="stacking peeking">
             <div
               role="listitem"
               className={`highlighting-card pickable-card ${Player.STYLES[controller]}`}
             >
-              {
-                // TODO 9: controller based on card not on zone position
-              }
-              <Froglet player={controller} isOnLeaf />
+              <Froglet player={owner} isOnLeaf />
             </div>
           </div>
         ))}

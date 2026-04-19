@@ -2,7 +2,7 @@ import './App.css';
 import { useCallback, useState, type ReactNode } from 'react';
 
 import { Froglet, LilyPad } from './Card';
-import { CardClass, CardType } from './card-types';
+import { CardClass, CardType, UnitCard, UnitClass } from './card-types';
 import { type Position, INITIAL_GRID, GridState, Grid } from './Grid';
 import { Hand } from './Hand';
 import {
@@ -138,8 +138,18 @@ const gameStateForCardPlaced =
       subphase === Subphase.Upgrading
         ? // TODO 10: Make it create a card for leaves too
           { units, isUpgraded: true }
-        : // TODO 9: Make it create a card for new units only
-          { isUpgraded, units: [...units, CardClass.Froglet] },
+        : // TODO 9: Use a real key
+          {
+            isUpgraded,
+            units: [
+              ...units,
+              UnitCard.create({
+                cardClass: UnitClass.Froglet,
+                owner: player,
+                key: 0,
+              }),
+            ],
+          },
     ),
   });
 
