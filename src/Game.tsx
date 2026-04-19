@@ -22,6 +22,9 @@ export type GameState = {
   readonly southHand: readonly CardClass[];
   // TODO 11: Card
   readonly pickedCard?: CardClass;
+  readonly activationState?: {
+    readonly start: Position;
+  };
 };
 
 export const DETERMINISTIC_STARTING_HAND = [
@@ -44,11 +47,15 @@ export type GameContext = {
   // TODO 10: onUpgrade, onDeploy,
   readonly placeCard: (_: Position) => void;
   // TODO 9: activate(card)
+  // - should set pickedCard
+  // - should set activationState
   // TODO 9: commitActivation(position)
+  // - should move the pickedCard
+  // - should unset pickedCard
+  // - should unset activationState
 };
 
-// TODO 11: Make generic
-const shuffled = (cards: readonly CardClass[]): CardClass[] => {
+const shuffled: <T>(cards: readonly T[]) => T[] = cards => {
   const source = [...cards];
   const result = [];
   while (source.length > 0) {
