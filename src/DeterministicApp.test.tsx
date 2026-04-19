@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { DeterministicApp } from './App';
+import { CardClass } from './card-types';
 import { Phase, Player } from './PhaseTracker';
 import { HOME } from './position';
 
@@ -8,12 +9,7 @@ const MANY = 15;
 
 const { Start, Main, End } = Phase;
 const { North, South } = Player;
-
-describe('the dom test environment', () => {
-  it('should have a defined document', () => {
-    expectTypeOf(document).not.toBeUndefined();
-  });
-});
+const { Froglet } = CardClass;
 
 describe(DeterministicApp, () => {
   beforeEach(() => render(<DeterministicApp />));
@@ -28,8 +24,16 @@ describe(DeterministicApp, () => {
     pickedCardNamed: (name: string) =>
       withinThe.pickedCardDisplay().getByRole('region', { name }),
     playArea: () => withinThe.main().getByRole('grid'),
-    homeRow: (player: Player) => getThe.nthRow(HOME[player].y),
-    nthRow: (n: number) => withinThe.playArea().getAllByRole('row')[n],
+    homeRow: (player: Player) => getThe.nthRank(HOME[player].y),
+    nthRank: (n: number) => withinThe.playArea().getAllByRole('row')[n],
+    nthRankFor: (player: Player, n: number) =>
+      withinThe.playArea().getAllByRole('row')[player === North ? n : 5 - n],
+    nthRankDropzoneFor: (player: Player, n: number) =>
+      withinThe.nthRankFor(player, n).getByRole('button'),
+    nthRankUnitControlledBy: (player: Player, n: number) =>
+      withinThe.nthRankFor(player, n).getByRole('img', {
+        name: `${player} unit`,
+      }),
     homeLeafDropzone: (player: Player) =>
       withinThe.homeRow(player).getByRole('button', {
         name: new RegExp(`(Upgrade|Deploy on) ${player} Home Lily Pad`),
@@ -77,7 +81,7 @@ describe(DeterministicApp, () => {
     handCardNamed: (player: Player, name: string) =>
       getAll.handCardsNamed(player, name)[0],
     leafControlledBy: (player: Player) => getAll.leavesControlledBy(player)[0],
-    cardControlledByWithName: (player: Player, name: string) =>
+    pondCardOwnedByNamed: (player: Player, name: string) =>
       getAll.cardsControlledByWithName(player, name)[0],
   };
 
@@ -103,7 +107,11 @@ describe(DeterministicApp, () => {
       withinThe.playArea().queryByRole('button', {
         name: `Upgrade ${player} controlled leaf`,
       }),
-    nthRowDropzone: (n: number) => withinThe.nthRow(n).queryByRole('button'),
+    nthRankDropzone: (n: number) => withinThe.nthRank(n).queryByRole('button'),
+    nthRankUnitControlledBy: (player: Player, n: number) =>
+      withinThe.nthRankFor(player, n).queryByRole('img', {
+        name: `${player} unit`,
+      }),
     upgradeDropzoneOnLeafNamed: (name: string) =>
       withinThe.playArea().queryByRole('button', {
         name: new RegExp(`(controlled|Home) ${name}`),
@@ -117,7 +125,9 @@ describe(DeterministicApp, () => {
     pickedCardDisplay: () => within(getThe.pickedCardDisplay()),
     playArea: () => within(getThe.playArea()),
     homeRow: (player: Player) => within(getThe.homeRow(player)),
-    nthRow: (n: number) => within(getThe.nthRow(n)),
+    nthRank: (n: number) => within(getThe.nthRank(n)),
+    nthRankFor: (player: Player, n: number) =>
+      within(getThe.nthRankFor(player, n)),
   };
 
   const advanceToPhase = (player: Player, phase: Phase) => {
@@ -127,6 +137,26 @@ describe(DeterministicApp, () => {
     }
     expect(getThe.phaseIndicator(player, phase)).toBeVisible();
   };
+
+  describe('Stories', () => {
+    describe.for([North, South])('for the %s player Main Phase', player => {
+      beforeEach(() => {
+        advanceToPhase(player, Main);
+      });
+
+      it.skip('Should allow you to play and activate a Froglet, moving it to the second rank', () => {
+        fireEvent.click(getFirst.handCardNamed(player, Froglet.name));
+        fireEvent.click(getFirst.leafDropzoneControlledBy(player));
+        fireEvent.click(getFirst.pondCardOwnedByNamed(player, Froglet.name));
+
+        expect(
+          queryA.nthRankUnitControlledBy(player, 1),
+        ).not.toBeInTheDocument();
+        fireEvent.click(getThe.nthRankDropzoneFor(player, 1));
+        expect(getThe.nthRankUnitControlledBy(player, 1)).toBeVisible();
+      });
+    });
+  });
 
   describe('Hands', () => {
     describe('Picked Card', () => {
@@ -270,9 +300,7 @@ describe(DeterministicApp, () => {
             queryA.upgradeDropzoneOnLeafNamed('Lily Pad'),
           ).not.toBeInTheDocument();
 
-          fireEvent.click(
-            getFirst.cardControlledByWithName(player, 'Lily Pad'),
-          );
+          fireEvent.click(getFirst.pondCardOwnedByNamed(player, 'Lily Pad'));
           expect(
             getAll.cardsControlledByWithName(player, 'Lily Pad'),
           ).toHaveLength(initialLilyPadCount);
@@ -322,7 +350,7 @@ describe(DeterministicApp, () => {
               player === North
                 ? HOME[North].y + offset
                 : HOME[South].y - offset;
-            expect(queryA.nthRowDropzone(targetRow)).not.toBeInTheDocument();
+            expect(queryA.nthRankDropzone(targetRow)).not.toBeInTheDocument();
           },
         );
 
