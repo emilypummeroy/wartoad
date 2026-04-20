@@ -1,18 +1,13 @@
 import { Replace } from 'lucide-react';
-import { useId, useCallback } from 'react';
+import { useId, useCallback, useContext } from 'react';
 
 import { CardBack, Froglet, LilyPad } from '../base/Card';
+import { GameContext } from '../context/GameContext';
 import { HOME, type ZoneState } from '../state/pond';
-import {
-  PLAYER_CLASSNAME,
-  Subphase,
-  type Player,
-  type FlowState,
-} from '../types/gameflow';
+import { PLAYER_CLASSNAME, Subphase, type Player } from '../types/gameflow';
 import { positionsAreEqual, type Position } from '../types/position';
 
 type ZoneProps = Readonly<{
-  flow: FlowState;
   controller: Player;
   position: Position;
   zone: ZoneState;
@@ -22,12 +17,16 @@ type ZoneProps = Readonly<{
 }>;
 
 export function Zone({
-  flow: { subphase, player },
+  zone: { isUpgraded, units },
   controller,
   position,
-  zone: { isUpgraded, units },
   onPlace,
 }: ZoneProps) {
+  const [
+    {
+      flow: { subphase, player },
+    },
+  ] = useContext(GameContext);
   const handleClick = useCallback(() => onPlace(position), [position, onPlace]);
   const isUpgradeDropzone =
     subphase === Subphase.Upgrading && !isUpgraded && player === controller;

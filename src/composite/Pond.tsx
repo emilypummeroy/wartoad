@@ -1,21 +1,19 @@
 import { ROW_COUNT_PER_PLAYER, type PondState } from '../state/pond';
-import { Player, type FlowState } from '../types/gameflow';
+import { Player } from '../types/gameflow';
 import { type Position } from '../types/position';
 import { Zone } from './Zone';
 
 export type PondProps = Readonly<{
   grid: PondState;
-  flow: FlowState;
-  onPlaceCard: (position: Position) => void;
+  onCardPlaced: (position: Position) => void;
 }>;
-export function Pond({ grid, flow, onPlaceCard }: PondProps) {
+export function Pond({ grid, onCardPlaced }: PondProps) {
   const children = (x: number, y: number) => (
     <Zone
       controller={y < ROW_COUNT_PER_PLAYER ? Player.North : Player.South}
-      flow={flow}
       position={{ x, y }}
       zone={grid[y][x]}
-      onPlace={onPlaceCard}
+      onPlace={onCardPlaced}
     />
   );
   return (

@@ -58,7 +58,7 @@ export function Game() {
         </section>
         <div className="scroll-x">
           <section className="playarea">
-            <Pond onPlaceCard={placeCard} flow={flow} grid={grid} />
+            <Pond onCardPlaced={placeCard} grid={grid} />
           </section>
         </div>
       </main>

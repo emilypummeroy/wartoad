@@ -13,26 +13,25 @@ import {
 } from '../types/gameflow';
 import { type Position } from '../types/position';
 
-export type GameContext = readonly [
-  state: GameState,
-  dispatch: {
-    readonly endPhase: () => void;
-    // No different pickUnit, pickLeaf, etc.
-    // The difference between activation and upgrading is not the concern of
-    // Hand or Card.
-    // TODO 11: Make it operate on a card instead of a card class
-    readonly pickCard: (_: CardClass) => void;
-    // TODO 10: onUpgrade, onDeploy,
-    readonly placeCard: (_: Position) => void;
-    // TODO 9: activate(card, position)
-    // - should set pickedCard
-    // - should set activationState
-    // TODO 9: commitActivation(position)
-    // - should move the pickedCard
-    // - should unset pickedCard
-    // - should unset activationState
-  },
-];
+export type GameContext = readonly [GameState, GameDispatch];
+
+export type GameDispatch = {
+  readonly endPhase: () => void;
+  // No different pickUnit, pickLeaf, etc.
+  // The difference between activation and upgrading is not the concern of
+  // Hand or Card.
+  // TODO 11: Make it operate on a card instead of a card class
+  readonly pickCard: (_: CardClass) => void;
+  // TODO 10: onUpgrade, onDeploy,
+  readonly placeCard: (_: Position) => void;
+  // TODO 9: activate(card, position)
+  // - should set pickedCard
+  // - should set activationState
+  // TODO 9: commitActivation(position)
+  // - should move the pickedCard
+  // - should unset pickedCard
+  // - should unset activationState
+};
 
 export type GameState = {
   readonly flow: FlowState;

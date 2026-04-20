@@ -1,6 +1,11 @@
 import { screen, render, within, fireEvent } from '@testing-library/react';
 
 import {
+  DEFAULT_GAME_DISPATCH,
+  DEFAULT_GAME_STATE,
+  GameContext,
+} from '../context/GameContext';
+import {
   LEAF_COUNT_PER_RANK,
   HOME,
   ROW_COUNT,
@@ -15,7 +20,7 @@ import { Phase, Player, Subphase } from '../types/gameflow';
 import { Pond } from './Pond';
 
 describe(Pond, () => {
-  const handlePlaceCard = vi.fn<() => void>();
+  const handleCardPlaced = vi.fn<() => void>();
   const getPlayerRows = (player: Player) =>
     player === Player.North
       ? screen.getAllByRole('row').slice(0, ROW_COUNT_PER_PLAYER)
@@ -33,23 +38,55 @@ describe(Pond, () => {
       ? screen.getAllByRole('row').slice(HOME[Player.North].y + 1)
       : screen.getAllByRole('row').slice(0, HOME[Player.South].y);
 
-  describe.for<[name: string, PondState]>([
+  it.for<[name: string, PondState]>([
     ['INITIAL_GRID_STATE', INITIAL_POND],
     ['FULL_GRID', FULL_GRID],
     ['EMPTY_GRID', EMPTY_GRID],
     ['ANOTHER_GRID', ANOTHER_GRID],
-  ])('with the grid: %s', ([_, grid]) => {
+  ])(
+    `without context should display a grid with ${ROW_COUNT} rows of ${LEAF_COUNT_PER_RANK} leaves`,
+    ([_, grid]) => {
+      render(<Pond grid={grid} onCardPlaced={handleCardPlaced} />);
+
+      expect(screen.getByRole('grid')).toBeVisible();
+
+      const rows = within(screen.getByRole('grid')).getAllByRole('row');
+      expect(rows).toHaveLength(ROW_COUNT);
+
+      for (const row of rows) {
+        expect(within(row).getAllByRole('region')).toHaveLength(
+          LEAF_COUNT_PER_RANK,
+        );
+      }
+    },
+  );
+
+  describe.for<[Player, name: string, PondState]>([
+    [Player.North, 'INITIAL_GRID_STATE', INITIAL_POND],
+    [Player.North, 'FULL_GRID', FULL_GRID],
+    [Player.North, 'EMPTY_GRID', EMPTY_GRID],
+    [Player.North, 'ANOTHER_GRID', ANOTHER_GRID],
+    [Player.South, 'INITIAL_GRID_STATE', INITIAL_POND],
+    [Player.South, 'FULL_GRID', FULL_GRID],
+    [Player.South, 'EMPTY_GRID', EMPTY_GRID],
+    [Player.South, 'ANOTHER_GRID', ANOTHER_GRID],
+  ])('on the %s turn with the grid: %s', ([player, _, grid]) => {
+    const context: GameContext = [
+      {
+        ...DEFAULT_GAME_STATE,
+        flow: {
+          ...DEFAULT_GAME_STATE.flow,
+          player,
+        },
+      },
+      DEFAULT_GAME_DISPATCH,
+    ];
+
     beforeEach(() => {
       render(
-        <Pond
-          onPlaceCard={handlePlaceCard}
-          flow={{
-            phase: Phase.Main,
-            player: Player.North,
-            subphase: Subphase.Idle,
-          }}
-          grid={grid}
-        />,
+        <GameContext value={context}>
+          <Pond onCardPlaced={handleCardPlaced} grid={grid} />
+        </GameContext>,
       );
     });
 
@@ -66,7 +103,7 @@ describe(Pond, () => {
       }
     });
 
-    it.for<[Player, rowY: number]>([
+    it.for<[rowController: Player, rowY: number]>([
       [Player.North, 0],
       [Player.North, 1],
       [Player.North, 2],
@@ -75,9 +112,9 @@ describe(Pond, () => {
       [Player.South, 5],
     ])(
       'should display %s controlled leaves in the %sth row',
-      ([player, rowY]) => {
-        const emptyName = new RegExp(`${player} controlled leaf`);
-        const fullName = new RegExp(`${player} (controlled|Home) Lily Pad`);
+      ([controller, rowY]) => {
+        const emptyName = new RegExp(`${controller} controlled leaf`);
+        const fullName = new RegExp(`${controller} (controlled|Home) Lily Pad`);
         const zones = within(screen.getAllByRole('row')[rowY]).getAllByRole(
           'region',
         );
@@ -91,19 +128,24 @@ describe(Pond, () => {
   });
 
   describe.for<Player>([Player.North, Player.South])(
-    'when placing a %s card in a full grid',
+    'when %s is Upgrading in a full grid',
     player => {
+      const context: GameContext = [
+        {
+          ...DEFAULT_GAME_STATE,
+          flow: {
+            phase: Phase.Main,
+            player,
+            subphase: Subphase.Upgrading,
+          },
+        },
+        DEFAULT_GAME_DISPATCH,
+      ];
       beforeEach(() => {
         render(
-          <Pond
-            onPlaceCard={handlePlaceCard}
-            flow={{
-              phase: Phase.Main,
-              player,
-              subphase: Subphase.Upgrading,
-            }}
-            grid={FULL_GRID}
-          />,
+          <GameContext value={context}>
+            <Pond onCardPlaced={handleCardPlaced} grid={FULL_GRID} />,
+          </GameContext>,
         );
       });
 
@@ -114,7 +156,7 @@ describe(Pond, () => {
           expect(zone).not.toHaveAccessibleName(/Upgrade/);
           fireEvent.click(zone);
         }
-        expect(handlePlaceCard).not.toHaveBeenCalled();
+        expect(handleCardPlaced).not.toHaveBeenCalled();
       });
     },
   );
@@ -127,17 +169,23 @@ describe(Pond, () => {
     const goodRowsName = shouldReverse ? 'last' : 'first';
 
     describe(`when ${player} is Upgrading`, () => {
+      const context: GameContext = [
+        {
+          ...DEFAULT_GAME_STATE,
+          flow: {
+            phase: Phase.Main,
+            player,
+            subphase: Subphase.Upgrading,
+          },
+        },
+        DEFAULT_GAME_DISPATCH,
+      ];
+
       beforeEach(() => {
         render(
-          <Pond
-            onPlaceCard={handlePlaceCard}
-            flow={{
-              phase: Phase.Main,
-              player,
-              subphase: Subphase.Upgrading,
-            }}
-            grid={EMPTY_GRID}
-          />,
+          <GameContext value={context}>
+            <Pond onCardPlaced={handleCardPlaced} grid={EMPTY_GRID} />
+          </GameContext>,
         );
       });
 
@@ -150,8 +198,8 @@ describe(Pond, () => {
             fireEvent.click(button);
             expect(button).toHaveAccessibleName(/Upgrade/);
 
-            expect(handlePlaceCard).toHaveBeenCalledOnce();
-            handlePlaceCard.mockReset();
+            expect(handleCardPlaced).toHaveBeenCalledOnce();
+            handleCardPlaced.mockReset();
           }
           const zones = within(row).getAllByRole('gridcell');
           expect(zones).toHaveLength(LEAF_COUNT_PER_RANK);
@@ -161,8 +209,8 @@ describe(Pond, () => {
               `Upgrade ${player} controlled leaf`,
             );
 
-            expect(handlePlaceCard).toHaveBeenCalledOnce();
-            handlePlaceCard.mockReset();
+            expect(handleCardPlaced).toHaveBeenCalledOnce();
+            handleCardPlaced.mockReset();
           }
         }
       });
@@ -178,22 +226,28 @@ describe(Pond, () => {
             fireEvent.click(zone);
           }
         }
-        expect(handlePlaceCard).not.toHaveBeenCalled();
+        expect(handleCardPlaced).not.toHaveBeenCalled();
       });
     });
 
     describe(`when ${player} is Deploying`, () => {
+      const context: GameContext = [
+        {
+          ...DEFAULT_GAME_STATE,
+          flow: {
+            phase: Phase.Main,
+            player,
+            subphase: Subphase.Deploying,
+          },
+        },
+        DEFAULT_GAME_DISPATCH,
+      ];
+
       beforeEach(() => {
         render(
-          <Pond
-            onPlaceCard={handlePlaceCard}
-            flow={{
-              phase: Phase.Main,
-              player,
-              subphase: Subphase.Deploying,
-            }}
-            grid={EMPTY_GRID}
-          />,
+          <GameContext value={context}>
+            <Pond onCardPlaced={handleCardPlaced} grid={EMPTY_GRID} />
+          </GameContext>,
         );
       });
 
@@ -204,8 +258,8 @@ describe(Pond, () => {
         for (const button of buttons) {
           fireEvent.click(button);
           expect(button).toHaveAccessibleName(/Deploy on/);
-          expect(handlePlaceCard).toHaveBeenCalledOnce();
-          handlePlaceCard.mockReset();
+          expect(handleCardPlaced).toHaveBeenCalledOnce();
+          handleCardPlaced.mockReset();
         }
 
         const zones = within(row).getAllByRole('gridcell');
@@ -215,8 +269,8 @@ describe(Pond, () => {
           expect(zone).toHaveAccessibleName(
             `Deploy on ${player} controlled leaf`,
           );
-          expect(handlePlaceCard).toHaveBeenCalledOnce();
-          handlePlaceCard.mockReset();
+          expect(handleCardPlaced).toHaveBeenCalledOnce();
+          handleCardPlaced.mockReset();
         }
       });
 
@@ -231,7 +285,7 @@ describe(Pond, () => {
             fireEvent.click(zone);
           }
         }
-        expect(handlePlaceCard).not.toHaveBeenCalled();
+        expect(handleCardPlaced).not.toHaveBeenCalled();
       });
     });
   });
