@@ -7,14 +7,21 @@ import { HOME, type ZoneState } from '../state/pond';
 import { PLAYER_CLASSNAME, Subphase, type Player } from '../types/gameflow';
 import { positionsAreEqual, type Position } from '../types/position';
 
-type ZoneProps = Readonly<{
-  controller: Player;
-  position: Position;
-  zone: ZoneState;
+type ZoneProps = {
+  readonly controller: Player;
+  readonly position: Position;
+  readonly zone: ZoneState;
   // TODO 9: Get from context
   // TODO 9: onUpgrade, onDeploy, onCommitActivation
-  onPlace: (position: Position) => void;
-}>;
+  readonly onPlace: (position: Position) => void;
+};
+
+type ZoneContext = readonly [
+  {
+    flow: { subphase: Subphase; player: Player };
+  },
+  {},
+];
 
 export function Zone({
   zone: { isUpgraded, units },
@@ -26,7 +33,7 @@ export function Zone({
     {
       flow: { subphase, player },
     },
-  ] = useContext(GameContext);
+  ]: ZoneContext = useContext(GameContext);
   const handleClick = useCallback(() => onPlace(position), [position, onPlace]);
   const isUpgradeDropzone =
     subphase === Subphase.Upgrading && !isUpgraded && player === controller;
