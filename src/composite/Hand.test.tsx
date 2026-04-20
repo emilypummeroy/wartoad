@@ -1,6 +1,6 @@
 import { screen, within, render, fireEvent } from '@testing-library/react';
 
-import { CardClass, type CardKey } from '../types/card-class';
+import { CardClass, type CardKey } from '../types/card';
 import { Phase, Player } from '../types/gameflow';
 import {
   Hand,

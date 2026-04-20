@@ -12,7 +12,7 @@ import {
 } from './context/GameContext';
 import { Game } from './Game';
 import { DETERMINISTIC_STARTING_HAND } from './state/card';
-import { CardClass } from './types/card-class';
+import { CardClass } from './types/card';
 
 export function DeterministicApp() {
   const [state, setGameState] = useState<Readonly<GameState>>({

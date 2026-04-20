@@ -2,7 +2,7 @@ import { createContext } from 'react';
 
 import { createUnit } from '../state/card';
 import { INITIAL_POND, setPondStateAt, type PondState } from '../state/pond';
-import { type CardClass, CardType, UnitClass } from '../types/card-class';
+import { type CardClass, CardType, UnitClass } from '../types/card';
 import {
   Phase,
   PHASE_AFTER,

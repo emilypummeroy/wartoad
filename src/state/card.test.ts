@@ -1,11 +1,13 @@
-import type { Card, LeafCard, UnitCard } from '../state-types/card';
 import {
+  type Card,
+  type LeafCard,
+  type UnitCard,
   CardClass,
   CardType,
   LeafClass,
   NoneValues,
   UnitClass,
-} from '../types/card-class';
+} from '../types/card';
 import { Player } from '../types/gameflow';
 import { createUnit, createLeaf, isUnit, isLeaf, createCard } from './card';
 

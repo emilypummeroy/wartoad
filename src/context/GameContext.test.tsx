@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { useContext } from 'react';
 
-import { CardClass } from '../types/card-class';
+import { CardClass } from '../types/card';
 import { GameContext, type GameDispatch } from './GameContext';
 
 describe(GameContext, () => {

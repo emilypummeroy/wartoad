@@ -6,7 +6,7 @@ import {
 } from '../context/GameContext.test-utils';
 import { createUnit } from '../state/card';
 import { HOME } from '../state/pond';
-import { UnitClass } from '../types/card-class';
+import { UnitClass } from '../types/card';
 import { Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { Zone } from './Zone';

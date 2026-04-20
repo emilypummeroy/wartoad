@@ -1,15 +1,17 @@
-import type { Card, LeafCard, UnitCard } from '../state-types/card';
 import {
   CardClass,
   CardType,
   NoneValues,
+  type Card,
+  type LeafCard,
+  type UnitCard,
   type LeafClass,
   type UnitClass,
   type Leaf,
   type LeafValues,
   type Unit,
   type UnitValues,
-} from '../types/card-class';
+} from '../types/card';
 import type { Player } from '../types/gameflow';
 
 export const isUnit = (card: Card): card is UnitCard =>

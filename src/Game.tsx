@@ -5,7 +5,7 @@ import { PhaseTracker } from './base/PhaseTracker';
 import { Hand } from './composite/Hand';
 import { Pond } from './composite/Pond';
 import { GameContext } from './context/GameContext';
-import { CardClass } from './types/card-class';
+import { CardClass } from './types/card';
 import { Phase, Player, PLAYER_CLASSNAME, Subphase } from './types/gameflow';
 
 export function Game() {

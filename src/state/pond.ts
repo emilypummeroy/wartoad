@@ -1,4 +1,4 @@
-import type { UnitCard } from '../state-types/card';
+import type { UnitCard } from '../types/card';
 import { Player } from '../types/gameflow';
 import type { Position } from '../types/position';
 

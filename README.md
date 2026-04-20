@@ -10,19 +10,19 @@ Directories are ordered as follows. Files in later directories may only import f
 
 src:
 
-- types: basic types with no dependencies
-- state-types: composite types required by the state directory
+- types: basic types -- type imports only and only from the same directory
 - state: types, constants, and functions for operating on those types and constants
 - context: React contexts and relevant custom hooks, for direct use in any component
 - base: React components which import no other components
-- composite: React components which import some other components.
+- composite: React components which import some other components
 
 Also:
 
 - Files in src/composite may import eachother for now.
-- Files in other subdirectories may not import eachother.
+- Files in src/types may type-import eachother for now.
 - Game.tsx composes all components of the game. It is presentational/structural.
-- App.tsx provides top level context and state. It is an entrypoint and provides wiring but should have minimal logic.
+- App.tsx provides top level context and state for Game.tsx, which it imports. It is an entrypoint and provides wiring but should have minimal logic.
+- In other subdirectories, files of the same directory may not import eachother.
 
 ---
 

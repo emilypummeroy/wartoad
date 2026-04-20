@@ -2,7 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { DeterministicApp } from './App';
 import { HOME } from './state/pond';
-import { CardClass } from './types/card-class';
+import { CardClass } from './types/card';
 import { Phase, Player } from './types/gameflow';
 
 const MANY = 15;
