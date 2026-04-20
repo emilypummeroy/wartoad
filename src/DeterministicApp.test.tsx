@@ -2,7 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { DeterministicApp } from './App';
 import { HOME } from './state/pond';
-import { CardClass } from './types/card';
+import { CardClass, UnitClass } from './types/card';
 import { Phase, Player } from './types/gameflow';
 
 const MANY = 15;
@@ -73,6 +73,10 @@ describe(DeterministicApp, () => {
       withinThe.playArea().getAllByRole('region', {
         name: new RegExp(`${player} (controlled|Home) ${name}`),
       }),
+    unitsControlledByOfClass: (player: Player, cardClass: UnitClass) =>
+      withinThe.playArea().getAllByRole('region', {
+        name: new RegExp(`${player} unit ${cardClass.name}`),
+      }),
   };
 
   const getFirst = {
@@ -81,8 +85,10 @@ describe(DeterministicApp, () => {
     handCardNamed: (player: Player, name: string) =>
       getAll.handCardsNamed(player, name)[0],
     leafControlledBy: (player: Player) => getAll.leavesControlledBy(player)[0],
-    pondCardOwnedByNamed: (player: Player, name: string) =>
+    cardsControlledByWithName: (player: Player, name: string) =>
       getAll.cardsControlledByWithName(player, name)[0],
+    unitControlledByOfClass: (player: Player, cardClass: UnitClass) =>
+      getAll.unitsControlledByOfClass(player, cardClass)[0],
   };
 
   const queryAll = {
@@ -144,10 +150,11 @@ describe(DeterministicApp, () => {
         advanceToPhase(player, Main);
       });
 
+      // TODO 9: Unskip this
       it.skip('Should allow you to play and activate a Froglet, moving it to the second rank', () => {
         fireEvent.click(getFirst.handCardNamed(player, Froglet.name));
         fireEvent.click(getFirst.leafDropzoneControlledBy(player));
-        fireEvent.click(getFirst.pondCardOwnedByNamed(player, Froglet.name));
+        fireEvent.click(getFirst.unitControlledByOfClass(player, Froglet));
 
         expect(
           queryA.nthRankUnitControlledBy(player, 1),
@@ -300,7 +307,9 @@ describe(DeterministicApp, () => {
             queryA.upgradeDropzoneOnLeafNamed('Lily Pad'),
           ).not.toBeInTheDocument();
 
-          fireEvent.click(getFirst.pondCardOwnedByNamed(player, 'Lily Pad'));
+          fireEvent.click(
+            getFirst.cardsControlledByWithName(player, 'Lily Pad'),
+          );
           expect(
             getAll.cardsControlledByWithName(player, 'Lily Pad'),
           ).toHaveLength(initialLilyPadCount);

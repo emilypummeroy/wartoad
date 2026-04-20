@@ -2,6 +2,7 @@ import './App.css';
 import { useCallback, useRef, useState } from 'react';
 
 import {
+  activate,
   DEFAULT_GAME_STATE,
   endPhase,
   GameContext,
@@ -34,6 +35,10 @@ export function DeterministicApp() {
         position => setGameState(placeCard(getNext)(position)),
         [getNext],
       ),
+      activate: useCallback(
+        (card, position) => setGameState(activate(card, position)),
+        [],
+      ),
     },
   ];
 
@@ -60,6 +65,10 @@ export function App() {
       placeCard: useCallback(
         position => setGameState(placeCard(getNext)(position)),
         [getNext],
+      ),
+      activate: useCallback(
+        (card, position) => setGameState(activate(card, position)),
+        [],
       ),
     },
   ];

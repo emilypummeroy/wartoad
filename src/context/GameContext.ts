@@ -30,8 +30,6 @@ export type GameDispatch = {
   // TODO 10: onUpgrade, onDeploy,
   readonly placeCard: (_: Position) => void;
   readonly activate: (unit: UnitCard, position: Position) => void;
-  // - should set pickedCard
-  // - should set activationState
   // TODO 9: commitActivation(position)
   // - should move the pickedCard
   // - should unset pickedCard
@@ -81,14 +79,22 @@ export const GameContext = createContext<GameContext>([
 export const INITIAL_HAND_CARD_COUNT = 7;
 
 // TODO 11: Remove the particular card
-const removeOne = (cards: readonly CardClass[], cardClass: CardClass) => [
+const removeOne = (
+  cards: readonly CardClass[],
+  cardClass: CardClass,
+): CardClass[] => [
   ...cards.slice(0, cards.lastIndexOf(cardClass)),
   ...cards.slice(cards.lastIndexOf(cardClass) + 1),
 ];
 
 export const endPhase =
   (draw: () => CardClass) =>
-  ({ flow: { player, phase }, northHand, southHand, ...rest }: GameState) => ({
+  ({
+    flow: { player, phase },
+    northHand,
+    southHand,
+    ...rest
+  }: GameState): GameState => ({
     ...rest,
     flow: {
       player: phase === Phase.End ? PLAYER_AFTER[player] : player,
@@ -111,7 +117,7 @@ export const endPhase =
 
 export const pickCard =
   (pickedCard: CardClass) =>
-  ({ flow, ...rest }: GameState) => ({
+  ({ flow, ...rest }: GameState): GameState => ({
     ...rest,
     flow: {
       ...flow,
@@ -122,6 +128,18 @@ export const pickCard =
           : Subphase.Upgrading,
     },
     pickedCard,
+  });
+
+export const activate =
+  (unit: UnitCard, position: Position) =>
+  ({ flow, ...rest }: GameState): GameState => ({
+    ...rest,
+    flow: {
+      ...flow,
+      subphase: Subphase.Activating,
+    },
+    pickedCard: unit.cardClass,
+    activationState: { start: position },
   });
 
 export const placeCard =
@@ -139,7 +157,7 @@ export const placeCard =
     northHand,
     southHand,
     pickedCard,
-  }: GameState) => ({
+  }: GameState): GameState => ({
     flow: { ...flow, subphase: Subphase.Idle },
     northHand:
       player === Player.North && pickedCard && northHand.length > 0

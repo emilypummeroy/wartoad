@@ -88,7 +88,7 @@ export function Zone({
       >
         {isUpgraded ? (
           // TODO 11: Implement a non-splay-row hack to display cards on leaves
-          // TODO 10: Controller based on ZoneState not on position
+          // TODO 10: Set the controller based on ZoneState not on position
           <div className="stacking peeking">
             <div
               role="listitem"
@@ -143,7 +143,6 @@ const ZoneUnit = ({ card, position }: ZoneUnitProps) => {
     () => activate(card, position),
     [card, position, activate],
   );
-  // TODO 9: no activation outside main phase
   const canActivate =
     player === card.owner && phase === Phase.Main && subphase === Subphase.Idle;
   return canActivate ? (

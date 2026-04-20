@@ -172,13 +172,18 @@ describe(Zone, () => {
   );
 
   // No dropzone on zone:
-  // TODO 9: Add the Activating cases
   describe.for<Inputs>([
     // | Idle
     [North, North, Idle, { x: 0, y: 0 }, false, [South]],
     [South, North, Idle, { x: 1, y: 2 }, true, [North, South]],
     [North, South, Idle, { x: 2, y: 3 }, false, []],
     [South, South, Idle, { x: 0, y: 5 }, true, [North]],
+
+    // | Activating
+    [North, North, Activating, { x: 0, y: 0 }, false, [South]],
+    [South, North, Activating, { x: 1, y: 2 }, true, [North, South]],
+    [North, South, Activating, { x: 2, y: 3 }, false, []],
+    [South, South, Activating, { x: 0, y: 5 }, true, [North]],
 
     // | Deploying & not back row
     [North, North, Deploying, { x: 1, y: 1 }, true, [North, North]],
@@ -229,8 +234,8 @@ describe(Zone, () => {
   );
 
   // No dropzones or activation buttons if:
-  // | Start phase & back row & unupgraded & controlled by player
-  // | End phase & back row & unupgraded & controlled by player
+  // | Start phase & even if all other conditions are satisfied
+  // | End phase & even if all other conditions are satisfied
   describe.for<[Phase, ...Inputs]>([
     [Start, North, North, Idle, { x: 0, y: 0 }, false, [North, North]],
     [Start, North, North, Deploying, { x: 2, y: 0 }, false, [North, North]],
