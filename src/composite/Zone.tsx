@@ -4,7 +4,14 @@ import { useId, useCallback, useContext } from 'react';
 import { CardBack, Froglet, LilyPad } from '../base/Card';
 import { GameContext } from '../context/GameContext';
 import { HOME, type ZoneState } from '../state/pond';
-import { PLAYER_CLASSNAME, Subphase, type Player } from '../types/gameflow';
+import type { UnitCard } from '../types/card';
+import {
+  Phase,
+  PLAYER_CLASSNAME,
+  Subphase,
+  type Gameflow,
+  type Player,
+} from '../types/gameflow';
 import { positionsAreEqual, type Position } from '../types/position';
 
 type ZoneProps = {
@@ -18,7 +25,7 @@ type ZoneProps = {
 
 type ZoneContext = readonly [
   {
-    flow: { subphase: Subphase; player: Player };
+    flow: { subphase: Subphase; phase: Phase; player: Player };
   },
   {},
 ];
@@ -31,14 +38,19 @@ export function Zone({
 }: ZoneProps) {
   const [
     {
-      flow: { subphase, player },
+      flow: { subphase, phase, player },
     },
   ]: ZoneContext = useContext(GameContext);
   const handleClick = useCallback(() => onPlace(position), [position, onPlace]);
   const isUpgradeDropzone =
-    subphase === Subphase.Upgrading && !isUpgraded && player === controller;
+    phase === Phase.Main &&
+    subphase === Subphase.Upgrading &&
+    player === controller &&
+    !isUpgraded;
   const isDeployDropzone =
-    subphase === Subphase.Deploying && position.y === HOME[player].y;
+    phase === Phase.Main &&
+    subphase === Subphase.Deploying &&
+    position.y === HOME[player].y;
   // TODO 9: Activation dropzone
   const isHome = positionsAreEqual(HOME[controller], position);
   const buttonId = useId();
@@ -101,18 +113,71 @@ export function Zone({
             />
           </div>
         )}
-        {units.map(({ key, owner }) => (
-          // TODO 9: Click to activate a unit
-          <div key={key} className="stacking peeking">
-            <div
-              role="listitem"
-              className={`highlighting-card pickable-card ${PLAYER_CLASSNAME[controller]}`}
-            >
-              <Froglet player={owner} isOnLeaf />
-            </div>
-          </div>
+        {units.map(card => (
+          <ZoneUnit key={card.key} card={card} position={position} />
         ))}
       </div>
     </div>
   );
 }
+
+type ZoneUnitContext = readonly [
+  { flow: Gameflow },
+  {
+    readonly activate: (unit: UnitCard, position: Position) => void;
+  },
+];
+type ZoneUnitProps = { readonly card: UnitCard; readonly position: Position };
+
+const ZoneUnit = ({ card, position }: ZoneUnitProps) => {
+  const [
+    {
+      flow: { player, phase, subphase },
+    },
+    { activate },
+  ]: ZoneUnitContext = useContext(GameContext);
+  const buttonId = useId();
+  const symbolId = useId();
+  const nameId = useId();
+  const handleClick = useCallback(
+    () => activate(card, position),
+    [card, position, activate],
+  );
+  // TODO 9: no activation outside main phase
+  const canActivate =
+    player === card.owner && phase === Phase.Main && subphase === Subphase.Idle;
+  return canActivate ? (
+    <div className="stacking peeking">
+      <div
+        role="button"
+        aria-labelledby={`${buttonId} ${symbolId} ${nameId}`}
+        id={buttonId}
+        aria-label="Activate"
+        tabIndex={0}
+        onClick={handleClick}
+        className={`highlighting-card pickable-card ${PLAYER_CLASSNAME[card.owner]}`}
+      >
+        <Froglet
+          nameId={nameId}
+          symbolId={symbolId}
+          player={card.owner}
+          isOnLeaf
+        />
+      </div>
+    </div>
+  ) : (
+    <div className="stacking peeking">
+      <div
+        role="listitem"
+        className={`highlighting-card ${PLAYER_CLASSNAME[card.owner]}`}
+      >
+        <Froglet
+          nameId={nameId}
+          symbolId={symbolId}
+          player={card.owner}
+          isOnLeaf
+        />
+      </div>
+    </div>
+  );
+};

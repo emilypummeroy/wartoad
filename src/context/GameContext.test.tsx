@@ -1,7 +1,9 @@
 import { render } from '@testing-library/react';
 import { useContext } from 'react';
 
-import { CardClass } from '../types/card';
+import { createUnit } from '../state/card';
+import { CardClass, UnitClass } from '../types/card';
+import { Player } from '../types/gameflow';
 import { GameContext, type GameDispatch } from './GameContext';
 
 describe(GameContext, () => {
@@ -11,11 +13,21 @@ describe(GameContext, () => {
 
       for (const x of Object.values(dispatch)) expect(x).not.toThrow();
 
-      const { endPhase, pickCard, placeCard } = dispatch;
+      const { endPhase, pickCard, placeCard, activate } = dispatch;
       expect(() => endPhase()).not.toThrow();
       expect(() => pickCard(CardClass.LilyPad)).not.toThrow();
       expect(() => placeCard({ x: 0, y: 0 })).not.toThrow();
-      ({ endPhase, pickCard, placeCard }) satisfies GameDispatch;
+      expect(() =>
+        activate(
+          createUnit({
+            cardClass: UnitClass.Froglet,
+            owner: Player.North,
+            key: 0,
+          }),
+          { x: 0, y: 0 },
+        ),
+      ).not.toThrow();
+      ({ endPhase, pickCard, placeCard, activate }) satisfies GameDispatch;
 
       return '';
     }

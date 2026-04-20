@@ -2,7 +2,12 @@ import { createContext } from 'react';
 
 import { createUnit } from '../state/card';
 import { INITIAL_POND, setPondStateAt, type PondState } from '../state/pond';
-import { type CardClass, CardType, UnitClass } from '../types/card';
+import {
+  type CardClass,
+  CardType,
+  type UnitCard,
+  UnitClass,
+} from '../types/card';
 import {
   Phase,
   PHASE_AFTER,
@@ -24,7 +29,7 @@ export type GameDispatch = {
   readonly pickCard: (_: CardClass) => void;
   // TODO 10: onUpgrade, onDeploy,
   readonly placeCard: (_: Position) => void;
-  // TODO 9: activate(card, position)
+  readonly activate: (unit: UnitCard, position: Position) => void;
   // - should set pickedCard
   // - should set activationState
   // TODO 9: commitActivation(position)
@@ -64,6 +69,7 @@ export const DEFAULT_GAME_DISPATCH = {
   endPhase: NOOP,
   pickCard: NOOP,
   placeCard: NOOP,
+  activate: NOOP,
 };
 
 // TODO 10: Unit test the context and default values

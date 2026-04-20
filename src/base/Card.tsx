@@ -77,16 +77,23 @@ export function LilyPad({
     </section>
   );
 }
-
+type UnitCardProps = {
+  readonly isOnLeaf?: boolean;
+  readonly player?: Player;
+  readonly nameId?: string;
+  readonly symbolId?: string;
+};
 export function Froglet({
   player,
   isOnLeaf = false,
   nameId,
-}: Readonly<{ isOnLeaf?: boolean; nameId?: string; player?: Player }>) {
-  const symbolId = useId();
+  symbolId,
+}: UnitCardProps) {
   {
     const _nameId = useId();
+    const _symbolId = useId();
     nameId ??= _nameId;
+    symbolId ??= _symbolId;
   }
   const costId = useId();
   // TODO 17: Wire in card.class:
