@@ -9,7 +9,7 @@ import {
   Player,
   PLAYER_AFTER,
   Subphase,
-  type FlowState,
+  type Gameflow,
 } from '../types/gameflow';
 import { type Position } from '../types/position';
 
@@ -34,7 +34,7 @@ export type GameDispatch = {
 };
 
 export type GameState = {
-  readonly flow: FlowState;
+  readonly flow: Gameflow;
   readonly grid: PondState;
   // TODO 11: Card[]
   readonly northHand: readonly CardClass[];

@@ -1,13 +1,13 @@
 import { StepForward } from 'lucide-react';
 
-import { Player, Subphase, type FlowState } from '../types/gameflow';
+import { Player, Subphase, type Gameflow } from '../types/gameflow';
 
 // TODO 9: Tests for Activation subphase
 export function PhaseTracker({
   flow: { player, phase, subphase },
   onNextPhaseClicked,
 }: {
-  readonly flow: FlowState;
+  readonly flow: Gameflow;
   readonly onNextPhaseClicked: () => void;
 }) {
   return (

@@ -1,18 +1,16 @@
 import { fireEvent, screen, render } from '@testing-library/react';
 
 import {
-  DEFAULT_GAME_DISPATCH,
-  DEFAULT_GAME_STATE,
-  GameContext,
-} from '../context/GameContext';
+  gameflowOf,
+  renderWithGameContext,
+} from '../context/GameContext.test-utils';
 import { createUnit } from '../state/card';
 import { HOME } from '../state/pond';
 import { UnitClass } from '../types/card-class';
-import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import { Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { Zone } from './Zone';
 
-const { Main } = Phase;
 const { North, South } = Player;
 const { Upgrading, Deploying } = Subphase;
 
@@ -128,16 +126,13 @@ describe(Zone, () => {
       beforeEach(() => {
         const position = HOME[controller];
         const units = nFrogletsOwnedBy(unitCount, unitOwner);
-        render(
-          <GameContext value={[DEFAULT_GAME_STATE, DEFAULT_GAME_DISPATCH]}>
-            <Zone
-              position={position}
-              controller={controller}
-              zone={{ isUpgraded: true, units }}
-              onPlace={NOOP}
-            />
-            ,
-          </GameContext>,
+        renderWithGameContext()(
+          <Zone
+            position={position}
+            controller={controller}
+            zone={{ isUpgraded: true, units }}
+            onPlace={NOOP}
+          />,
         );
       });
 
@@ -170,31 +165,16 @@ describe(Zone, () => {
     'while %s is upgrading but controlled by %s | upgraded: %s | at %s | %s %s units',
     ([player, controller, isUpgraded, position, unitCount]) => {
       const units = nFrogletsOwnedByAlternating(unitCount, player);
-      const flow = {
-        player,
-        phase: Main,
-        subphase: Upgrading,
-      };
-      const context = [
-        {
-          ...DEFAULT_GAME_STATE,
-          flow,
-        },
-        DEFAULT_GAME_DISPATCH,
-      ] as const;
       const onPlace = vi.fn<() => void>();
 
       beforeEach(() => {
-        render(
-          <GameContext value={context}>
-            <Zone
-              position={position}
-              controller={controller}
-              zone={{ isUpgraded, units }}
-              onPlace={onPlace}
-            />
-            ,
-          </GameContext>,
+        renderWithGameContext([gameflowOf([player, Upgrading])])(
+          <Zone
+            position={position}
+            controller={controller}
+            zone={{ isUpgraded, units }}
+            onPlace={onPlace}
+          />,
         );
       });
 
@@ -228,44 +208,28 @@ describe(Zone, () => {
     'when controlled by %s while they are upgrading | position: %s',
     ([player, position, unitCount]) => {
       const units = nFrogletsOwnedByAlternating(unitCount, player);
-      const flow = {
-        player,
-        phase: Main,
-        subphase: Upgrading,
-      };
-      const context = [
-        {
-          ...DEFAULT_GAME_STATE,
-          flow,
-        },
-        DEFAULT_GAME_DISPATCH,
-      ] as const;
+      const onPlace = vi.fn<() => void>();
 
       it('should not have a dropzone if upgraded', () => {
-        render(
-          <GameContext value={context}>
-            <Zone
-              position={position}
-              controller={player}
-              zone={{ isUpgraded: true, units }}
-              onPlace={NOOP}
-            />
-          </GameContext>,
+        renderWithGameContext([gameflowOf([player, Upgrading])])(
+          <Zone
+            position={position}
+            controller={player}
+            zone={{ isUpgraded: true, units }}
+            onPlace={onPlace}
+          />,
         );
         expect(screen.queryByRole('button')).not.toBeInTheDocument();
       });
 
       it('should not call onPlace if upgraded when clicked', () => {
-        const onPlace = vi.fn<() => void>();
-        render(
-          <GameContext value={context}>
-            <Zone
-              position={position}
-              controller={player}
-              zone={{ isUpgraded: true, units }}
-              onPlace={onPlace}
-            />
-          </GameContext>,
+        renderWithGameContext([gameflowOf([player, Upgrading])])(
+          <Zone
+            position={position}
+            controller={player}
+            zone={{ isUpgraded: true, units }}
+            onPlace={onPlace}
+          />,
         );
 
         fireEvent.click(screen.getAllByRole('region')[0]);
@@ -273,17 +237,13 @@ describe(Zone, () => {
       });
 
       it('should call onPlace if unupgraded if the dropzone is clicked', () => {
-        const onPlace = vi.fn<() => void>();
-        render(
-          <GameContext value={context}>
-            <Zone
-              position={position}
-              controller={player}
-              zone={{ isUpgraded: false, units }}
-              onPlace={onPlace}
-            />
-            ,
-          </GameContext>,
+        renderWithGameContext([gameflowOf([player, Upgrading])])(
+          <Zone
+            position={position}
+            controller={player}
+            zone={{ isUpgraded: false, units }}
+            onPlace={onPlace}
+          />,
         );
         fireEvent.click(
           screen.getByRole('button', {
@@ -328,33 +288,19 @@ describe(Zone, () => {
     [South, { x: 1, y: 4 }, true, 4],
     [South, { x: 2, y: 4 }, false, 5],
   ])(
-    "in %s's non-home row position %s while deploying",
+    "in %s's non-home row position %s while they're deploying",
     ([player, position, isUpgraded, unitCount]) => {
       const units = nFrogletsOwnedByAlternating(unitCount, player);
       const onPlace = vi.fn<() => void>();
-      const flow = {
-        player,
-        phase: Main,
-        subphase: Deploying,
-      };
-      const context = [
-        {
-          ...DEFAULT_GAME_STATE,
-          flow,
-        },
-        DEFAULT_GAME_DISPATCH,
-      ] as const;
 
       beforeEach(() => {
-        render(
-          <GameContext value={context}>
-            <Zone
-              position={position}
-              controller={player}
-              zone={{ isUpgraded, units }}
-              onPlace={onPlace}
-            />
-          </GameContext>,
+        renderWithGameContext([gameflowOf([player, Deploying])])(
+          <Zone
+            position={position}
+            controller={player}
+            zone={{ isUpgraded, units }}
+            onPlace={onPlace}
+          />,
         );
       });
 
@@ -380,33 +326,19 @@ describe(Zone, () => {
     [South, HOME.South, true, 5, 'Home', 'Lily Pad'],
     [South, { x: 2, y: 5 }, false, 6, 'controlled', 'leaf'],
   ])(
-    "in %s's home row position %s while Deploying | isUpgraded: %s | unitCount: %s",
+    "in %s's home row position %s while they're Deploying | isUpgraded: %s | unitCount: %s",
     ([player, position, isUpgraded, unitCount, leafAdjective, leafName]) => {
       const onPlace = vi.fn<() => void>();
       const units = nFrogletsOwnedByAlternating(unitCount, player);
-      const flow = {
-        player,
-        phase: Main,
-        subphase: Deploying,
-      };
-      const context = [
-        {
-          ...DEFAULT_GAME_STATE,
-          flow,
-        },
-        DEFAULT_GAME_DISPATCH,
-      ] as const;
 
       beforeEach(() => {
-        render(
-          <GameContext value={context}>
-            <Zone
-              position={position}
-              controller={player}
-              zone={{ isUpgraded, units }}
-              onPlace={onPlace}
-            />
-          </GameContext>,
+        renderWithGameContext([gameflowOf([player, Deploying])])(
+          <Zone
+            position={position}
+            controller={player}
+            zone={{ isUpgraded, units }}
+            onPlace={onPlace}
+          />,
         );
       });
 

@@ -91,7 +91,7 @@
       }
     },
     {
-      "files": ["src/test-setup.ts", "**/*.test.ts*"],
+      "files": ["src/test-setup.ts", "**/*.test-utils.ts*", "**/*.test.ts*"],
       "plugins": ["vitest"],
       "rules": {
         "no-await-in-loop": "allow",

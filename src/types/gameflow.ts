@@ -1,4 +1,4 @@
-export type FlowState = {
+export type Gameflow = {
   readonly player: Player;
   readonly phase: Phase;
   readonly subphase: Subphase;

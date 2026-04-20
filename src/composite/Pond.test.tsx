@@ -1,10 +1,9 @@
 import { screen, render, within, fireEvent } from '@testing-library/react';
 
 import {
-  DEFAULT_GAME_DISPATCH,
-  DEFAULT_GAME_STATE,
-  GameContext,
-} from '../context/GameContext';
+  gameflowOf,
+  renderWithGameContext,
+} from '../context/GameContext.test-utils';
 import {
   LEAF_COUNT_PER_RANK,
   HOME,
@@ -16,8 +15,10 @@ import {
   EMPTY_GRID,
   ANOTHER_GRID,
 } from '../state/pond';
-import { Phase, Player, Subphase } from '../types/gameflow';
+import { Player, Subphase } from '../types/gameflow';
 import { Pond } from './Pond';
+
+const { Deploying, Upgrading } = Subphase;
 
 describe(Pond, () => {
   const handleCardPlaced = vi.fn<() => void>();
@@ -71,22 +72,9 @@ describe(Pond, () => {
     [Player.South, 'EMPTY_GRID', EMPTY_GRID],
     [Player.South, 'ANOTHER_GRID', ANOTHER_GRID],
   ])('on the %s turn with the grid: %s', ([player, _, grid]) => {
-    const context: GameContext = [
-      {
-        ...DEFAULT_GAME_STATE,
-        flow: {
-          ...DEFAULT_GAME_STATE.flow,
-          player,
-        },
-      },
-      DEFAULT_GAME_DISPATCH,
-    ];
-
     beforeEach(() => {
-      render(
-        <GameContext value={context}>
-          <Pond onCardPlaced={handleCardPlaced} grid={grid} />
-        </GameContext>,
+      renderWithGameContext([gameflowOf([player])])(
+        <Pond onCardPlaced={handleCardPlaced} grid={grid} />,
       );
     });
 
@@ -130,22 +118,9 @@ describe(Pond, () => {
   describe.for<Player>([Player.North, Player.South])(
     'when %s is Upgrading in a full grid',
     player => {
-      const context: GameContext = [
-        {
-          ...DEFAULT_GAME_STATE,
-          flow: {
-            phase: Phase.Main,
-            player,
-            subphase: Subphase.Upgrading,
-          },
-        },
-        DEFAULT_GAME_DISPATCH,
-      ];
       beforeEach(() => {
-        render(
-          <GameContext value={context}>
-            <Pond onCardPlaced={handleCardPlaced} grid={FULL_GRID} />,
-          </GameContext>,
+        renderWithGameContext([gameflowOf([player, Upgrading])])(
+          <Pond onCardPlaced={handleCardPlaced} grid={FULL_GRID} />,
         );
       });
 
@@ -169,23 +144,9 @@ describe(Pond, () => {
     const goodRowsName = shouldReverse ? 'last' : 'first';
 
     describe(`when ${player} is Upgrading`, () => {
-      const context: GameContext = [
-        {
-          ...DEFAULT_GAME_STATE,
-          flow: {
-            phase: Phase.Main,
-            player,
-            subphase: Subphase.Upgrading,
-          },
-        },
-        DEFAULT_GAME_DISPATCH,
-      ];
-
       beforeEach(() => {
-        render(
-          <GameContext value={context}>
-            <Pond onCardPlaced={handleCardPlaced} grid={EMPTY_GRID} />
-          </GameContext>,
+        renderWithGameContext([gameflowOf([player, Upgrading])])(
+          <Pond onCardPlaced={handleCardPlaced} grid={EMPTY_GRID} />,
         );
       });
 
@@ -231,23 +192,9 @@ describe(Pond, () => {
     });
 
     describe(`when ${player} is Deploying`, () => {
-      const context: GameContext = [
-        {
-          ...DEFAULT_GAME_STATE,
-          flow: {
-            phase: Phase.Main,
-            player,
-            subphase: Subphase.Deploying,
-          },
-        },
-        DEFAULT_GAME_DISPATCH,
-      ];
-
       beforeEach(() => {
-        render(
-          <GameContext value={context}>
-            <Pond onCardPlaced={handleCardPlaced} grid={EMPTY_GRID} />
-          </GameContext>,
+        renderWithGameContext([gameflowOf([player, Deploying])])(
+          <Pond onCardPlaced={handleCardPlaced} grid={EMPTY_GRID} />,
         );
       });
 
