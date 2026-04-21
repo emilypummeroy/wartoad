@@ -27,6 +27,7 @@
     ],
     "id-length": "allow",
     "no-inline-comments": "allow",
+    "no-implicit-coercion": ["error", { "allow": ["!!"] }],
     "switch-case-braces": ["error", "avoid"],
     "no-ternary": "allow",
     "no-shadow": "allow",

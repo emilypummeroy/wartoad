@@ -2,15 +2,15 @@ import { fireEvent, screen } from '@testing-library/react';
 
 import { activationOf, gameflowOf, renderWithGameContext } from '../context/GameContext.test-utils';
 import { createUnit } from '../state/card';
-import { HOME } from '../state/pond';
+import { HOME, INITIAL_POND, setPondStateAt } from '../state/pond';
 import { UnitClass, type UnitCard } from '../types/card';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
-import { Zone } from './Zone';
+import { LeafAndDropzone } from './LeafZone';
 
 const { North, South } = Player;
 const { Start, Main, End } = Phase;
-const { Idle, Deploying, Upgrading, Activation: Activating } = Subphase;
+const { Idle, Deploying, Upgrading, Activation } = Subphase;
 
 type Inputs = [
   controller: Player,
@@ -84,7 +84,7 @@ const itShouldNotHaveOpponentUpgradeOrActivateButtons = ([, player]: Inputs) => 
   });
 };
 
-describe(Zone, () => {
+describe(LeafAndDropzone, () => {
   const onPlace = vi.fn<() => void>();
   const activate = vi.fn<(c: UnitCard, p: Position) => void>();
 
@@ -96,9 +96,10 @@ describe(Zone, () => {
       {
         ...activationOf(activationStart),
         ...gameflowOf([player, subphase, Main]),
+        pond: setPondStateAt(INITIAL_POND, position, { isUpgraded, units }),
       },
       { activate },
-    ])(<Zone controller={controller} position={position} zone={{ isUpgraded, units }} onPlace={onPlace} />);
+    ])(<LeafAndDropzone controller={controller} position={position} onCardPlaced={onPlace} />);
   };
 
   // Home Lily Pad: upgraded & Home
@@ -106,7 +107,7 @@ describe(Zone, () => {
     [North, North, Idle, HOME[North], true, []],
     [North, South, Deploying, HOME[North], true, [South]],
     [South, North, Upgrading, HOME[South], true, []],
-    [South, South, Activating, HOME[South], true, [North, North]],
+    [South, South, Activation, HOME[South], true, [North, North]],
   ])('controlled by %s | Home position %s | upgraded %s | units owned by %s | turn of %s | subphase %s', inputs => {
     const [controller] = inputs;
     beforeEach(() => renderForInputsInMainPhase(inputs));
@@ -121,7 +122,7 @@ describe(Zone, () => {
   // Controlled Lily Pad: upgraded & !Home
   describe.for<Inputs>([
     [North, North, Upgrading, { x: 1, y: 2 }, true, [North, South]],
-    [North, South, Activating, { x: 2, y: 0 }, true, [North]],
+    [North, South, Activation, { x: 2, y: 0 }, true, [North]],
     [South, North, Idle, { x: 1, y: 4 }, true, []],
     [South, South, Deploying, { x: 0, y: 5 }, true, [South]],
   ])(
@@ -145,7 +146,7 @@ describe(Zone, () => {
     [North, South, Upgrading, { x: 0, y: 2 }, false, []],
     [North, South, Deploying, { x: 1, y: 5 }, false, [South]],
     [South, North, Idle, { x: 1, y: 0 }, false, [North, South]],
-    [South, North, Activating, { x: 2, y: 3 }, false, [North]],
+    [South, North, Activation, { x: 2, y: 3 }, false, [North]],
   ])(
     'controlled by %s | turn of %s | subphase %s | non-Home position %s | upgraded? %s | units owned by %s',
     inputs => {
@@ -173,18 +174,18 @@ describe(Zone, () => {
 
     // | Activating & not in range of start
     // Offsets: x+2, y-2, y+2, x-2
-    [North, North, Activating, { x: 0, y: 0 }, false, [South], { x: 2, y: 0 }],
-    [South, North, Activating, { x: 1, y: 2 }, true, [North, South], { x: 1, y: 0 }],
-    [North, South, Activating, { x: 1, y: 3 }, false, [], { x: 1, y: 5 }],
-    [South, South, Activating, { x: 2, y: 5 }, true, [North], { x: 0, y: 5 }],
+    [North, North, Activation, { x: 0, y: 0 }, false, [South], { x: 2, y: 0 }],
+    [South, North, Activation, { x: 1, y: 2 }, true, [North, South], { x: 1, y: 0 }],
+    [North, South, Activation, { x: 1, y: 3 }, false, [], { x: 1, y: 5 }],
+    [South, South, Activation, { x: 2, y: 5 }, true, [North], { x: 0, y: 5 }],
 
     // | Activating & same position as start
-    [North, North, Activating, { x: 1, y: 4 }, false, [South], { x: 1, y: 4 }],
-    [South, South, Activating, { x: 0, y: 3 }, true, [North], { x: 0, y: 3 }],
+    [North, North, Activation, { x: 1, y: 4 }, false, [South], { x: 1, y: 4 }],
+    [South, South, Activation, { x: 0, y: 3 }, true, [North], { x: 0, y: 3 }],
 
     // | Activating & no activation state
-    [North, North, Activating, { x: 2, y: 2 }, false, [South]],
-    [South, South, Activating, { x: 1, y: 5 }, true, [North]],
+    [North, North, Activation, { x: 2, y: 2 }, false, [South]],
+    [South, South, Activation, { x: 1, y: 5 }, true, [North]],
 
     // | Deploying & not back row
     [North, North, Deploying, { x: 1, y: 1 }, true, [North, North]],
@@ -237,33 +238,37 @@ describe(Zone, () => {
   // No dropzones or activation buttons if:
   // | Start phase & even if all other conditions are satisfied
   // | End phase & even if all other conditions are satisfied
+  // TODO 9: Add a case for Activation subphase
   describe.for<[Phase, ...Inputs]>([
     [Start, North, North, Idle, { x: 0, y: 0 }, false, [North, North], { x: 1, y: 0 }],
+    [Start, North, North, Activation, { x: 0, y: 0 }, false, [North, North], { x: 1, y: 0 }],
     [Start, North, North, Deploying, { x: 2, y: 0 }, false, [North, North], { x: 1, y: 0 }],
     [Start, North, North, Upgrading, { x: 2, y: 0 }, false, [North, North], { x: 1, y: 0 }],
     [Start, South, South, Idle, { x: 0, y: 5 }, false, [South, South], { x: 1, y: 5 }],
+    [Start, South, South, Activation, { x: 0, y: 5 }, false, [South, South], { x: 1, y: 5 }],
     [Start, South, South, Deploying, { x: 2, y: 5 }, false, [South, South], { x: 1, y: 5 }],
     [Start, South, South, Upgrading, { x: 2, y: 5 }, false, [South, South], { x: 1, y: 5 }],
     [End, North, North, Idle, { x: 0, y: 0 }, false, [North, North], { x: 0, y: 1 }],
+    [End, North, North, Activation, { x: 0, y: 0 }, false, [North, North], { x: 0, y: 1 }],
     [End, North, North, Deploying, { x: 2, y: 0 }, false, [North, North], { x: 2, y: 1 }],
     [End, North, North, Upgrading, { x: 2, y: 0 }, false, [North, North], { x: 2, y: 1 }],
     [End, South, South, Idle, { x: 0, y: 5 }, false, [South, South], { x: 0, y: 4 }],
+    [End, South, South, Activation, { x: 0, y: 5 }, false, [South, South], { x: 0, y: 4 }],
     [End, South, South, Deploying, { x: 2, y: 5 }, false, [South, South], { x: 2, y: 4 }],
     [End, South, South, Upgrading, { x: 2, y: 5 }, false, [South, South], { x: 2, y: 4 }],
   ])(
     '<<Special case>> during %s phase | controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s | activated from %s',
     ([phase, ...input]) => {
-      const [controller, player, subphase, position, isUpgraded, unitOwners] = input;
+      const [controller, player, subphase, position, isUpgraded, unitOwners, activationStart] = input;
 
       beforeEach(() => {
-        renderWithGameContext([gameflowOf([player, subphase, phase])])(
-          <Zone
-            controller={controller}
-            position={position}
-            zone={{ isUpgraded, units: frogletsOwnedBy(unitOwners) }}
-            onPlace={onPlace}
-          />,
-        );
+        renderWithGameContext([
+          {
+            ...gameflowOf([player, subphase, phase]),
+            ...activationOf(activationStart),
+            pond: setPondStateAt(INITIAL_POND, position, { isUpgraded, units: frogletsOwnedBy(unitOwners) }),
+          },
+        ])(<LeafAndDropzone controller={controller} position={position} onCardPlaced={onPlace} />);
       });
       itShouldHaveTheRightFroglets(input);
       itShouldNotHaveOpponentUpgradeOrActivateButtons(input);
@@ -379,10 +384,10 @@ describe(Zone, () => {
   describe.for<Inputs>([
     // Modified from: Activating & not in range of start
     // Offsets: x+1, y-1, y+1, x-1
-    [North, North, Activating, { x: 1, y: 0 }, false, [South], { x: 2, y: 0 }],
-    [South, North, Activating, { x: 0, y: 1 }, true, [North, South], { x: 0, y: 0 }],
-    [North, South, Activating, { x: 2, y: 4 }, false, [], { x: 2, y: 5 }],
-    [South, South, Activating, { x: 1, y: 5 }, true, [North], { x: 0, y: 5 }],
+    [North, North, Activation, { x: 1, y: 0 }, false, [South], { x: 2, y: 0 }],
+    [South, North, Activation, { x: 0, y: 1 }, true, [North, South], { x: 0, y: 0 }],
+    [North, South, Activation, { x: 2, y: 4 }, false, [], { x: 2, y: 5 }],
+    [South, South, Activation, { x: 1, y: 5 }, true, [North], { x: 0, y: 5 }],
   ])(
     'controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s | activated from %s',
     inputs => {
@@ -464,12 +469,12 @@ describe(Zone, () => {
   describe.for<Inputs>([
     [North, North, Idle, { x: 2, y: 3 }, true, []],
     [North, North, Idle, { x: 1, y: 4 }, false, [South]],
-    [North, North, Activating, { x: 0, y: 5 }, true, [North]],
+    [North, North, Activation, { x: 0, y: 5 }, true, [North]],
     [South, North, Deploying, { x: 2, y: 0 }, false, [North]],
     [South, North, Upgrading, { x: 1, y: 1 }, true, [North]],
     [South, South, Idle, { x: 0, y: 2 }, true, []],
     [North, South, Idle, { x: 2, y: 3 }, false, [North]],
-    [North, South, Activating, { x: 1, y: 4 }, true, [South]],
+    [North, South, Activation, { x: 1, y: 4 }, true, [South]],
     [South, South, Deploying, { x: 0, y: 5 }, false, [South]],
     [South, South, Upgrading, { x: 2, y: 0 }, true, [South]],
   ])('controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s', inputs => {

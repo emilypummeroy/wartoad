@@ -43,14 +43,18 @@ describe(App, () => {
         name: new RegExp(`${player} controlled leaf`),
       }),
     dropzoneControlledBy: (player: Player) =>
-      withinThe.playArea().getAllByRole('gridcell', {
-        name: new RegExp(`(Upgrade|Deploy on) ${player} controlled`),
+      withinThe.playArea().getAllByRole('button', {
+        name: new RegExp(`(Upgrade|Deploy on|Move to) ${player} (controlled|Home)`),
+      }),
+    basicDropzoneControlledBy: (player: Player) =>
+      withinThe.playArea().getAllByRole('button', {
+        name: new RegExp(`(Upgrade|Deploy on|Move to) ${player} controlled leaf`),
       }),
   };
 
   const getFirst = {
     dropzoneControlledBy: (player: Player) => getAll.dropzoneControlledBy(player)[0],
-    leafDropzoneControlledBy: (player: Player) => getAll.dropzoneControlledBy(player)[0],
+    basicDropzoneControlledBy: (player: Player) => getAll.basicDropzoneControlledBy(player)[0],
     clickableHandCard: (player: Player) => getAll.clickableHandCards(player)[0],
   };
 
@@ -230,7 +234,7 @@ describe(App, () => {
         const initialHandSize = getAll.handCards(player).length;
 
         fireEvent.click(getAll.clickableHandCards(player)[5]);
-        fireEvent.click(getFirst.leafDropzoneControlledBy(player));
+        fireEvent.click(getFirst.basicDropzoneControlledBy(player));
 
         expect(getAll.handCards(player)).toHaveLength(initialHandSize - 1);
       });

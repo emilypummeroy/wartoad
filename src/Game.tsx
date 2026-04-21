@@ -13,7 +13,6 @@ export function Game() {
     {
       flow: { phase, player, subphase },
       flow,
-      grid,
       northHand,
       southHand,
       pickedCard,
@@ -58,7 +57,7 @@ export function Game() {
         </section>
         <div className="scroll-x">
           <section className="playarea">
-            <Pond onCardPlaced={placeCard} pond={grid} />
+            <Pond onCardPlaced={placeCard} />
           </section>
         </div>
       </main>

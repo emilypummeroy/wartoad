@@ -53,9 +53,9 @@ describe(DeterministicApp, () => {
       withinThe.playArea().getAllByRole('gridcell', {
         name: `${player} controlled leaf`,
       }),
-    leafDropzonesControlledBy: (player: Player) =>
-      withinThe.playArea().getAllByRole('gridcell', {
-        name: new RegExp(`(Upgrade|Deploy on) ${player} controlled leaf`),
+    basicDropzonesControlledBy: (player: Player) =>
+      withinThe.playArea().getAllByRole('button', {
+        name: new RegExp(`(Upgrade|Deploy on|Move to) ${player} controlled leaf`),
       }),
     homeRowDropzones: (player: Player) =>
       withinThe.homeRow(player).getAllByRole('button', {
@@ -72,7 +72,7 @@ describe(DeterministicApp, () => {
   };
 
   const getFirst = {
-    leafDropzoneControlledBy: (player: Player) => getAll.leafDropzonesControlledBy(player)[0],
+    basicDropzoneControlledBy: (player: Player) => getAll.basicDropzonesControlledBy(player)[0],
     handCardNamed: (player: Player, name: string) => getAll.handCardsNamed(player, name)[0],
     leafControlledBy: (player: Player) => getAll.leavesControlledBy(player)[0],
     cardsControlledByWithName: (player: Player, name: string) => getAll.cardsControlledByWithName(player, name)[0],
@@ -138,7 +138,7 @@ describe(DeterministicApp, () => {
       // TODO 9: Unskip this
       it.skip('Should allow you to play and activate a Froglet, moving it to the second rank', () => {
         fireEvent.click(getFirst.handCardNamed(player, Froglet.name));
-        fireEvent.click(getFirst.leafDropzoneControlledBy(player));
+        fireEvent.click(getFirst.basicDropzoneControlledBy(player));
         fireEvent.click(getFirst.unitControlledByOfClass(player, Froglet));
 
         expect(queryA.nthRankUnitControlledBy(player, 1)).not.toBeInTheDocument();
@@ -165,7 +165,7 @@ describe(DeterministicApp, () => {
         expect(getThe.pickedCardDisplay()).toBeVisible();
         expect(getThe.pickedCardNamed(cardName)).toBeVisible();
 
-        fireEvent.click(getFirst.leafDropzoneControlledBy(player));
+        fireEvent.click(getFirst.basicDropzoneControlledBy(player));
         expect(queryA.pickedCardDisplay()).not.toBeInTheDocument();
       });
     });
@@ -206,7 +206,7 @@ describe(DeterministicApp, () => {
         const initialHandCount = getAll.handCards(player).length;
 
         fireEvent.click(getFirst.handCardNamed(player, name));
-        fireEvent.click(getFirst.leafDropzoneControlledBy(player));
+        fireEvent.click(getFirst.basicDropzoneControlledBy(player));
         expect(getAll.handCards(player)).toHaveLength(initialHandCount - 1);
         expect(getAll.handCardsNamed(player, name)).toHaveLength(initialNamedCount - 1);
       });
@@ -228,7 +228,7 @@ describe(DeterministicApp, () => {
         leafIndex => {
           const initialLilyPadCount = queryAll.cardsControlledByWithName(player, 'Lily Pad').length;
 
-          fireEvent.click(getAll.leafDropzonesControlledBy(player)[leafIndex]);
+          fireEvent.click(getAll.basicDropzonesControlledBy(player)[leafIndex]);
 
           expect(getAll.controlledCardsNamed(player, 'Lily Pad')).toHaveLength(initialLilyPadCount + 1);
         },

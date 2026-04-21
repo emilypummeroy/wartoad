@@ -3,7 +3,7 @@ import { useId, useCallback, useContext } from 'react';
 
 import { CardBack, Froglet, LilyPad } from '../base/Card';
 import { GameContext } from '../context/GameContext';
-import { HOME, type ZoneState } from '../state/pond';
+import { HOME, type PondState, type ZoneState } from '../state/pond';
 import type { UnitCard } from '../types/card';
 import {
   Phase,
@@ -19,86 +19,27 @@ import {
 } from '../types/position';
 
 type ZoneProps = {
+  readonly leafNameId: string;
+  readonly leafSymbolId: string;
+
+  // TODO 9: Get these from context
   readonly controller: Player;
   readonly position: Position;
-  readonly zone: ZoneState;
-  // TODO 9: Get from context
-  // TODO 9: onUpgrade, onDeploy, onCommitActivation
-  readonly onPlace: (position: Position) => void;
+  readonly leaf: ZoneState;
 };
 
-type ZoneContext = readonly [
-  {
-    flow: { subphase: Subphase; phase: Phase; player: Player };
-    activationState?: { start: Position };
-  },
-  {},
-];
+export function PondLeaf({
+  leafNameId,
+  leafSymbolId,
 
-// TODO 9: Simplify
-// oxlint-disable-next-line max-statements,max-lines-per-function
-export function Zone({
-  zone: { isUpgraded, units },
+  leaf: { isUpgraded, units },
   controller,
   position,
-  onPlace,
 }: ZoneProps) {
-  const [
-    {
-      flow: { subphase, phase, player },
-      activationState,
-    },
-  ]: ZoneContext = useContext(GameContext);
-  const handleClick = useCallback(() => onPlace(position), [position, onPlace]);
-  const isUpgradeDropzone =
-    phase === Phase.Main &&
-    subphase === Subphase.Upgrading &&
-    player === controller &&
-    !isUpgraded;
-  const isDeployDropzone =
-    phase === Phase.Main &&
-    subphase === Subphase.Deploying &&
-    position.y === HOME[player].y;
-  const isMoveDropzone =
-    phase === Phase.Main &&
-    subphase === Subphase.Activation &&
-    activationState &&
-    !positionsAreEqual(position, activationState.start) &&
-    distanceBetween(position, activationState.start) <= 1;
   const isHome = positionsAreEqual(HOME[controller], position);
-  const buttonId = useId();
-  const leafNameId = useId();
-  const leafSymbolId = useId();
-  const isDropzone = isUpgradeDropzone || isDeployDropzone || isMoveDropzone;
 
   return (
-    <div
-      role="gridcell"
-      aria-colindex={position.x}
-      className={`${isDropzone ? 'dropzone' : ''} zone ${PLAYER_CLASSNAME[controller]}`}
-      onClick={isDropzone ? handleClick : undefined}
-      tabIndex={isDropzone ? 0 : undefined}
-    >
-      {isDropzone && (
-        <div
-          id={buttonId}
-          aria-labelledby={`${buttonId} ${leafSymbolId} ${leafNameId}`}
-          role="button"
-          className="overlay-container"
-        >
-          <Replace>
-            <title>
-              {isUpgradeDropzone
-                ? 'Upgrade'
-                : isDeployDropzone
-                  ? 'Deploy on'
-                  : isMoveDropzone
-                    ? 'Move to'
-                    : ''}
-            </title>
-          </Replace>
-        </div>
-      )}
+    <>
       <div
         key="card-list"
         role="list"
@@ -138,7 +79,7 @@ export function Zone({
           <ZoneUnit key={card.key} card={card} position={position} />
         ))}
       </div>
-    </div>
+    </>
   );
 }
 
@@ -201,3 +142,111 @@ const ZoneUnit = ({ card, position }: ZoneUnitProps) => {
     </div>
   );
 };
+
+type LeafAndDropzoneContext = readonly [
+  {
+    readonly pond: PondState;
+    readonly flow: {
+      subphase: Subphase;
+      phase: Phase;
+      player: Player;
+    };
+    readonly activationState?: { start: Position };
+  },
+  unknown,
+  // {
+  //   commitUpgrade: (target: Position) => void;
+  //   commitDeploy: (on: Position) => void;
+  //   commitActivation: (end: Position) => void;
+  // },
+];
+
+type LeafAndDropzoneProps = {
+  readonly position: Position;
+  readonly controller: Player;
+  readonly onCardPlaced: (position: Position) => void;
+};
+export function LeafAndDropzone({
+  position,
+  position: { x, y },
+  controller,
+  onCardPlaced,
+}: LeafAndDropzoneProps) {
+  const [
+    {
+      flow: { player, phase, subphase },
+      activationState,
+      pond: {
+        [y]: { [x]: leaf },
+      },
+    },
+  ]: LeafAndDropzoneContext = useContext(GameContext);
+  const dropzoneId = useId();
+  const leafSymbolId = useId();
+  const leafNameId = useId();
+  const isUpgradeDropzone =
+    phase === Phase.Main &&
+    subphase === Subphase.Upgrading &&
+    player === controller &&
+    !leaf.isUpgraded;
+  const isDeployDropzone =
+    phase === Phase.Main &&
+    subphase === Subphase.Deploying &&
+    position.y === HOME[player].y;
+  const isMoveDropzone =
+    phase === Phase.Main &&
+    subphase === Subphase.Activation &&
+    !!activationState &&
+    !positionsAreEqual(position, activationState.start) &&
+    // TODO 21: Use unit's speed stat
+    distanceBetween(position, activationState.start) <= 1;
+
+  const isDropzone = isUpgradeDropzone || isDeployDropzone || isMoveDropzone;
+  const handleClick = useCallback(
+    () => (isDropzone ? onCardPlaced(position) : undefined),
+    [isDropzone, position],
+  );
+
+  return (
+    <div
+      role="gridcell"
+      aria-labelledby={`${leafSymbolId} ${leafNameId}`}
+      aria-colindex={position.x}
+    >
+      <div
+        className={`${isDropzone ? 'dropzone' : ''} zone ${PLAYER_CLASSNAME[controller]}`}
+        aria-labelledby={`${dropzoneId} ${leafSymbolId} ${leafNameId}`}
+        role={isDropzone ? 'button' : ''}
+        onClick={handleClick}
+        tabIndex={isDropzone ? 0 : undefined}
+      >
+        {isDropzone && (
+          <div
+            role="presentation"
+            id={dropzoneId}
+            className="overlay-container"
+          >
+            <Replace>
+              <title>
+                {isUpgradeDropzone
+                  ? 'Upgrade'
+                  : isDeployDropzone
+                    ? 'Deploy on'
+                    : isMoveDropzone
+                      ? 'Move to'
+                      : ''}
+              </title>
+            </Replace>
+          </div>
+        )}
+        <PondLeaf
+          leafNameId={leafNameId}
+          leafSymbolId={leafSymbolId}
+          position={position}
+          leaf={leaf}
+          controller={controller}
+        />
+      </div>
+    </div>
+  );
+}

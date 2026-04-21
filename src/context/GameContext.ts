@@ -38,7 +38,7 @@ export type GameDispatch = {
 
 export type GameState = {
   readonly flow: Gameflow;
-  readonly grid: PondState;
+  readonly pond: PondState;
   // TODO 11: Card[]
   readonly northHand: readonly CardClass[];
   // TODO 11: Card[]
@@ -67,10 +67,10 @@ export const DEFAULT_GAME_STATE = {
     player: Player.South,
     subphase: Subphase.Idle,
   },
-  grid: INITIAL_POND,
+  pond: INITIAL_POND,
   northHand: [],
   southHand: [],
-};
+} as const;
 
 export const DEFAULT_GAME_DISPATCH = {
   endPhase: () => {},
@@ -175,7 +175,7 @@ const placeCard =
   (getNextCardKey: () => number) =>
   (position: Position) =>
   ({
-    grid,
+    pond: grid,
     flow,
     flow: { subphase, player },
     northHand,
@@ -191,7 +191,7 @@ const placeCard =
       player === Player.South && pickedCard && southHand.length > 0
         ? removeOne(southHand, pickedCard)
         : southHand,
-    grid: setPondStateAt(
+    pond: setPondStateAt(
       grid,
       position,
       subphase === Subphase.Upgrading

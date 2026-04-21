@@ -1,19 +1,17 @@
-import { ROW_COUNT_PER_PLAYER, type PondState } from '../state/pond';
+import { ROW_COUNT_PER_PLAYER } from '../state/pond';
 import { Player } from '../types/gameflow';
 import { type Position } from '../types/position';
-import { Zone } from './Zone';
+import { LeafAndDropzone } from './LeafZone';
 
 export type PondProps = Readonly<{
-  pond: PondState;
   onCardPlaced: (position: Position) => void;
 }>;
-export function Pond({ pond: grid, onCardPlaced }: PondProps) {
+export function Pond({ onCardPlaced }: PondProps) {
   const children = (x: number, y: number) => (
-    <Zone
+    <LeafAndDropzone
       controller={y < ROW_COUNT_PER_PLAYER ? Player.North : Player.South}
       position={{ x, y }}
-      zone={grid[y][x]}
-      onPlace={onCardPlaced}
+      onCardPlaced={onCardPlaced}
     />
   );
   return (
