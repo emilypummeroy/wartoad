@@ -1,211 +1,238 @@
 import { screen, render, within, fireEvent } from '@testing-library/react';
 
-import { gameflowOf, renderWithGameContext } from '../context/GameContext.test-utils';
-import {
-  LEAF_COUNT_PER_RANK,
-  HOME,
-  ROW_COUNT,
-  ROW_COUNT_PER_PLAYER,
-  type PondState,
-  INITIAL_POND,
-} from '../state/pond';
-import { FULL_POND, EMPTY_POND, ANOTHER_POND } from '../state/pond.test-utils';
-import { Player, Subphase } from '../types/gameflow';
+import { activationOf, gameflowOf, renderWithGameContext } from '../context/GameContext.test-utils';
+import { LEAF_COUNT_PER_ROW, HOME, ROW_COUNT, ROW_COUNT_PER_PLAYER, type PondState } from '../state/pond';
+import { TestPondKey, TEST_PONDS_BY_KEY } from '../state/pond.test-utils';
+import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import type { Position } from '../types/position';
 import { Pond } from './Pond';
 
-const { Deploying, Upgrading } = Subphase;
+const { North, South } = Player;
+const { Start, Main, End } = Phase;
+const { Idle, Deploying, Upgrading, Activation } = Subphase;
+const { INITIAL_POND, FULL_POND, EMPTY_POND, ANOTHER_POND, POND_UNITS } = TestPondKey;
 
-describe(Pond, () => {
-  const handleCardPlaced = vi.fn<() => void>();
-  const getPlayerRows = (player: Player) =>
-    player === Player.North
-      ? screen.getAllByRole('row').slice(0, ROW_COUNT_PER_PLAYER)
-      : screen.getAllByRole('row').slice(ROW_COUNT_PER_PLAYER);
-  const getOpponentRows = (player: Player) =>
-    player === Player.North
-      ? screen.getAllByRole('row').slice(ROW_COUNT_PER_PLAYER)
-      : screen.getAllByRole('row').slice(0, ROW_COUNT_PER_PLAYER);
-  const getHomeRow = (player: Player) =>
-    player === Player.North
-      ? screen.getAllByRole('row')[HOME[Player.North].y]
-      : screen.getAllByRole('row')[HOME[Player.South].y];
-  const getNonHomeRows = (player: Player) =>
-    player === Player.North
-      ? screen.getAllByRole('row').slice(HOME[Player.North].y + 1)
-      : screen.getAllByRole('row').slice(0, HOME[Player.South].y);
+type Input = [turn: Player, Phase, Subphase, TestPondKey];
 
-  it.for<[name: string, PondState]>([
-    ['INITIAL_GRID_STATE', INITIAL_POND],
-    ['FULL_GRID', FULL_POND],
-    ['EMPTY_GRID', EMPTY_POND],
-    ['ANOTHER_GRID', ANOTHER_POND],
-  ])(`without context should display a grid with ${ROW_COUNT} rows of ${LEAF_COUNT_PER_RANK} leaves`, ([_, grid]) => {
-    render(<Pond grid={grid} onCardPlaced={handleCardPlaced} />);
-
+// 6x3 grid: Always
+// But this is a slightly slow test, so don't do it in every describe block,
+const it_should_have_a_6x3_grid_with_leaves = () => {
+  it(`should display a grid with ${ROW_COUNT} rows of ${LEAF_COUNT_PER_ROW} leaves`, () => {
     expect(screen.getByRole('grid')).toBeVisible();
-
     const rows = within(screen.getByRole('grid')).getAllByRole('row');
     expect(rows).toHaveLength(ROW_COUNT);
 
     for (const row of rows) {
-      expect(within(row).getAllByRole('region')).toHaveLength(LEAF_COUNT_PER_RANK);
+      const zones = within(row).getAllByRole('gridcell');
+      expect(zones).toHaveLength(LEAF_COUNT_PER_ROW);
+      for (const zone of zones) {
+        expect(within(zone).getByRole('region', { name: /Lily Pad|leaf/ })).toBeVisible();
+      }
     }
   });
+};
 
-  describe.for<[Player, name: string, PondState]>([
-    [Player.North, 'INITIAL_GRID_STATE', INITIAL_POND],
-    [Player.North, 'FULL_GRID', FULL_POND],
-    [Player.North, 'EMPTY_GRID', EMPTY_POND],
-    [Player.North, 'ANOTHER_GRID', ANOTHER_POND],
-    [Player.South, 'INITIAL_GRID_STATE', INITIAL_POND],
-    [Player.South, 'FULL_GRID', FULL_POND],
-    [Player.South, 'EMPTY_GRID', EMPTY_POND],
-    [Player.South, 'ANOTHER_GRID', ANOTHER_POND],
-  ])('on the %s turn with the grid: %s', ([player, _, grid]) => {
+// South rows and North rows: Always
+// But this is a slightly slow test, so don't do it in every describe block,
+const it_should_have_the_right_controlling_player_and_leaves_in_each_row = (pond: PondState) => {
+  it.for<[Player, number]>([
+    [North, 0],
+    [South, ROW_COUNT_PER_PLAYER],
+  ])(
+    `should display %s controlled leaves and Lily Pads ${ROW_COUNT_PER_PLAYER} rows from row %s`,
+    ([controller, firstY]) => {
+      const rows = screen.getAllByRole('row');
+      for (let y = firstY; y < firstY + ROW_COUNT_PER_PLAYER; y += 1) {
+        const zones = within(rows[y]).getAllByRole('gridcell', { name: new RegExp(controller) });
+        expect(zones).toHaveLength(LEAF_COUNT_PER_ROW);
+        for (let x = 0; x < zones.length; x += 1) {
+          const name = pond[y][x].isUpgraded ? /Lily Pad/ : /leaf/;
+          expect(within(zones[x]).getByRole('region', { name })).toBeVisible();
+        }
+      }
+    },
+  );
+};
+
+describe(Pond, () => {
+  const handleCardPlaced = vi.fn<() => void>();
+  const getPlayerRows = (player: Player) =>
+    player === North
+      ? screen.getAllByRole('row').slice(0, ROW_COUNT_PER_PLAYER)
+      : screen.getAllByRole('row').slice(ROW_COUNT_PER_PLAYER);
+  const getOpponentRows = (player: Player) =>
+    player === North
+      ? screen.getAllByRole('row').slice(ROW_COUNT_PER_PLAYER)
+      : screen.getAllByRole('row').slice(0, ROW_COUNT_PER_PLAYER);
+  const getHomeRow = (player: Player) =>
+    player === North ? screen.getAllByRole('row')[HOME[North].y] : screen.getAllByRole('row')[HOME[South].y];
+  const getNonHomeRows = (player: Player) =>
+    player === North
+      ? screen.getAllByRole('row').slice(HOME[North].y + 1)
+      : screen.getAllByRole('row').slice(0, HOME[South].y);
+
+  // Without context: default state
+  describe.for<[Player, TestPondKey]>([
+    [North, INITIAL_POND],
+    [South, ANOTHER_POND],
+  ])('without context | on %s turn | in pond: %s', ([, pondKey]) => {
+    const pond = TEST_PONDS_BY_KEY[pondKey];
+    beforeEach(() => render(<Pond pond={pond} onCardPlaced={handleCardPlaced} />));
+    it_should_have_a_6x3_grid_with_leaves();
+    it_should_have_the_right_controlling_player_and_leaves_in_each_row(pond);
+  });
+
+  // No dropzones:
+  describe.for<Input>([
+    // | Start phase
+    [North, Start, Idle, INITIAL_POND],
+    // | End phase
+    [South, End, Idle, INITIAL_POND],
+    // | Upgrading & full pond
+    [North, Main, Upgrading, FULL_POND],
+    [South, Main, Upgrading, FULL_POND],
+
+    // | Idle
+    [North, Main, Idle, INITIAL_POND],
+    [North, Main, Idle, FULL_POND],
+    [North, Main, Idle, POND_UNITS],
+    [South, Main, Idle, ANOTHER_POND],
+    [South, Main, Idle, EMPTY_POND],
+    [South, Main, Idle, POND_UNITS],
+  ])('on %s turn %s phase while %s | in pond: %s', ([player, phase, subphase, pondKey]) => {
+    const pond = TEST_PONDS_BY_KEY[pondKey];
     beforeEach(() => {
-      renderWithGameContext([gameflowOf([player])])(<Pond onCardPlaced={handleCardPlaced} grid={grid} />);
+      renderWithGameContext([gameflowOf([player, subphase, phase])])(
+        <Pond onCardPlaced={handleCardPlaced} pond={pond} />,
+      );
     });
+    it_should_have_a_6x3_grid_with_leaves();
+    it_should_have_the_right_controlling_player_and_leaves_in_each_row(pond);
 
-    it(`should display a grid with ${ROW_COUNT} rows of ${LEAF_COUNT_PER_RANK} leaves`, () => {
-      expect(screen.getByRole('grid')).toBeVisible();
-
-      const rows = within(screen.getByRole('grid')).getAllByRole('row');
-      expect(rows).toHaveLength(ROW_COUNT);
-
-      for (const row of rows) {
-        expect(within(row).getAllByRole('region')).toHaveLength(LEAF_COUNT_PER_RANK);
-      }
-    });
-
-    it.for<[rowController: Player, rowY: number]>([
-      [Player.North, 0],
-      [Player.North, 1],
-      [Player.North, 2],
-      [Player.South, 3],
-      [Player.South, 4],
-      [Player.South, 5],
-    ])('should display %s controlled leaves in the %sth row', ([controller, rowY]) => {
-      const emptyName = new RegExp(`${controller} controlled leaf`);
-      const fullName = new RegExp(`${controller} (controlled|Home) Lily Pad`);
-      const zones = within(screen.getAllByRole('row')[rowY]).getAllByRole('region');
-      for (let x = 0; x < zones.length; x += 1) {
-        expect(zones[x]).toHaveAccessibleName(grid[rowY][x].isUpgraded ? fullName : emptyName);
-      }
+    it('should not have any dropzones', () => {
+      expect(screen.queryByRole('button', { name: /Upgrade|Deploy|Move/ })).not.toBeInTheDocument();
+      expect(screen.queryByRole('gridcell', { name: /Upgrade|Deploy|Move/ })).not.toBeInTheDocument();
     });
   });
 
-  describe.for<Player>([Player.North, Player.South])('when %s is Upgrading in a full grid', player => {
+  // Upgrade dropzones in player-controlled leaves: Upgrading & empty pond
+  describe.for<Input>([
+    [North, Main, Upgrading, EMPTY_POND],
+    [South, Main, Upgrading, EMPTY_POND],
+  ])('on %s turn %s phase while %s | in pond: %s', ([player, phase, subphase, pondKey]) => {
+    const opponent = PLAYER_AFTER[player];
+    const pond = TEST_PONDS_BY_KEY[pondKey];
     beforeEach(() => {
-      renderWithGameContext([gameflowOf([player, Upgrading])])(
-        <Pond onCardPlaced={handleCardPlaced} grid={FULL_POND} />,
+      renderWithGameContext([gameflowOf([player, subphase, phase])])(
+        <Pond onCardPlaced={handleCardPlaced} pond={pond} />,
       );
     });
 
-    it('should not display any clickable zones', () => {
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
-      const zones = screen.getAllByRole('gridcell');
-      for (const zone of zones) {
-        expect(zone).not.toHaveAccessibleName(/Upgrade/);
-        fireEvent.click(zone);
+    it(`should display ${LEAF_COUNT_PER_ROW} clickable leaves in the ${player} rows`, () => {
+      for (const row of getPlayerRows(player)) {
+        const buttons = within(row).getAllByRole('button');
+        expect(buttons).toHaveLength(LEAF_COUNT_PER_ROW);
+
+        for (const button of buttons) {
+          fireEvent.click(button);
+          expect(button).toHaveAccessibleName(/Upgrade/);
+
+          expect(handleCardPlaced).toHaveBeenCalledOnce();
+          handleCardPlaced.mockReset();
+        }
+        const zones = within(row).getAllByRole('gridcell');
+        expect(zones).toHaveLength(LEAF_COUNT_PER_ROW);
+        for (const zone of zones) {
+          const dropzone = within(zone).getByRole('button', { name: `Upgrade ${player} controlled leaf` });
+          fireEvent.click(dropzone);
+          expect(handleCardPlaced).toHaveBeenCalledOnce();
+          handleCardPlaced.mockReset();
+        }
+      }
+    });
+
+    it(`should not display clickable leaves in the ${opponent} rows`, () => {
+      for (const row of getOpponentRows(player)) {
+        const zones = within(row).getAllByRole('gridcell');
+        expect(within(row).queryByRole('button')).not.toBeInTheDocument();
+        expect(zones).toHaveLength(LEAF_COUNT_PER_ROW);
+
+        for (const zone of zones) {
+          expect(zone).not.toHaveAccessibleName(/Upgrade/);
+          fireEvent.click(zone);
+        }
       }
       expect(handleCardPlaced).not.toHaveBeenCalled();
     });
   });
 
-  describe.for<[Player, shouldReverse: boolean]>([
-    [Player.North, false],
-    [Player.South, true],
-  ])("during %s's Main phase in an empty grid", ([player, shouldReverse]) => {
-    const badRowsName = shouldReverse ? 'first' : 'last';
-    const goodRowsName = shouldReverse ? 'last' : 'first';
-
-    describe(`when ${player} is Upgrading`, () => {
-      beforeEach(() => {
-        renderWithGameContext([gameflowOf([player, Upgrading])])(
-          <Pond onCardPlaced={handleCardPlaced} grid={EMPTY_POND} />,
-        );
-      });
-
-      it(`should display ${LEAF_COUNT_PER_RANK} clickable leaves in the ${goodRowsName} rows`, () => {
-        for (const row of getPlayerRows(player)) {
-          const buttons = within(row).getAllByRole('button');
-          expect(buttons).toHaveLength(LEAF_COUNT_PER_RANK);
-
-          for (const button of buttons) {
-            fireEvent.click(button);
-            expect(button).toHaveAccessibleName(/Upgrade/);
-
-            expect(handleCardPlaced).toHaveBeenCalledOnce();
-            handleCardPlaced.mockReset();
-          }
-          const zones = within(row).getAllByRole('gridcell');
-          expect(zones).toHaveLength(LEAF_COUNT_PER_RANK);
-          for (const zone of zones) {
-            fireEvent.click(zone);
-            expect(zone).toHaveAccessibleName(`Upgrade ${player} controlled leaf`);
-
-            expect(handleCardPlaced).toHaveBeenCalledOnce();
-            handleCardPlaced.mockReset();
-          }
-        }
-      });
-
-      it(`should not display clickable leaves in the ${badRowsName} rows`, () => {
-        for (const row of getOpponentRows(player)) {
-          const zones = within(row).getAllByRole('gridcell');
-          expect(within(row).queryByRole('button')).not.toBeInTheDocument();
-          expect(zones).toHaveLength(LEAF_COUNT_PER_RANK);
-
-          for (const zone of zones) {
-            expect(zone).not.toHaveAccessibleName(/Upgrade/);
-            fireEvent.click(zone);
-          }
-        }
-        expect(handleCardPlaced).not.toHaveBeenCalled();
-      });
+  // Deploy dropzones in home row: Deploying & any pond
+  describe.for<Input>([
+    [North, Main, Deploying, INITIAL_POND],
+    [North, Main, Deploying, FULL_POND],
+    [South, Main, Deploying, ANOTHER_POND],
+    [South, Main, Deploying, EMPTY_POND],
+  ])('on %s turn %s phase while %s | in pond: %s', ([player, phase, subphase, pondKey]) => {
+    const opponent = PLAYER_AFTER[player];
+    const pond = TEST_PONDS_BY_KEY[pondKey];
+    beforeEach(() => {
+      renderWithGameContext([gameflowOf([player, subphase, phase])])(
+        <Pond onCardPlaced={handleCardPlaced} pond={pond} />,
+      );
     });
 
-    describe(`when ${player} is Deploying`, () => {
-      beforeEach(() => {
-        renderWithGameContext([gameflowOf([player, Deploying])])(
-          <Pond onCardPlaced={handleCardPlaced} grid={EMPTY_POND} />,
-        );
-      });
+    it(`should display ${LEAF_COUNT_PER_ROW} Deploy dropzones in the ${player} home row`, () => {
+      const row = getHomeRow(player);
+      const buttons = within(row).getAllByRole('button', { name: /Deploy on/ });
+      expect(buttons).toHaveLength(LEAF_COUNT_PER_ROW);
+      for (const button of buttons) {
+        fireEvent.click(button);
+        expect(handleCardPlaced).toHaveBeenCalledOnce();
+        handleCardPlaced.mockReset();
+      }
+    });
 
-      it(`should display ${LEAF_COUNT_PER_RANK} clickable leaves in the single ${goodRowsName} row`, () => {
-        const row = getHomeRow(player);
-        const buttons = within(row).getAllByRole('button');
-        expect(buttons).toHaveLength(LEAF_COUNT_PER_RANK);
-        for (const button of buttons) {
-          fireEvent.click(button);
-          expect(button).toHaveAccessibleName(/Deploy on/);
-          expect(handleCardPlaced).toHaveBeenCalledOnce();
-          handleCardPlaced.mockReset();
-        }
+    it(`should not display clickable leaves in the 5 ${opponent} rows`, () => {
+      for (const row of getNonHomeRows(player)) {
+        expect(within(row).queryByRole('button')).not.toBeInTheDocument();
 
         const zones = within(row).getAllByRole('gridcell');
-        expect(zones).toHaveLength(LEAF_COUNT_PER_RANK);
+        expect(zones).toHaveLength(LEAF_COUNT_PER_ROW);
         for (const zone of zones) {
+          expect(zone).not.toHaveAccessibleName(/Deploy/);
           fireEvent.click(zone);
-          expect(zone).toHaveAccessibleName(`Deploy on ${player} controlled leaf`);
+        }
+      }
+      expect(handleCardPlaced).not.toHaveBeenCalled();
+    });
+  });
+
+  // Four Move dropzones: Activating from middle column near centre
+  const MIDDLE_COLUMN = { x: 1, y: 3 };
+  const ANOTHER_POSITION = { x: 1, y: 2 };
+  describe.for<[...Input, Position]>([
+    [North, Main, Activation, INITIAL_POND, MIDDLE_COLUMN],
+    [South, Main, Activation, FULL_POND, ANOTHER_POSITION],
+  ])(
+    'on %s turn %s phase while %s | in pond: %s | activation started at %s',
+    ([player, phase, subphase, pondKey, start]) => {
+      const pond = TEST_PONDS_BY_KEY[pondKey];
+      beforeEach(() => {
+        renderWithGameContext([{ ...gameflowOf([player, subphase, phase]), ...activationOf(start) }])(
+          <Pond onCardPlaced={handleCardPlaced} pond={pond} />,
+        );
+      });
+
+      const CARDINAL_DIRECTIONS = 4;
+      it(`should display ${CARDINAL_DIRECTIONS} Move dropzones`, () => {
+        const buttons = screen.getAllByRole('button', { name: /Move to/ });
+        expect(buttons).toHaveLength(CARDINAL_DIRECTIONS);
+        for (const button of buttons) {
+          fireEvent.click(button);
           expect(handleCardPlaced).toHaveBeenCalledOnce();
           handleCardPlaced.mockReset();
         }
       });
-
-      it(`should not display clickable leaves in the ${badRowsName} rows`, () => {
-        for (const row of getNonHomeRows(player)) {
-          const zones = within(row).getAllByRole('gridcell');
-          expect(within(row).queryByRole('button')).not.toBeInTheDocument();
-          expect(zones).toHaveLength(LEAF_COUNT_PER_RANK);
-
-          for (const zone of zones) {
-            expect(zone).not.toHaveAccessibleName(/Deploy on/);
-            fireEvent.click(zone);
-          }
-        }
-        expect(handleCardPlaced).not.toHaveBeenCalled();
-      });
-    });
-  });
+    },
+  );
 });

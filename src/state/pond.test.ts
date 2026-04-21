@@ -5,7 +5,7 @@ import {
   LEAF,
   INITIAL_POND,
   isPondState,
-  LEAF_COUNT_PER_RANK,
+  LEAF_COUNT_PER_ROW,
   ROW_COUNT,
   setPondStateAt,
   UPGRADED,
@@ -89,7 +89,7 @@ const itShouldNotChangeOtherZones = (
       for (let xx = 0; xx < x; xx += 1) {
         expect(newPond[yy][xx]).toBe(pond[yy][xx]);
       }
-      for (let xx = x + 1; xx < LEAF_COUNT_PER_RANK; xx += 1) {
+      for (let xx = x + 1; xx < LEAF_COUNT_PER_ROW; xx += 1) {
         expect(newPond[yy][xx]).toBe(pond[yy][xx]);
       }
     }
@@ -98,7 +98,7 @@ const itShouldNotChangeOtherZones = (
       for (let xx = 0; xx < x; xx += 1) {
         expect(newPond[yy][xx]).toBe(pond[yy][xx]);
       }
-      for (let xx = x + 1; xx < LEAF_COUNT_PER_RANK; xx += 1) {
+      for (let xx = x + 1; xx < LEAF_COUNT_PER_ROW; xx += 1) {
         expect(newPond[yy][xx]).toBe(pond[yy][xx]);
       }
     }

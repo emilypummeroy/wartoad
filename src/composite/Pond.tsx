@@ -4,10 +4,10 @@ import { type Position } from '../types/position';
 import { Zone } from './Zone';
 
 export type PondProps = Readonly<{
-  grid: PondState;
+  pond: PondState;
   onCardPlaced: (position: Position) => void;
 }>;
-export function Pond({ grid, onCardPlaced }: PondProps) {
+export function Pond({ pond: grid, onCardPlaced }: PondProps) {
   const children = (x: number, y: number) => (
     <Zone
       controller={y < ROW_COUNT_PER_PLAYER ? Player.North : Player.South}

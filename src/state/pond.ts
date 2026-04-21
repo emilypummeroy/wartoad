@@ -21,7 +21,7 @@ export const isPondState = (
   array: ReadonlyArray<ReadonlyArray<ZoneState>>,
 ): array is PondState =>
   array.length === ROW_COUNT &&
-  array.every(row => row.length === LEAF_COUNT_PER_RANK);
+  array.every(row => row.length === LEAF_COUNT_PER_ROW);
 
 export const setPondStateAt = (
   old: PondState,
@@ -47,7 +47,7 @@ export const setPondStateAt = (
 
 export const ROW_COUNT = 6 as const;
 export const ROW_COUNT_PER_PLAYER = 3 as const;
-export const LEAF_COUNT_PER_RANK = 3 as const;
+export const LEAF_COUNT_PER_ROW = 3 as const;
 
 export const UPGRADED = { units: [], isUpgraded: true } as const;
 export const LEAF = { units: [], isUpgraded: false } as const;

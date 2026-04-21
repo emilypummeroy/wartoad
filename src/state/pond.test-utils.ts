@@ -1,7 +1,15 @@
 import { CardClass, type UnitCard } from '../types/card';
 import { Player } from '../types/gameflow';
 import { createUnit } from './card';
-import { LEAF, UPGRADED, type PondState, type ZoneState } from './pond';
+import {
+  INITIAL_POND,
+  LEAF,
+  UPGRADED,
+  type PondState,
+  type ZoneState,
+} from './pond';
+
+export type TestPondKey = keyof typeof TEST_PONDS_BY_KEY;
 
 const SOUTH_UNIT: UnitCard[] = [
   createUnit({
@@ -110,3 +118,19 @@ export const POND_UNITS: PondState = [
   [UPGRADED, LEAF_WITH_UNIT, UPGRADED],
   [LEAF, UPGRADED, LEAF],
 ];
+
+export const TEST_PONDS_BY_KEY = {
+  INITIAL_POND,
+  FULL_POND,
+  EMPTY_POND,
+  ANOTHER_POND,
+  POND_UNITS,
+} as const;
+
+export const TestPondKey = {
+  INITIAL_POND: 'INITIAL_POND',
+  FULL_POND: 'FULL_POND',
+  EMPTY_POND: 'EMPTY_POND',
+  ANOTHER_POND: 'ANOTHER_POND',
+  POND_UNITS: 'POND_UNITS',
+} as Record<TestPondKey, TestPondKey>;

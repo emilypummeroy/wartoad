@@ -14,6 +14,7 @@ const { Froglet } = CardClass;
 describe(DeterministicApp, () => {
   beforeEach(() => render(<DeterministicApp />));
 
+  // TODO 10: Try getters
   const getThe = {
     header: () => screen.getByRole('banner'),
     main: () => screen.getByRole('main'),
