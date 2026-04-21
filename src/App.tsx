@@ -1,46 +1,18 @@
 import './App.css';
-import { useCallback, useRef, useState } from 'react';
-
 import {
-  activate,
-  DEFAULT_GAME_STATE,
-  endPhase,
   GameContext,
   INITIAL_HAND_CARD_COUNT,
-  pickCard,
-  placeCard,
-  type GameState,
+  useGameContextData,
 } from './context/GameContext';
 import { Game } from './Game';
 import { DETERMINISTIC_STARTING_HAND } from './state/card';
 import { CardClass } from './types/card';
 
 export function DeterministicApp() {
-  const [state, setGameState] = useState<Readonly<GameState>>({
-    ...DEFAULT_GAME_STATE,
-    northHand: shuffled(DETERMINISTIC_STARTING_HAND),
-    southHand: shuffled(DETERMINISTIC_STARTING_HAND),
-  });
-
-  const { getNextCardKey: getNext } = useCardKeys();
-  const context: GameContext = [
-    state,
-    {
-      endPhase: useCallback(
-        () => setGameState(endPhase(() => CardClass.Froglet)),
-        [],
-      ),
-      pickCard: useCallback(cardClass => setGameState(pickCard(cardClass)), []),
-      placeCard: useCallback(
-        position => setGameState(placeCard(getNext)(position)),
-        [getNext],
-      ),
-      activate: useCallback(
-        (card, position) => setGameState(activate(card, position)),
-        [],
-      ),
-    },
-  ];
+  const context: GameContext = useGameContextData(
+    () => shuffled(DETERMINISTIC_STARTING_HAND),
+    () => CardClass.Froglet,
+  );
 
   return (
     <GameContext value={context}>
@@ -50,28 +22,10 @@ export function DeterministicApp() {
 }
 
 export function App() {
-  const [state, setGameState] = useState<Readonly<GameState>>({
-    ...DEFAULT_GAME_STATE,
-    northHand: Array.from({ length: INITIAL_HAND_CARD_COUNT }, randomCardClass),
-    southHand: Array.from({ length: INITIAL_HAND_CARD_COUNT }, randomCardClass),
-  });
-
-  const { getNextCardKey: getNext } = useCardKeys();
-  const context: GameContext = [
-    state,
-    {
-      endPhase: useCallback(() => setGameState(endPhase(randomCardClass)), []),
-      pickCard: useCallback(cardClass => setGameState(pickCard(cardClass)), []),
-      placeCard: useCallback(
-        position => setGameState(placeCard(getNext)(position)),
-        [getNext],
-      ),
-      activate: useCallback(
-        (card, position) => setGameState(activate(card, position)),
-        [],
-      ),
-    },
-  ];
+  const context: GameContext = useGameContextData(
+    () => Array.from({ length: INITIAL_HAND_CARD_COUNT }, randomCardClass),
+    randomCardClass,
+  );
 
   return (
     <GameContext value={context}>
@@ -84,17 +38,6 @@ const randomCardClass = (): CardClass =>
   Object.values(CardClass)[
     Math.floor(Math.random() * Object.values(CardClass).length)
   ];
-
-const useCardKeys = () => {
-  const previousCardKey = useRef(0);
-  return {
-    getNextCardKey: useCallback(() => {
-      const cardKey = previousCardKey.current + 1;
-      previousCardKey.current = cardKey;
-      return cardKey;
-    }, [previousCardKey]),
-  };
-};
 
 const shuffled: <T>(cards: readonly T[]) => T[] = cards => {
   const source = [...cards];

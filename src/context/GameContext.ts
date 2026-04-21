@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext, useRef, useState } from 'react';
 
 import { createUnit } from '../state/card';
 import { INITIAL_POND, setPondStateAt, type PondState } from '../state/pond';
@@ -50,7 +50,16 @@ export type GameState = {
   };
 };
 
-const NOOP = () => {};
+export const useGameContextData = (
+  getStartingHand: () => CardClass[],
+  getDrawnCard: () => CardClass,
+): GameContext => {
+  const cardKey = useRef(0);
+  const getNextCardKey = () => (cardKey.current += 1);
+  const [state, setState] = useState<GameState>(createState(getStartingHand));
+  const dispatch = createDispatch(getDrawnCard, getNextCardKey)(setState);
+  return [state, dispatch];
+};
 
 export const DEFAULT_GAME_STATE = {
   flow: {
@@ -64,10 +73,10 @@ export const DEFAULT_GAME_STATE = {
 };
 
 export const DEFAULT_GAME_DISPATCH = {
-  endPhase: NOOP,
-  pickCard: NOOP,
-  placeCard: NOOP,
-  activate: NOOP,
+  endPhase: () => {},
+  pickCard: () => {},
+  placeCard: () => {},
+  activate: () => {},
 };
 
 // TODO 10: Unit test the context and default values
@@ -78,6 +87,26 @@ export const GameContext = createContext<GameContext>([
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 
+const createDispatch =
+  (getDrawnCard: () => CardClass, getNextCardKey: () => number) =>
+  (setState: (_: (_: GameState) => GameState) => void): GameDispatch => ({
+    endPhase: () => setState(endPhase(getDrawnCard)),
+
+    pickCard: (card: CardClass) => setState(pickCard(card)),
+
+    placeCard: (position: Position) =>
+      setState(placeCard(getNextCardKey)(position)),
+
+    activate: (unit: UnitCard, position: Position) =>
+      setState(activate(unit, position)),
+  });
+
+const createState = (getStartingHand: () => CardClass[]) => ({
+  ...DEFAULT_GAME_STATE,
+  northHand: getStartingHand(),
+  southHand: getStartingHand(),
+});
+
 // TODO 11: Remove the particular card
 const removeOne = (
   cards: readonly CardClass[],
@@ -87,7 +116,7 @@ const removeOne = (
   ...cards.slice(cards.lastIndexOf(cardClass) + 1),
 ];
 
-export const endPhase =
+const endPhase =
   (draw: () => CardClass) =>
   ({
     flow: { player, phase },
@@ -115,7 +144,7 @@ export const endPhase =
         : southHand,
   });
 
-export const pickCard =
+const pickCard =
   (pickedCard: CardClass) =>
   ({ flow, ...rest }: GameState): GameState => ({
     ...rest,
@@ -130,7 +159,7 @@ export const pickCard =
     pickedCard,
   });
 
-export const activate =
+const activate =
   (unit: UnitCard, position: Position) =>
   ({ flow, ...rest }: GameState): GameState => ({
     ...rest,
@@ -142,7 +171,7 @@ export const activate =
     activationState: { start: position },
   });
 
-export const placeCard =
+const placeCard =
   (getNextCardKey: () => number) =>
   (position: Position) =>
   ({
