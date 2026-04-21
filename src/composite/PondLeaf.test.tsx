@@ -6,7 +6,7 @@ import { HOME, INITIAL_POND, setPondStateAt } from '../state/pond';
 import { UnitClass, type UnitCard } from '../types/card';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
-import { LeafAndDropzone } from './LeafZone';
+import { PondLeaf } from './PondLeaf';
 
 const { North, South } = Player;
 const { Start, Main, End } = Phase;
@@ -84,7 +84,7 @@ const itShouldNotHaveOpponentUpgradeOrActivateButtons = ([, player]: Inputs) => 
   });
 };
 
-describe(LeafAndDropzone, () => {
+describe(PondLeaf, () => {
   const onPlace = vi.fn<() => void>();
   const activate = vi.fn<(c: UnitCard, p: Position) => void>();
 
@@ -99,7 +99,7 @@ describe(LeafAndDropzone, () => {
         pond: setPondStateAt(INITIAL_POND, position, { isUpgraded, units }),
       },
       { activate },
-    ])(<LeafAndDropzone controller={controller} position={position} onCardPlaced={onPlace} />);
+    ])(<PondLeaf controller={controller} position={position} onCardPlaced={onPlace} />);
   };
 
   // Home Lily Pad: upgraded & Home
@@ -268,7 +268,7 @@ describe(LeafAndDropzone, () => {
             ...activationOf(activationStart),
             pond: setPondStateAt(INITIAL_POND, position, { isUpgraded, units: frogletsOwnedBy(unitOwners) }),
           },
-        ])(<LeafAndDropzone controller={controller} position={position} onCardPlaced={onPlace} />);
+        ])(<PondLeaf controller={controller} position={position} onCardPlaced={onPlace} />);
       });
       itShouldHaveTheRightFroglets(input);
       itShouldNotHaveOpponentUpgradeOrActivateButtons(input);
