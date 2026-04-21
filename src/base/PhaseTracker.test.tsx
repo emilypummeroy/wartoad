@@ -21,16 +21,11 @@ describe(PhaseTracker, () => {
     [South, Main, Deploying],
     [South, Main, Upgrading],
     [South, End, Idle],
-  ])(
-    'should show the %s %s phase during %s subphase',
-    ([player, phase, subphase]) => {
-      const flow = { player, phase, subphase };
-      render(<PhaseTracker flow={flow} onNextPhaseClicked={NOOP} />);
-      expect(
-        screen.getByRole('region', { name: `${player}: ${phase} phase` }),
-      ).toBeVisible();
-    },
-  );
+  ])('should show the %s %s phase during %s subphase', ([player, phase, subphase]) => {
+    const flow = { player, phase, subphase };
+    render(<PhaseTracker flow={flow} onNextPhaseClicked={NOOP} />);
+    expect(screen.getByRole('region', { name: `${player}: ${phase} phase` })).toBeVisible();
+  });
 
   it.for<[Player, Phase]>([
     [North, Start],
@@ -39,38 +34,22 @@ describe(PhaseTracker, () => {
     [South, Start],
     [South, Main],
     [South, End],
-  ])(
-    'should allow clicking to progress phase when Idle in the %s %s phase',
-    ([player, phase]) => {
-      const onNextPhaseClicked = vi.fn<() => void>();
-      render(
-        <PhaseTracker
-          flow={{ player, phase, subphase: Idle }}
-          onNextPhaseClicked={onNextPhaseClicked}
-        />,
-      );
-      fireEvent.click(screen.getByRole('button', { name: 'Next phase' }));
-      expect(onNextPhaseClicked).toHaveBeenCalledOnce();
-    },
-  );
+  ])('should allow clicking to progress phase when Idle in the %s %s phase', ([player, phase]) => {
+    const onNextPhaseClicked = vi.fn<() => void>();
+    render(<PhaseTracker flow={{ player, phase, subphase: Idle }} onNextPhaseClicked={onNextPhaseClicked} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Next phase' }));
+    expect(onNextPhaseClicked).toHaveBeenCalledOnce();
+  });
 
   it.for<[Subphase, Player]>([
     [Deploying, North],
     [Upgrading, North],
     [Deploying, South],
     [Upgrading, South],
-  ])(
-    'should not allow clicking to progress phase when Idle in the %s %s phase',
-    ([subphase, player]) => {
-      const onNextPhaseClicked = vi.fn<() => void>();
-      render(
-        <PhaseTracker
-          flow={{ player, phase: Main, subphase }}
-          onNextPhaseClicked={onNextPhaseClicked}
-        />,
-      );
-      fireEvent.click(screen.getByRole('button', { name: 'Next phase' }));
-      expect(onNextPhaseClicked).not.toHaveBeenCalled();
-    },
-  );
+  ])('should not allow clicking to progress phase when Idle in the %s %s phase', ([subphase, player]) => {
+    const onNextPhaseClicked = vi.fn<() => void>();
+    render(<PhaseTracker flow={{ player, phase: Main, subphase }} onNextPhaseClicked={onNextPhaseClicked} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Next phase' }));
+    expect(onNextPhaseClicked).not.toHaveBeenCalled();
+  });
 });

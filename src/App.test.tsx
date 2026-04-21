@@ -25,28 +25,19 @@ describe(App, () => {
     main: () => screen.getByRole('main'),
     southHand: () => getThe.hand(South),
     northHand: () => getThe.hand(North),
-    hand: (player: Player) =>
-      screen.getByRole('region', { name: `${player} hand` }),
-    pickedCardDisplay: () =>
-      screen.getByRole('region', { name: `Picked card` }),
-    pickedCard: () =>
-      withinThe.pickedCardDisplay().getByRole('region', { name: /(?!back)$/ }),
+    hand: (player: Player) => screen.getByRole('region', { name: `${player} hand` }),
+    pickedCardDisplay: () => screen.getByRole('region', { name: `Picked card` }),
+    pickedCard: () => withinThe.pickedCardDisplay().getByRole('region', { name: /(?!back)$/ }),
     playArea: () => withinThe.main().getByRole('grid'),
     phaseIndicator: (player: Player, phase: Phase) =>
-      withinThe
-        .header()
-        .getByRole('region', { name: `${player}: ${phase} phase` }),
+      withinThe.header().getByRole('region', { name: `${player}: ${phase} phase` }),
   };
 
   const getAll = {
-    handCards: (player: Player) =>
-      withinThe.hand(player).getAllByRole('region'),
-    clickableHandCards: (player: Player) =>
-      withinThe.hand(player).getAllByRole('button', {}),
-    visibleHandCards: (player: Player) =>
-      withinThe.hand(player).getAllByRole('region', { name: /(?!back)$/ }),
-    hiddenHandCards: (player: Player) =>
-      withinThe.hand(player).getAllByRole('region', { name: 'Card back' }),
+    handCards: (player: Player) => withinThe.hand(player).getAllByRole('region'),
+    clickableHandCards: (player: Player) => withinThe.hand(player).getAllByRole('button', {}),
+    visibleHandCards: (player: Player) => withinThe.hand(player).getAllByRole('region', { name: /(?!back)$/ }),
+    hiddenHandCards: (player: Player) => withinThe.hand(player).getAllByRole('region', { name: 'Card back' }),
     basicLeavesControlledBy: (player: Player) =>
       withinThe.playArea().getAllByRole('region', {
         name: new RegExp(`${player} controlled leaf`),
@@ -58,16 +49,13 @@ describe(App, () => {
   };
 
   const getFirst = {
-    dropzoneControlledBy: (player: Player) =>
-      getAll.dropzoneControlledBy(player)[0],
-    leafDropzoneControlledBy: (player: Player) =>
-      getAll.dropzoneControlledBy(player)[0],
+    dropzoneControlledBy: (player: Player) => getAll.dropzoneControlledBy(player)[0],
+    leafDropzoneControlledBy: (player: Player) => getAll.dropzoneControlledBy(player)[0],
     clickableHandCard: (player: Player) => getAll.clickableHandCards(player)[0],
   };
 
   const queryAll = {
-    clickableHandCards: (player: Player) =>
-      withinThe.hand(player).queryAllByRole('button'),
+    clickableHandCards: (player: Player) => withinThe.hand(player).queryAllByRole('button'),
     unitsControlledBy: (player: Player) =>
       withinThe.playArea().queryAllByRole('img', {
         name: new RegExp(`${player} unit`),
@@ -75,12 +63,9 @@ describe(App, () => {
   };
 
   const queryThe = {
-    pickedCardDisplay: () =>
-      screen.queryByRole('region', { name: `Picked card` }),
+    pickedCardDisplay: () => screen.queryByRole('region', { name: `Picked card` }),
     phaseIndicator: (player: Player, phase: Phase) =>
-      withinThe
-        .header()
-        .queryByRole('region', { name: `${player}: ${phase} phase` }),
+      withinThe.header().queryByRole('region', { name: `${player}: ${phase} phase` }),
     controlledEmptyFieldDropzone: (player: Player) =>
       withinThe.playArea().queryByRole('button', {
         name: `Ugrade ${player} controlled leaf`,
@@ -175,21 +160,18 @@ describe(App, () => {
         [North, 2],
         [South, 4],
         [South, 6],
-      ])(
-        'after %s picks the %sth card from their hand during their Main phase',
-        ([player, cardIndex]) => {
-          it(`should show the card only until it is placed`, () => {
-            advanceToPhase(player, Main);
-            fireEvent.click(getAll.clickableHandCards(player)[cardIndex]);
+      ])('after %s picks the %sth card from their hand during their Main phase', ([player, cardIndex]) => {
+        it(`should show the card only until it is placed`, () => {
+          advanceToPhase(player, Main);
+          fireEvent.click(getAll.clickableHandCards(player)[cardIndex]);
 
-            expect(getThe.pickedCardDisplay()).toBeVisible();
-            expect(getThe.pickedCard()).toBeVisible();
+          expect(getThe.pickedCardDisplay()).toBeVisible();
+          expect(getThe.pickedCard()).toBeVisible();
 
-            fireEvent.click(getFirst.dropzoneControlledBy(player));
-            expect(queryThe.pickedCardDisplay()).not.toBeInTheDocument();
-          });
-        },
-      );
+          fireEvent.click(getFirst.dropzoneControlledBy(player));
+          expect(queryThe.pickedCardDisplay()).not.toBeInTheDocument();
+        });
+      });
     });
 
     describe.for([North, South])('%s hand', player => {
@@ -260,42 +242,33 @@ describe(App, () => {
       expect(withinThe.main().getByRole('grid')).toBeVisible();
     });
 
-    describe.for<Player>([North, South])(
-      'after picking a card from the %s hand',
-      player => {
-        const opponent = player === North ? South : North;
+    describe.for<Player>([North, South])('after picking a card from the %s hand', player => {
+      const opponent = player === North ? South : North;
 
-        let cardName = '';
-        beforeEach(() => {
-          advanceToPhase(player, Main);
-          const clickedCard = getFirst.clickableHandCard(player);
-          cardName = within(clickedCard).getByRole('region').textContent;
-          fireEvent.click(clickedCard);
-        });
+      let cardName = '';
+      beforeEach(() => {
+        advanceToPhase(player, Main);
+        const clickedCard = getFirst.clickableHandCard(player);
+        cardName = within(clickedCard).getByRole('region').textContent;
+        fireEvent.click(clickedCard);
+      });
 
-        it(`should allow ${player} to play the picked card on a leaf by clicking on it`, () => {
-          // Playing a leaf will make the "basic leaf" count go down.
-          // Playing a unit will make the unit count go up.
-          const initialHeuristicCount =
-            queryAll.unitsControlledBy(player).length -
-            getAll.basicLeavesControlledBy(player).length;
-          fireEvent.click(getFirst.dropzoneControlledBy(player));
+      it(`should allow ${player} to play the picked card on a leaf by clicking on it`, () => {
+        // Playing a leaf will make the "basic leaf" count go down.
+        // Playing a unit will make the unit count go up.
+        const initialHeuristicCount =
+          queryAll.unitsControlledBy(player).length - getAll.basicLeavesControlledBy(player).length;
+        fireEvent.click(getFirst.dropzoneControlledBy(player));
 
-          const newHeuristicCount =
-            queryAll.unitsControlledBy(player).length -
-            getAll.basicLeavesControlledBy(player).length;
-          expect(newHeuristicCount, `heuristic after playing ${cardName}`).toBe(
-            initialHeuristicCount + 1,
-          );
-        });
+        const newHeuristicCount =
+          queryAll.unitsControlledBy(player).length - getAll.basicLeavesControlledBy(player).length;
+        expect(newHeuristicCount, `heuristic after playing ${cardName}`).toBe(initialHeuristicCount + 1);
+      });
 
-        it(`should not allow ${player} to play a card on an a ${opponent} leaf`, () => {
-          expect(
-            queryThe.controlledEmptyFieldDropzone(opponent),
-          ).not.toBeInTheDocument();
-        });
-      },
-    );
+      it(`should not allow ${player} to play a card on an a ${opponent} leaf`, () => {
+        expect(queryThe.controlledEmptyFieldDropzone(opponent)).not.toBeInTheDocument();
+      });
+    });
 
     describe('The initial placement of leaves', () => {
       it('should have 18 leaves in 6 rows of 3', () => {
@@ -331,21 +304,13 @@ describe(App, () => {
       });
 
       it('should have the north home leaf', () => {
-        const [_, homeZone] = within(
-          withinThe.playArea().getAllByRole('row')[0],
-        ).getAllByRole('gridcell');
-        expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
-          'North Home Lily Pad',
-        );
+        const [_, homeZone] = within(withinThe.playArea().getAllByRole('row')[0]).getAllByRole('gridcell');
+        expect(within(homeZone).getByRole('region')).toHaveAccessibleName('North Home Lily Pad');
       });
 
       it('should have the south home leaf', () => {
-        const [_, homeZone] = within(
-          withinThe.playArea().getAllByRole('row')[ROW_COUNT - 1],
-        ).getAllByRole('gridcell');
-        expect(within(homeZone).getByRole('region')).toHaveAccessibleName(
-          'South Home Lily Pad',
-        );
+        const [_, homeZone] = within(withinThe.playArea().getAllByRole('row')[ROW_COUNT - 1]).getAllByRole('gridcell');
+        expect(within(homeZone).getByRole('region')).toHaveAccessibleName('South Home Lily Pad');
       });
     });
   });
