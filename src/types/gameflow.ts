@@ -40,5 +40,5 @@ export const Subphase = {
   Idle: 'Idle',
   Upgrading: 'Upgrading',
   Deploying: 'Deploying',
-  Activating: 'Activating',
+  Activation: 'Activating',
 } as const;

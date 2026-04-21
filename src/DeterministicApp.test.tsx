@@ -141,8 +141,10 @@ describe(DeterministicApp, () => {
         fireEvent.click(getFirst.unitControlledByOfClass(player, Froglet));
 
         expect(queryA.nthRankUnitControlledBy(player, 1)).not.toBeInTheDocument();
+        expect(getThe.nthRankUnitControlledBy(player, 0)).toBeVisible();
         fireEvent.click(getThe.nthRankDropzoneFor(player, 1));
         expect(getThe.nthRankUnitControlledBy(player, 1)).toBeVisible();
+        expect(queryA.nthRankUnitControlledBy(player, 0)).not.toBeInTheDocument();
       });
     });
   });

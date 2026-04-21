@@ -136,7 +136,7 @@ export const activate =
     ...rest,
     flow: {
       ...flow,
-      subphase: Subphase.Activating,
+      subphase: Subphase.Activation,
     },
     pickedCard: unit.cardClass,
     activationState: { start: position },

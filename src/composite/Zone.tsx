@@ -12,7 +12,11 @@ import {
   type Gameflow,
   type Player,
 } from '../types/gameflow';
-import { positionsAreEqual, type Position } from '../types/position';
+import {
+  distanceBetween,
+  positionsAreEqual,
+  type Position,
+} from '../types/position';
 
 type ZoneProps = {
   readonly controller: Player;
@@ -26,10 +30,13 @@ type ZoneProps = {
 type ZoneContext = readonly [
   {
     flow: { subphase: Subphase; phase: Phase; player: Player };
+    activationState?: { start: Position };
   },
   {},
 ];
 
+// TODO 9: Simplify
+// oxlint-disable-next-line max-statements,max-lines-per-function
 export function Zone({
   zone: { isUpgraded, units },
   controller,
@@ -39,6 +46,7 @@ export function Zone({
   const [
     {
       flow: { subphase, phase, player },
+      activationState,
     },
   ]: ZoneContext = useContext(GameContext);
   const handleClick = useCallback(() => onPlace(position), [position, onPlace]);
@@ -51,12 +59,17 @@ export function Zone({
     phase === Phase.Main &&
     subphase === Subphase.Deploying &&
     position.y === HOME[player].y;
-  // TODO 9: Activation dropzone
+  const isMoveDropzone =
+    phase === Phase.Main &&
+    subphase === Subphase.Activation &&
+    activationState &&
+    !positionsAreEqual(position, activationState.start) &&
+    distanceBetween(position, activationState.start) <= 1;
   const isHome = positionsAreEqual(HOME[controller], position);
   const buttonId = useId();
   const leafNameId = useId();
   const leafSymbolId = useId();
-  const isDropzone = isUpgradeDropzone || isDeployDropzone;
+  const isDropzone = isUpgradeDropzone || isDeployDropzone || isMoveDropzone;
 
   return (
     <div
@@ -74,7 +87,15 @@ export function Zone({
           className="overlay-container"
         >
           <Replace>
-            <title>{isUpgradeDropzone ? 'Upgrade' : 'Deploy on'}</title>
+            <title>
+              {isUpgradeDropzone
+                ? 'Upgrade'
+                : isDeployDropzone
+                  ? 'Deploy on'
+                  : isMoveDropzone
+                    ? 'Move to'
+                    : ''}
+            </title>
           </Replace>
         </div>
       )}
