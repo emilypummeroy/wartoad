@@ -1,9 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react';
 
-import {
-  gameflowOf,
-  renderWithGameContext,
-} from '../context/GameContext.test-utils';
+import { activationOf, gameflowOf, renderWithGameContext } from '../context/GameContext.test-utils';
 import { createUnit } from '../state/card';
 import { HOME } from '../state/pond';
 import { UnitClass, type UnitCard } from '../types/card';
@@ -22,6 +19,7 @@ type Inputs = [
   Position,
   upgraded: boolean,
   unitOwners: [] | [Player] | [Player, Player], // More is generally irrelevant
+  activationStart?: Position,
 ];
 
 const Inputs = {
@@ -31,6 +29,7 @@ const Inputs = {
   position: 3,
   upgraded: 4,
   unitOwners: 5,
+  activationStart: 6,
 } as const;
 
 const frogletsOwnedBy = (owners: Player[]) =>
@@ -89,17 +88,16 @@ describe(Zone, () => {
   const activate = vi.fn<(c: UnitCard, p: Position) => void>();
 
   const renderForInputsInMainPhase = (
-    [controller, player, subphase, position, isUpgraded, unitOwners]: Inputs,
+    [controller, player, subphase, position, isUpgraded, unitOwners, activationStart]: Inputs,
     units: UnitCard[] = frogletsOwnedBy(unitOwners),
   ) => {
-    renderWithGameContext([gameflowOf([player, subphase, Main]), { activate }])(
-      <Zone
-        controller={controller}
-        position={position}
-        zone={{ isUpgraded, units }}
-        onPlace={onPlace}
-      />,
-    );
+    renderWithGameContext([
+      {
+        ...activationOf(activationStart),
+        ...gameflowOf([player, subphase, Main]),
+      },
+      { activate },
+    ])(<Zone controller={controller} position={position} zone={{ isUpgraded, units }} onPlace={onPlace} />);
   };
 
   // Home Lily Pad: upgraded & Home
@@ -108,21 +106,16 @@ describe(Zone, () => {
     [North, South, Deploying, HOME[North], true, [South]],
     [South, North, Upgrading, HOME[South], true, []],
     [South, South, Activating, HOME[South], true, [North, North]],
-  ])(
-    'controlled by %s | Home position %s | upgraded %s | units owned by %s | turn of %s | subphase %s',
-    inputs => {
-      const [controller] = inputs;
-      beforeEach(() => renderForInputsInMainPhase(inputs));
-      itShouldHaveTheRightFroglets(inputs);
-      itShouldNotHaveOpponentsDropzonesOrButtons(inputs);
+  ])('controlled by %s | Home position %s | upgraded %s | units owned by %s | turn of %s | subphase %s', inputs => {
+    const [controller] = inputs;
+    beforeEach(() => renderForInputsInMainPhase(inputs));
+    itShouldHaveTheRightFroglets(inputs);
+    itShouldNotHaveOpponentsDropzonesOrButtons(inputs);
 
-      it(`should have a ${controller} Home Lily Pad`, () => {
-        expect(
-          screen.getByRole('region', { name: /Lily Pad/ }),
-        ).toHaveAccessibleName(`${controller} Home Lily Pad`);
-      });
-    },
-  );
+    it(`should have a ${controller} Home Lily Pad`, () => {
+      expect(screen.getByRole('region', { name: /Lily Pad/ })).toHaveAccessibleName(`${controller} Home Lily Pad`);
+    });
+  });
 
   // Controlled Lily Pad: upgraded & !Home
   describe.for<Inputs>([
@@ -139,9 +132,9 @@ describe(Zone, () => {
       itShouldNotHaveOpponentsDropzonesOrButtons(inputs);
 
       it(`should have a ${controller} controlled Lily Pad`, () => {
-        expect(
-          screen.getByRole('region', { name: /Lily Pad/ }),
-        ).toHaveAccessibleName(`${controller} controlled Lily Pad`);
+        expect(screen.getByRole('region', { name: /Lily Pad/ })).toHaveAccessibleName(
+          `${controller} controlled Lily Pad`,
+        );
       });
     },
   );
@@ -161,12 +154,10 @@ describe(Zone, () => {
       itShouldNotHaveOpponentsDropzonesOrButtons(inputs);
 
       it(`should have a ${controller} controlled leaf`, () => {
-        expect(
-          screen.getByRole('region', { name: /leaf/ }),
-        ).toHaveAccessibleName(`${controller} controlled leaf`);
-        expect(
-          screen.getByRole('region', { name: /controlled/ }),
-        ).toHaveAccessibleName(`${controller} controlled leaf`);
+        expect(screen.getByRole('region', { name: /leaf/ })).toHaveAccessibleName(`${controller} controlled leaf`);
+        expect(screen.getByRole('region', { name: /controlled/ })).toHaveAccessibleName(
+          `${controller} controlled leaf`,
+        );
       });
     },
   );
@@ -179,11 +170,12 @@ describe(Zone, () => {
     [North, South, Idle, { x: 2, y: 3 }, false, []],
     [South, South, Idle, { x: 0, y: 5 }, true, [North]],
 
-    // | Activating
-    [North, North, Activating, { x: 0, y: 0 }, false, [South]],
-    [South, North, Activating, { x: 1, y: 2 }, true, [North, South]],
-    [North, South, Activating, { x: 2, y: 3 }, false, []],
-    [South, South, Activating, { x: 0, y: 5 }, true, [North]],
+    // TODO: 9
+    // | Activating & not in range of start
+    [North, North, Activating, { x: 0, y: 0 }, false, [South], { x: 2, y: 0 }],
+    [South, North, Activating, { x: 1, y: 2 }, true, [North, South], { x: 1, y: 3 }],
+    [North, South, Activating, { x: 2, y: 3 }, false, [], { x: 2, y: 5 }],
+    [South, South, Activating, { x: 0, y: 5 }, true, [North], { x: 2, y: 3 }],
 
     // | Deploying & not back row
     [North, North, Deploying, { x: 1, y: 1 }, true, [North, North]],
@@ -202,58 +194,54 @@ describe(Zone, () => {
     [South, North, Upgrading, { x: 1, y: 4 }, false, [North]],
     [North, South, Upgrading, { x: 2, y: 2 }, false, [South, North]],
     [North, South, Upgrading, { x: 0, y: 3 }, false, []],
-  ])(
-    'controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s',
-    inputs => {
-      beforeEach(() => renderForInputsInMainPhase(inputs));
-      itShouldHaveTheRightFroglets(inputs);
-      itShouldNotHaveOpponentsDropzonesOrButtons(inputs);
+  ])('controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s', inputs => {
+    beforeEach(() => renderForInputsInMainPhase(inputs));
+    itShouldHaveTheRightFroglets(inputs);
+    itShouldNotHaveOpponentsDropzonesOrButtons(inputs);
 
-      it('should not have a Deploy dropzone', () => {
-        expect(
-          screen.queryByRole('button', { name: /Deploy/ }),
-        ).not.toBeInTheDocument();
-      });
+    it('should not have a Deploy dropzone', () => {
+      expect(screen.queryByRole('button', { name: /Deploy/ })).not.toBeInTheDocument();
+    });
 
-      it('should not have a Upgrade dropzone', () => {
-        expect(
-          screen.queryByRole('button', { name: /Upgrade/ }),
-        ).not.toBeInTheDocument();
-      });
+    it('should not have an Upgrade dropzone', () => {
+      expect(screen.queryByRole('button', { name: /Upgrade/ })).not.toBeInTheDocument();
+    });
 
-      it('should not call onPlace if clicked', () => {
-        for (const button of screen.queryAllByRole('button')) {
-          fireEvent.click(button);
-        }
-        for (const region of screen.getAllByRole('region')) {
-          fireEvent.click(region);
-        }
-        expect(onPlace).not.toHaveBeenCalled();
-      });
-    },
-  );
+    it('should not have a Move dropzone', () => {
+      expect(screen.queryByRole('button', { name: /Move/ })).not.toBeInTheDocument();
+    });
+
+    it('should not call onPlace if clicked', () => {
+      for (const button of screen.queryAllByRole('button')) {
+        fireEvent.click(button);
+      }
+      for (const region of screen.getAllByRole('region')) {
+        fireEvent.click(region);
+      }
+      expect(onPlace).not.toHaveBeenCalled();
+    });
+  });
 
   // No dropzones or activation buttons if:
   // | Start phase & even if all other conditions are satisfied
   // | End phase & even if all other conditions are satisfied
   describe.for<[Phase, ...Inputs]>([
-    [Start, North, North, Idle, { x: 0, y: 0 }, false, [North, North]],
-    [Start, North, North, Deploying, { x: 2, y: 0 }, false, [North, North]],
-    [Start, North, North, Upgrading, { x: 2, y: 0 }, false, [North, North]],
-    [Start, South, South, Idle, { x: 0, y: 5 }, false, [South, South]],
-    [Start, South, South, Deploying, { x: 2, y: 5 }, false, [South, South]],
-    [Start, South, South, Upgrading, { x: 2, y: 5 }, false, [South, South]],
-    [End, North, North, Idle, { x: 0, y: 0 }, false, [North, North]],
-    [End, North, North, Deploying, { x: 2, y: 0 }, false, [North, North]],
-    [End, North, North, Upgrading, { x: 2, y: 0 }, false, [North, North]],
-    [End, South, South, Idle, { x: 0, y: 5 }, false, [South, South]],
-    [End, South, South, Deploying, { x: 2, y: 5 }, false, [South, South]],
-    [End, South, South, Upgrading, { x: 2, y: 5 }, false, [South, South]],
+    [Start, North, North, Idle, { x: 0, y: 0 }, false, [North, North], { x: 1, y: 0 }],
+    [Start, North, North, Deploying, { x: 2, y: 0 }, false, [North, North], { x: 1, y: 0 }],
+    [Start, North, North, Upgrading, { x: 2, y: 0 }, false, [North, North], { x: 1, y: 0 }],
+    [Start, South, South, Idle, { x: 0, y: 5 }, false, [South, South], { x: 1, y: 5 }],
+    [Start, South, South, Deploying, { x: 2, y: 5 }, false, [South, South], { x: 1, y: 5 }],
+    [Start, South, South, Upgrading, { x: 2, y: 5 }, false, [South, South], { x: 1, y: 5 }],
+    [End, North, North, Idle, { x: 0, y: 0 }, false, [North, North], { x: 0, y: 1 }],
+    [End, North, North, Deploying, { x: 2, y: 0 }, false, [North, North], { x: 2, y: 1 }],
+    [End, North, North, Upgrading, { x: 2, y: 0 }, false, [North, North], { x: 2, y: 1 }],
+    [End, South, South, Idle, { x: 0, y: 5 }, false, [South, South], { x: 0, y: 4 }],
+    [End, South, South, Deploying, { x: 2, y: 5 }, false, [South, South], { x: 2, y: 4 }],
+    [End, South, South, Upgrading, { x: 2, y: 5 }, false, [South, South], { x: 2, y: 4 }],
   ])(
     '<<Special case>> during %s phase | controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s',
     ([phase, ...input]) => {
-      const [controller, player, subphase, position, isUpgraded, unitOwners] =
-        input;
+      const [controller, player, subphase, position, isUpgraded, unitOwners] = input;
 
       beforeEach(() => {
         renderWithGameContext([gameflowOf([player, subphase, phase])])(
@@ -269,21 +257,19 @@ describe(Zone, () => {
       itShouldNotHaveOpponentsDropzonesOrButtons(input);
 
       it('should not have a Deploy dropzone', () => {
-        expect(
-          screen.queryByRole('button', { name: /Deploy/ }),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Deploy/ })).not.toBeInTheDocument();
       });
 
       it('should not have a Upgrade dropzone', () => {
-        expect(
-          screen.queryByRole('button', { name: /Upgrade/ }),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Upgrade/ })).not.toBeInTheDocument();
+      });
+
+      it('should not have a Move dropzone', () => {
+        expect(screen.queryByRole('button', { name: /Move/ })).not.toBeInTheDocument();
       });
 
       it('should not have any Activate buttons', () => {
-        expect(
-          screen.queryByRole('button', { name: /Activate/ }),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Activate/ })).not.toBeInTheDocument();
       });
     },
   );
@@ -317,15 +303,15 @@ describe(Zone, () => {
       });
 
       it('should not have a Deploy dropzone', () => {
-        expect(
-          screen.queryByRole('button', { name: /Deploy/ }),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Deploy/ })).not.toBeInTheDocument();
+      });
+
+      it('should not have a Move dropzone', () => {
+        expect(screen.queryByRole('button', { name: /Move/ })).not.toBeInTheDocument();
       });
 
       it('should not have any Activate buttons', () => {
-        expect(
-          screen.queryByRole('button', { name: /Activate/ }),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Activate/ })).not.toBeInTheDocument();
       });
 
       it('should call onPlace if clicked', () => {
@@ -359,15 +345,15 @@ describe(Zone, () => {
       });
 
       it('should not have a Upgrade dropzone', () => {
-        expect(
-          screen.queryByRole('button', { name: /Upgrade/ }),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Upgrade/ })).not.toBeInTheDocument();
+      });
+
+      it('should not have a Move dropzone', () => {
+        expect(screen.queryByRole('button', { name: /Move/ })).not.toBeInTheDocument();
       });
 
       it(`should not have any Activate buttons`, () => {
-        expect(
-          screen.queryByRole('button', { name: /Activate/ }),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Activate/ })).not.toBeInTheDocument();
       });
 
       it('should call onPlace if clicked', () => {
@@ -388,33 +374,30 @@ describe(Zone, () => {
     [South, South, Idle, { x: 1, y: 5 }, false, [North, South]],
     [North, South, Idle, { x: 2, y: 0 }, true, [South, North]],
     [North, South, Idle, { x: 0, y: 1 }, false, [South, South]],
-  ])(
-    'controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s',
-    inputs => {
-      const [, player, , position, , unitOwners] = inputs;
-      const units = frogletsOwnedBy(unitOwners);
-      const playerUnits = units.filter(({ owner }) => owner === player);
-      beforeEach(() => renderForInputsInMainPhase(inputs, units));
-      itShouldHaveTheRightFroglets(inputs);
-      itShouldNotHaveOpponentsDropzonesOrButtons(inputs);
+  ])('controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s', inputs => {
+    const [, player, , position, , unitOwners] = inputs;
+    const units = frogletsOwnedBy(unitOwners);
+    const playerUnits = units.filter(({ owner }) => owner === player);
+    beforeEach(() => renderForInputsInMainPhase(inputs, units));
+    itShouldHaveTheRightFroglets(inputs);
+    itShouldNotHaveOpponentsDropzonesOrButtons(inputs);
 
-      it(`should have ${player}'s Activate buttons`, () => {
-        expect(
-          screen.getAllByRole('button', {
-            name: `Activate ${player} unit Froglet`,
-          }),
-        ).toHaveLength(units.filter(({ owner }) => owner === player).length);
-      });
+    it(`should have ${player}'s Activate buttons`, () => {
+      expect(
+        screen.getAllByRole('button', {
+          name: `Activate ${player} unit Froglet`,
+        }),
+      ).toHaveLength(units.filter(({ owner }) => owner === player).length);
+    });
 
-      it('should call activate if units are clicked', () => {
-        const cards = screen.getAllByRole('button', { name: /Activate/ });
-        for (let i = 0; i < playerUnits.length; i += 1) {
-          fireEvent.click(cards[i]);
-          expect(activate).toHaveBeenCalledWith(playerUnits[i], position);
-        }
-      });
-    },
-  );
+    it('should call activate if units are clicked', () => {
+      const cards = screen.getAllByRole('button', { name: /Activate/ });
+      for (let i = 0; i < playerUnits.length; i += 1) {
+        fireEvent.click(cards[i]);
+        expect(activate).toHaveBeenCalledWith(playerUnits[i], position);
+      }
+    });
+  });
 
   // Cannot click units to activate:
   // Idle & units in [] | [opponent]
@@ -432,26 +415,21 @@ describe(Zone, () => {
     [North, South, Activating, { x: 1, y: 4 }, true, [South]],
     [South, South, Deploying, { x: 0, y: 5 }, false, [South]],
     [South, South, Upgrading, { x: 2, y: 0 }, true, [South]],
-  ])(
-    'controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s',
-    inputs => {
-      beforeEach(() => renderForInputsInMainPhase(inputs));
-      itShouldHaveTheRightFroglets(inputs);
-      itShouldNotHaveOpponentsDropzonesOrButtons(inputs);
+  ])('controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s', inputs => {
+    beforeEach(() => renderForInputsInMainPhase(inputs));
+    itShouldHaveTheRightFroglets(inputs);
+    itShouldNotHaveOpponentsDropzonesOrButtons(inputs);
 
-      it(`should not have any Activate buttons`, () => {
-        expect(
-          screen.queryByRole('button', { name: /Activate/ }),
-        ).not.toBeInTheDocument();
-      });
+    it(`should not have any Activate buttons`, () => {
+      expect(screen.queryByRole('button', { name: /Activate/ })).not.toBeInTheDocument();
+    });
 
-      it('should not call activate if units are clicked', () => {
-        const cards = screen.queryAllByRole('region', { name: /unit/ });
-        for (const card of cards) {
-          fireEvent.click(card);
-        }
-        expect(activate).not.toHaveBeenCalled();
-      });
-    },
-  );
+    it('should not call activate if units are clicked', () => {
+      const cards = screen.queryAllByRole('region', { name: /unit/ });
+      for (const card of cards) {
+        fireEvent.click(card);
+      }
+      expect(activate).not.toHaveBeenCalled();
+    });
+  });
 });

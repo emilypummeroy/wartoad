@@ -5,5 +5,13 @@
   "printWidth": 80,
   "singleQuote": true,
   "sortImports": {},
-  "sortPackageJson": true
+  "sortPackageJson": true,
+  "overrides": [
+    {
+      "files": ["*.test.tsx", "*.text.ts"],
+      "options": {
+        "printWidth": 120
+      }
+    }
+  ]
 }

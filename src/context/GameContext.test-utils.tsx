@@ -2,6 +2,7 @@ import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 import { Phase, Player, Subphase } from '../types/gameflow';
+import type { Position } from '../types/position';
 import {
   DEFAULT_GAME_DISPATCH,
   DEFAULT_GAME_STATE,
@@ -45,3 +46,10 @@ export const gameflowOf = ([
     subphase,
   },
 });
+
+export const activationOf = (start?: Position) =>
+  start
+    ? {
+        activationState: { start },
+      }
+    : {};
