@@ -3,7 +3,7 @@ import { useId, useCallback, useContext, type ReactNode } from 'react';
 
 import { CardBack, Froglet, LilyPad } from '../base/Card';
 import { GameContext } from '../context/GameContext';
-import { HOME, type PondState } from '../state/pond';
+import { getPondStateAt, HOME, type PondState } from '../state/pond';
 import type { UnitCard } from '../types/card';
 import {
   Phase,
@@ -26,25 +26,11 @@ type PondLeafProps = {
   readonly controller: Player;
 };
 
-type PondLeafContext = readonly [
-  {
-    pond: PondState;
-  },
-  unknown,
-];
-
 export function PondLeaf({
   position,
   onCardPlaced,
   controller,
 }: PondLeafProps) {
-  const [
-    {
-      pond: {
-        [position.y]: { [position.x]: _ },
-      },
-    },
-  ]: PondLeafContext = useContext(GameContext);
   const leafSymbolId = useId();
   const leafNameId = useId();
   return (
@@ -53,7 +39,7 @@ export function PondLeaf({
       aria-labelledby={`${leafSymbolId} ${leafNameId}`}
       aria-colindex={position.x}
     >
-      <LeafDropzone
+      <PondLeafDropzone
         leafSymbolId={leafSymbolId}
         leafNameId={leafNameId}
         position={position}
@@ -66,8 +52,8 @@ export function PondLeaf({
           position={position}
           controller={controller}
         />
-        <PondUnits position={position} />
-      </LeafDropzone>
+        <PondLeafUnits position={position} />
+      </PondLeafDropzone>
     </div>
   );
 }
@@ -90,15 +76,8 @@ function PondLeafCard({
   position,
   controller,
 }: PondLeafCardProps) {
-  const [
-    {
-      pond: {
-        [position.y]: {
-          [position.x]: { isUpgraded },
-        },
-      },
-    },
-  ]: PondLeafCardContext = useContext(GameContext);
+  const context: PondLeafCardContext = useContext(GameContext);
+  const { isUpgraded } = getPondStateAt(context[0].pond, position);
   const isHome = positionsAreEqual(HOME[controller], position);
   return isUpgraded ? (
     // TODO 11: Implement a non-splay-row hack to display cards on leaves
@@ -129,7 +108,7 @@ function PondLeafCard({
   );
 }
 
-type PondUnitsContext = readonly [
+type PondLeafUnitsContext = readonly [
   {
     readonly pond: PondState;
   },
@@ -140,10 +119,10 @@ type PondUnitsContext = readonly [
   //   commitActivation: (end: Position) => void;
   // },
 ];
-type PondUnitsProps = {
+type PondLeafUnitsProps = {
   readonly position: Position;
 };
-function PondUnits({ position }: PondUnitsProps) {
+function PondLeafUnits({ position }: PondLeafUnitsProps) {
   const [
     {
       pond: {
@@ -152,7 +131,7 @@ function PondUnits({ position }: PondUnitsProps) {
         },
       },
     },
-  ]: PondUnitsContext = useContext(GameContext);
+  ]: PondLeafUnitsContext = useContext(GameContext);
 
   return (
     <div
@@ -164,13 +143,13 @@ function PondUnits({ position }: PondUnitsProps) {
       }}
     >
       {units.map(card => (
-        <ZoneUnit key={card.key} card={card} position={position} />
+        <PondUnit key={card.key} card={card} position={position} />
       ))}
     </div>
   );
 }
 
-type LeafDropzoneContext = readonly [
+type PondLeafDropzoneContext = readonly [
   {
     readonly pond: PondState;
     readonly flow: {
@@ -188,7 +167,7 @@ type LeafDropzoneContext = readonly [
   // },
 ];
 
-type LeafDropzoneProps = {
+type PondLeafDropzoneProps = {
   readonly children: ReactNode;
   readonly leafNameId: string;
   readonly leafSymbolId: string;
@@ -196,29 +175,28 @@ type LeafDropzoneProps = {
   readonly controller: Player;
   readonly onCardPlaced: (position: Position) => void;
 };
-export function LeafDropzone({
+export function PondLeafDropzone({
   children,
   leafNameId,
   leafSymbolId,
   position,
   controller,
   onCardPlaced,
-}: LeafDropzoneProps) {
+}: PondLeafDropzoneProps) {
   const [
     {
       flow: { player, phase, subphase },
       activationState,
-      pond: {
-        [position.y]: { [position.x]: leaf },
-      },
+      pond,
     },
-  ]: LeafDropzoneContext = useContext(GameContext);
+  ]: PondLeafDropzoneContext = useContext(GameContext);
+  const { isUpgraded } = getPondStateAt(pond, position);
   const dropzoneId = useId();
   const isUpgradeDropzone =
     phase === Phase.Main &&
     subphase === Subphase.Upgrading &&
     player === controller &&
-    !leaf.isUpgraded;
+    !isUpgraded;
   const isDeployDropzone =
     phase === Phase.Main &&
     subphase === Subphase.Deploying &&
@@ -265,21 +243,21 @@ export function LeafDropzone({
   );
 }
 
-type ZoneUnitContext = readonly [
+type PondUnitContext = readonly [
   { flow: Gameflow },
   {
     readonly activate: (unit: UnitCard, position: Position) => void;
   },
 ];
-type ZoneUnitProps = { readonly card: UnitCard; readonly position: Position };
+type PondUnitProps = { readonly card: UnitCard; readonly position: Position };
 
-const ZoneUnit = ({ card, position }: ZoneUnitProps) => {
+const PondUnit = ({ card, position }: PondUnitProps) => {
   const [
     {
       flow: { player, phase, subphase },
     },
     { activate },
-  ]: ZoneUnitContext = useContext(GameContext);
+  ]: PondUnitContext = useContext(GameContext);
   const buttonId = useId();
   const symbolId = useId();
   const nameId = useId();

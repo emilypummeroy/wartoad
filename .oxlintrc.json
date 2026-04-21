@@ -30,6 +30,7 @@
     "no-implicit-coercion": ["error", { "allow": ["!!"] }],
     "switch-case-braces": ["error", "avoid"],
     "no-ternary": "allow",
+    "no-continue": "allow",
     "no-shadow": "allow",
     "array-type": ["allow", { "default": "array-simple" }],
     "no-nested-ternary": "allow",

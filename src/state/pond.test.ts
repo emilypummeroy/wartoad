@@ -11,6 +11,7 @@ import {
   UPGRADED,
   type PondState,
   type LeafState,
+  getPondStateAt,
 } from './pond';
 import {
   ANOTHER_POND,
@@ -85,27 +86,22 @@ const itShouldNotChangeOtherZones = (
   it('should not change other zones', () => {
     const newPond = setPondStateAt(pond, { x, y }, valueToSet);
 
-    for (let yy = 0; yy < y; yy += 1) {
-      for (let xx = 0; xx < x; xx += 1) {
-        expect(newPond[yy][xx]).toBe(pond[yy][xx]);
-      }
-      for (let xx = x + 1; xx < LEAF_COUNT_PER_ROW; xx += 1) {
-        expect(newPond[yy][xx]).toBe(pond[yy][xx]);
-      }
-    }
-
-    for (let yy = y + 1; yy < ROW_COUNT; yy += 1) {
-      for (let xx = 0; xx < x; xx += 1) {
-        expect(newPond[yy][xx]).toBe(pond[yy][xx]);
-      }
-      for (let xx = x + 1; xx < LEAF_COUNT_PER_ROW; xx += 1) {
-        expect(newPond[yy][xx]).toBe(pond[yy][xx]);
+    for (let yy = 0; yy < ROW_COUNT; yy += 1) {
+      if (yy === y) continue;
+      for (let xx = 0; xx < LEAF_COUNT_PER_ROW; xx += 1) {
+        if (xx === x) continue;
+        const position = { x: xx, y: yy };
+        const newValue = getPondStateAt(newPond, position);
+        const oldValue = getPondStateAt(pond, position);
+        expect(newValue).toBe(newPond[yy][xx]);
+        expect(oldValue).toBe(pond[yy][xx]);
+        expect(newValue).toBe(oldValue);
       }
     }
   });
 
 describe('the PondState type functions', () => {
-  describe(setPondStateAt, () => {
+  describe(`${setPondStateAt.name} and ${getPondStateAt.name}`, () => {
     describe.for<[string, string, PondState, (old: LeafState) => LeafState]>([
       ['INITIAL_POND', 'addNorthUnit', INITIAL_POND, addNorthUnit],
       ['ANOTHER_POND', 'addSouthUnit', ANOTHER_POND, addSouthUnit],
@@ -121,7 +117,9 @@ describe('the PondState type functions', () => {
 
           it(`should set the value at x=${x}, y=${y} to ${updaterName}`, () => {
             const newPond = setPondStateAt(pond, { x, y }, updater);
-            expect(newPond[y][x]).toStrictEqual(updater(pond[y][x]));
+            const newValue = getPondStateAt(newPond, { x, y });
+            expect(newValue).toBe(newPond[y][x]);
+            expect(newValue).toStrictEqual(updater(pond[y][x]));
           });
 
           it(`should produce a result verified by ${isPondState.name}`, () => {
@@ -157,7 +155,9 @@ describe('the PondState type functions', () => {
 
           it(`should set the value at x=${x}, y=${y} to ${newValueName}`, () => {
             const newPond = setPondStateAt(pond, { x, y }, valueToSet);
-            expect(newPond[y][x]).toStrictEqual(valueToSet);
+            const newValue = getPondStateAt(newPond, { x, y });
+            expect(newValue).toBe(newPond[y][x]);
+            expect(newValue).toStrictEqual(valueToSet);
           });
 
           it(`should produce a result verified by ${isPondState.name}`, () => {
@@ -175,7 +175,9 @@ describe('the PondState type functions', () => {
                 { x, y },
                 { [key]: valueToSet[key] },
               );
-              expect(newPond[y][x][key]).toStrictEqual(valueToSet[key]);
+              const newValue = getPondStateAt(newPond, { x, y });
+              expect(newValue).toBe(newPond[y][x]);
+              expect(newValue[key]).toStrictEqual(valueToSet[key]);
             });
 
             it(`should set not change other properties besides ${key} at x=${x}, y=${y}`, () => {
@@ -185,8 +187,8 @@ describe('the PondState type functions', () => {
                 { x, y },
                 { [key]: valueToSet[key] },
               );
-              const { [key]: __, ...newZone } = newPond[y][x];
-              expect(newZone).toStrictEqual(oldZone);
+              const { [key]: __, ...newValue } = newPond[y][x];
+              expect(newValue).toStrictEqual(oldZone);
             });
           });
         });
