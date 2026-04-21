@@ -11,10 +11,8 @@ import {
   ROW_COUNT_PER_PLAYER,
   type PondState,
   INITIAL_POND,
-  FULL_GRID,
-  EMPTY_GRID,
-  ANOTHER_GRID,
 } from '../state/pond';
+import { FULL_POND, EMPTY_POND, ANOTHER_POND } from '../state/pond.test-utils';
 import { Player, Subphase } from '../types/gameflow';
 import { Pond } from './Pond';
 
@@ -41,9 +39,9 @@ describe(Pond, () => {
 
   it.for<[name: string, PondState]>([
     ['INITIAL_GRID_STATE', INITIAL_POND],
-    ['FULL_GRID', FULL_GRID],
-    ['EMPTY_GRID', EMPTY_GRID],
-    ['ANOTHER_GRID', ANOTHER_GRID],
+    ['FULL_GRID', FULL_POND],
+    ['EMPTY_GRID', EMPTY_POND],
+    ['ANOTHER_GRID', ANOTHER_POND],
   ])(
     `without context should display a grid with ${ROW_COUNT} rows of ${LEAF_COUNT_PER_RANK} leaves`,
     ([_, grid]) => {
@@ -64,13 +62,13 @@ describe(Pond, () => {
 
   describe.for<[Player, name: string, PondState]>([
     [Player.North, 'INITIAL_GRID_STATE', INITIAL_POND],
-    [Player.North, 'FULL_GRID', FULL_GRID],
-    [Player.North, 'EMPTY_GRID', EMPTY_GRID],
-    [Player.North, 'ANOTHER_GRID', ANOTHER_GRID],
+    [Player.North, 'FULL_GRID', FULL_POND],
+    [Player.North, 'EMPTY_GRID', EMPTY_POND],
+    [Player.North, 'ANOTHER_GRID', ANOTHER_POND],
     [Player.South, 'INITIAL_GRID_STATE', INITIAL_POND],
-    [Player.South, 'FULL_GRID', FULL_GRID],
-    [Player.South, 'EMPTY_GRID', EMPTY_GRID],
-    [Player.South, 'ANOTHER_GRID', ANOTHER_GRID],
+    [Player.South, 'FULL_GRID', FULL_POND],
+    [Player.South, 'EMPTY_GRID', EMPTY_POND],
+    [Player.South, 'ANOTHER_GRID', ANOTHER_POND],
   ])('on the %s turn with the grid: %s', ([player, _, grid]) => {
     beforeEach(() => {
       renderWithGameContext([gameflowOf([player])])(
@@ -120,7 +118,7 @@ describe(Pond, () => {
     player => {
       beforeEach(() => {
         renderWithGameContext([gameflowOf([player, Upgrading])])(
-          <Pond onCardPlaced={handleCardPlaced} grid={FULL_GRID} />,
+          <Pond onCardPlaced={handleCardPlaced} grid={FULL_POND} />,
         );
       });
 
@@ -146,7 +144,7 @@ describe(Pond, () => {
     describe(`when ${player} is Upgrading`, () => {
       beforeEach(() => {
         renderWithGameContext([gameflowOf([player, Upgrading])])(
-          <Pond onCardPlaced={handleCardPlaced} grid={EMPTY_GRID} />,
+          <Pond onCardPlaced={handleCardPlaced} grid={EMPTY_POND} />,
         );
       });
 
@@ -194,7 +192,7 @@ describe(Pond, () => {
     describe(`when ${player} is Deploying`, () => {
       beforeEach(() => {
         renderWithGameContext([gameflowOf([player, Deploying])])(
-          <Pond onCardPlaced={handleCardPlaced} grid={EMPTY_GRID} />,
+          <Pond onCardPlaced={handleCardPlaced} grid={EMPTY_POND} />,
         );
       });
 

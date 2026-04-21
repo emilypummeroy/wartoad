@@ -26,10 +26,17 @@ export const isPondState = (
 export const setPondStateAt = (
   old: PondState,
   { x, y }: Position,
-  newValue: ZoneState,
+  newValue: Partial<ZoneState> | ((old: ZoneState) => ZoneState),
 ): PondState => {
   const array = old.map((row, yy) =>
-    row.map((oldValue, xx) => (yy === y && xx === x ? newValue : oldValue)),
+    row.map(
+      (oldValue, xx): ZoneState =>
+        yy !== y || xx !== x
+          ? oldValue
+          : typeof newValue === 'function'
+            ? newValue(oldValue)
+            : { ...oldValue, ...newValue },
+    ),
   );
   // v8 ignore if
   if (!isPondState(array)) {
@@ -42,45 +49,18 @@ export const ROW_COUNT = 6 as const;
 export const ROW_COUNT_PER_PLAYER = 3 as const;
 export const LEAF_COUNT_PER_RANK = 3 as const;
 
-export const UPGRADED = { units: [], isUpgraded: true };
-export const EMPTY = { units: [], isUpgraded: false };
+export const UPGRADED = { units: [], isUpgraded: true } as const;
+export const LEAF = { units: [], isUpgraded: false } as const;
 export const INITIAL_POND: PondState = [
-  [EMPTY, UPGRADED, EMPTY],
-  [EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY],
-  [EMPTY, UPGRADED, EMPTY],
+  [LEAF, UPGRADED, LEAF],
+  [LEAF, LEAF, LEAF],
+  [LEAF, LEAF, LEAF],
+  [LEAF, LEAF, LEAF],
+  [LEAF, LEAF, LEAF],
+  [LEAF, UPGRADED, LEAF],
 ];
 
 export const HOME = {
   [Player.North]: { x: 1, y: 0 },
   [Player.South]: { x: 1, y: ROW_COUNT - 1 },
 };
-
-export const ANOTHER_GRID: PondState = [
-  [UPGRADED, EMPTY, EMPTY],
-  [UPGRADED, UPGRADED, UPGRADED],
-  [EMPTY, UPGRADED, UPGRADED],
-  [EMPTY, EMPTY, EMPTY],
-  [UPGRADED, UPGRADED, EMPTY],
-  [EMPTY, EMPTY, UPGRADED],
-];
-
-export const EMPTY_GRID: PondState = [
-  [EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY],
-];
-
-export const FULL_GRID: PondState = [
-  [UPGRADED, UPGRADED, UPGRADED],
-  [UPGRADED, UPGRADED, UPGRADED],
-  [UPGRADED, UPGRADED, UPGRADED],
-  [UPGRADED, UPGRADED, UPGRADED],
-  [UPGRADED, UPGRADED, UPGRADED],
-  [UPGRADED, UPGRADED, UPGRADED],
-];

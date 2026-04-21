@@ -147,11 +147,6 @@ export const placeCard =
   (position: Position) =>
   ({
     grid,
-    grid: {
-      [position.y]: {
-        [position.x]: { isUpgraded, units },
-      },
-    },
     flow,
     flow: { subphase, player },
     northHand,
@@ -172,17 +167,17 @@ export const placeCard =
       position,
       subphase === Subphase.Upgrading
         ? // TODO 10: Make it create a card for leaves too
-          { units, isUpgraded: true }
-        : {
-            isUpgraded,
+          { isUpgraded: true }
+        : // TODO 11: Append a unit instead of setting units
+          old => ({
+            ...old,
             units: [
-              ...units,
               createUnit({
                 cardClass: UnitClass.Froglet,
                 owner: player,
                 key: getNextCardKey(),
               }),
             ],
-          },
+          }),
     ),
   });
