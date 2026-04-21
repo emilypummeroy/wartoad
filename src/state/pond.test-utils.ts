@@ -6,7 +6,7 @@ import {
   LEAF,
   UPGRADED,
   type PondState,
-  type ZoneState,
+  type LeafState,
 } from './pond';
 
 export type TestPondKey = keyof typeof TEST_PONDS_BY_KEY;
@@ -62,23 +62,23 @@ const OTHER_UNITS: UnitCard[] = [
   }),
 ];
 
-export const LEAF_WITH_UNIT: ZoneState = {
+export const LEAF_WITH_UNIT: LeafState = {
   ...LEAF,
   units: SOUTH_UNIT,
 };
-export const LEAF_OTHER_UNIT: ZoneState = {
+export const LEAF_OTHER_UNIT: LeafState = {
   ...LEAF,
   units: NORTH_UNIT,
 };
-export const LEAF_WITH_UNITS: ZoneState = {
+export const LEAF_WITH_UNITS: LeafState = {
   ...LEAF,
   units: NORTH_UNIT,
 };
-export const UPGRADED_UNITS: ZoneState = {
+export const UPGRADED_UNITS: LeafState = {
   ...UPGRADED,
   units: SOME_UNITS,
 };
-export const UPGRADED_OTHER_UNITS: ZoneState = {
+export const UPGRADED_OTHER_UNITS: LeafState = {
   ...UPGRADED,
   units: OTHER_UNITS,
 };

@@ -10,7 +10,7 @@ import {
   setPondStateAt,
   UPGRADED,
   type PondState,
-  type ZoneState,
+  type LeafState,
 } from './pond';
 import {
   ANOTHER_POND,
@@ -34,21 +34,21 @@ const NORTH_UNIT = createUnit({
   key: 77,
   owner: Player.North,
 });
-const addSouthUnit = (old: ZoneState) => ({
+const addSouthUnit = (old: LeafState) => ({
   ...old,
   units: [...old.units, SOUTH_UNIT],
 });
-const addNorthUnit = (old: ZoneState) => ({
+const addNorthUnit = (old: LeafState) => ({
   ...old,
   units: [...old.units, NORTH_UNIT],
 });
-const upgrade = (old: ZoneState) => ({ ...old, isUpgraded: true });
-const unupgrade = (old: ZoneState) => ({ ...old, isUpgraded: false });
-const upgradeAndSetUnits = (_: ZoneState) => ({
+const upgrade = (old: LeafState) => ({ ...old, isUpgraded: true });
+const unupgrade = (old: LeafState) => ({ ...old, isUpgraded: false });
+const upgradeAndSetUnits = (_: LeafState) => ({
   isUpgraded: true,
   units: [NORTH_UNIT, SOUTH_UNIT],
 });
-const removeUnits = (old: ZoneState) => ({
+const removeUnits = (old: LeafState) => ({
   ...old,
   units: [],
 });
@@ -79,7 +79,7 @@ const describeForAllPositions = (block: (_: [x: number, y: number]) => void) =>
 
 const itShouldNotChangeOtherZones = (
   pond: PondState,
-  valueToSet: Partial<ZoneState> | ((old: ZoneState) => ZoneState),
+  valueToSet: Partial<LeafState> | ((old: LeafState) => LeafState),
   [x, y]: [number, number],
 ) =>
   it('should not change other zones', () => {
@@ -106,7 +106,7 @@ const itShouldNotChangeOtherZones = (
 
 describe('the PondState type functions', () => {
   describe(setPondStateAt, () => {
-    describe.for<[string, string, PondState, (old: ZoneState) => ZoneState]>([
+    describe.for<[string, string, PondState, (old: LeafState) => LeafState]>([
       ['INITIAL_POND', 'addNorthUnit', INITIAL_POND, addNorthUnit],
       ['ANOTHER_POND', 'addSouthUnit', ANOTHER_POND, addSouthUnit],
       ['FULL_POND', 'unupgrade', FULL_POND, unupgrade],
@@ -132,7 +132,7 @@ describe('the PondState type functions', () => {
       },
     );
 
-    describe.for<[string, string, PondState, ZoneState]>([
+    describe.for<[string, string, PondState, LeafState]>([
       ['INITIAL_POND', 'LEAF', INITIAL_POND, LEAF],
       ['INITIAL_POND', 'LEAF_WITH_UNIT', INITIAL_POND, LEAF_WITH_UNIT],
       ['INITIAL_POND', 'UPGRADED', INITIAL_POND, UPGRADED],
@@ -167,7 +167,7 @@ describe('the PondState type functions', () => {
 
           describe.for(
             // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-            Object.keys(valueToSet) as (keyof ZoneState)[],
+            Object.keys(valueToSet) as (keyof LeafState)[],
           )('when called with partial state: %s', key => {
             it(`should set zone.${key} at x=${x}, y=${y} to ${newValueName}.${key} `, () => {
               const newPond = setPondStateAt(
@@ -195,7 +195,7 @@ describe('the PondState type functions', () => {
   });
 
   describe(isPondState, () => {
-    describe.for<[string, ReadonlyArray<ReadonlyArray<ZoneState>>]>([
+    describe.for<[string, ReadonlyArray<ReadonlyArray<LeafState>>]>([
       ['INITIAL_POND', INITIAL_POND],
       ['ANOTHER_POND', ANOTHER_POND],
       ['FULL_POND', FULL_POND],

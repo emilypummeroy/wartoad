@@ -26,11 +26,25 @@ type PondLeafProps = {
   readonly controller: Player;
 };
 
+type PondLeafContext = readonly [
+  {
+    pond: PondState;
+  },
+  unknown,
+];
+
 export function PondLeaf({
   position,
   onCardPlaced,
   controller,
 }: PondLeafProps) {
+  const [
+    {
+      pond: {
+        [position.y]: { [position.x]: _ },
+      },
+    },
+  ]: PondLeafContext = useContext(GameContext);
   const leafSymbolId = useId();
   const leafNameId = useId();
   return (
@@ -46,18 +60,76 @@ export function PondLeaf({
         onCardPlaced={onCardPlaced}
         controller={controller}
       >
-        <PondLeafCards
-          leafNameId={leafNameId}
+        <PondLeafCard
           leafSymbolId={leafSymbolId}
-          controller={controller}
+          leafNameId={leafNameId}
           position={position}
+          controller={controller}
         />
+        <PondUnits position={position} />
       </LeafDropzone>
     </div>
   );
 }
 
-type PondLeafCardsContext = readonly [
+type PondLeafCardContext = readonly [
+  {
+    pond: PondState;
+  },
+  unknown,
+];
+type PondLeafCardProps = {
+  readonly leafSymbolId: string;
+  readonly leafNameId: string;
+  readonly position: Position;
+  readonly controller: Player;
+};
+function PondLeafCard({
+  leafSymbolId,
+  leafNameId,
+  position,
+  controller,
+}: PondLeafCardProps) {
+  const [
+    {
+      pond: {
+        [position.y]: {
+          [position.x]: { isUpgraded },
+        },
+      },
+    },
+  ]: PondLeafCardContext = useContext(GameContext);
+  const isHome = positionsAreEqual(HOME[controller], position);
+  return isUpgraded ? (
+    // TODO 11: Implement a non-splay-row hack to display cards on leaves
+    // TODO 10: Set the controller based on ZoneState not on position
+    <div className="stacking peeking">
+      <div
+        role="listitem"
+        className={`highlighting-card ${PLAYER_CLASSNAME[controller]}`}
+      >
+        <LilyPad
+          symbolId={leafSymbolId}
+          nameId={leafNameId}
+          isHome={isHome}
+          player={controller}
+          isLeaf
+        />
+      </div>
+    </div>
+  ) : (
+    <div className="stacking">
+      <CardBack
+        iconId={leafSymbolId}
+        key="facedown-card"
+        player={controller}
+        isLeaf
+      />
+    </div>
+  );
+}
+
+type PondUnitsContext = readonly [
   {
     readonly pond: PondState;
   },
@@ -68,28 +140,19 @@ type PondLeafCardsContext = readonly [
   //   commitActivation: (end: Position) => void;
   // },
 ];
-type PondLeafCardsProps = {
-  readonly leafNameId: string;
-  readonly leafSymbolId: string;
-  readonly controller: Player;
+type PondUnitsProps = {
   readonly position: Position;
 };
-function PondLeafCards({
-  leafNameId,
-  leafSymbolId,
-  controller,
-  position,
-}: PondLeafCardsProps) {
+function PondUnits({ position }: PondUnitsProps) {
   const [
     {
       pond: {
         [position.y]: {
-          [position.x]: { isUpgraded, units },
+          [position.x]: { units },
         },
       },
     },
-  ]: PondLeafCardsContext = useContext(GameContext);
-  const isHome = positionsAreEqual(HOME[controller], position);
+  ]: PondUnitsContext = useContext(GameContext);
 
   return (
     <div
@@ -100,33 +163,6 @@ function PondLeafCards({
         '--hand-size': 0,
       }}
     >
-      {isUpgraded ? (
-        // TODO 11: Implement a non-splay-row hack to display cards on leaves
-        // TODO 10: Set the controller based on ZoneState not on position
-        <div className="stacking peeking">
-          <div
-            role="listitem"
-            className={`highlighting-card ${PLAYER_CLASSNAME[controller]}`}
-          >
-            <LilyPad
-              symbolId={leafSymbolId}
-              nameId={leafNameId}
-              isHome={isHome}
-              player={controller}
-              isLeaf
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="stacking">
-          <CardBack
-            iconId={leafSymbolId}
-            key="facedown-card"
-            player={controller}
-            isLeaf
-          />
-        </div>
-      )}
       {units.map(card => (
         <ZoneUnit key={card.key} card={card} position={position} />
       ))}
@@ -134,7 +170,7 @@ function PondLeafCards({
   );
 }
 
-type LeafAndDropzoneContext = readonly [
+type LeafDropzoneContext = readonly [
   {
     readonly pond: PondState;
     readonly flow: {
@@ -152,10 +188,10 @@ type LeafAndDropzoneContext = readonly [
   // },
 ];
 
-type LeafAndDropzoneProps = {
+type LeafDropzoneProps = {
+  readonly children: ReactNode;
   readonly leafNameId: string;
   readonly leafSymbolId: string;
-  readonly children: ReactNode;
   readonly position: Position;
   readonly controller: Player;
   readonly onCardPlaced: (position: Position) => void;
@@ -167,7 +203,7 @@ export function LeafDropzone({
   position,
   controller,
   onCardPlaced,
-}: LeafAndDropzoneProps) {
+}: LeafDropzoneProps) {
   const [
     {
       flow: { player, phase, subphase },
@@ -176,7 +212,7 @@ export function LeafDropzone({
         [position.y]: { [position.x]: leaf },
       },
     },
-  ]: LeafAndDropzoneContext = useContext(GameContext);
+  ]: LeafDropzoneContext = useContext(GameContext);
   const dropzoneId = useId();
   const isUpgradeDropzone =
     phase === Phase.Main &&
@@ -198,7 +234,7 @@ export function LeafDropzone({
   const isDropzone = isUpgradeDropzone || isDeployDropzone || isMoveDropzone;
   const handleClick = useCallback(
     () => (isDropzone ? onCardPlaced(position) : undefined),
-    [isDropzone, position],
+    [isDropzone, position, onCardPlaced],
   );
 
   return (
