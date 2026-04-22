@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 import { activationOf, gameflowOf, renderWithGameContext } from '../context/GameContext.test-utils';
 import { HOME } from '../state/pond';
@@ -33,7 +33,7 @@ type Inputs = [
 // > Deploy dropzone
 // > Move dropzone
 describe(PondLeafDropzone, () => {
-  const TEST_LABEL_ID = 'test-label-id';
+  const TEST_TARGET_ID = 'test-label-id';
   const TEST_LABEL = 'the Target';
   const CHILD_TEXT = 'Hello';
 
@@ -52,8 +52,8 @@ describe(PondLeafDropzone, () => {
         { pond, ...gameflowOf([player, subphase, phase]), ...activationOf(start) },
         { activate, placeCard },
       ])(
-        <PondLeafDropzone targetLabelId={TEST_LABEL_ID} position={position} controller={controller}>
-          <div id={TEST_LABEL_ID} aria-label={TEST_LABEL}>
+        <PondLeafDropzone targetLabelId={TEST_TARGET_ID} position={position} controller={controller}>
+          <div id={TEST_TARGET_ID} aria-label={TEST_LABEL}>
             Hello
           </div>
         </PondLeafDropzone>,
@@ -64,8 +64,8 @@ describe(PondLeafDropzone, () => {
   describe('without context', () => {
     beforeEach(() => {
       render(
-        <PondLeafDropzone targetLabelId={TEST_LABEL_ID} position={{ x: 2, y: 2 }} controller={Player.South}>
-          <div id={TEST_LABEL_ID} aria-label={TEST_LABEL}>
+        <PondLeafDropzone targetLabelId={TEST_TARGET_ID} position={{ x: 2, y: 2 }} controller={Player.South}>
+          <div id={TEST_TARGET_ID} aria-label={TEST_LABEL}>
             Hello
           </div>
         </PondLeafDropzone>,
@@ -124,6 +124,13 @@ describe(PondLeafDropzone, () => {
     it('should have no dropzones', () => {
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
+    it('should not call placeCard when children clicked', () => {
+      fireEvent.click(screen.getByLabelText(TEST_LABEL));
+      expect(placeCard).not.toHaveBeenCalled();
+    });
+    // TODO 9: it('should not call commitUpgrade when children clicked', () => {
+    // TODO 9: it('should not call commitDeploy when children clicked', () => {
+    // TODO 9: it('should not call commitActivate when children clicked', () => {
   });
 
   // ###
@@ -137,20 +144,28 @@ describe(PondLeafDropzone, () => {
     [South, South, SOUTH_POSITION.LeafEdge, Upgrading, ANOTHER_POND],
     [South, South, SOUTH_POSITION.LeafEdge, Upgrading, ANOTHER_POND],
   ])('controlled by %s on %s turn at %s while %s | pond: %s', inputs => {
+    const [_, __, position] = inputs;
     beforeEach_render_with_subphase(inputs);
     it_should_render_its_children();
 
     it('should have an Upgrade dropzone', () => {
       expect(screen.getByRole('button', { name: `Upgrade ${TEST_LABEL}` })).toBeVisible();
     });
+    it('should call placeCard when children clicked', () => {
+      fireEvent.click(screen.getByLabelText(TEST_LABEL));
+      expect(placeCard).toHaveBeenCalledExactlyOnceWith(position);
+    });
+    // TODO 9: it('should call commitUpgrade when children clicked', () => {
 
     it('should have no Deploy dropzone', () => {
       expect(screen.queryByRole('button', { name: /Deploy/ })).not.toBeInTheDocument();
     });
+    // TODO 9: it('should not call commitDeploy when children clicked', () => {
 
     it('should have no Move dropzone', () => {
       expect(screen.queryByRole('button', { name: /Move/ })).not.toBeInTheDocument();
     });
+    // TODO 9: it('should not call commitActivate when children clicked', () => {
   });
 
   // ###
@@ -164,20 +179,28 @@ describe(PondLeafDropzone, () => {
     [South, South, { x: 2, y: 5 }, Deploying],
     [North, South, { x: 0, y: 5 }, Deploying],
   ])('controlled by %s on %s turn at %s while %s', inputs => {
+    const [_, __, position] = inputs;
     beforeEach_render_with_subphase(inputs);
     it_should_render_its_children();
 
     it('should have a Deploy dropzone', () => {
       expect(screen.getByRole('button', { name: `Deploy on ${TEST_LABEL}` })).toBeVisible();
     });
+    it('should call placeCard when children clicked', () => {
+      fireEvent.click(screen.getByLabelText(TEST_LABEL));
+      expect(placeCard).toHaveBeenCalledExactlyOnceWith(position);
+    });
+    // TODO 9: it('should call commitDeploy when children clicked', () => {
 
     it('should have no Upgrade dropzone', () => {
       expect(screen.queryByRole('button', { name: /Upgrade / })).not.toBeInTheDocument();
     });
+    // TODO 9: it('should not call commitUpgrade when children clicked', () => {
 
     it('should have no Move dropzone', () => {
       expect(screen.queryByRole('button', { name: /Move/ })).not.toBeInTheDocument();
     });
+    // TODO 9: it('should not call commitActivate when children clicked', () => {
   });
 
   // ###
@@ -189,19 +212,27 @@ describe(PondLeafDropzone, () => {
     [South, South, { x: 1, y: 1 }, Activating, INITIAL_POND, Main, { x: 2, y: 1 }],
     [North, North, { x: 1, y: 4 }, Activating, ANOTHER_POND, Main, { x: 0, y: 4 }],
   ])('controlled by %s on %s turn at %s while %s | pond: %s | phase: %s | start: %s', inputs => {
+    const [_, __, position] = inputs;
     beforeEach_render_with_subphase(inputs);
     it_should_render_its_children();
 
     it('should have a Move dropzone', () => {
       expect(screen.getByRole('button', { name: `Move to ${TEST_LABEL}` })).toBeVisible();
     });
+    it('should call placeCard when children clicked', () => {
+      fireEvent.click(screen.getByLabelText(TEST_LABEL));
+      expect(placeCard).toHaveBeenCalledExactlyOnceWith(position);
+    });
+    // TODO 9: it('should call commitActivate when children clicked', () => {
 
     it('should have no Upgrade dropzone', () => {
       expect(screen.queryByRole('button', { name: /Upgrade / })).not.toBeInTheDocument();
     });
+    // TODO 9: it('should not call commitUpgrade when children clicked', () => {
 
     it('should have no Deploy dropzone', () => {
       expect(screen.queryByRole('button', { name: /Deploy/ })).not.toBeInTheDocument();
     });
+    // TODO 9: it('should not call commitDeploy when children clicked', () => {
   });
 });

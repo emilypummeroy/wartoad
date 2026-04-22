@@ -57,15 +57,18 @@ export function PondLeafDropzone({
   ]: PondLeafDropzoneContext = useContext(GameContext);
   const { isUpgraded } = getPondStateAt(pond, position);
   const dropzoneId = useId();
+
   const isUpgradeDropzone =
     phase === Phase.Main &&
     subphase === Subphase.Upgrading &&
     player === controller &&
     !isUpgraded;
+
   const isDeployDropzone =
     phase === Phase.Main &&
     subphase === Subphase.Deploying &&
     position.y === HOME[player].y;
+
   const isMoveDropzone =
     phase === Phase.Main &&
     subphase === Subphase.Activating &&
