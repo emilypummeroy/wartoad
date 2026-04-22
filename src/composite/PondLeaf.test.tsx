@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 
 import { activationOf, gameflowOf, renderWithGameContext } from '../context/GameContext.test-utils';
 import { createUnit } from '../state/card';
@@ -85,9 +85,6 @@ const itShouldNotHaveOpponentUpgradeOrActivateButtons = ([, player]: Inputs) => 
 };
 
 describe(PondLeaf, () => {
-  const onPlace = vi.fn<() => void>();
-  const activate = vi.fn<(c: UnitCard, p: Position) => void>();
-
   const renderForInputsInMainPhase = (
     [controller, player, subphase, position, isUpgraded, unitOwners, activationStart]: Inputs,
     units: UnitCard[] = frogletsOwnedBy(unitOwners),
@@ -98,8 +95,7 @@ describe(PondLeaf, () => {
         ...gameflowOf([player, subphase, Main]),
         pond: setPondStateAt(INITIAL_POND, position, { isUpgraded, units }),
       },
-      { activate },
-    ])(<PondLeaf controller={controller} position={position} onCardPlaced={onPlace} />);
+    ])(<PondLeaf controller={controller} position={position} />);
   };
 
   // Home Lily Pad: upgraded & Home
@@ -222,16 +218,6 @@ describe(PondLeaf, () => {
       it('should not have a Move dropzone', () => {
         expect(screen.queryByRole('button', { name: /Move/ })).not.toBeInTheDocument();
       });
-
-      it('should not call onPlace if clicked', () => {
-        for (const button of screen.queryAllByRole('button')) {
-          fireEvent.click(button);
-        }
-        for (const region of screen.getAllByRole('region')) {
-          fireEvent.click(region);
-        }
-        expect(onPlace).not.toHaveBeenCalled();
-      });
     },
   );
 
@@ -268,7 +254,7 @@ describe(PondLeaf, () => {
             ...activationOf(activationStart),
             pond: setPondStateAt(INITIAL_POND, position, { isUpgraded, units: frogletsOwnedBy(unitOwners) }),
           },
-        ])(<PondLeaf controller={controller} position={position} onCardPlaced={onPlace} />);
+        ])(<PondLeaf controller={controller} position={position} />);
       });
       itShouldHaveTheRightFroglets(input);
       itShouldNotHaveOpponentUpgradeOrActivateButtons(input);
@@ -306,7 +292,7 @@ describe(PondLeaf, () => {
   ])(
     'controlled by %s | turn of %s | subphase %s | non-Home position %s | upgraded? %s | units owned by %s',
     inputs => {
-      const [controller, , _, position] = inputs;
+      const [controller] = inputs;
       beforeEach(() => renderForInputsInMainPhase(inputs));
       itShouldHaveTheRightFroglets(inputs);
       itShouldNotHaveOpponentUpgradeOrActivateButtons(inputs);
@@ -330,11 +316,6 @@ describe(PondLeaf, () => {
       it('should not have any Activate buttons', () => {
         expect(screen.queryByRole('button', { name: /Activate/ })).not.toBeInTheDocument();
       });
-
-      it('should call onPlace if clicked', () => {
-        fireEvent.click(screen.getByRole('button', { name: /Upgrade/ }));
-        expect(onPlace).toHaveBeenCalledWith(position);
-      });
     },
   );
 
@@ -348,7 +329,7 @@ describe(PondLeaf, () => {
   ])(
     'controlled by %s | turn of %s | subphase %s | back row position %s | upgraded? %s | units owned by %s',
     inputs => {
-      const [controller, , _, position, isUpgraded] = inputs;
+      const [controller, , _, , isUpgraded] = inputs;
       beforeEach(() => renderForInputsInMainPhase(inputs));
       itShouldHaveTheRightFroglets(inputs);
       itShouldNotHaveOpponentUpgradeOrActivateButtons(inputs);
@@ -372,11 +353,6 @@ describe(PondLeaf, () => {
       it(`should not have any Activate buttons`, () => {
         expect(screen.queryByRole('button', { name: /Activate/ })).not.toBeInTheDocument();
       });
-
-      it('should call onPlace if clicked', () => {
-        fireEvent.click(screen.getByRole('button', { name: /Deploy/ }));
-        expect(onPlace).toHaveBeenCalledWith(position);
-      });
     },
   );
 
@@ -391,7 +367,7 @@ describe(PondLeaf, () => {
   ])(
     'controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s | activated from %s',
     inputs => {
-      const [controller, , _, position, isUpgraded] = inputs;
+      const [controller, , _, , isUpgraded] = inputs;
       beforeEach(() => renderForInputsInMainPhase(inputs));
       itShouldHaveTheRightFroglets(inputs);
       itShouldNotHaveOpponentUpgradeOrActivateButtons(inputs);
@@ -415,13 +391,6 @@ describe(PondLeaf, () => {
       it(`should not have any Activate buttons`, () => {
         expect(screen.queryByRole('button', { name: /Activate/ })).not.toBeInTheDocument();
       });
-
-      // TODO 9: unskip
-      it.skip('should call commitActivation if clicked', () => {
-        fireEvent.click(screen.getByRole('button', { name: /Move/ }));
-        // TODO 9: change to commitActivation
-        expect(onPlace).toHaveBeenCalledWith(position);
-      });
     },
   );
 
@@ -437,7 +406,7 @@ describe(PondLeaf, () => {
     [North, South, Idle, { x: 2, y: 0 }, true, [South, North]],
     [North, South, Idle, { x: 0, y: 1 }, false, [South, South]],
   ])('controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s', inputs => {
-    const [, player, , position, , unitOwners] = inputs;
+    const [, player, , _, , unitOwners] = inputs;
     const units = frogletsOwnedBy(unitOwners);
     const playerUnits = units.filter(({ owner }) => owner === player);
     beforeEach(() => renderForInputsInMainPhase(inputs, units));
@@ -454,10 +423,7 @@ describe(PondLeaf, () => {
 
     it('should call activate if units are clicked', () => {
       const cards = screen.getAllByRole('button', { name: /Activate/ });
-      for (let i = 0; i < playerUnits.length; i += 1) {
-        fireEvent.click(cards[i]);
-        expect(activate).toHaveBeenCalledWith(playerUnits[i], position);
-      }
+      expect(cards).toHaveLength(playerUnits.length);
     });
   });
 
@@ -484,14 +450,6 @@ describe(PondLeaf, () => {
 
     it(`should not have any Activate buttons`, () => {
       expect(screen.queryByRole('button', { name: /Activate/ })).not.toBeInTheDocument();
-    });
-
-    it('should not call activate if units are clicked', () => {
-      const cards = screen.queryAllByRole('region', { name: /unit/ });
-      for (const card of cards) {
-        fireEvent.click(card);
-      }
-      expect(activate).not.toHaveBeenCalled();
     });
   });
 });

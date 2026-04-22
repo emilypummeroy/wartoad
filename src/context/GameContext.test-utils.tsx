@@ -11,6 +11,7 @@ import {
   type GameState,
 } from './GameContext';
 
+// (Not a component):
 // oxlint-disable-next-line react/display-name
 export const renderWithGameContext =
   ([state, dispatch]: [

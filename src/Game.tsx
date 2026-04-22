@@ -17,7 +17,7 @@ export function Game() {
       southHand,
       pickedCard,
     },
-    { endPhase, pickCard, placeCard },
+    { endPhase, pickCard },
   ] = useContext(GameContext);
 
   return (
@@ -57,7 +57,7 @@ export function Game() {
         </section>
         <div className="scroll-x">
           <section className="playarea">
-            <Pond onCardPlaced={placeCard} />
+            <Pond />
           </section>
         </div>
       </main>

@@ -21,17 +21,10 @@ type PondLeafContext = readonly [
 ];
 type PondLeafProps = {
   readonly position: Position;
-
-  // TODO 12: Get from context
-  readonly onCardPlaced: (position: Position) => void;
   readonly controller: Player;
 };
 
-export function PondLeaf({
-  position,
-  onCardPlaced,
-  controller,
-}: PondLeafProps) {
+export function PondLeaf({ position, controller }: PondLeafProps) {
   const [
     {
       pond: {
@@ -53,7 +46,6 @@ export function PondLeaf({
       <PondLeafDropzone
         targetLabelId={labelledById}
         position={position}
-        onCardPlaced={onCardPlaced}
         controller={controller}
       >
         <PondLeafCard

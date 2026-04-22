@@ -25,7 +25,9 @@ type PondLeafDropzoneContext = readonly [
     };
     readonly activationState?: { start: Position };
   },
-  unknown,
+  {
+    readonly placeCard: (position: Position) => void;
+  },
   // {
   //   commitUpgrade: (target: Position) => void;
   //   commitDeploy: (on: Position) => void;
@@ -38,14 +40,12 @@ type PondLeafDropzoneProps = {
   readonly targetLabelId: string;
   readonly position: Position;
   readonly controller: Player;
-  readonly onCardPlaced: (position: Position) => void;
 };
 export function PondLeafDropzone({
   children,
   targetLabelId,
   position,
   controller,
-  onCardPlaced,
 }: PondLeafDropzoneProps) {
   const [
     {
@@ -53,6 +53,7 @@ export function PondLeafDropzone({
       activationState,
       pond,
     },
+    { placeCard },
   ]: PondLeafDropzoneContext = useContext(GameContext);
   const { isUpgraded } = getPondStateAt(pond, position);
   const dropzoneId = useId();
@@ -75,8 +76,8 @@ export function PondLeafDropzone({
 
   const isDropzone = isUpgradeDropzone || isDeployDropzone || isMoveDropzone;
   const handleClick = useCallback(
-    () => (isDropzone ? onCardPlaced(position) : undefined),
-    [isDropzone, position, onCardPlaced],
+    () => (isDropzone ? placeCard(position) : undefined),
+    [isDropzone, position, placeCard],
   );
 
   return (

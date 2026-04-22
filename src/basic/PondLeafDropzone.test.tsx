@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { activationOf, gameflowOf, renderWithGameContext } from '../context/GameContext.test-utils';
 import { HOME } from '../state/pond';
 import { TEST_PONDS_BY_KEY, ANOTHER_POND_POSITIONS, TestPondKey } from '../state/pond.test-utils';
+import type { UnitCard } from '../types/card';
 import { Player, Phase, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { PondLeafDropzone } from './PondLeafDropzone';
@@ -10,10 +11,6 @@ import { PondLeafDropzone } from './PondLeafDropzone';
 const { North, South } = Player;
 const { Start, Main, End } = Phase;
 const { Idle, Upgrading, Deploying, Activating } = Subphase;
-
-const TEST_LABEL_ID = 'test-label-id';
-const TEST_LABEL = 'the Target';
-const CHILD_TEXT = 'Hello';
 
 const { INITIAL_POND, ANOTHER_POND, FULL_POND, EMPTY_POND, UNITS_POND } = TestPondKey;
 const NORTH_POSITION = ANOTHER_POND_POSITIONS.North;
@@ -28,29 +25,6 @@ type Inputs = [
   phase?: Phase,
   start?: Position,
 ];
-const beforeEach_render_with_subphase = ([controller, player, position, subphase, pondKey, phase, start]: Inputs) => {
-  beforeEach(() => {
-    const pond = TEST_PONDS_BY_KEY[pondKey ?? INITIAL_POND];
-    renderWithGameContext([{ pond, ...gameflowOf([player, subphase, phase]), ...activationOf(start) }])(
-      <PondLeafDropzone
-        targetLabelId={TEST_LABEL_ID}
-        position={position}
-        onCardPlaced={() => {}}
-        controller={controller}
-      >
-        <div id={TEST_LABEL_ID} aria-label={TEST_LABEL}>
-          Hello
-        </div>
-      </PondLeafDropzone>,
-    );
-  });
-};
-
-const it_should_render_its_children = () => {
-  it('should render its children', () => {
-    expect(screen.getByText(CHILD_TEXT)).toBeVisible();
-  });
-};
 
 // ###
 // # Outputs:
@@ -59,15 +33,38 @@ const it_should_render_its_children = () => {
 // > Deploy dropzone
 // > Move dropzone
 describe(PondLeafDropzone, () => {
+  const TEST_LABEL_ID = 'test-label-id';
+  const TEST_LABEL = 'the Target';
+  const CHILD_TEXT = 'Hello';
+
+  const it_should_render_its_children = () => {
+    it('should render its children', () => {
+      expect(screen.getByText(CHILD_TEXT)).toBeVisible();
+    });
+  };
+
+  const placeCard = vi.fn<() => void>();
+  const activate = vi.fn<(c: UnitCard, p: Position) => void>();
+  const beforeEach_render_with_subphase = ([controller, player, position, subphase, pondKey, phase, start]: Inputs) => {
+    beforeEach(() => {
+      const pond = TEST_PONDS_BY_KEY[pondKey ?? INITIAL_POND];
+      renderWithGameContext([
+        { pond, ...gameflowOf([player, subphase, phase]), ...activationOf(start) },
+        { activate, placeCard },
+      ])(
+        <PondLeafDropzone targetLabelId={TEST_LABEL_ID} position={position} controller={controller}>
+          <div id={TEST_LABEL_ID} aria-label={TEST_LABEL}>
+            Hello
+          </div>
+        </PondLeafDropzone>,
+      );
+    });
+  };
+
   describe('without context', () => {
     beforeEach(() => {
       render(
-        <PondLeafDropzone
-          targetLabelId={TEST_LABEL_ID}
-          position={{ x: 2, y: 2 }}
-          onCardPlaced={() => {}}
-          controller={Player.South}
-        >
+        <PondLeafDropzone targetLabelId={TEST_LABEL_ID} position={{ x: 2, y: 2 }} controller={Player.South}>
           <div id={TEST_LABEL_ID} aria-label={TEST_LABEL}>
             Hello
           </div>

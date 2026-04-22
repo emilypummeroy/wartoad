@@ -1,17 +1,12 @@
 import { ROW_COUNT_PER_PLAYER } from '../state/pond';
 import { Player } from '../types/gameflow';
-import { type Position } from '../types/position';
 import { PondLeaf } from './PondLeaf';
 
-export type PondProps = Readonly<{
-  onCardPlaced: (position: Position) => void;
-}>;
-export function Pond({ onCardPlaced }: PondProps) {
+export function Pond() {
   const children = (x: number, y: number) => (
     <PondLeaf
       controller={y < ROW_COUNT_PER_PLAYER ? Player.North : Player.South}
       position={{ x, y }}
-      onCardPlaced={onCardPlaced}
     />
   );
   return (
