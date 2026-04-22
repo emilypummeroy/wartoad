@@ -35,16 +35,14 @@ type PondLeafDropzoneContext = readonly [
 
 type PondLeafDropzoneProps = {
   readonly children: ReactNode;
-  readonly leafNameId: string;
-  readonly leafSymbolId: string;
+  readonly targetLabelId: string;
   readonly position: Position;
   readonly controller: Player;
   readonly onCardPlaced: (position: Position) => void;
 };
 export function PondLeafDropzone({
   children,
-  leafNameId,
-  leafSymbolId,
+  targetLabelId,
   position,
   controller,
   onCardPlaced,
@@ -84,7 +82,7 @@ export function PondLeafDropzone({
   return (
     <div
       className={`${isDropzone ? 'dropzone' : ''} zone ${PLAYER_CLASSNAME[controller]}`}
-      aria-labelledby={`${dropzoneId} ${leafSymbolId} ${leafNameId}`}
+      aria-labelledby={`${dropzoneId} ${targetLabelId}`}
       role={isDropzone ? 'button' : ''}
       onClick={handleClick}
       tabIndex={isDropzone ? 0 : undefined}

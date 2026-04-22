@@ -43,15 +43,15 @@ export function PondLeaf({
   ]: PondLeafContext = useContext(GameContext);
   const leafSymbolId = useId();
   const leafNameId = useId();
+  const labelledById = `${leafSymbolId} ${leafNameId}`;
   return (
     <div
       role="gridcell"
-      aria-labelledby={`${leafSymbolId} ${leafNameId}`}
+      aria-labelledby={labelledById}
       aria-colindex={position.x}
     >
       <PondLeafDropzone
-        leafSymbolId={leafSymbolId}
-        leafNameId={leafNameId}
+        targetLabelId={labelledById}
         position={position}
         onCardPlaced={onCardPlaced}
         controller={controller}
