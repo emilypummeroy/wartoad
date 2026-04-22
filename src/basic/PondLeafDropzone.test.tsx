@@ -43,14 +43,16 @@ describe(PondLeafDropzone, () => {
     });
   };
 
-  const placeCard = vi.fn<() => void>();
+  const commitUpgrade = vi.fn<(p: Position) => void>();
+  const commitDeploy = vi.fn<(p: Position) => void>();
+  const commitActivate = vi.fn<(p: Position) => void>();
   const activate = vi.fn<(c: UnitCard, p: Position) => void>();
   const beforeEach_render_with_subphase = ([controller, player, position, subphase, pondKey, phase, start]: Inputs) => {
     beforeEach(() => {
       const pond = TEST_PONDS_BY_KEY[pondKey ?? INITIAL_POND];
       renderWithGameContext([
         { pond, ...gameflowOf([player, subphase, phase]), ...activationOf(start) },
-        { activate, placeCard },
+        { activate, commitUpgrade, commitDeploy, commitActivate },
       ])(
         <PondLeafDropzone targetLabelId={TEST_TARGET_ID} position={position} controller={controller}>
           <div id={TEST_TARGET_ID} aria-label={TEST_LABEL}>
@@ -124,13 +126,21 @@ describe(PondLeafDropzone, () => {
     it('should have no dropzones', () => {
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
-    it('should not call placeCard when children clicked', () => {
+
+    it('should not call commitUpgrade when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(placeCard).not.toHaveBeenCalled();
+      expect(commitUpgrade).not.toHaveBeenCalled();
     });
-    // TODO 9: it('should not call commitUpgrade when children clicked', () => {
-    // TODO 9: it('should not call commitDeploy when children clicked', () => {
-    // TODO 9: it('should not call commitActivate when children clicked', () => {
+
+    it('should not call commitDeploy when children clicked', () => {
+      fireEvent.click(screen.getByLabelText(TEST_LABEL));
+      expect(commitDeploy).not.toHaveBeenCalled();
+    });
+
+    it('should not call commitActivate when children clicked', () => {
+      fireEvent.click(screen.getByLabelText(TEST_LABEL));
+      expect(commitActivate).not.toHaveBeenCalled();
+    });
   });
 
   // ###
@@ -151,21 +161,29 @@ describe(PondLeafDropzone, () => {
     it('should have an Upgrade dropzone', () => {
       expect(screen.getByRole('button', { name: `Upgrade ${TEST_LABEL}` })).toBeVisible();
     });
-    it('should call placeCard when children clicked', () => {
+
+    it('should call commitUpgrade when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(placeCard).toHaveBeenCalledExactlyOnceWith(position);
+      expect(commitUpgrade).toHaveBeenCalledExactlyOnceWith(position);
     });
-    // TODO 9: it('should call commitUpgrade when children clicked', () => {
 
     it('should have no Deploy dropzone', () => {
       expect(screen.queryByRole('button', { name: /Deploy/ })).not.toBeInTheDocument();
     });
-    // TODO 9: it('should not call commitDeploy when children clicked', () => {
+
+    it('should not call commitDeploy when children clicked', () => {
+      fireEvent.click(screen.getByLabelText(TEST_LABEL));
+      expect(commitDeploy).not.toHaveBeenCalled();
+    });
 
     it('should have no Move dropzone', () => {
       expect(screen.queryByRole('button', { name: /Move/ })).not.toBeInTheDocument();
     });
-    // TODO 9: it('should not call commitActivate when children clicked', () => {
+
+    it('should not call commitActivate when children clicked', () => {
+      fireEvent.click(screen.getByLabelText(TEST_LABEL));
+      expect(commitActivate).not.toHaveBeenCalled();
+    });
   });
 
   // ###
@@ -186,21 +204,29 @@ describe(PondLeafDropzone, () => {
     it('should have a Deploy dropzone', () => {
       expect(screen.getByRole('button', { name: `Deploy on ${TEST_LABEL}` })).toBeVisible();
     });
-    it('should call placeCard when children clicked', () => {
+
+    it('should call commitDeploy when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(placeCard).toHaveBeenCalledExactlyOnceWith(position);
+      expect(commitDeploy).toHaveBeenCalledExactlyOnceWith(position);
     });
-    // TODO 9: it('should call commitDeploy when children clicked', () => {
 
     it('should have no Upgrade dropzone', () => {
       expect(screen.queryByRole('button', { name: /Upgrade / })).not.toBeInTheDocument();
     });
-    // TODO 9: it('should not call commitUpgrade when children clicked', () => {
+
+    it('should not call commitUpgrade when children clicked', () => {
+      fireEvent.click(screen.getByLabelText(TEST_LABEL));
+      expect(commitUpgrade).not.toHaveBeenCalled();
+    });
 
     it('should have no Move dropzone', () => {
       expect(screen.queryByRole('button', { name: /Move/ })).not.toBeInTheDocument();
     });
-    // TODO 9: it('should not call commitActivate when children clicked', () => {
+
+    it('should not call commitActivate when children clicked', () => {
+      fireEvent.click(screen.getByLabelText(TEST_LABEL));
+      expect(commitActivate).not.toHaveBeenCalled();
+    });
   });
 
   // ###
@@ -219,20 +245,28 @@ describe(PondLeafDropzone, () => {
     it('should have a Move dropzone', () => {
       expect(screen.getByRole('button', { name: `Move to ${TEST_LABEL}` })).toBeVisible();
     });
-    it('should call placeCard when children clicked', () => {
+
+    it('should call commitActivate when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(placeCard).toHaveBeenCalledExactlyOnceWith(position);
+      expect(commitActivate).toHaveBeenCalledExactlyOnceWith(position);
     });
-    // TODO 9: it('should call commitActivate when children clicked', () => {
 
     it('should have no Upgrade dropzone', () => {
       expect(screen.queryByRole('button', { name: /Upgrade / })).not.toBeInTheDocument();
     });
-    // TODO 9: it('should not call commitUpgrade when children clicked', () => {
+
+    it('should not call commitUpgrade when children clicked', () => {
+      fireEvent.click(screen.getByLabelText(TEST_LABEL));
+      expect(commitUpgrade).not.toHaveBeenCalled();
+    });
 
     it('should have no Deploy dropzone', () => {
       expect(screen.queryByRole('button', { name: /Deploy/ })).not.toBeInTheDocument();
     });
-    // TODO 9: it('should not call commitDeploy when children clicked', () => {
+
+    it('should not call commitDeploy when children clicked', () => {
+      fireEvent.click(screen.getByLabelText(TEST_LABEL));
+      expect(commitDeploy).not.toHaveBeenCalled();
+    });
   });
 });

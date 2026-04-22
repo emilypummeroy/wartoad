@@ -1,5 +1,5 @@
 import { Replace } from 'lucide-react';
-import { useCallback, useContext, useId, type ReactNode } from 'react';
+import { useContext, useId, type ReactNode } from 'react';
 
 import { GameContext } from '../context/GameContext';
 import { getPondStateAt, HOME, type PondState } from '../state/pond';
@@ -26,13 +26,10 @@ type PondLeafDropzoneContext = readonly [
     readonly activationState?: { start: Position };
   },
   {
-    readonly placeCard: (position: Position) => void;
+    commitUpgrade: (target: Position) => void;
+    commitDeploy: (on: Position) => void;
+    commitActivate: (end: Position) => void;
   },
-  // {
-  //   commitUpgrade: (target: Position) => void;
-  //   commitDeploy: (on: Position) => void;
-  //   commitActivation: (end: Position) => void;
-  // },
 ];
 
 type PondLeafDropzoneProps = {
@@ -53,60 +50,55 @@ export function PondLeafDropzone({
       activationState,
       pond,
     },
-    { placeCard },
+    { commitUpgrade, commitDeploy, commitActivate },
   ]: PondLeafDropzoneContext = useContext(GameContext);
   const { isUpgraded } = getPondStateAt(pond, position);
   const dropzoneId = useId();
 
-  const isUpgradeDropzone =
+  const isDropzone =
     phase === Phase.Main &&
-    subphase === Subphase.Upgrading &&
-    player === controller &&
-    !isUpgraded;
+    {
+      [Subphase.Idle]: false,
+      [Subphase.Upgrading]: player === controller && !isUpgraded,
+      [Subphase.Deploying]: position.y === HOME[player].y,
+      [Subphase.Activating]:
+        // TODO 9: fix bug -- in place movement is allowed
+        !positionsAreEqual(position, activationState?.start ?? position) &&
+        !!activationState &&
+        // TODO 21: Use unit's speed stat
+        distanceBetween(position, activationState.start) <= 1,
+    }[subphase];
 
-  const isDeployDropzone =
-    phase === Phase.Main &&
-    subphase === Subphase.Deploying &&
-    position.y === HOME[player].y;
+  const handleClick = {
+    [Subphase.Idle]: () => {},
+    [Subphase.Upgrading]: () => commitUpgrade(position),
+    [Subphase.Deploying]: () => commitDeploy(position),
+    [Subphase.Activating]: () => commitActivate(position),
+  }[subphase];
 
-  const isMoveDropzone =
-    phase === Phase.Main &&
-    subphase === Subphase.Activating &&
-    !!activationState &&
-    !positionsAreEqual(position, activationState.start) &&
-    // TODO 21: Use unit's speed stat
-    distanceBetween(position, activationState.start) <= 1;
-
-  const isDropzone = isUpgradeDropzone || isDeployDropzone || isMoveDropzone;
-  const handleClick = useCallback(
-    () => (isDropzone ? placeCard(position) : undefined),
-    [isDropzone, position, placeCard],
-  );
+  const dropzoneVerb = {
+    [Subphase.Idle]: '',
+    [Subphase.Upgrading]: 'Upgrade',
+    [Subphase.Deploying]: 'Deploy on',
+    [Subphase.Activating]: 'Move to',
+  }[subphase];
 
   return (
     <div
       className={`${isDropzone ? 'dropzone' : ''} zone ${PLAYER_CLASSNAME[controller]}`}
-      aria-labelledby={`${dropzoneId} ${targetLabelId}`}
+      aria-labelledby={`${isDropzone ? dropzoneId : ''} ${targetLabelId}`}
       role={isDropzone ? 'button' : ''}
-      onClick={handleClick}
+      onClick={isDropzone ? handleClick : undefined}
       tabIndex={isDropzone ? 0 : undefined}
     >
+      {children}
       {isDropzone && (
         <div role="presentation" id={dropzoneId} className="overlay-container">
           <Replace>
-            <title>
-              {isUpgradeDropzone
-                ? 'Upgrade'
-                : isDeployDropzone
-                  ? 'Deploy on'
-                  : isMoveDropzone
-                    ? 'Move to'
-                    : ''}
-            </title>
+            <title>{dropzoneVerb}</title>
           </Replace>
         </div>
       )}
-      {children}
     </div>
   );
 }

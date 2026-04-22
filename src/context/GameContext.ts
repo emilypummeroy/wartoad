@@ -27,10 +27,11 @@ export type GameDispatch = {
   // Hand or Card.
   // TODO 11: Make it operate on a card instead of a card class
   readonly pickCard: (_: CardClass) => void;
-  // TODO 10: onUpgrade, onDeploy,
-  readonly placeCard: (_: Position) => void;
   readonly activate: (unit: UnitCard, position: Position) => void;
-  // TODO 9: commitActivation(position)
+  readonly commitUpgrade: (_: Position) => void;
+  readonly commitDeploy: (_: Position) => void;
+  readonly commitActivate: (_: Position) => void;
+  // TODO 9: commit functions:
   // - should move the pickedCard
   // - should unset pickedCard
   // - should unset activationState
@@ -75,8 +76,10 @@ export const DEFAULT_GAME_STATE = {
 export const DEFAULT_GAME_DISPATCH = {
   endPhase: () => {},
   pickCard: () => {},
-  placeCard: () => {},
   activate: () => {},
+  commitUpgrade: () => {},
+  commitDeploy: () => {},
+  commitActivate: () => {},
 };
 
 // TODO 10: Unit test the context and default values
@@ -94,11 +97,15 @@ const createDispatch =
 
     pickCard: (card: CardClass) => setState(pickCard(card)),
 
-    placeCard: (position: Position) =>
-      setState(placeCard(getNextCardKey)(position)),
-
     activate: (unit: UnitCard, position: Position) =>
       setState(activate(unit, position)),
+
+    commitUpgrade: (position: Position) =>
+      setState(placeCard(getNextCardKey)(position)),
+    commitDeploy: (position: Position) =>
+      setState(placeCard(getNextCardKey)(position)),
+    commitActivate: (position: Position) =>
+      setState(placeCard(getNextCardKey)(position)),
   });
 
 const createState = (getStartingHand: () => CardClass[]) => ({

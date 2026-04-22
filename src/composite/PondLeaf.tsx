@@ -55,7 +55,6 @@ export function PondLeaf({ position, controller }: PondLeafProps) {
           controller={controller}
         />
         <div
-          key="card-list"
           role="list"
           className="splay-row in-zone"
           style={{
