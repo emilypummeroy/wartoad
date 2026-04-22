@@ -12,6 +12,7 @@ import {
   type PondState,
   type LeafState,
   getPondStateAt,
+  HOME,
 } from './pond';
 import {
   ANOTHER_POND,
@@ -20,9 +21,11 @@ import {
   LEAF_WITH_UNIT,
   LEAF_OTHER_UNIT,
   LEAF_WITH_UNITS,
-  POND_UNITS,
+  UNITS_POND,
   UPGRADED_UNITS,
   UPGRADED_OTHER_UNITS,
+  TestPondKey,
+  ANOTHER_POND_POSITIONS as POSITIONS,
 } from './pond.test-utils';
 
 const SOUTH_UNIT = createUnit({
@@ -108,7 +111,7 @@ describe('the PondState type functions', () => {
       ['FULL_POND', 'unupgrade', FULL_POND, unupgrade],
       ['EMPTY_POND', 'upgradeAndAddUnit', EMPTY_POND, upgradeAndSetUnits],
       ['EMPTY_POND', 'upgrade', EMPTY_POND, upgrade],
-      ['POND_UNITS', 'removeUnits', POND_UNITS, removeUnits],
+      ['UNITS_POND', 'removeUnits', UNITS_POND, removeUnits],
     ])(
       'with known PondState: %s | updater function: %s',
       ([_, updaterName, pond, updater]) => {
@@ -139,8 +142,8 @@ describe('the PondState type functions', () => {
       ['FULL_POND', 'LEAF_OTHER_UNIT', FULL_POND, LEAF_OTHER_UNIT],
       ['EMPTY_POND', 'UPGRADED_UNITS', EMPTY_POND, UPGRADED_UNITS],
       ['EMPTY_POND', 'UPGRADED_OTHER_UNITS', EMPTY_POND, UPGRADED_OTHER_UNITS],
-      ['POND_UNITS', 'LEAF_UNITS', POND_UNITS, LEAF],
-      ['POND_UNITS', 'UPGRADED', POND_UNITS, UPGRADED],
+      ['POND_UNITS', 'LEAF_UNITS', UNITS_POND, LEAF],
+      ['POND_UNITS', 'UPGRADED', UNITS_POND, UPGRADED],
     ])(
       'with known PondState: %s | new value: %s',
       ([_, newValueName, pond, valueToSet]) => {
@@ -202,7 +205,7 @@ describe('the PondState type functions', () => {
       ['ANOTHER_POND', ANOTHER_POND],
       ['FULL_POND', FULL_POND],
       ['EMPTY_POND', EMPTY_POND],
-      ['POND_UNITS', POND_UNITS],
+      ['POND_UNITS', UNITS_POND],
     ])('with known GridState: %s', ([name, array]) => {
       it(`should verify ${name}`, () => {
         expect(isPondState(array)).toBe(true);
@@ -264,4 +267,91 @@ describe('the PondState type functions', () => {
       });
     });
   });
+});
+
+describe(TestPondKey.ANOTHER_POND, () => {
+  it.for([Player.North, Player.South])(
+    'should have %s.LeafHomeRow unupgraded',
+    player => {
+      const position = POSITIONS[player].LeafHomeRow;
+      expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(false);
+    },
+  );
+
+  it.for([Player.North, Player.South])(
+    'should have %s.LeafHomeRow be on the home row and not Home',
+    player => {
+      const { x, y } = POSITIONS[player].LeafHomeRow;
+      expect(x).not.toBe(1);
+      expect(y).toBe(HOME[player].y);
+    },
+  );
+
+  it.for([Player.North, Player.South])(
+    'should have %s.LeafEdge be unupgraded',
+    player => {
+      const position = POSITIONS[player].LeafEdge;
+      expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(false);
+    },
+  );
+
+  it.for([Player.North, Player.South])(
+    'should have %s.LeafEdge be on the edge and not the home row',
+    player => {
+      const { x, y } = POSITIONS[player].LeafEdge;
+      expect(x).not.toBe(1);
+      expect(y).not.toBe(HOME[player].y);
+    },
+  );
+
+  it.for([Player.North, Player.South])(
+    'should have %s.UpgradedEdge be unupgraded',
+    player => {
+      const position = POSITIONS[player].UpgradedEdge;
+      expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(true);
+    },
+  );
+
+  it.for([Player.North, Player.South])(
+    'should have %s.UpgradedEdge be on the edge and not the home row',
+    player => {
+      const { x, y } = POSITIONS[player].UpgradedEdge;
+      expect(x).not.toBe(1);
+      expect(y).not.toBe(HOME[player].y);
+    },
+  );
+
+  it.for([Player.North, Player.South])(
+    'should have %s.LeafMiddle be unupgraded',
+    player => {
+      const position = POSITIONS[player].LeafMiddle;
+      expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(false);
+    },
+  );
+
+  it.for([Player.North, Player.South])(
+    'should have %s.LeafMiddle be on the edge and not the home row',
+    player => {
+      const { x, y } = POSITIONS[player].LeafMiddle;
+      expect(x).toBe(1);
+      expect(y).not.toBe(HOME[player].y);
+    },
+  );
+
+  it.for([Player.North, Player.South])(
+    'should have %s.UpgradedMiddle be unupgraded',
+    player => {
+      const position = POSITIONS[player].UpgradedMiddle;
+      expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(true);
+    },
+  );
+
+  it.for([Player.North, Player.South])(
+    'should have %s.UpgradedMiddle be on the edge and not the home row',
+    player => {
+      const { x, y } = POSITIONS[player].UpgradedMiddle;
+      expect(x).toBe(1);
+      expect(y).not.toBe(HOME[player].y);
+    },
+  );
 });

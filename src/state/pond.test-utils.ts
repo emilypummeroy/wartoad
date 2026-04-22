@@ -84,13 +84,29 @@ export const UPGRADED_OTHER_UNITS: LeafState = {
 };
 
 export const ANOTHER_POND: PondState = [
-  [UPGRADED, LEAF, LEAF],
-  [UPGRADED, UPGRADED, UPGRADED],
-  [LEAF, UPGRADED, UPGRADED],
-  [LEAF, LEAF, LEAF],
   [UPGRADED, UPGRADED, LEAF],
-  [LEAF, LEAF, UPGRADED],
+  [UPGRADED, LEAF, UPGRADED],
+  [LEAF, UPGRADED, LEAF],
+  [UPGRADED, UPGRADED, LEAF],
+  [UPGRADED, LEAF, LEAF],
+  [LEAF, UPGRADED, UPGRADED],
 ];
+export const ANOTHER_POND_POSITIONS = {
+  [Player.North]: {
+    LeafHomeRow: { x: 2, y: 0 },
+    LeafMiddle: { x: 1, y: 1 },
+    UpgradedMiddle: { x: 1, y: 2 },
+    LeafEdge: { x: 0, y: 2 },
+    UpgradedEdge: { x: 2, y: 1 },
+  },
+  [Player.South]: {
+    LeafHomeRow: { x: 0, y: 5 },
+    LeafMiddle: { x: 1, y: 4 },
+    UpgradedMiddle: { x: 1, y: 3 },
+    LeafEdge: { x: 2, y: 4 },
+    UpgradedEdge: { x: 0, y: 3 },
+  },
+} as const;
 
 export const EMPTY_POND: PondState = [
   [LEAF, LEAF, LEAF],
@@ -110,7 +126,7 @@ export const FULL_POND: PondState = [
   [UPGRADED, UPGRADED, UPGRADED],
 ];
 
-export const POND_UNITS: PondState = [
+export const UNITS_POND: PondState = [
   [UPGRADED_UNITS, UPGRADED, UPGRADED_UNITS],
   [UPGRADED, LEAF, LEAF_WITH_UNIT],
   [LEAF_WITH_UNITS, UPGRADED, LEAF],
@@ -124,7 +140,7 @@ export const TEST_PONDS_BY_KEY = {
   FULL_POND,
   EMPTY_POND,
   ANOTHER_POND,
-  POND_UNITS,
+  UNITS_POND,
 } as const;
 
 export const TestPondKey = {
@@ -132,5 +148,5 @@ export const TestPondKey = {
   FULL_POND: 'FULL_POND',
   EMPTY_POND: 'EMPTY_POND',
   ANOTHER_POND: 'ANOTHER_POND',
-  POND_UNITS: 'POND_UNITS',
+  UNITS_POND: 'UNITS_POND',
 } as Record<TestPondKey, TestPondKey>;
