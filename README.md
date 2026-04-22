@@ -6,14 +6,15 @@ Upgrade leaves floating on the pond to support your forces, train units, and use
 
 ## Project directory structure
 
-Directories are ordered as follows. Files in later directories may only import from earlier ones.
+Directories are "ordered" as follows. Files in later directories may only import from earlier ones.
 
 src:
 
-- types: basic types -- type imports only and only from the same directory
+- types: basic types -- only uses type imports only from the same directory
 - state: types, constants, and functions for operating on those types and constants
+- view: React components which import no other components and don't use context or state
 - context: React contexts and relevant custom hooks, for direct use in any component
-- base: React components which import no other components
+- basic: React components which import only components from src/view and may use context and/or state
 - composite: React components which import some other components
 
 Also:

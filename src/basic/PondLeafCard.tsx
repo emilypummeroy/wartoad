@@ -1,10 +1,10 @@
 import { useContext } from 'react';
 
-import { CardBack, LilyPad } from '../base/Card';
 import { GameContext } from '../context/GameContext';
 import { getPondStateAt, HOME, type PondState } from '../state/pond';
 import { PLAYER_CLASSNAME, type Player } from '../types/gameflow';
 import { positionsAreEqual, type Position } from '../types/position';
+import { CardBack, LilyPad } from '../view/Card';
 
 type PondLeafCardContext = readonly [
   {

@@ -1,6 +1,5 @@
 import { useCallback, useContext, useId } from 'react';
 
-import { Froglet } from '../base/Card';
 import { GameContext } from '../context/GameContext';
 import type { UnitCard } from '../types/card';
 import {
@@ -10,6 +9,7 @@ import {
   type Gameflow,
 } from '../types/gameflow';
 import type { Position } from '../types/position';
+import { Froglet } from '../view/Card';
 
 type PondUnitCardContext = readonly [
   { flow: Gameflow },

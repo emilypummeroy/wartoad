@@ -1,8 +1,8 @@
 import { useCallback, useId } from 'react';
 
-import { CardBack, Froglet, LilyPad } from '../base/Card';
 import { CardClass, type CardKey } from '../types/card';
 import { Player, PLAYER_CLASSNAME } from '../types/gameflow';
+import { CardBack, Froglet, LilyPad } from '../view/Card';
 
 export const INITIAL_HAND_SIZE = 7;
 export const SMALL_HAND_SIZE = 8;
