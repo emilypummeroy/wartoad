@@ -1,5 +1,5 @@
 // oxlint-disable no-magic-numbers
-import { distanceBetween, positionsAreEqual, type Position } from './position';
+import { distanceBetween, arePositionsEqual, type Position } from './position';
 
 const ALL_POSITIONS: Position[] = [
   { x: 0, y: 0 },
@@ -49,10 +49,10 @@ const SOUTH_CENTRE_POSITIONS: Position[] = [
   { x: 1, y: 5 },
 ];
 
-describe(positionsAreEqual, () => {
+describe(arePositionsEqual, () => {
   describe.for(ALL_POSITIONS)('for position %s', ({ x, y }) => {
     it('should return true for an identical position', () => {
-      expect(positionsAreEqual({ x, y }, { x, y })).toBe(true);
+      expect(arePositionsEqual({ x, y }, { x, y })).toBe(true);
     });
   });
 
@@ -60,33 +60,33 @@ describe(positionsAreEqual, () => {
     it.for([{ x: 2 - x, y: 5 - y }])(
       'should return false for the opposite position %s',
       opposite => {
-        expect(positionsAreEqual({ x, y }, opposite)).toBe(false);
-        expect(positionsAreEqual(opposite, { x, y })).toBe(false);
+        expect(arePositionsEqual({ x, y }, opposite)).toBe(false);
+        expect(arePositionsEqual(opposite, { x, y })).toBe(false);
       },
     );
   });
 
   describe.for(CENTRE_POSITIONS)('for centre file position %s', ({ x, y }) => {
     it('should return false for the left neighbour', () => {
-      expect(positionsAreEqual({ x, y }, { x: x - 1, y })).toBe(false);
-      expect(positionsAreEqual({ x: x - 1, y }, { x, y })).toBe(false);
+      expect(arePositionsEqual({ x, y }, { x: x - 1, y })).toBe(false);
+      expect(arePositionsEqual({ x: x - 1, y }, { x, y })).toBe(false);
     });
 
     it('should return false for the right neighbour', () => {
-      expect(positionsAreEqual({ x, y }, { x: x + 1, y })).toBe(false);
-      expect(positionsAreEqual({ x: x + 1, y }, { x, y })).toBe(false);
+      expect(arePositionsEqual({ x, y }, { x: x + 1, y })).toBe(false);
+      expect(arePositionsEqual({ x: x + 1, y }, { x, y })).toBe(false);
     });
 
     it('should return false for the north neighbour', ({ skip }) => {
       skip(y === 0);
-      expect(positionsAreEqual({ x, y }, { x, y: y - 1 })).toBe(false);
-      expect(positionsAreEqual({ x, y: y - 1 }, { x, y })).toBe(false);
+      expect(arePositionsEqual({ x, y }, { x, y: y - 1 })).toBe(false);
+      expect(arePositionsEqual({ x, y: y - 1 }, { x, y })).toBe(false);
     });
 
     it('should return false for the south neighbour', ({ skip }) => {
       skip(y === 5);
-      expect(positionsAreEqual({ x, y }, { x, y: y + 1 })).toBe(false);
-      expect(positionsAreEqual({ x, y: y + 1 }, { x, y })).toBe(false);
+      expect(arePositionsEqual({ x, y }, { x, y: y + 1 })).toBe(false);
+      expect(arePositionsEqual({ x, y: y + 1 }, { x, y })).toBe(false);
     });
 
     it.for<[x: number, y: number]>([
@@ -102,8 +102,8 @@ describe(positionsAreEqual, () => {
         skip(y + yy > 5 || y + yy < 0);
         const position = { x, y };
         const other = { x: x + xx, y: y + yy };
-        expect(positionsAreEqual(position, other)).toBe(false);
-        expect(positionsAreEqual(other, position)).toBe(false);
+        expect(arePositionsEqual(position, other)).toBe(false);
+        expect(arePositionsEqual(other, position)).toBe(false);
       },
     );
 
@@ -120,8 +120,8 @@ describe(positionsAreEqual, () => {
         skip(y + yy > 5 || y + yy < 0);
         const position = { x, y };
         const other = { x: x + xx, y: y + yy };
-        expect(positionsAreEqual(position, other)).toBe(false);
-        expect(positionsAreEqual(other, position)).toBe(false);
+        expect(arePositionsEqual(position, other)).toBe(false);
+        expect(arePositionsEqual(other, position)).toBe(false);
       },
     );
   });
@@ -139,8 +139,8 @@ describe(positionsAreEqual, () => {
           skip(y + yy > 5 || y + yy < 0);
           const position = { x, y };
           const other = { x: x + xx, y: y + yy };
-          expect(positionsAreEqual(position, other)).toBe(false);
-          expect(positionsAreEqual(other, position)).toBe(false);
+          expect(arePositionsEqual(position, other)).toBe(false);
+          expect(arePositionsEqual(other, position)).toBe(false);
         },
       );
 
@@ -154,8 +154,8 @@ describe(positionsAreEqual, () => {
           skip(x + xx > 2 || x + xx < 0 || y + yy > 5 || y + yy < 0);
           const position = { x, y };
           const other = { x: x + xx, y: y + yy };
-          expect(positionsAreEqual(position, other)).toBe(false);
-          expect(positionsAreEqual(other, position)).toBe(false);
+          expect(arePositionsEqual(position, other)).toBe(false);
+          expect(arePositionsEqual(other, position)).toBe(false);
         },
       );
     },
@@ -174,8 +174,8 @@ describe(positionsAreEqual, () => {
   ])(
     'should return false for the sixth degree neighbours %s and %s',
     ([x1, y1, x2, y2]) => {
-      expect(positionsAreEqual({ x: x1, y: y1 }, { x: x2, y: y2 })).toBe(false);
-      expect(positionsAreEqual({ x: x2, y: y2 }, { x: x1, y: y1 })).toBe(false);
+      expect(arePositionsEqual({ x: x1, y: y1 }, { x: x2, y: y2 })).toBe(false);
+      expect(arePositionsEqual({ x: x2, y: y2 }, { x: x1, y: y1 })).toBe(false);
     },
   );
 

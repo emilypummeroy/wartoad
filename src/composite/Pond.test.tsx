@@ -99,7 +99,7 @@ describe(Pond, () => {
   ])('on %s turn %s phase while %s | in pond: %s', ([player, phase, subphase, pondKey]) => {
     const pond = TEST_PONDS_BY_KEY[pondKey];
     beforeEach(() => {
-      renderWithGameContext([{ ...gameflowOf([player, subphase, phase]), pond }])(<Pond />);
+      renderWithGameContext([{ ...gameflowOf(player, subphase, phase), pond }])(<Pond />);
     });
     it_should_have_a_6x3_grid_with_leaves();
     it_should_have_the_right_controlling_player_and_leaves_in_each_row(pond);
@@ -118,7 +118,7 @@ describe(Pond, () => {
     const opponent = PLAYER_AFTER[player];
     const pond = TEST_PONDS_BY_KEY[pondKey];
     beforeEach(() => {
-      renderWithGameContext([{ ...gameflowOf([player, subphase, phase]), pond }])(<Pond />);
+      renderWithGameContext([{ ...gameflowOf(player, subphase, phase), pond }])(<Pond />);
     });
 
     it(`should display ${LEAF_COUNT_PER_ROW} clickable leaves in the ${player} rows`, () => {
@@ -156,7 +156,7 @@ describe(Pond, () => {
     const opponent = PLAYER_AFTER[player];
     const pond = TEST_PONDS_BY_KEY[pondKey];
     beforeEach(() => {
-      renderWithGameContext([{ ...gameflowOf([player, subphase, phase]), pond }])(<Pond />);
+      renderWithGameContext([{ ...gameflowOf(player, subphase, phase), pond }])(<Pond />);
     });
 
     it(`should display ${LEAF_COUNT_PER_ROW} Deploy dropzones in the ${player} home row`, () => {
@@ -187,7 +187,7 @@ describe(Pond, () => {
     ([player, phase, subphase, pondKey, start]) => {
       const pond = TEST_PONDS_BY_KEY[pondKey];
       beforeEach(() => {
-        renderWithGameContext([{ ...gameflowOf([player, subphase, phase]), ...activationOf(start), pond }])(<Pond />);
+        renderWithGameContext([{ ...gameflowOf(player, subphase, phase), ...activationOf(start), pond }])(<Pond />);
       });
 
       const CARDINAL_DIRECTIONS = 4;

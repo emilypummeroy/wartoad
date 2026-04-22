@@ -674,7 +674,7 @@ span.south {
     top: 0;
     left: 0;
     background: var(--bg-transparent);
-    opacity: 50%;
+    opacity: 30%;
     border-radius: calc(1px + 0.5svh);
 
     display: flex;

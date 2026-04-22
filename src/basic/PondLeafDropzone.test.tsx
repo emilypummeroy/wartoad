@@ -51,7 +51,7 @@ describe(PondLeafDropzone, () => {
     beforeEach(() => {
       const pond = TEST_PONDS_BY_KEY[pondKey ?? INITIAL_POND];
       renderWithGameContext([
-        { pond, ...gameflowOf([player, subphase, phase]), ...activationOf(start) },
+        { pond, ...gameflowOf(player, subphase, phase), ...activationOf(start) },
         { activate, commitUpgrade, commitDeploy, commitActivate },
       ])(
         <PondLeafDropzone targetLabelId={TEST_TARGET_ID} position={position} controller={controller}>

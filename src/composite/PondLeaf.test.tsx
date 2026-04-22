@@ -92,7 +92,7 @@ describe(PondLeaf, () => {
     renderWithGameContext([
       {
         ...activationOf(activationStart),
-        ...gameflowOf([player, subphase, Main]),
+        ...gameflowOf(player, subphase, Main),
         pond: setPondStateAt(INITIAL_POND, position, { isUpgraded, units }),
       },
     ])(<PondLeaf controller={controller} position={position} />);
@@ -241,7 +241,7 @@ describe(PondLeaf, () => {
       beforeEach(() => {
         renderWithGameContext([
           {
-            ...gameflowOf([player, subphase, phase]),
+            ...gameflowOf(player, subphase, phase),
             ...activationOf(activationStart),
             pond: setPondStateAt(INITIAL_POND, position, { isUpgraded, units: frogletsOwnedBy(unitOwners) }),
           },

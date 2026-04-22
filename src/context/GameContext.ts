@@ -1,6 +1,6 @@
 import { createContext, useRef, useState } from 'react';
 
-import { createUnit } from '../state/card';
+import { createUnit, DETERMINISTIC_STARTING_HAND } from '../state/card';
 import { INITIAL_POND, setPondStateAt, type PondState } from '../state/pond';
 import {
   type CardClass,
@@ -16,7 +16,11 @@ import {
   Subphase,
   type Gameflow,
 } from '../types/gameflow';
-import { type Position } from '../types/position';
+import {
+  arePositionsEqual,
+  distanceBetween,
+  type Position,
+} from '../types/position';
 
 export type GameContext = readonly [GameState, GameDispatch];
 
@@ -46,8 +50,9 @@ export type GameState = {
   readonly southHand: readonly CardClass[];
   // TODO 11: Card
   readonly pickedCard?: CardClass;
-  readonly activationState?: {
+  readonly activation?: {
     readonly start: Position;
+    readonly unit: UnitCard;
   };
 };
 
@@ -69,8 +74,8 @@ export const DEFAULT_GAME_STATE = {
     subphase: Subphase.Idle,
   },
   pond: INITIAL_POND,
-  northHand: [],
-  southHand: [],
+  northHand: DETERMINISTIC_STARTING_HAND,
+  southHand: DETERMINISTIC_STARTING_HAND,
 } as const;
 
 export const DEFAULT_GAME_DISPATCH = {
@@ -87,7 +92,6 @@ export const GameContext = createContext<GameContext>([
   DEFAULT_GAME_STATE,
   DEFAULT_GAME_DISPATCH,
 ]);
-
 export const INITIAL_HAND_CARD_COUNT = 7;
 
 const createDispatch =
@@ -101,19 +105,20 @@ const createDispatch =
       setState(activate(unit, position)),
 
     commitUpgrade: (position: Position) =>
-      setState(placeCard(getNextCardKey)(position)),
+      setState(commitUpgrade(getNextCardKey)(position)),
     commitDeploy: (position: Position) =>
-      setState(placeCard(getNextCardKey)(position)),
-    commitActivate: (position: Position) =>
-      setState(placeCard(getNextCardKey)(position)),
+      setState(commitDeploy(getNextCardKey)(position)),
+    commitActivate: (position: Position) => setState(commitActivate(position)),
   });
 
+// TODO 11: test
 const createState = (getStartingHand: () => CardClass[]) => ({
   ...DEFAULT_GAME_STATE,
   northHand: getStartingHand(),
   southHand: getStartingHand(),
 });
 
+// TODO 11: test
 // TODO 11: Remove the particular card
 const removeOne = (
   cards: readonly CardClass[],
@@ -123,6 +128,7 @@ const removeOne = (
   ...cards.slice(cards.lastIndexOf(cardClass) + 1),
 ];
 
+// TODO 11: test
 const endPhase =
   (draw: () => CardClass) =>
   ({
@@ -151,6 +157,8 @@ const endPhase =
         : southHand,
   });
 
+// TODO 10: test
+// TODO 10: make this move the cardclass from the hand and make a Card
 const pickCard =
   (pickedCard: CardClass) =>
   ({ flow, ...rest }: GameState): GameState => ({
@@ -166,6 +174,7 @@ const pickCard =
     pickedCard,
   });
 
+// TODO 11: test
 const activate =
   (unit: UnitCard, position: Position) =>
   ({ flow, ...rest }: GameState): GameState => ({
@@ -175,10 +184,12 @@ const activate =
       subphase: Subphase.Activating,
     },
     pickedCard: unit.cardClass,
-    activationState: { start: position },
+    activation: { unit, start: position },
   });
 
-const placeCard =
+// TODO 10: test
+// TODO 10: Make this just for upgrading
+export const commitUpgrade =
   (getNextCardKey: () => number) =>
   (position: Position) =>
   ({
@@ -217,3 +228,81 @@ const placeCard =
           }),
     ),
   });
+
+// TODO 10: test
+// TODO 10: Make this just for deploying
+export const commitDeploy =
+  (getNextCardKey: () => number) =>
+  (position: Position) =>
+  ({
+    pond: grid,
+    flow,
+    flow: { subphase, player },
+    northHand,
+    southHand,
+    pickedCard,
+  }: GameState): GameState => ({
+    flow: { ...flow, subphase: Subphase.Idle },
+    northHand:
+      player === Player.North && pickedCard && northHand.length > 0
+        ? removeOne(northHand, pickedCard)
+        : northHand,
+    southHand:
+      player === Player.South && pickedCard && southHand.length > 0
+        ? removeOne(southHand, pickedCard)
+        : southHand,
+    pond: setPondStateAt(
+      grid,
+      position,
+      subphase === Subphase.Upgrading
+        ? // TODO 10: Make it create a card for leaves too
+          { isUpgraded: true }
+        : // TODO 11: Append a unit instead of setting units
+          old => ({
+            ...old,
+            units: [
+              createUnit({
+                cardClass: UnitClass.Froglet,
+                owner: player,
+                key: getNextCardKey(),
+              }),
+            ],
+          }),
+    ),
+  });
+
+export const commitActivate =
+  (target: Position) =>
+  (old: GameState): GameState => {
+    if (
+      old.flow.phase !== Phase.Main ||
+      old.flow.subphase !== Subphase.Activating ||
+      !old.activation ||
+      distanceBetween(old.activation.start, target) > 1
+    ) {
+      return old;
+    }
+    const {
+      pond,
+      flow,
+      activation: { start, unit },
+      ...rest
+    } = old;
+    return {
+      ...rest,
+      flow: { ...flow, subphase: Subphase.Idle },
+      pond: arePositionsEqual(target, start)
+        ? pond
+        : setPondStateAt(
+            setPondStateAt(pond, target, leaf => ({
+              ...leaf,
+              units: [...leaf.units, unit],
+            })),
+            start,
+            leaf => ({
+              ...leaf,
+              units: leaf.units.filter(({ key }) => key !== unit.key),
+            }),
+          ),
+    };
+  };

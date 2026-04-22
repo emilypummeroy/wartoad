@@ -1,4 +1,4 @@
-import { Replace } from 'lucide-react';
+import { Replace, Move } from 'lucide-react';
 import { useContext, useId, type ReactNode } from 'react';
 
 import { GameContext } from '../context/GameContext';
@@ -19,7 +19,7 @@ type PondLeafDropzoneContext = readonly [
       phase: Phase;
       player: Player;
     };
-    readonly activationState?: { start: Position };
+    readonly activation?: { start: Position };
   },
   {
     commitUpgrade: (target: Position) => void;
@@ -43,7 +43,7 @@ export function PondLeafDropzone({
   const [
     {
       flow: { player, phase, subphase },
-      activationState,
+      activation,
       pond,
     },
     { commitUpgrade, commitDeploy, commitActivate },
@@ -58,7 +58,7 @@ export function PondLeafDropzone({
       [Subphase.Upgrading]: player === controller && !isUpgraded,
       [Subphase.Deploying]: position.y === HOME[player].y,
       [Subphase.Activating]:
-        distanceBetween(position, activationState?.start ?? position) <= 1,
+        distanceBetween(position, activation?.start ?? position) <= 1,
     }[subphase];
 
   const handleClick = {
@@ -75,6 +75,13 @@ export function PondLeafDropzone({
     [Subphase.Activating]: 'Move to',
   }[subphase];
 
+  const DropzoneIcon = {
+    [Subphase.Idle]: Replace,
+    [Subphase.Upgrading]: Replace,
+    [Subphase.Deploying]: Replace,
+    [Subphase.Activating]: Move,
+  }[subphase];
+
   return (
     <div
       className={`${isDropzone ? 'dropzone' : ''} zone ${PLAYER_CLASSNAME[controller]}`}
@@ -86,9 +93,9 @@ export function PondLeafDropzone({
       {children}
       {isDropzone && (
         <div role="presentation" id={dropzoneId} className="overlay-container">
-          <Replace>
+          <DropzoneIcon>
             <title>{dropzoneVerb}</title>
-          </Replace>
+          </DropzoneIcon>
         </div>
       )}
     </div>

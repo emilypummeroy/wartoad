@@ -2,7 +2,8 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { DeterministicApp } from './App';
 import { HOME } from './state/pond';
-import { CardClass, UnitClass } from './types/card';
+import type { UnitClass } from './types/card';
+import { CardClass } from './types/card';
 import { Phase, Player } from './types/gameflow';
 
 const MANY = 15;
@@ -135,8 +136,7 @@ describe(DeterministicApp, () => {
         advanceToPhase(player, Main);
       });
 
-      // TODO 9: Unskip this
-      it.skip('Should allow you to play and activate a Froglet, moving it to the second rank', () => {
+      it('Should allow you to play and activate a Froglet, moving it to the second rank', () => {
         fireEvent.click(getFirst.handCardNamed(player, Froglet.name));
         fireEvent.click(getFirst.basicDropzoneControlledBy(player));
         fireEvent.click(getFirst.unitControlledByOfClass(player, Froglet));
@@ -146,6 +146,8 @@ describe(DeterministicApp, () => {
         fireEvent.click(getThe.nthRankDropzoneFor(player, 1));
         expect(getThe.nthRankUnitControlledBy(player, 1)).toBeVisible();
         expect(queryA.nthRankUnitControlledBy(player, 0)).not.toBeInTheDocument();
+
+        // TODO 11: Should not have a clickable unit anymore
       });
     });
   });
