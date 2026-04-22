@@ -175,14 +175,6 @@ describe(PondLeaf, () => {
     [North, South, Activating, { x: 1, y: 3 }, false, [], { x: 1, y: 5 }],
     [South, South, Activating, { x: 2, y: 5 }, true, [North], { x: 0, y: 5 }],
 
-    // | Activating & same position as start
-    [North, North, Activating, { x: 1, y: 4 }, false, [South], { x: 1, y: 4 }],
-    [South, South, Activating, { x: 0, y: 3 }, true, [North], { x: 0, y: 3 }],
-
-    // | Activating & no activation state
-    [North, North, Activating, { x: 2, y: 2 }, false, [South]],
-    [South, South, Activating, { x: 1, y: 5 }, true, [North]],
-
     // | Deploying & not back row
     [North, North, Deploying, { x: 1, y: 1 }, true, [North, North]],
     [South, North, Deploying, { x: 2, y: 5 }, false, []],
@@ -224,7 +216,6 @@ describe(PondLeaf, () => {
   // No dropzones or activation buttons if:
   // | Start phase & even if all other conditions are satisfied
   // | End phase & even if all other conditions are satisfied
-  // TODO 9: Add a case for Activation subphase
   describe.for<[Phase, ...Inputs]>([
     [Start, North, North, Idle, { x: 0, y: 0 }, false, [North, North], { x: 1, y: 0 }],
     [Start, North, North, Activating, { x: 0, y: 0 }, false, [North, North], { x: 1, y: 0 }],
@@ -364,6 +355,10 @@ describe(PondLeaf, () => {
     [South, North, Activating, { x: 0, y: 1 }, true, [North, South], { x: 0, y: 0 }],
     [North, South, Activating, { x: 2, y: 4 }, false, [], { x: 2, y: 5 }],
     [South, South, Activating, { x: 1, y: 5 }, true, [North], { x: 0, y: 5 }],
+
+    // | Activating & same position as start
+    [North, North, Activating, { x: 1, y: 4 }, false, [South], { x: 1, y: 4 }],
+    [South, South, Activating, { x: 0, y: 3 }, true, [North], { x: 0, y: 3 }],
   ])(
     'controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s | activated from %s',
     inputs => {

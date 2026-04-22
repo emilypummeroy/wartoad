@@ -86,6 +86,8 @@ describe(Pond, () => {
     // | Upgrading & full pond
     [North, Main, Upgrading, FULL_POND],
     [South, Main, Upgrading, FULL_POND],
+    // Deploying always has the home row
+    // Activating always has move-in-place
 
     // | Idle
     [North, Main, Idle, INITIAL_POND],
@@ -189,9 +191,9 @@ describe(Pond, () => {
       });
 
       const CARDINAL_DIRECTIONS = 4;
-      it(`should display ${CARDINAL_DIRECTIONS} Move dropzones`, () => {
+      it(`should display ${CARDINAL_DIRECTIONS + 1} Move dropzones including moving in place`, () => {
         const buttons = screen.getAllByRole('button', { name: /Move to/ });
-        expect(buttons).toHaveLength(CARDINAL_DIRECTIONS);
+        expect(buttons).toHaveLength(CARDINAL_DIRECTIONS + 1);
       });
     },
   );

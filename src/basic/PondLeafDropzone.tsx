@@ -9,11 +9,7 @@ import {
   Subphase,
   type Player,
 } from '../types/gameflow';
-import {
-  distanceBetween,
-  positionsAreEqual,
-  type Position,
-} from '../types/position';
+import { distanceBetween, type Position } from '../types/position';
 
 type PondLeafDropzoneContext = readonly [
   {
@@ -62,11 +58,7 @@ export function PondLeafDropzone({
       [Subphase.Upgrading]: player === controller && !isUpgraded,
       [Subphase.Deploying]: position.y === HOME[player].y,
       [Subphase.Activating]:
-        // TODO 9: fix bug -- in place movement is allowed
-        !positionsAreEqual(position, activationState?.start ?? position) &&
-        !!activationState &&
-        // TODO 21: Use unit's speed stat
-        distanceBetween(position, activationState.start) <= 1,
+        distanceBetween(position, activationState?.start ?? position) <= 1,
     }[subphase];
 
   const handleClick = {

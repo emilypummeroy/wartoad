@@ -109,11 +109,6 @@ describe(PondLeafDropzone, () => {
     [South, North, { x: 0, y: 5 }, Deploying],
     [South, South, { x: 2, y: 4 }, Deploying],
     [North, South, { x: 1, y: 0 }, Deploying],
-    // < Activating & same position as start
-    [North, North, { x: 0, y: 0 }, Activating, UNITS_POND, Main, { x: 0, y: 0 }],
-    [South, North, { x: 2, y: 0 }, Activating, UNITS_POND, Main, { x: 2, y: 0 }],
-    [South, South, { x: 0, y: 5 }, Activating, UNITS_POND, Main, { x: 0, y: 5 }],
-    [North, South, { x: 2, y: 5 }, Activating, UNITS_POND, Main, { x: 2, y: 5 }],
     // < Activating & out of range of start
     [North, North, { x: 0, y: 0 }, Activating, UNITS_POND, Main, { x: 2, y: 0 }],
     [South, North, { x: 2, y: 0 }, Activating, UNITS_POND, Main, { x: 0, y: 0 }],
@@ -237,6 +232,11 @@ describe(PondLeafDropzone, () => {
     [North, South, { x: 0, y: 2 }, Activating, FULL_POND, Main, { x: 0, y: 3 }],
     [South, South, { x: 1, y: 1 }, Activating, INITIAL_POND, Main, { x: 2, y: 1 }],
     [North, North, { x: 1, y: 4 }, Activating, ANOTHER_POND, Main, { x: 0, y: 4 }],
+    // < Activating & same position as start
+    [North, North, { x: 0, y: 0 }, Activating, UNITS_POND, Main, { x: 0, y: 0 }],
+    [South, North, { x: 2, y: 0 }, Activating, UNITS_POND, Main, { x: 2, y: 0 }],
+    [South, South, { x: 0, y: 5 }, Activating, UNITS_POND, Main, { x: 0, y: 5 }],
+    [North, South, { x: 2, y: 5 }, Activating, UNITS_POND, Main, { x: 2, y: 5 }],
   ])('controlled by %s on %s turn at %s while %s | pond: %s | phase: %s | start: %s', inputs => {
     const [_, __, position] = inputs;
     beforeEach_render_with_subphase(inputs);
