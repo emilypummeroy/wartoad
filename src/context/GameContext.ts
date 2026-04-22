@@ -165,7 +165,7 @@ const activate =
     ...rest,
     flow: {
       ...flow,
-      subphase: Subphase.Activation,
+      subphase: Subphase.Activating,
     },
     pickedCard: unit.cardClass,
     activationState: { start: position },

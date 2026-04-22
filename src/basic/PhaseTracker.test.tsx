@@ -7,7 +7,7 @@ const NOOP = () => {};
 
 const { North, South } = Player;
 const { Start, Main, End } = Phase;
-const { Idle, Upgrading, Deploying } = Subphase;
+const { Idle, Upgrading, Deploying, Activating } = Subphase;
 
 describe(PhaseTracker, () => {
   it.for<[Player, Phase, Subphase]>([
@@ -15,6 +15,7 @@ describe(PhaseTracker, () => {
     [North, Main, Idle],
     [North, Main, Deploying],
     [North, Main, Upgrading],
+    [North, Main, Activating],
     [North, End, Idle],
     [South, Start, Idle],
     [South, Main, Idle],

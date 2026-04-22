@@ -9,7 +9,7 @@ import { Pond } from './Pond';
 
 const { North, South } = Player;
 const { Start, Main, End } = Phase;
-const { Idle, Deploying, Upgrading, Activation } = Subphase;
+const { Idle, Deploying, Upgrading, Activating } = Subphase;
 const { INITIAL_POND, FULL_POND, EMPTY_POND, ANOTHER_POND, POND_UNITS } = TestPondKey;
 
 type Input = [turn: Player, Phase, Subphase, TestPondKey];
@@ -207,8 +207,8 @@ describe(Pond, () => {
   const MIDDLE_COLUMN = { x: 1, y: 3 };
   const ANOTHER_POSITION = { x: 1, y: 2 };
   describe.for<[...Input, Position]>([
-    [North, Main, Activation, INITIAL_POND, MIDDLE_COLUMN],
-    [South, Main, Activation, FULL_POND, ANOTHER_POSITION],
+    [North, Main, Activating, INITIAL_POND, MIDDLE_COLUMN],
+    [South, Main, Activating, FULL_POND, ANOTHER_POSITION],
   ])(
     'on %s turn %s phase while %s | in pond: %s | activation started at %s',
     ([player, phase, subphase, pondKey, start]) => {

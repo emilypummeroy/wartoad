@@ -10,7 +10,7 @@ import { PondLeaf } from './PondLeaf';
 
 const { North, South } = Player;
 const { Start, Main, End } = Phase;
-const { Idle, Deploying, Upgrading, Activation } = Subphase;
+const { Idle, Deploying, Upgrading, Activating } = Subphase;
 
 type Inputs = [
   controller: Player,
@@ -107,7 +107,7 @@ describe(PondLeaf, () => {
     [North, North, Idle, HOME[North], true, []],
     [North, South, Deploying, HOME[North], true, [South]],
     [South, North, Upgrading, HOME[South], true, []],
-    [South, South, Activation, HOME[South], true, [North, North]],
+    [South, South, Activating, HOME[South], true, [North, North]],
   ])('controlled by %s | Home position %s | upgraded %s | units owned by %s | turn of %s | subphase %s', inputs => {
     const [controller] = inputs;
     beforeEach(() => renderForInputsInMainPhase(inputs));
@@ -122,7 +122,7 @@ describe(PondLeaf, () => {
   // Controlled Lily Pad: upgraded & !Home
   describe.for<Inputs>([
     [North, North, Upgrading, { x: 1, y: 2 }, true, [North, South]],
-    [North, South, Activation, { x: 2, y: 0 }, true, [North]],
+    [North, South, Activating, { x: 2, y: 0 }, true, [North]],
     [South, North, Idle, { x: 1, y: 4 }, true, []],
     [South, South, Deploying, { x: 0, y: 5 }, true, [South]],
   ])(
@@ -146,7 +146,7 @@ describe(PondLeaf, () => {
     [North, South, Upgrading, { x: 0, y: 2 }, false, []],
     [North, South, Deploying, { x: 1, y: 5 }, false, [South]],
     [South, North, Idle, { x: 1, y: 0 }, false, [North, South]],
-    [South, North, Activation, { x: 2, y: 3 }, false, [North]],
+    [South, North, Activating, { x: 2, y: 3 }, false, [North]],
   ])(
     'controlled by %s | turn of %s | subphase %s | non-Home position %s | upgraded? %s | units owned by %s',
     inputs => {
@@ -174,18 +174,18 @@ describe(PondLeaf, () => {
 
     // | Activating & not in range of start
     // Offsets: x+2, y-2, y+2, x-2
-    [North, North, Activation, { x: 0, y: 0 }, false, [South], { x: 2, y: 0 }],
-    [South, North, Activation, { x: 1, y: 2 }, true, [North, South], { x: 1, y: 0 }],
-    [North, South, Activation, { x: 1, y: 3 }, false, [], { x: 1, y: 5 }],
-    [South, South, Activation, { x: 2, y: 5 }, true, [North], { x: 0, y: 5 }],
+    [North, North, Activating, { x: 0, y: 0 }, false, [South], { x: 2, y: 0 }],
+    [South, North, Activating, { x: 1, y: 2 }, true, [North, South], { x: 1, y: 0 }],
+    [North, South, Activating, { x: 1, y: 3 }, false, [], { x: 1, y: 5 }],
+    [South, South, Activating, { x: 2, y: 5 }, true, [North], { x: 0, y: 5 }],
 
     // | Activating & same position as start
-    [North, North, Activation, { x: 1, y: 4 }, false, [South], { x: 1, y: 4 }],
-    [South, South, Activation, { x: 0, y: 3 }, true, [North], { x: 0, y: 3 }],
+    [North, North, Activating, { x: 1, y: 4 }, false, [South], { x: 1, y: 4 }],
+    [South, South, Activating, { x: 0, y: 3 }, true, [North], { x: 0, y: 3 }],
 
     // | Activating & no activation state
-    [North, North, Activation, { x: 2, y: 2 }, false, [South]],
-    [South, South, Activation, { x: 1, y: 5 }, true, [North]],
+    [North, North, Activating, { x: 2, y: 2 }, false, [South]],
+    [South, South, Activating, { x: 1, y: 5 }, true, [North]],
 
     // | Deploying & not back row
     [North, North, Deploying, { x: 1, y: 1 }, true, [North, North]],
@@ -241,19 +241,19 @@ describe(PondLeaf, () => {
   // TODO 9: Add a case for Activation subphase
   describe.for<[Phase, ...Inputs]>([
     [Start, North, North, Idle, { x: 0, y: 0 }, false, [North, North], { x: 1, y: 0 }],
-    [Start, North, North, Activation, { x: 0, y: 0 }, false, [North, North], { x: 1, y: 0 }],
+    [Start, North, North, Activating, { x: 0, y: 0 }, false, [North, North], { x: 1, y: 0 }],
     [Start, North, North, Deploying, { x: 2, y: 0 }, false, [North, North], { x: 1, y: 0 }],
     [Start, North, North, Upgrading, { x: 2, y: 0 }, false, [North, North], { x: 1, y: 0 }],
     [Start, South, South, Idle, { x: 0, y: 5 }, false, [South, South], { x: 1, y: 5 }],
-    [Start, South, South, Activation, { x: 0, y: 5 }, false, [South, South], { x: 1, y: 5 }],
+    [Start, South, South, Activating, { x: 0, y: 5 }, false, [South, South], { x: 1, y: 5 }],
     [Start, South, South, Deploying, { x: 2, y: 5 }, false, [South, South], { x: 1, y: 5 }],
     [Start, South, South, Upgrading, { x: 2, y: 5 }, false, [South, South], { x: 1, y: 5 }],
     [End, North, North, Idle, { x: 0, y: 0 }, false, [North, North], { x: 0, y: 1 }],
-    [End, North, North, Activation, { x: 0, y: 0 }, false, [North, North], { x: 0, y: 1 }],
+    [End, North, North, Activating, { x: 0, y: 0 }, false, [North, North], { x: 0, y: 1 }],
     [End, North, North, Deploying, { x: 2, y: 0 }, false, [North, North], { x: 2, y: 1 }],
     [End, North, North, Upgrading, { x: 2, y: 0 }, false, [North, North], { x: 2, y: 1 }],
     [End, South, South, Idle, { x: 0, y: 5 }, false, [South, South], { x: 0, y: 4 }],
-    [End, South, South, Activation, { x: 0, y: 5 }, false, [South, South], { x: 0, y: 4 }],
+    [End, South, South, Activating, { x: 0, y: 5 }, false, [South, South], { x: 0, y: 4 }],
     [End, South, South, Deploying, { x: 2, y: 5 }, false, [South, South], { x: 2, y: 4 }],
     [End, South, South, Upgrading, { x: 2, y: 5 }, false, [South, South], { x: 2, y: 4 }],
   ])(
@@ -384,10 +384,10 @@ describe(PondLeaf, () => {
   describe.for<Inputs>([
     // Modified from: Activating & not in range of start
     // Offsets: x+1, y-1, y+1, x-1
-    [North, North, Activation, { x: 1, y: 0 }, false, [South], { x: 2, y: 0 }],
-    [South, North, Activation, { x: 0, y: 1 }, true, [North, South], { x: 0, y: 0 }],
-    [North, South, Activation, { x: 2, y: 4 }, false, [], { x: 2, y: 5 }],
-    [South, South, Activation, { x: 1, y: 5 }, true, [North], { x: 0, y: 5 }],
+    [North, North, Activating, { x: 1, y: 0 }, false, [South], { x: 2, y: 0 }],
+    [South, North, Activating, { x: 0, y: 1 }, true, [North, South], { x: 0, y: 0 }],
+    [North, South, Activating, { x: 2, y: 4 }, false, [], { x: 2, y: 5 }],
+    [South, South, Activating, { x: 1, y: 5 }, true, [North], { x: 0, y: 5 }],
   ])(
     'controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s | activated from %s',
     inputs => {
@@ -469,12 +469,12 @@ describe(PondLeaf, () => {
   describe.for<Inputs>([
     [North, North, Idle, { x: 2, y: 3 }, true, []],
     [North, North, Idle, { x: 1, y: 4 }, false, [South]],
-    [North, North, Activation, { x: 0, y: 5 }, true, [North]],
+    [North, North, Activating, { x: 0, y: 5 }, true, [North]],
     [South, North, Deploying, { x: 2, y: 0 }, false, [North]],
     [South, North, Upgrading, { x: 1, y: 1 }, true, [North]],
     [South, South, Idle, { x: 0, y: 2 }, true, []],
     [North, South, Idle, { x: 2, y: 3 }, false, [North]],
-    [North, South, Activation, { x: 1, y: 4 }, true, [South]],
+    [North, South, Activating, { x: 1, y: 4 }, true, [South]],
     [South, South, Deploying, { x: 0, y: 5 }, false, [South]],
     [South, South, Upgrading, { x: 2, y: 0 }, true, [South]],
   ])('controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s', inputs => {

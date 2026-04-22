@@ -69,7 +69,7 @@ export function PondLeafDropzone({
     position.y === HOME[player].y;
   const isMoveDropzone =
     phase === Phase.Main &&
-    subphase === Subphase.Activation &&
+    subphase === Subphase.Activating &&
     !!activationState &&
     !positionsAreEqual(position, activationState.start) &&
     // TODO 21: Use unit's speed stat
