@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import { activationOf, gameflowOf, renderWithGameContext } from '../context/GameContext.test-utils';
-import { HOME } from '../state/pond';
+import { HOME, setPondStateAt } from '../state/pond';
 import { TEST_PONDS_BY_KEY, ANOTHER_POND_POSITIONS, TestPondKey } from '../state/pond.test-utils';
 import type { UnitCard } from '../types/card';
 import { Player, Phase, Subphase } from '../types/gameflow';
@@ -49,12 +49,12 @@ describe(PondLeafDropzone, () => {
   const activate = vi.fn<(c: UnitCard, p: Position) => void>();
   const beforeEach_render_with_subphase = ([controller, player, position, subphase, pondKey, phase, start]: Inputs) => {
     beforeEach(() => {
-      const pond = TEST_PONDS_BY_KEY[pondKey ?? INITIAL_POND];
+      const pond = setPondStateAt(TEST_PONDS_BY_KEY[pondKey ?? INITIAL_POND], position, { controller });
       renderWithGameContext([
         { pond, ...gameflowOf(player, subphase, phase), ...activationOf(start) },
         { activate, commitUpgrade, commitDeploy, commitActivate },
       ])(
-        <PondLeafDropzone targetLabelId={TEST_TARGET_ID} position={position} controller={controller}>
+        <PondLeafDropzone targetLabelId={TEST_TARGET_ID} position={position}>
           <div id={TEST_TARGET_ID} aria-label={TEST_LABEL}>
             Hello
           </div>
@@ -66,7 +66,7 @@ describe(PondLeafDropzone, () => {
   describe('without context', () => {
     beforeEach(() => {
       render(
-        <PondLeafDropzone targetLabelId={TEST_TARGET_ID} position={{ x: 2, y: 2 }} controller={Player.South}>
+        <PondLeafDropzone targetLabelId={TEST_TARGET_ID} position={{ x: 2, y: 2 }}>
           <div id={TEST_TARGET_ID} aria-label={TEST_LABEL}>
             Hello
           </div>

@@ -93,9 +93,9 @@ describe(PondLeaf, () => {
       {
         ...activationOf(activationStart),
         ...gameflowOf(player, subphase, Main),
-        pond: setPondStateAt(INITIAL_POND, position, { isUpgraded, units }),
+        pond: setPondStateAt(INITIAL_POND, position, { isUpgraded, units, controller }),
       },
-    ])(<PondLeaf controller={controller} position={position} />);
+    ])(<PondLeaf position={position} />);
   };
 
   // Home Lily Pad: upgraded & Home
@@ -243,9 +243,13 @@ describe(PondLeaf, () => {
           {
             ...gameflowOf(player, subphase, phase),
             ...activationOf(activationStart),
-            pond: setPondStateAt(INITIAL_POND, position, { isUpgraded, units: frogletsOwnedBy(unitOwners) }),
+            pond: setPondStateAt(INITIAL_POND, position, {
+              isUpgraded,
+              controller,
+              units: frogletsOwnedBy(unitOwners),
+            }),
           },
-        ])(<PondLeaf controller={controller} position={position} />);
+        ])(<PondLeaf position={position} />);
       });
       itShouldHaveTheRightFroglets(input);
       itShouldNotHaveOpponentUpgradeOrActivateButtons(input);

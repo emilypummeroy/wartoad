@@ -3,12 +3,8 @@ import { useContext, useId, type ReactNode } from 'react';
 
 import { GameContext } from '../context/GameContext';
 import { getPondStateAt, HOME, type PondState } from '../state/pond';
-import {
-  Phase,
-  PLAYER_CLASSNAME,
-  Subphase,
-  type Player,
-} from '../types/gameflow';
+import type { Player } from '../types/gameflow';
+import { Phase, PLAYER_CLASSNAME, Subphase } from '../types/gameflow';
 import { distanceBetween, type Position } from '../types/position';
 
 type PondLeafDropzoneContext = readonly [
@@ -32,13 +28,11 @@ type PondLeafDropzoneProps = {
   readonly children: ReactNode;
   readonly targetLabelId: string;
   readonly position: Position;
-  readonly controller: Player;
 };
 export function PondLeafDropzone({
   children,
   targetLabelId,
   position,
-  controller,
 }: PondLeafDropzoneProps) {
   const [
     {
@@ -48,7 +42,7 @@ export function PondLeafDropzone({
     },
     { commitUpgrade, commitDeploy, commitActivate },
   ]: PondLeafDropzoneContext = useContext(GameContext);
-  const { isUpgraded } = getPondStateAt(pond, position);
+  const { isUpgraded, controller } = getPondStateAt(pond, position);
   const dropzoneId = useId();
 
   const isDropzone =

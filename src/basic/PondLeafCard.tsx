@@ -2,7 +2,7 @@ import { useContext } from 'react';
 
 import { GameContext } from '../context/GameContext';
 import { getPondStateAt, HOME, type PondState } from '../state/pond';
-import { PLAYER_CLASSNAME, type Player } from '../types/gameflow';
+import { PLAYER_CLASSNAME } from '../types/gameflow';
 import { arePositionsEqual, type Position } from '../types/position';
 import { CardBack, LilyPad } from '../view/Card';
 
@@ -16,16 +16,14 @@ type PondLeafCardProps = {
   readonly leafSymbolId: string;
   readonly leafNameId: string;
   readonly position: Position;
-  readonly controller: Player;
 };
 export function PondLeafCard({
   leafSymbolId,
   leafNameId,
   position,
-  controller,
 }: PondLeafCardProps) {
-  const context: PondLeafCardContext = useContext(GameContext);
-  const { isUpgraded } = getPondStateAt(context[0].pond, position);
+  const [{ pond }]: PondLeafCardContext = useContext(GameContext);
+  const { controller, isUpgraded } = getPondStateAt(pond, position);
   const isHome = arePositionsEqual(HOME[controller], position);
   return isUpgraded ? (
     // TODO 11: Implement a non-splay-row hack to display cards on leaves
