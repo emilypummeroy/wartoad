@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { useContext } from 'react';
 
-import { createUnit } from '../state/card';
+import { createUnit } from '../state-types/card';
 import { CardClass, UnitClass } from '../types/card';
 import { Player } from '../types/gameflow';
 import { GameContext, type GameDispatch } from './GameContext';

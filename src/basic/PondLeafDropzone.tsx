@@ -2,7 +2,7 @@ import { Replace, Move } from 'lucide-react';
 import { useContext, useId, type ReactNode } from 'react';
 
 import { GameContext } from '../context/GameContext';
-import { getPondStateAt, HOME, type PondState } from '../state/pond';
+import { getPondStateAt, HOME, type PondState } from '../state-types/pond';
 import type { Player } from '../types/gameflow';
 import { Phase, PLAYER_CLASSNAME, Subphase } from '../types/gameflow';
 import { distanceBetween, type Position } from '../types/position';

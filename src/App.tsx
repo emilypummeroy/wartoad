@@ -5,7 +5,7 @@ import {
   useGameContextData,
 } from './context/GameContext';
 import { Game } from './Game';
-import { DETERMINISTIC_STARTING_HAND } from './state/card';
+import { DETERMINISTIC_STARTING_HAND } from './state-types/card';
 import { CardClass } from './types/card';
 
 export function DeterministicApp() {

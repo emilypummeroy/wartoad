@@ -4,7 +4,7 @@ import { PondLeafCard } from '../basic/PondLeafCard';
 import { PondLeafDropzone } from '../basic/PondLeafDropzone';
 import { PondUnitCard } from '../basic/PondUnitCard';
 import { GameContext } from '../context/GameContext';
-import { type PondState } from '../state/pond';
+import { type PondState } from '../state-types/pond';
 import { type Position } from '../types/position';
 
 type PondLeafContext = readonly [

@@ -1,8 +1,12 @@
 import { createContext, useRef, useState } from 'react';
 
 import { commitActivate } from '../action/commit-activate';
-import { createUnit, DETERMINISTIC_STARTING_HAND } from '../state/card';
-import { INITIAL_POND, setPondStateAt, type PondState } from '../state/pond';
+import { createUnit, DETERMINISTIC_STARTING_HAND } from '../state-types/card';
+import {
+  INITIAL_POND,
+  setPondStateAt,
+  type PondState,
+} from '../state-types/pond';
 import {
   type CardClass,
   CardType,

@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 
 import { GameContext } from '../context/GameContext';
-import { getPondStateAt, HOME, type PondState } from '../state/pond';
+import { getPondStateAt, HOME, type PondState } from '../state-types/pond';
 import { PLAYER_CLASSNAME } from '../types/gameflow';
 import { arePositionsEqual, type Position } from '../types/position';
 import { CardBack, LilyPad } from '../view/Card';

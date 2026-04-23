@@ -1,6 +1,6 @@
 import { fireEvent, screen, within } from '@testing-library/react';
 
-import { HOME } from '../state/pond';
+import { HOME } from '../state-types/pond';
 import type { UnitClass } from '../types/card';
 import { Player, type Phase } from '../types/gameflow';
 

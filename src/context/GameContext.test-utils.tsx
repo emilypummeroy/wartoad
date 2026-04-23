@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
-import { createUnit, DETERMINISTIC_STARTING_HAND } from '../state/card';
+import { createUnit, DETERMINISTIC_STARTING_HAND } from '../state-types/card';
 import type { CardClass, UnitCard } from '../types/card';
 import { UnitClass, type UnitKey } from '../types/card';
 import type { Phase, Subphase } from '../types/gameflow';

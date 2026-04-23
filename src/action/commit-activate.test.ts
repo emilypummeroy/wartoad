@@ -4,14 +4,14 @@ import {
   createStateWith,
   gameflowOf,
 } from '../context/GameContext.test-utils';
-import { createUnit } from '../state/card';
+import { createUnit } from '../state-types/card';
 import {
   getPondStateAt,
   INITIAL_POND,
   LEAF_COUNT_PER_ROW,
   ROW_COUNT,
   setPondStateAt,
-} from '../state/pond';
+} from '../state-types/pond';
 import { CardClass } from '../types/card';
 import { Phase, Player, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';

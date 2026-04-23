@@ -8,8 +8,8 @@ import {
   ROW_COUNT_PER_PLAYER,
   type PondState,
   getPondStateAt,
-} from '../state/pond';
-import { TestPondKey, TEST_PONDS_BY_KEY } from '../state/pond.test-utils';
+} from '../state-types/pond';
+import { TestPondKey, TEST_PONDS_BY_KEY } from '../state-types/pond.test-utils';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { Pond } from './Pond';

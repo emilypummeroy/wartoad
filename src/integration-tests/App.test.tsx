@@ -2,7 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { App } from '../App';
 import { INITIAL_HAND_CARD_COUNT } from '../context/GameContext';
-import { ROW_COUNT } from '../state/pond';
+import { ROW_COUNT } from '../state-types/pond';
 import { Phase, Player } from '../types/gameflow';
 import { advanceToPhase, getAll, getFirst, getThe, queryA, queryAll, withinThe } from './app.test-utils';
 

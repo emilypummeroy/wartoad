@@ -1,5 +1,5 @@
 import type { GameState } from '../context/GameContext';
-import { setPondStateAtEach } from '../state/pond';
+import { setPondStateAtEach } from '../state-types/pond';
 import { Phase, Subphase } from '../types/gameflow';
 import {
   arePositionsEqual,

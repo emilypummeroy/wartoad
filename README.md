@@ -11,7 +11,7 @@ Directories are "ordered" as follows. Files in later directories may only import
 src:
 
 - types: basic types -- only uses type imports only from the same directory
-- state: types, constants, and functions for operating on those types and constants
+- state-types: types and constants for state and convenience functions for operating on those types
 - action: action and/or reducer functions for modifying state
 - view: React components which import no other components and don't use context or state
 - context: React contexts and relevant custom hooks, for direct use in any component

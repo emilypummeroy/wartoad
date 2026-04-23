@@ -1,7 +1,7 @@
 import { fireEvent, render } from '@testing-library/react';
 
 import { DeterministicApp } from '../App';
-import { HOME } from '../state/pond';
+import { HOME } from '../state-types/pond';
 import { Phase, Player } from '../types/gameflow';
 import { advanceToPhase, getAll, getFirst, getThe, queryA, queryAll } from './app.test-utils';
 
