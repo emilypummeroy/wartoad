@@ -2,28 +2,29 @@ import { CardClass } from '../types/card';
 import { Player } from '../types/gameflow';
 import { createUnit } from './card';
 import {
-  LEAF,
+  NORTH_LEAF,
   INITIAL_POND,
   isPondState,
   LEAF_COUNT_PER_ROW,
   ROW_COUNT,
   setPondStateAt,
-  UPGRADED,
+  NORTH_UPGRADED,
   type PondState,
   type LeafState,
   getPondStateAt,
   HOME,
+  SOUTH_LEAF,
 } from './pond';
 import {
   ANOTHER_POND,
   EMPTY_POND,
   FULL_POND,
-  LEAF_WITH_UNIT,
-  LEAF_OTHER_UNIT,
-  LEAF_WITH_UNITS,
+  NORTH_LEAF_WITH_UNIT,
+  NORTH_LEAF_OTHER_UNIT,
+  NORTH_LEAF_WITH_UNITS,
   UNITS_POND,
-  UPGRADED_UNITS,
-  UPGRADED_OTHER_UNITS,
+  NORTH_UPGRADED_UNITS,
+  NORTH_UPGRADED_OTHER_UNITS,
   TestPondKey,
   ANOTHER_POND_POSITIONS as POSITIONS,
 } from './pond.test-utils';
@@ -136,16 +137,21 @@ describe('the PondState type functions', () => {
     );
 
     describe.for<[string, string, PondState, LeafState]>([
-      ['INITIAL_POND', 'LEAF', INITIAL_POND, LEAF],
-      ['INITIAL_POND', 'LEAF_WITH_UNIT', INITIAL_POND, LEAF_WITH_UNIT],
-      ['INITIAL_POND', 'UPGRADED', INITIAL_POND, UPGRADED],
-      ['ANOTHER_POND', 'LEAF_WITH_UNIT', ANOTHER_POND, LEAF_WITH_UNIT],
-      ['FULL_POND', 'LEAF_WITH_UNITS', FULL_POND, LEAF_WITH_UNITS],
-      ['FULL_POND', 'LEAF_OTHER_UNIT', FULL_POND, LEAF_OTHER_UNIT],
-      ['EMPTY_POND', 'UPGRADED_UNITS', EMPTY_POND, UPGRADED_UNITS],
-      ['EMPTY_POND', 'UPGRADED_OTHER_UNITS', EMPTY_POND, UPGRADED_OTHER_UNITS],
-      ['POND_UNITS', 'LEAF_UNITS', UNITS_POND, LEAF],
-      ['POND_UNITS', 'UPGRADED', UNITS_POND, UPGRADED],
+      ['INITIAL_POND', 'LEAF', INITIAL_POND, NORTH_LEAF],
+      ['INITIAL_POND', 'LEAF_WITH_UNIT', INITIAL_POND, NORTH_LEAF_WITH_UNIT],
+      ['INITIAL_POND', 'UPGRADED', INITIAL_POND, NORTH_UPGRADED],
+      ['ANOTHER_POND', 'LEAF_WITH_UNIT', ANOTHER_POND, NORTH_LEAF_WITH_UNIT],
+      ['FULL_POND', 'LEAF_WITH_UNITS', FULL_POND, NORTH_LEAF_WITH_UNITS],
+      ['FULL_POND', 'LEAF_OTHER_UNIT', FULL_POND, NORTH_LEAF_OTHER_UNIT],
+      ['EMPTY_POND', 'UPGRADED_UNITS', EMPTY_POND, NORTH_UPGRADED_UNITS],
+      [
+        'EMPTY_POND',
+        'UPGRADED_OTHER_UNITS',
+        EMPTY_POND,
+        NORTH_UPGRADED_OTHER_UNITS,
+      ],
+      ['POND_UNITS', 'LEAF_UNITS', UNITS_POND, NORTH_LEAF],
+      ['POND_UNITS', 'UPGRADED', UNITS_POND, NORTH_UPGRADED],
     ])(
       'with known PondState: %s | new value: %s',
       ([_, newValueName, pond, valueToSet]) => {
@@ -261,7 +267,14 @@ describe('the PondState type functions', () => {
           expect(
             isPondState([
               ...array.slice(0, i),
-              [...array[i], LEAF],
+              [...array[i], NORTH_LEAF],
+              ...array.slice(i + 1),
+            ]),
+          ).toBe(false);
+          expect(
+            isPondState([
+              ...array.slice(0, i),
+              [...array[i], SOUTH_LEAF],
               ...array.slice(i + 1),
             ]),
           ).toBe(false);

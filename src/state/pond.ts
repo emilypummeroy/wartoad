@@ -14,6 +14,7 @@ export type PondState = readonly [
 export type LeafState = Readonly<{
   units: readonly UnitCard[];
   isUpgraded: boolean;
+  controller: Player;
   // TODO 10: Controller in ZoneState
 }>;
 
@@ -56,15 +57,33 @@ export const ROW_COUNT = 6 as const;
 export const ROW_COUNT_PER_PLAYER = 3 as const;
 export const LEAF_COUNT_PER_ROW = 3 as const;
 
-export const UPGRADED = { units: [], isUpgraded: true } as const;
-export const LEAF = { units: [], isUpgraded: false } as const;
+export const NORTH_UPGRADED = {
+  units: [],
+  isUpgraded: true,
+  controller: Player.North,
+} as const;
+export const NORTH_LEAF = {
+  units: [],
+  isUpgraded: false,
+  controller: Player.North,
+} as const;
+export const SOUTH_UPGRADED = {
+  units: [],
+  isUpgraded: true,
+  controller: Player.South,
+} as const;
+export const SOUTH_LEAF = {
+  units: [],
+  isUpgraded: false,
+  controller: Player.South,
+} as const;
 export const INITIAL_POND: PondState = [
-  [LEAF, UPGRADED, LEAF],
-  [LEAF, LEAF, LEAF],
-  [LEAF, LEAF, LEAF],
-  [LEAF, LEAF, LEAF],
-  [LEAF, LEAF, LEAF],
-  [LEAF, UPGRADED, LEAF],
+  [NORTH_LEAF, NORTH_UPGRADED, NORTH_LEAF],
+  [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],
+  [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],
+  [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],
+  [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],
+  [NORTH_LEAF, NORTH_UPGRADED, NORTH_LEAF],
 ];
 
 export const HOME = {
