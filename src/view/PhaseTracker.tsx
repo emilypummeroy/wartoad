@@ -2,7 +2,6 @@ import { StepForward } from 'lucide-react';
 
 import { Player, Subphase, type Gameflow } from '../types/gameflow';
 
-// TODO 9: Tests for Activation subphase
 export function PhaseTracker({
   flow: { player, phase, subphase },
   onNextPhaseClicked,

@@ -40,10 +40,6 @@ export type GameDispatch = {
   readonly commitUpgrade: (_: Position) => void;
   readonly commitDeploy: (_: Position) => void;
   readonly commitActivate: (_: Position) => void;
-  // TODO 9: commit functions:
-  // - should move the pickedCard
-  // - should unset pickedCard
-  // - should unset activationState
 };
 
 export type GameState = {

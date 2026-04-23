@@ -45,8 +45,10 @@ describe(PhaseTracker, () => {
   it.for<[Subphase, Player]>([
     [Deploying, North],
     [Upgrading, North],
+    [Activating, North],
     [Deploying, South],
     [Upgrading, South],
+    [Activating, South],
   ])('should not allow clicking to progress phase when Idle in the %s %s phase', ([subphase, player]) => {
     const onNextPhaseClicked = vi.fn<() => void>();
     render(<PhaseTracker flow={{ player, phase: Main, subphase }} onNextPhaseClicked={onNextPhaseClicked} />);
