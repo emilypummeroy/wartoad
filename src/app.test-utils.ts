@@ -20,6 +20,9 @@ export const getThe = {
   pickedCardNamed(name: string) {
     return withinThe.pickedCardDisplay.getByRole('region', { name });
   },
+  get pickedCard() {
+    return withinThe.pickedCardDisplay.getByRole('region');
+  },
   get playArea() {
     return withinThe.main.getByRole('grid');
   },
@@ -58,6 +61,14 @@ export const getAll = {
   handCards(player: Player) {
     return withinThe.hand(player).getAllByRole('region');
   },
+  visibleHandCards(player: Player) {
+    return withinThe
+      .hand(player)
+      .getAllByRole('region', { name: /(?!.*Card back.*)/ });
+  },
+  hiddenHandCards(player: Player) {
+    return withinThe.hand(player).getAllByRole('region', { name: 'Card back' });
+  },
   handCardsNamed(player: Player, name: string) {
     return withinThe.hand(player).getAllByRole('region', { name });
   },
@@ -69,7 +80,7 @@ export const getAll = {
   unitsControlledBy(player: Player) {
     return withinThe.playArea.getAllByRole('img', { name: `${player} unit` });
   },
-  leavesControlledBy(player: Player) {
+  basicLeavesControlledBy(player: Player) {
     return withinThe.playArea.getAllByRole('gridcell', {
       name: `${player} controlled leaf`,
     });
@@ -100,11 +111,14 @@ export const getFirst = {
   basicDropzoneControlledBy(player: Player) {
     return getAll.basicDropzonesControlledBy(player)[0];
   },
+  handCard(player: Player) {
+    return getAll.handCards(player)[0];
+  },
   handCardNamed(player: Player, name: string) {
     return getAll.handCardsNamed(player, name)[0];
   },
   leafControlledBy(player: Player) {
-    return getAll.leavesControlledBy(player)[0];
+    return getAll.basicLeavesControlledBy(player)[0];
   },
   cardsControlledByWithName(player: Player, name: string) {
     return getAll.cardsControlledByWithName(player, name)[0];
@@ -115,6 +129,9 @@ export const getFirst = {
 };
 
 export const queryAll = {
+  handCards(player: Player) {
+    return withinThe.hand(player).queryAllByRole('region');
+  },
   cardsControlledByWithName(player: Player, name: string) {
     return withinThe.playArea.queryAllByRole('region', {
       name: `${player} controlled ${name}`,
@@ -132,6 +149,11 @@ export const queryA = {
   phaseIndicator(player: Player, phase: Phase) {
     return withinThe.header.queryByRole('region', {
       name: `${player}: ${phase} phase`,
+    });
+  },
+  basicDropzoneControlledBy(player: Player) {
+    return withinThe.playArea.queryByRole('button', {
+      name: new RegExp(`(Upgrade|Deploy on|Move to) ${player} controlled leaf`),
     });
   },
   upgradeDropzoneControlledBy(player: Player) {
