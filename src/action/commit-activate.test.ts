@@ -1,9 +1,4 @@
-import type { GameState } from '../context/GameContext';
-import {
-  activationOf,
-  createStateWith,
-  gameflowOf,
-} from '../context/GameContext.test-utils';
+import type { GameState } from '../state';
 import { createUnit } from '../state-types/card';
 import {
   getPondStateAt,
@@ -12,6 +7,7 @@ import {
   ROW_COUNT,
   setPondStateAt,
 } from '../state-types/pond';
+import { activationOf, createStateWith, gameflowOf } from '../state/test-utils';
 import { CardClass } from '../types/card';
 import { Phase, Player, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';

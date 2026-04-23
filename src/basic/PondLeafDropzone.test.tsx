@@ -1,8 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { activationOf, gameflowOf, renderWithGameContext } from '../context/GameContext.test-utils';
+import { renderWithGameContext } from '../context/GameContext.test-utils';
 import { HOME, setPondStateAt } from '../state-types/pond';
 import { TEST_PONDS_BY_KEY, ANOTHER_POND_POSITIONS, TestPondKey } from '../state-types/pond.test-utils';
+import { activationOf, gameflowOf } from '../state/test-utils';
 import type { UnitCard } from '../types/card';
 import { Player, Phase, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';

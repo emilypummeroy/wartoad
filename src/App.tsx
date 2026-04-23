@@ -1,10 +1,7 @@
 import './App.css';
-import {
-  GameContext,
-  INITIAL_HAND_CARD_COUNT,
-  useGameContextData,
-} from './context/GameContext';
+import { GameContext, useGameContextData } from './context/GameContext';
 import { Game } from './Game';
+import { INITIAL_HAND_CARD_COUNT } from './state';
 import { DETERMINISTIC_STARTING_HAND } from './state-types/card';
 import { CardClass } from './types/card';
 

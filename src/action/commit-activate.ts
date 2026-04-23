@@ -1,4 +1,4 @@
-import type { GameState } from '../context/GameContext';
+import type { GameState } from '../state';
 import { setPondStateAtEach } from '../state-types/pond';
 import { Phase, Subphase } from '../types/gameflow';
 import {

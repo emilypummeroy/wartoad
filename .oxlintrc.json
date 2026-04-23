@@ -34,7 +34,7 @@
     "no-shadow": "allow",
     "array-type": ["allow", { "default": "array-simple" }],
     "no-duplicate-imports": ["error", { "allowSeparateTypeImports": true }],
-    "typescript/consistent-type-imports": "error",
+    "consistent-type-imports": "error",
     "no-nested-ternary": "allow",
     "unicorn/no-nested-ternary": "allow",
     "no-negated-condition": "allow",

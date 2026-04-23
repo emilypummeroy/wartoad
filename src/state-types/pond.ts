@@ -15,7 +15,6 @@ export type LeafState = Readonly<{
   units: readonly UnitCard[];
   isUpgraded: boolean;
   controller: Player;
-  // TODO 10: Controller in ZoneState
 }>;
 
 export const isPondState = (

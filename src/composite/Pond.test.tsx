@@ -1,6 +1,6 @@
 import { screen, render, within } from '@testing-library/react';
 
-import { activationOf, gameflowOf, renderWithGameContext } from '../context/GameContext.test-utils';
+import { renderWithGameContext } from '../context/GameContext.test-utils';
 import {
   LEAF_COUNT_PER_ROW,
   HOME,
@@ -10,6 +10,7 @@ import {
   getPondStateAt,
 } from '../state-types/pond';
 import { TestPondKey, TEST_PONDS_BY_KEY } from '../state-types/pond.test-utils';
+import { activationOf, gameflowOf } from '../state/test-utils';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { Pond } from './Pond';

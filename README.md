@@ -11,15 +11,18 @@ Directories are "ordered" as follows. Files in later directories may only import
 src:
 
 - types: basic types -- only uses type imports only from the same directory
-- state-types: types and constants for state and convenience functions for operating on those types
-- action: action and/or reducer functions for modifying state
+- state-types: types and constants for store/context state and convenience functions for operating on those types
 - view: React components which import no other components and don't use context or state
+- state: state to be provided by store/context
+- action: action and/or reducer functions for modifying store/context state
 - context: React contexts and relevant custom hooks, for direct use in any component
 - basic: React components which import only components from src/view and may use context and/or state
 - composite: React components which import some other components
 
 Also:
 
+- src/state/game imports all the other state files
+- src/action/game imports all the other action files
 - Files in src/composite may import eachother for now.
 - Files in src/types may type-import eachother for now.
 - Game.tsx composes all components of the game. It is presentational/structural.

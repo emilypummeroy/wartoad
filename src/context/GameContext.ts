@@ -1,12 +1,9 @@
 import { createContext, useRef, useState } from 'react';
 
 import { commitActivate } from '../action/commit-activate';
-import { createUnit, DETERMINISTIC_STARTING_HAND } from '../state-types/card';
-import {
-  INITIAL_POND,
-  setPondStateAt,
-  type PondState,
-} from '../state-types/pond';
+import { createState, DEFAULT_GAME_STATE, type GameState } from '../state';
+import { createUnit } from '../state-types/card';
+import { setPondStateAt } from '../state-types/pond';
 import {
   type CardClass,
   CardType,
@@ -19,7 +16,6 @@ import {
   Player,
   PLAYER_AFTER,
   Subphase,
-  type Gameflow,
 } from '../types/gameflow';
 import { type Position } from '../types/position';
 
@@ -38,21 +34,6 @@ export type GameDispatch = {
   readonly commitActivate: (_: Position) => void;
 };
 
-export type GameState = {
-  readonly flow: Gameflow;
-  readonly pond: PondState;
-  // TODO 11: Card[]
-  readonly northHand: readonly CardClass[];
-  // TODO 11: Card[]
-  readonly southHand: readonly CardClass[];
-  // TODO 11: Card
-  readonly pickedCard?: CardClass;
-  readonly activation?: {
-    readonly start: Position;
-    readonly unit: UnitCard;
-  };
-};
-
 export const useGameContextData = (
   getStartingHand: () => CardClass[],
   getDrawnCard: () => CardClass,
@@ -63,17 +44,6 @@ export const useGameContextData = (
   const dispatch = createDispatch(getDrawnCard, getNextCardKey)(setState);
   return [state, dispatch];
 };
-
-export const DEFAULT_GAME_STATE = {
-  flow: {
-    phase: Phase.Main,
-    player: Player.South,
-    subphase: Subphase.Idle,
-  },
-  pond: INITIAL_POND,
-  northHand: DETERMINISTIC_STARTING_HAND,
-  southHand: DETERMINISTIC_STARTING_HAND,
-} as const;
 
 export const DEFAULT_GAME_DISPATCH = {
   endPhase: () => {},
@@ -89,7 +59,6 @@ export const GameContext = createContext<GameContext>([
   DEFAULT_GAME_STATE,
   DEFAULT_GAME_DISPATCH,
 ]);
-export const INITIAL_HAND_CARD_COUNT = 7;
 
 const createDispatch =
   (getDrawnCard: () => CardClass, getNextCardKey: () => number) =>
@@ -107,13 +76,6 @@ const createDispatch =
       setState(commitDeploy(getNextCardKey)(position)),
     commitActivate: (position: Position) => setState(commitActivate(position)),
   });
-
-// TODO 11: test
-const createState = (getStartingHand: () => CardClass[]) => ({
-  ...DEFAULT_GAME_STATE,
-  northHand: getStartingHand(),
-  southHand: getStartingHand(),
-});
 
 // TODO 11: test
 // TODO 11: Remove the particular card
@@ -184,8 +146,8 @@ const activate =
     activation: { unit, start: position },
   });
 
-// TODO 10: test
-// TODO 10: Make this just for upgrading
+// TODO 11: test
+// TODO 11: Make this just for upgrading
 export const commitUpgrade =
   (getNextCardKey: () => number) =>
   (position: Position) =>
@@ -210,10 +172,9 @@ export const commitUpgrade =
       grid,
       position,
       subphase === Subphase.Upgrading
-        ? // TODO 10: Make it create a card for leaves too
+        ? // TODO 11: Make it create a card for leaves too
           { isUpgraded: true }
-        : // TODO 11: Append a unit instead of setting units
-          old => ({
+        : old => ({
             ...old,
             units: [
               createUnit({
@@ -226,8 +187,8 @@ export const commitUpgrade =
     ),
   });
 
-// TODO 10: test
-// TODO 10: Make this just for deploying
+// TODO 11: test
+// TODO 11: Make this just for deploying
 export const commitDeploy =
   (getNextCardKey: () => number) =>
   (position: Position) =>
@@ -252,8 +213,7 @@ export const commitDeploy =
       grid,
       position,
       subphase === Subphase.Upgrading
-        ? // TODO 10: Make it create a card for leaves too
-          { isUpgraded: true }
+        ? { isUpgraded: true }
         : // TODO 11: Append a unit instead of setting units
           old => ({
             ...old,
