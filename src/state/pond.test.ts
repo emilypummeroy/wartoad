@@ -39,11 +39,9 @@ const NORTH_UNIT = createUnit({
   owner: Player.North,
 });
 const addSouthUnit = (old: LeafState) => ({
-  ...old,
   units: [...old.units, SOUTH_UNIT],
 });
 const addNorthUnit = (old: LeafState) => ({
-  ...old,
   units: [...old.units, NORTH_UNIT],
 });
 const upgrade = (old: LeafState) => ({ ...old, isUpgraded: true });
@@ -52,8 +50,7 @@ const upgradeAndSetUnits = (_: LeafState) => ({
   isUpgraded: true,
   units: [NORTH_UNIT, SOUTH_UNIT],
 });
-const removeUnits = (old: LeafState) => ({
-  ...old,
+const removeUnits = () => ({
   units: [],
 });
 
@@ -83,7 +80,7 @@ const describeForAllPositions = (block: (_: [x: number, y: number]) => void) =>
 
 const itShouldNotChangeOtherZones = (
   pond: PondState,
-  valueToSet: Partial<LeafState> | ((old: LeafState) => LeafState),
+  valueToSet: Partial<LeafState> | ((old: LeafState) => Partial<LeafState>),
   [x, y]: [number, number],
 ) =>
   it('should not change other zones', () => {
@@ -105,7 +102,9 @@ const itShouldNotChangeOtherZones = (
 
 describe('the PondState type functions', () => {
   describe(`${setPondStateAt.name} and ${getPondStateAt.name}`, () => {
-    describe.for<[string, string, PondState, (old: LeafState) => LeafState]>([
+    describe.for<
+      [string, string, PondState, (old: LeafState) => Partial<LeafState>]
+    >([
       ['INITIAL_POND', 'addNorthUnit', INITIAL_POND, addNorthUnit],
       ['ANOTHER_POND', 'addSouthUnit', ANOTHER_POND, addSouthUnit],
       ['FULL_POND', 'unupgrade', FULL_POND, unupgrade],
@@ -122,7 +121,10 @@ describe('the PondState type functions', () => {
             const newPond = setPondStateAt(pond, { x, y }, updater);
             const newValue = getPondStateAt(newPond, { x, y });
             expect(newValue).toBe(newPond[y][x]);
-            expect(newValue).toStrictEqual(updater(pond[y][x]));
+            expect(newValue).toStrictEqual({
+              ...pond[y][x],
+              ...updater(pond[y][x]),
+            });
           });
 
           it(`should produce a result verified by ${isPondState.name}`, () => {

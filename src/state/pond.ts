@@ -31,17 +31,19 @@ export const getPondStateAt = (
 export const setPondStateAt = (
   old: PondState,
   { x, y }: Position,
-  newValue: Partial<LeafState> | ((old: LeafState) => LeafState),
+  newValue: Partial<LeafState> | ((old: LeafState) => Partial<LeafState>),
 ): PondState => {
   const array = old.map((row, yy) =>
-    row.map(
-      (oldValue, xx): LeafState =>
-        yy !== y || xx !== x
-          ? oldValue
-          : typeof newValue === 'function'
-            ? newValue(oldValue)
-            : { ...oldValue, ...newValue },
-    ),
+    yy !== y
+      ? row
+      : row.map(
+          (oldValue, xx): LeafState =>
+            xx !== x
+              ? oldValue
+              : typeof newValue === 'function'
+                ? { ...oldValue, ...newValue(oldValue) }
+                : { ...oldValue, ...newValue },
+        ),
   );
   // v8 ignore if
   if (!isPondState(array)) {

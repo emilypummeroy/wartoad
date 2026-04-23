@@ -1,7 +1,12 @@
 import { createContext, useRef, useState } from 'react';
 
 import { createUnit, DETERMINISTIC_STARTING_HAND } from '../state/card';
-import { INITIAL_POND, setPondStateAt, type PondState } from '../state/pond';
+import {
+  INITIAL_POND,
+  setPondStateAt,
+  type LeafState,
+  type PondState,
+} from '../state/pond';
 import {
   type CardClass,
   CardType,
@@ -282,27 +287,45 @@ export const commitActivate =
     ) {
       return old;
     }
+
     const {
       pond,
       flow,
       activation: { start, unit },
       ...rest
     } = old;
+
     return {
-      ...rest,
       flow: { ...flow, subphase: Subphase.Idle },
       pond: arePositionsEqual(target, start)
         ? pond
-        : setPondStateAt(
-            setPondStateAt(pond, target, leaf => ({
-              ...leaf,
-              units: [...leaf.units, unit],
-            })),
-            start,
-            leaf => ({
-              ...leaf,
-              units: leaf.units.filter(({ key }) => key !== unit.key),
-            }),
+        : setPondStateAtEach(
+            pond,
+            [
+              target,
+              ({ units }) => ({
+                units: [...units, unit],
+              }),
+            ],
+            [
+              start,
+              ({ units }) => ({
+                units: units.filter(({ key }) => key !== unit.key),
+              }),
+            ],
           ),
+      ...rest,
     };
   };
+
+const setPondStateAtEach = (
+  init: PondState,
+  ...updates: readonly (readonly [
+    Position,
+    (leaf: LeafState) => Partial<LeafState>,
+  ])[]
+): PondState =>
+  updates.reduce(
+    (pond, [at, update]) => setPondStateAt(pond, at, update),
+    init,
+  );
