@@ -3,12 +3,12 @@ import { createContext, useRef, useState } from 'react';
 import {
   activate,
   commitDeploy,
+  commitActivate,
   commitUpgrade,
   endPhase,
   pickCard,
   type GameDispatch,
 } from '../action';
-import { commitActivate } from '../action/commit-activate';
 import { createState, DEFAULT_GAME_STATE, type GameState } from '../state';
 import { type CardClass, type UnitCard } from '../types/card';
 import { type Position } from '../types/position';
