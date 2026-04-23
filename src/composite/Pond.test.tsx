@@ -1,7 +1,14 @@
 import { screen, render, within } from '@testing-library/react';
 
 import { activationOf, gameflowOf, renderWithGameContext } from '../context/GameContext.test-utils';
-import { LEAF_COUNT_PER_ROW, HOME, ROW_COUNT, ROW_COUNT_PER_PLAYER, type PondState } from '../state/pond';
+import {
+  LEAF_COUNT_PER_ROW,
+  HOME,
+  ROW_COUNT,
+  ROW_COUNT_PER_PLAYER,
+  type PondState,
+  getPondStateAt,
+} from '../state/pond';
 import { TestPondKey, TEST_PONDS_BY_KEY } from '../state/pond.test-utils';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
@@ -93,7 +100,6 @@ describe(Pond, () => {
     [North, Main, Idle, INITIAL_POND],
     [North, Main, Idle, FULL_POND],
     [North, Main, Idle, UNITS_POND],
-    [South, Main, Idle, ANOTHER_POND],
     [South, Main, Idle, EMPTY_POND],
     [South, Main, Idle, UNITS_POND],
   ])('on %s turn %s phase while %s | in pond: %s', ([player, phase, subphase, pondKey]) => {
@@ -103,6 +109,38 @@ describe(Pond, () => {
     });
     it_should_have_a_6x3_grid_with_leaves();
     it_should_have_the_right_controlling_player_and_leaves_in_each_row(pond);
+
+    it('should not have any dropzones', () => {
+      expect(screen.queryByRole('button', { name: /Upgrade|Deploy|Move/ })).not.toBeInTheDocument();
+      expect(screen.queryByRole('gridcell', { name: /Upgrade|Deploy|Move/ })).not.toBeInTheDocument();
+    });
+  });
+
+  describe.for<Input>([
+    // After some leaves are captured
+    [South, Main, Idle, ANOTHER_POND],
+    [North, Main, Idle, ANOTHER_POND],
+  ])('on %s turn %s phase while %s | in pond: %s', ([player, phase, subphase, pondKey]) => {
+    const pond = TEST_PONDS_BY_KEY[pondKey];
+    beforeEach(() => {
+      renderWithGameContext([{ ...gameflowOf(player, subphase, phase), pond }])(<Pond />);
+    });
+    it_should_have_a_6x3_grid_with_leaves();
+
+    it(`should display the correctly controlled leaves and Lily Pads`, () => {
+      const rows = screen.getAllByRole('row');
+      for (let y = 0; y < ROW_COUNT; y += 1) {
+        const zones = within(rows[y]).getAllByRole('gridcell');
+        expect(zones).toHaveLength(LEAF_COUNT_PER_ROW);
+        for (let x = 0; x < zones.length; x += 1) {
+          const { controller } = getPondStateAt(pond, { x, y });
+          const leafName = pond[y][x].isUpgraded ? 'Lily Pad' : 'leaf';
+          expect(
+            within(zones[x]).getByRole('region', { name: new RegExp(`${controller} (controlled|Home) ${leafName}`) }),
+          ).toBeVisible();
+        }
+      }
+    });
 
     it('should not have any dropzones', () => {
       expect(screen.queryByRole('button', { name: /Upgrade|Deploy|Move/ })).not.toBeInTheDocument();

@@ -108,26 +108,26 @@ export const SOUTH_UPGRADED_OTHER_UNITS: LeafState = {
 
 export const ANOTHER_POND: PondState = [
   [NORTH_UPGRADED, NORTH_UPGRADED, NORTH_LEAF],
-  [NORTH_UPGRADED, NORTH_LEAF, NORTH_UPGRADED],
-  [NORTH_LEAF, NORTH_UPGRADED, NORTH_LEAF],
-  [SOUTH_UPGRADED, SOUTH_UPGRADED, SOUTH_LEAF],
-  [SOUTH_UPGRADED, SOUTH_LEAF, SOUTH_LEAF],
+  [NORTH_UPGRADED, SOUTH_LEAF, SOUTH_UPGRADED],
+  [NORTH_LEAF, NORTH_UPGRADED, SOUTH_LEAF],
+  [NORTH_UPGRADED, SOUTH_UPGRADED, SOUTH_LEAF],
+  [NORTH_UPGRADED, NORTH_LEAF, SOUTH_LEAF],
   [SOUTH_LEAF, SOUTH_UPGRADED, SOUTH_UPGRADED],
 ];
 export const ANOTHER_POND_POSITIONS = {
   [Player.North]: {
     LeafHomeRow: { x: 2, y: 0 },
-    LeafMiddle: { x: 1, y: 1 },
+    LeafMiddle: { x: 1, y: 4 },
     UpgradedMiddle: { x: 1, y: 2 },
     LeafEdge: { x: 0, y: 2 },
-    UpgradedEdge: { x: 2, y: 1 },
+    UpgradedEdge: { x: 0, y: 3 },
   },
   [Player.South]: {
     LeafHomeRow: { x: 0, y: 5 },
-    LeafMiddle: { x: 1, y: 4 },
+    LeafMiddle: { x: 1, y: 1 },
     UpgradedMiddle: { x: 1, y: 3 },
     LeafEdge: { x: 2, y: 4 },
-    UpgradedEdge: { x: 0, y: 3 },
+    UpgradedEdge: { x: 2, y: 1 },
   },
 } as const;
 

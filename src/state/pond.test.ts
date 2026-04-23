@@ -284,89 +284,78 @@ describe('the PondState type functions', () => {
   });
 });
 
-describe(TestPondKey.ANOTHER_POND, () => {
-  it.for([Player.North, Player.South])(
-    'should have %s.LeafHomeRow unupgraded',
-    player => {
+describe.for([Player.North, Player.South])(
+  `Test positions for %s in ${TestPondKey.ANOTHER_POND}`,
+  player => {
+    it.for<keyof (typeof POSITIONS)[Player]>([
+      'LeafHomeRow',
+      'LeafEdge',
+      'UpgradedEdge',
+      'LeafMiddle',
+      'UpgradedMiddle',
+    ])(`should have ${player}.%s controlled by ${player}`, key => {
+      const position = POSITIONS[player][key];
+      expect(getPondStateAt(ANOTHER_POND, position).controller).toBe(player);
+    });
+
+    it(`should have all ${player}.LeafHomeRow unupgraded`, () => {
       const position = POSITIONS[player].LeafHomeRow;
       expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(false);
-    },
-  );
+    });
 
-  it.for([Player.North, Player.South])(
-    'should have %s.LeafHomeRow be on the home row and not Home',
-    player => {
+    it(`should have ${player}.LeafHomeRow unupgraded`, () => {
+      const position = POSITIONS[player].LeafHomeRow;
+      expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(false);
+    });
+
+    it(`should have ${player}.LeafHomeRow be on the home row and not Home`, () => {
       const { x, y } = POSITIONS[player].LeafHomeRow;
       expect(x).not.toBe(1);
       expect(y).toBe(HOME[player].y);
-    },
-  );
+    });
 
-  it.for([Player.North, Player.South])(
-    'should have %s.LeafEdge be unupgraded',
-    player => {
+    it(`should have ${player}.LeafEdge be unupgraded`, () => {
       const position = POSITIONS[player].LeafEdge;
       expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(false);
-    },
-  );
+    });
 
-  it.for([Player.North, Player.South])(
-    'should have %s.LeafEdge be on the edge and not the home row',
-    player => {
+    it(`should have ${player}.LeafEdge be on the edge and not the home row`, () => {
       const { x, y } = POSITIONS[player].LeafEdge;
       expect(x).not.toBe(1);
       expect(y).not.toBe(HOME[player].y);
-    },
-  );
+    });
 
-  it.for([Player.North, Player.South])(
-    'should have %s.UpgradedEdge be unupgraded',
-    player => {
+    it(`should have ${player}.UpgradedEdge be unupgraded`, () => {
       const position = POSITIONS[player].UpgradedEdge;
       expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(true);
-    },
-  );
+    });
 
-  it.for([Player.North, Player.South])(
-    'should have %s.UpgradedEdge be on the edge and not the home row',
-    player => {
+    it(`should have ${player}.UpgradedEdge be on the edge and not the home row`, () => {
       const { x, y } = POSITIONS[player].UpgradedEdge;
       expect(x).not.toBe(1);
       expect(y).not.toBe(HOME[player].y);
-    },
-  );
+    });
 
-  it.for([Player.North, Player.South])(
-    'should have %s.LeafMiddle be unupgraded',
-    player => {
+    it(`should have ${player}.LeafMiddle be unupgraded`, () => {
       const position = POSITIONS[player].LeafMiddle;
       expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(false);
-    },
-  );
+    });
 
-  it.for([Player.North, Player.South])(
-    'should have %s.LeafMiddle be on the edge and not the home row',
-    player => {
+    it(`should have ${player}.LeafMiddle be on the edge and not the home row`, () => {
       const { x, y } = POSITIONS[player].LeafMiddle;
       expect(x).toBe(1);
       expect(y).not.toBe(HOME[player].y);
-    },
-  );
+    });
 
-  it.for([Player.North, Player.South])(
-    'should have %s.UpgradedMiddle be unupgraded',
-    player => {
+    it(`should have ${player}.UpgradedMiddle be unupgraded`, () => {
       const position = POSITIONS[player].UpgradedMiddle;
       expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(true);
-    },
-  );
+    });
 
-  it.for([Player.North, Player.South])(
-    'should have %s.UpgradedMiddle be on the edge and not the home row',
-    player => {
+    it(`should have ${player}.UpgradedMiddle be on the edge and not the home row`, () => {
       const { x, y } = POSITIONS[player].UpgradedMiddle;
       expect(x).toBe(1);
       expect(y).not.toBe(HOME[player].y);
-    },
-  );
-});
+    });
+  },
+);
