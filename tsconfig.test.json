@@ -10,6 +10,7 @@
   "include": [
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
+    "src/**/*.test-utils.ts",
     "src/**/*.test-utils.tsx"
   ],
   "exclude": [],

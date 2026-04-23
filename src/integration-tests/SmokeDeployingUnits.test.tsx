@@ -1,25 +1,15 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 
 import { DeterministicApp } from '../App';
 import { CardClass } from '../types/card';
 import { Phase, Player } from '../types/gameflow';
-import { getAll, getFirst, getThe, queryA } from './app.test-utils';
+import { advanceToPhase, getAll, getFirst, getThe, queryA } from './app.test-utils';
 
 const { Start, Main, End } = Phase;
 const { North, South } = Player;
 const { Froglet } = CardClass;
 
-const advanceToPhase = (player: Player, phase: Phase) => {
-  for (let i = 0; i < MANY; i += 1) {
-    if (queryA.phaseIndicator(player, phase)) break;
-    fireEvent.click(screen.getByText('Next phase'));
-  }
-  expect(getThe.phaseIndicator(player, phase)).toBeVisible();
-};
-
-const MANY = 15;
-
-describe('Smoke test: deploying units and moving them around', () => {
+describe('Smoke test: Deploying Units and Activating them', () => {
   beforeEach(() => render(<DeterministicApp />));
 
   describe.for([North, South])('for the %s player Main Phase', player => {

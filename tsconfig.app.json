@@ -28,5 +28,11 @@
   },
   "files": ["src/global.d.ts"],
   "include": ["src"],
-  "exclude": ["src/test-setup.ts", "src/**/*.test.ts", "src/**/*.test.tsx"]
+  "exclude": [
+    "src/test-setup.ts",
+    "src/**/*.test-utils.ts",
+    "src/**/*.test-utils.tsx",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
+  ]
 }

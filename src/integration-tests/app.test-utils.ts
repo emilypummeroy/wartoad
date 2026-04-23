@@ -1,8 +1,17 @@
-import { screen, within } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 
 import { HOME } from '../state/pond';
 import type { UnitClass } from '../types/card';
 import { Player, type Phase } from '../types/gameflow';
+
+const MANY = 15;
+export const advanceToPhase = (player: Player, phase: Phase) => {
+  for (let i = 0; i < MANY; i += 1) {
+    if (queryA.phaseIndicator(player, phase)) break;
+    fireEvent.click(screen.getByText('Next phase'));
+  }
+  expect(getThe.phaseIndicator(player, phase)).toBeVisible();
+};
 
 export const getThe = {
   get header() {
