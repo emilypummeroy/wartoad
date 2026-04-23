@@ -12,6 +12,7 @@ src:
 
 - types: basic types -- only uses type imports only from the same directory
 - state: types, constants, and functions for operating on those types and constants
+- action: action and/or reducer functions for modifying state
 - view: React components which import no other components and don't use context or state
 - context: React contexts and relevant custom hooks, for direct use in any component
 - basic: React components which import only components from src/view and may use context and/or state

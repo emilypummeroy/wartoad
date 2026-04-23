@@ -53,6 +53,18 @@ export const setPondStateAt = (
   return array;
 };
 
+export const setPondStateAtEach = (
+  init: PondState,
+  ...updates: readonly (readonly [
+    Position,
+    (leaf: LeafState) => Partial<LeafState>,
+  ])[]
+): PondState =>
+  updates.reduce(
+    (pond, [at, update]) => setPondStateAt(pond, at, update),
+    init,
+  );
+
 export const ROW_COUNT = 6 as const;
 export const ROW_COUNT_PER_PLAYER = 3 as const;
 export const LEAF_COUNT_PER_ROW = 3 as const;

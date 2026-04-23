@@ -24,6 +24,7 @@ type PondLeafDropzoneContext = readonly [
   },
 ];
 
+// TODO 11: Make this a view component with memo
 type PondLeafDropzoneProps = {
   readonly children: ReactNode;
   readonly targetLabelId: string;

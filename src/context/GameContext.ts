@@ -1,12 +1,8 @@
 import { createContext, useRef, useState } from 'react';
 
+import { commitActivate } from '../action/commit-activate';
 import { createUnit, DETERMINISTIC_STARTING_HAND } from '../state/card';
-import {
-  INITIAL_POND,
-  setPondStateAt,
-  type LeafState,
-  type PondState,
-} from '../state/pond';
+import { INITIAL_POND, setPondStateAt, type PondState } from '../state/pond';
 import {
   type CardClass,
   CardType,
@@ -21,11 +17,7 @@ import {
   Subphase,
   type Gameflow,
 } from '../types/gameflow';
-import {
-  arePositionsEqual,
-  distanceBetween,
-  type Position,
-} from '../types/position';
+import { type Position } from '../types/position';
 
 export type GameContext = readonly [GameState, GameDispatch];
 
@@ -271,57 +263,3 @@ export const commitDeploy =
           }),
     ),
   });
-
-export const commitActivate =
-  (target: Position) =>
-  (old: GameState): GameState => {
-    if (
-      old.flow.phase !== Phase.Main ||
-      old.flow.subphase !== Subphase.Activating ||
-      !old.activation ||
-      distanceBetween(old.activation.start, target) > 1
-    ) {
-      return old;
-    }
-
-    const {
-      pond,
-      flow,
-      activation: { start, unit },
-      ...rest
-    } = old;
-
-    return {
-      flow: { ...flow, subphase: Subphase.Idle },
-      pond: arePositionsEqual(target, start)
-        ? pond
-        : setPondStateAtEach(
-            pond,
-            [
-              target,
-              ({ units }) => ({
-                units: [...units, unit],
-              }),
-            ],
-            [
-              start,
-              ({ units }) => ({
-                units: units.filter(({ key }) => key !== unit.key),
-              }),
-            ],
-          ),
-      ...rest,
-    };
-  };
-
-const setPondStateAtEach = (
-  init: PondState,
-  ...updates: readonly (readonly [
-    Position,
-    (leaf: LeafState) => Partial<LeafState>,
-  ])[]
-): PondState =>
-  updates.reduce(
-    (pond, [at, update]) => setPondStateAt(pond, at, update),
-    init,
-  );
