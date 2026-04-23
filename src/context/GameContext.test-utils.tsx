@@ -1,9 +1,9 @@
 import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
+import type { GameDispatch } from '../action';
 import type { GameState } from '../state';
 import { DEFAULT_GAME_STATE } from '../state';
-import type { GameDispatch } from './GameContext';
 import { DEFAULT_GAME_DISPATCH, GameContext } from './GameContext';
 
 // (Not a component):

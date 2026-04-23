@@ -1,10 +1,11 @@
 import { render } from '@testing-library/react';
 import { useContext } from 'react';
 
+import type { GameDispatch } from '../action';
 import { createUnit } from '../state-types/card';
 import { CardClass, UnitClass } from '../types/card';
 import { Player } from '../types/gameflow';
-import { GameContext, type GameDispatch } from './GameContext';
+import { GameContext } from './GameContext';
 
 describe(GameContext, () => {
   describe('when consumed without a context provider', () => {
