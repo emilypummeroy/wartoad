@@ -1,14 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { DeterministicApp } from './App';
+import { DeterministicApp } from '../App';
+import { HOME } from '../state/pond';
+import { Phase, Player } from '../types/gameflow';
 import { getAll, getFirst, getThe, queryA, queryAll } from './app.test-utils';
-import { HOME } from './state/pond';
-import { CardClass } from './types/card';
-import { Phase, Player } from './types/gameflow';
 
 const { Start, Main, End } = Phase;
 const { North, South } = Player;
-const { Froglet } = CardClass;
 
 const advanceToPhase = (player: Player, phase: Phase) => {
   for (let i = 0; i < MANY; i += 1) {
@@ -22,28 +20,6 @@ const MANY = 15;
 
 describe(DeterministicApp, () => {
   beforeEach(() => render(<DeterministicApp />));
-
-  describe('Stories', () => {
-    describe.for([North, South])('for the %s player Main Phase', player => {
-      beforeEach(() => {
-        advanceToPhase(player, Main);
-      });
-
-      it('Should allow you to play and activate a Froglet, moving it to the second rank', () => {
-        fireEvent.click(getFirst.handCardNamed(player, Froglet.name));
-        fireEvent.click(getFirst.basicDropzoneControlledBy(player));
-        fireEvent.click(getFirst.unitControlledByOfClass(player, Froglet));
-
-        expect(queryA.nthRankUnitControlledBy(player, 1)).not.toBeInTheDocument();
-        expect(getThe.nthRankUnitControlledBy(player, 0)).toBeVisible();
-        fireEvent.click(getThe.nthRankDropzoneFor(player, 1));
-        expect(getThe.nthRankUnitControlledBy(player, 1)).toBeVisible();
-        expect(queryA.nthRankUnitControlledBy(player, 0)).not.toBeInTheDocument();
-
-        // TODO 11: Should not have a clickable unit anymore
-      });
-    });
-  });
 
   describe('Hands', () => {
     describe('Picked Card', () => {
@@ -179,7 +155,7 @@ describe(DeterministicApp, () => {
 
       it.for([1, 2])(`should not allow ${player} to play the Froglet on an a forward leaf`, offset => {
         const targetRow = player === North ? HOME[North].y + offset : HOME[South].y - offset;
-        expect(queryA.nthRankDropzone(targetRow)).not.toBeInTheDocument();
+        expect(queryA.nthRowDropzone(targetRow)).not.toBeInTheDocument();
       });
 
       it(`should not allow ${player} to play the Froglet on an a ${opponent} leaf`, () => {

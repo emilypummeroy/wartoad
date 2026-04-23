@@ -1,10 +1,10 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
-import { App } from './App';
+import { App } from '../App';
+import { INITIAL_HAND_CARD_COUNT } from '../context/GameContext';
+import { ROW_COUNT } from '../state/pond';
+import { Phase, Player } from '../types/gameflow';
 import { getAll, getFirst, getThe, queryA, queryAll, withinThe } from './app.test-utils';
-import { INITIAL_HAND_CARD_COUNT } from './context/GameContext';
-import { ROW_COUNT } from './state/pond';
-import { Phase, Player } from './types/gameflow';
 
 const FEW = 3;
 const MANY = 15;

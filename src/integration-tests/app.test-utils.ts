@@ -1,8 +1,8 @@
 import { screen, within } from '@testing-library/react';
 
-import { HOME } from './state/pond';
-import type { UnitClass } from './types/card';
-import { Player, type Phase } from './types/gameflow';
+import { HOME } from '../state/pond';
+import type { UnitClass } from '../types/card';
+import { Player, type Phase } from '../types/gameflow';
 
 export const getThe = {
   get header() {
@@ -37,13 +37,13 @@ export const getThe = {
       player === Player.North ? n : 5 - n
     ];
   },
-  nthRankDropzoneFor(player: Player, n: number) {
-    return withinThe.nthRankFor(player, n).getByRole('button');
-  },
-  nthRankUnitControlledBy(player: Player, n: number) {
-    return withinThe.nthRankFor(player, n).getByRole('img', {
+  nthRowUnitControlledBy(player: Player, n: number) {
+    return withinThe.nthRowFor(player, n).getByRole('img', {
       name: `${player} unit`,
     });
+  },
+  nthRowDropzoneFor(player: Player, n: number) {
+    return withinThe.nthRowFor(player, n).getByRole('button');
   },
   homeLeafDropzone(player: Player) {
     return withinThe.homeRow(player).getByRole('button', {
@@ -92,7 +92,9 @@ export const getAll = {
   },
   homeRowDropzones(player: Player) {
     return withinThe.homeRow(player).getAllByRole('button', {
-      name: new RegExp(`(Upgrade|Deploy on) ${player} (controlled|Home)`),
+      name: new RegExp(
+        `(Upgrade|Deploy on|Move to) ${player} (controlled|Home)`,
+      ),
     });
   },
   cardsControlledByWithName(player: Player, name: string) {
@@ -104,6 +106,11 @@ export const getAll = {
     return withinThe.playArea.getAllByRole('region', {
       name: new RegExp(`${player} unit ${cardClass.name}`),
     });
+  },
+  nthRowUnitsControlledBy(player: Player, n: number) {
+    return withinThe
+      .nthRowFor(player, n)
+      .getAllByRole('img', { name: `${player} unit` });
   },
 };
 
@@ -161,12 +168,12 @@ export const queryA = {
       name: `Upgrade ${player} controlled leaf`,
     });
   },
-  nthRankDropzone(n: number) {
-    return withinThe.nthRank(n).queryByRole('button');
+  nthRowDropzone(n: number) {
+    return withinThe.nthRow(n).queryByRole('button');
   },
-  nthRankUnitControlledBy(player: Player, n: number) {
+  nthRowUnitControlledBy(player: Player, n: number) {
     return withinThe
-      .nthRankFor(player, n)
+      .nthRowFor(player, n)
       .queryByRole('img', { name: `${player} unit` });
   },
   upgradeDropzoneOnLeafNamed(name: string) {
@@ -195,10 +202,10 @@ export const withinThe = {
   homeRow(player: Player) {
     return within(getThe.homeRow(player));
   },
-  nthRank(n: number) {
+  nthRow(n: number) {
     return within(getThe.nthRank(n));
   },
-  nthRankFor(player: Player, n: number) {
+  nthRowFor(player: Player, n: number) {
     return within(getThe.nthRankFor(player, n));
   },
 };
