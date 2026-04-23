@@ -15,111 +15,159 @@ const { Froglet } = CardClass;
 describe(DeterministicApp, () => {
   beforeEach(() => render(<DeterministicApp />));
 
-  // TODO 10: Try getters
   const getThe = {
-    header: () => screen.getByRole('banner'),
-    main: () => screen.getByRole('main'),
-    hand: (player: Player) => screen.getByRole('region', { name: `${player} hand` }),
-    pickedCardDisplay: () => screen.getByRole('region', { name: `Picked card` }),
-    pickedCardNamed: (name: string) => withinThe.pickedCardDisplay().getByRole('region', { name }),
-    playArea: () => withinThe.main().getByRole('grid'),
-    homeRow: (player: Player) => getThe.nthRank(HOME[player].y),
-    nthRank: (n: number) => withinThe.playArea().getAllByRole('row')[n],
-    nthRankFor: (player: Player, n: number) => withinThe.playArea().getAllByRole('row')[player === North ? n : 5 - n],
-    nthRankDropzoneFor: (player: Player, n: number) => withinThe.nthRankFor(player, n).getByRole('button'),
-    nthRankUnitControlledBy: (player: Player, n: number) =>
-      withinThe.nthRankFor(player, n).getByRole('img', {
+    get header() {
+      return screen.getByRole('banner');
+    },
+    get main() {
+      return screen.getByRole('main');
+    },
+    hand(player: Player) {
+      return screen.getByRole('region', { name: `${player} hand` });
+    },
+    get pickedCardDisplay() {
+      return screen.getByRole('region', { name: `Picked card` });
+    },
+    pickedCardNamed(name: string) {
+      return withinThe.pickedCardDisplay.getByRole('region', { name });
+    },
+    get playArea() {
+      return withinThe.main.getByRole('grid');
+    },
+    homeRow(player: Player) {
+      return getThe.nthRank(HOME[player].y);
+    },
+    nthRank(n: number) {
+      return withinThe.playArea.getAllByRole('row')[n];
+    },
+    nthRankFor(player: Player, n: number) {
+      return withinThe.playArea.getAllByRole('row')[player === North ? n : 5 - n];
+    },
+    nthRankDropzoneFor(player: Player, n: number) {
+      return withinThe.nthRankFor(player, n).getByRole('button');
+    },
+    nthRankUnitControlledBy(player: Player, n: number) {
+      return withinThe.nthRankFor(player, n).getByRole('img', {
         name: `${player} unit`,
-      }),
-    homeLeafDropzone: (player: Player) =>
-      withinThe.homeRow(player).getByRole('button', {
+      });
+    },
+    homeLeafDropzone(player: Player) {
+      return withinThe.homeRow(player).getByRole('button', {
         name: new RegExp(`(Upgrade|Deploy on) ${player} Home Lily Pad`),
-      }),
-    phaseIndicator: (player: Player, phase: Phase) =>
-      withinThe.header().getByRole('region', { name: `${player}: ${phase} phase` }),
+      });
+    },
+    phaseIndicator(player: Player, phase: Phase) {
+      return withinThe.header.getByRole('region', { name: `${player}: ${phase} phase` });
+    },
   };
 
   const getAll = {
-    handCards: (player: Player) => withinThe.hand(player).getAllByRole('region'),
-    handCardsNamed: (player: Player, name: string) => withinThe.hand(player).getAllByRole('region', { name }),
-    controlledCardsNamed: (player: Player, name: string) =>
-      withinThe.playArea().getAllByRole('region', {
-        name: `${player} controlled ${name}`,
-      }),
-    unitsControlledBy: (player: Player) =>
-      withinThe.playArea().getAllByRole('img', {
-        name: `${player} unit`,
-      }),
-    leavesControlledBy: (player: Player) =>
-      withinThe.playArea().getAllByRole('gridcell', {
-        name: `${player} controlled leaf`,
-      }),
-    basicDropzonesControlledBy: (player: Player) =>
-      withinThe.playArea().getAllByRole('button', {
+    handCards(player: Player) {
+      return withinThe.hand(player).getAllByRole('region');
+    },
+    handCardsNamed(player: Player, name: string) {
+      return withinThe.hand(player).getAllByRole('region', { name });
+    },
+    controlledCardsNamed(player: Player, name: string) {
+      return withinThe.playArea.getAllByRole('region', { name: `${player} controlled ${name}` });
+    },
+    unitsControlledBy(player: Player) {
+      return withinThe.playArea.getAllByRole('img', { name: `${player} unit` });
+    },
+    leavesControlledBy(player: Player) {
+      return withinThe.playArea.getAllByRole('gridcell', { name: `${player} controlled leaf` });
+    },
+    basicDropzonesControlledBy(player: Player) {
+      return withinThe.playArea.getAllByRole('button', {
         name: new RegExp(`(Upgrade|Deploy on|Move to) ${player} controlled leaf`),
-      }),
-    homeRowDropzones: (player: Player) =>
-      withinThe.homeRow(player).getAllByRole('button', {
-        name: new RegExp(`(Upgrade|Deploy on) ${player} (controlled|Home)`),
-      }),
-    cardsControlledByWithName: (player: Player, name: string) =>
-      withinThe.playArea().getAllByRole('region', {
-        name: new RegExp(`${player} (controlled|Home) ${name}`),
-      }),
-    unitsControlledByOfClass: (player: Player, cardClass: UnitClass) =>
-      withinThe.playArea().getAllByRole('region', {
-        name: new RegExp(`${player} unit ${cardClass.name}`),
-      }),
+      });
+    },
+    homeRowDropzones(player: Player) {
+      return withinThe
+        .homeRow(player)
+        .getAllByRole('button', { name: new RegExp(`(Upgrade|Deploy on) ${player} (controlled|Home)`) });
+    },
+    cardsControlledByWithName(player: Player, name: string) {
+      return withinThe.playArea.getAllByRole('region', { name: new RegExp(`${player} (controlled|Home) ${name}`) });
+    },
+    unitsControlledByOfClass(player: Player, cardClass: UnitClass) {
+      return withinThe.playArea.getAllByRole('region', { name: new RegExp(`${player} unit ${cardClass.name}`) });
+    },
   };
 
   const getFirst = {
-    basicDropzoneControlledBy: (player: Player) => getAll.basicDropzonesControlledBy(player)[0],
-    handCardNamed: (player: Player, name: string) => getAll.handCardsNamed(player, name)[0],
-    leafControlledBy: (player: Player) => getAll.leavesControlledBy(player)[0],
-    cardsControlledByWithName: (player: Player, name: string) => getAll.cardsControlledByWithName(player, name)[0],
-    unitControlledByOfClass: (player: Player, cardClass: UnitClass) =>
-      getAll.unitsControlledByOfClass(player, cardClass)[0],
+    basicDropzoneControlledBy(player: Player) {
+      return getAll.basicDropzonesControlledBy(player)[0];
+    },
+    handCardNamed(player: Player, name: string) {
+      return getAll.handCardsNamed(player, name)[0];
+    },
+    leafControlledBy(player: Player) {
+      return getAll.leavesControlledBy(player)[0];
+    },
+    cardsControlledByWithName(player: Player, name: string) {
+      return getAll.cardsControlledByWithName(player, name)[0];
+    },
+    unitControlledByOfClass(player: Player, cardClass: UnitClass) {
+      return getAll.unitsControlledByOfClass(player, cardClass)[0];
+    },
   };
 
   const queryAll = {
-    cardsControlledByWithName: (player: Player, name: string) =>
-      withinThe.playArea().queryAllByRole('region', {
-        name: `${player} controlled ${name}`,
-      }),
-    unitsControlledBy: (player: Player) =>
-      withinThe.playArea().queryAllByRole('img', {
-        name: `${player} unit`,
-      }),
+    cardsControlledByWithName(player: Player, name: string) {
+      return withinThe.playArea.queryAllByRole('region', { name: `${player} controlled ${name}` });
+    },
+    unitsControlledBy(player: Player) {
+      return withinThe.playArea.queryAllByRole('img', { name: `${player} unit` });
+    },
   };
 
   const queryA = {
-    pickedCardDisplay: () => screen.queryByRole('region', { name: `Picked card` }),
-    phaseIndicator: (player: Player, phase: Phase) =>
-      withinThe.header().queryByRole('region', { name: `${player}: ${phase} phase` }),
-    upgradeDropzoneControlledBy: (player: Player) =>
-      withinThe.playArea().queryByRole('button', {
-        name: `Upgrade ${player} controlled leaf`,
-      }),
-    nthRankDropzone: (n: number) => withinThe.nthRank(n).queryByRole('button'),
-    nthRankUnitControlledBy: (player: Player, n: number) =>
-      withinThe.nthRankFor(player, n).queryByRole('img', {
-        name: `${player} unit`,
-      }),
-    upgradeDropzoneOnLeafNamed: (name: string) =>
-      withinThe.playArea().queryByRole('button', {
-        name: new RegExp(`(controlled|Home) ${name}`),
-      }),
+    get pickedCardDisplay() {
+      return screen.queryByRole('region', { name: `Picked card` });
+    },
+    phaseIndicator(player: Player, phase: Phase) {
+      return withinThe.header.queryByRole('region', { name: `${player}: ${phase} phase` });
+    },
+    upgradeDropzoneControlledBy(player: Player) {
+      return withinThe.playArea.queryByRole('button', { name: `Upgrade ${player} controlled leaf` });
+    },
+    nthRankDropzone(n: number) {
+      return withinThe.nthRank(n).queryByRole('button');
+    },
+    nthRankUnitControlledBy(player: Player, n: number) {
+      return withinThe.nthRankFor(player, n).queryByRole('img', { name: `${player} unit` });
+    },
+    upgradeDropzoneOnLeafNamed(name: string) {
+      return withinThe.playArea.queryByRole('button', { name: new RegExp(`(controlled|Home) ${name}`) });
+    },
   };
 
   const withinThe = {
-    header: () => within(getThe.header()),
-    main: () => within(getThe.main()),
-    hand: (player: Player) => within(getThe.hand(player)),
-    pickedCardDisplay: () => within(getThe.pickedCardDisplay()),
-    playArea: () => within(getThe.playArea()),
-    homeRow: (player: Player) => within(getThe.homeRow(player)),
-    nthRank: (n: number) => within(getThe.nthRank(n)),
-    nthRankFor: (player: Player, n: number) => within(getThe.nthRankFor(player, n)),
+    get header() {
+      return within(getThe.header);
+    },
+    get main() {
+      return within(getThe.main);
+    },
+    hand(player: Player) {
+      return within(getThe.hand(player));
+    },
+    get pickedCardDisplay() {
+      return within(getThe.pickedCardDisplay);
+    },
+    get playArea() {
+      return within(getThe.playArea);
+    },
+    homeRow(player: Player) {
+      return within(getThe.homeRow(player));
+    },
+    nthRank(n: number) {
+      return within(getThe.nthRank(n));
+    },
+    nthRankFor(player: Player, n: number) {
+      return within(getThe.nthRankFor(player, n));
+    },
   };
 
   const advanceToPhase = (player: Player, phase: Phase) => {
@@ -164,11 +212,11 @@ describe(DeterministicApp, () => {
         advanceToPhase(player, Main);
         fireEvent.click(getFirst.handCardNamed(player, cardName));
 
-        expect(getThe.pickedCardDisplay()).toBeVisible();
+        expect(getThe.pickedCardDisplay).toBeVisible();
         expect(getThe.pickedCardNamed(cardName)).toBeVisible();
 
         fireEvent.click(getFirst.basicDropzoneControlledBy(player));
-        expect(queryA.pickedCardDisplay()).not.toBeInTheDocument();
+        expect(queryA.pickedCardDisplay).not.toBeInTheDocument();
       });
     });
 
@@ -198,7 +246,7 @@ describe(DeterministicApp, () => {
       it.for(['Lily Pad', 'Froglet'])(`should allow a %s to be picked during the ${player} Main phase`, name => {
         advanceToPhase(player, Main);
         fireEvent.click(getFirst.handCardNamed(player, name));
-        expect(getThe.pickedCardDisplay()).toBeVisible();
+        expect(getThe.pickedCardDisplay).toBeVisible();
         expect(getThe.pickedCardNamed(name)).toBeVisible();
       });
 
