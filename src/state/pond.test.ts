@@ -14,6 +14,7 @@ import {
   getPondStateAt,
   HOME,
   SOUTH_LEAF,
+  setPondStateAtEach,
 } from './pond';
 import {
   ANOTHER_POND,
@@ -102,6 +103,165 @@ const itShouldNotChangeOtherZones = (
   });
 
 describe('the PondState type functions', () => {
+  type Updater = (old: LeafState) => Partial<LeafState>;
+  describe(setPondStateAtEach, () => {
+    describe.for<[string, string, string, PondState, Updater, Updater]>([
+      [
+        'INITIAL_POND',
+        'addNorthUnit',
+        'addSouthUnit',
+        INITIAL_POND,
+        addNorthUnit,
+        addSouthUnit,
+      ],
+      [
+        'ANOTHER_POND',
+        'addSouthUnit',
+        'unupgrade',
+        ANOTHER_POND,
+        addSouthUnit,
+        unupgrade,
+      ],
+      [
+        'FULL_POND',
+        'unupgrade',
+        'addNorthUnit',
+        FULL_POND,
+        unupgrade,
+        addNorthUnit,
+      ],
+      [
+        'EMPTY_POND',
+        'upgradeAndSetUnits',
+        'unupgrade',
+        EMPTY_POND,
+        upgradeAndSetUnits,
+        unupgrade,
+      ],
+      ['FULL_POND', 'nupgrade', 'upgrade', FULL_POND, unupgrade, upgrade],
+      [
+        'UNITS_POND',
+        'addNorthUnit',
+        'removeUnits',
+        UNITS_POND,
+        addNorthUnit,
+        removeUnits,
+      ],
+    ])(
+      'with known PondState: %s | updater functions: %s and %s',
+      ([_, __, ___, pond, first, second]) => {
+        describeForAllPositions(([x, y]) => {
+          describe('if both updates are for the same position', () => {
+            it('should not change other zones', () => {
+              const newPond = setPondStateAtEach(
+                pond,
+                [{ x, y }, first],
+                [{ x, y }, second],
+              );
+
+              for (let yy = 0; yy < ROW_COUNT; yy += 1) {
+                if (yy === y) continue;
+                for (let xx = 0; xx < LEAF_COUNT_PER_ROW; xx += 1) {
+                  if (xx === x) continue;
+                  const position = { x: xx, y: yy };
+                  const newValue = getPondStateAt(newPond, position);
+                  const oldValue = getPondStateAt(pond, position);
+                  expect(newValue).toBe(newPond[yy][xx]);
+                  expect(oldValue).toBe(pond[yy][xx]);
+                  expect(newValue).toBe(oldValue);
+                }
+              }
+            });
+
+            it(`should set the value at x=${x}, y=${y}`, () => {
+              const newPond = setPondStateAtEach(
+                pond,
+                [{ x, y }, first],
+                [{ x, y }, second],
+              );
+              const newValue = getPondStateAt(newPond, { x, y });
+              expect(newValue).toBe(newPond[y][x]);
+              const wantMiddle = { ...pond[y][x], ...first(pond[y][x]) };
+              const want = { ...wantMiddle, ...second(wantMiddle) };
+              expect(newValue).toStrictEqual(want);
+            });
+
+            it(`should produce a result verified by ${isPondState.name}`, () => {
+              const newPond = setPondStateAtEach(
+                pond,
+                [{ x, y }, first],
+                [{ x, y }, second],
+              );
+              expect(isPondState(newPond)).toBe(true);
+            });
+          });
+
+          const x2 = (x + 1) % 3;
+          const y2 = (y + 2) % 5;
+          describe(`applying to a second position { x: ${x2} y: ${y2} }`, () => {
+            it(`should set the value at x1=${x}, y1=${y}`, () => {
+              const newPond = setPondStateAtEach(
+                pond,
+                [{ x, y }, first],
+                [{ x: x2, y: y2 }, second],
+              );
+              const newValue = getPondStateAt(newPond, { x, y });
+              expect(newValue).toBe(newPond[y][x]);
+              expect(newValue).toStrictEqual({
+                ...pond[y][x],
+                ...first(pond[y][x]),
+              });
+            });
+
+            it(`should set the value at x2=${x2}, y2=${y2}`, () => {
+              const newPond = setPondStateAtEach(
+                pond,
+                [{ x, y }, first],
+                [{ x: x2, y: y2 }, second],
+              );
+              const newValue = getPondStateAt(newPond, { x: x2, y: y2 });
+              expect(newValue).toBe(newPond[y2][x2]);
+              expect(newValue).toStrictEqual({
+                ...pond[y2][x2],
+                ...second(pond[y2][x2]),
+              });
+            });
+
+            it(`should produce a result verified by ${isPondState.name}`, () => {
+              const newPond = setPondStateAtEach(
+                pond,
+                [{ x, y }, first],
+                [{ x: x2, y: y2 }, second],
+              );
+              expect(isPondState(newPond)).toBe(true);
+            });
+
+            it('should not change other zones', () => {
+              const newPond = setPondStateAtEach(
+                pond,
+                [{ x, y }, first],
+                [{ x: x2, y: y2 }, second],
+              );
+
+              for (let yy = 0; yy < ROW_COUNT; yy += 1) {
+                for (let xx = 0; xx < LEAF_COUNT_PER_ROW; xx += 1) {
+                  if (xx === x && yy === y) continue;
+                  if (xx === x2 && yy === y2) continue;
+                  const position = { x: xx, y: yy };
+                  const newValue = getPondStateAt(newPond, position);
+                  const oldValue = getPondStateAt(pond, position);
+                  expect(newValue).toBe(newPond[yy][xx]);
+                  expect(oldValue).toBe(pond[yy][xx]);
+                  expect(newValue).toBe(oldValue);
+                }
+              }
+            });
+          });
+        });
+      },
+    );
+  });
+
   describe(`${setPondStateAt.name} and ${getPondStateAt.name}`, () => {
     describe.for<
       [string, string, PondState, (old: LeafState) => Partial<LeafState>]
