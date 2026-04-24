@@ -57,7 +57,7 @@ export function PondLeafDropzone({
     }[subphase];
 
   const handleClick = {
-    [Subphase.Idle]: () => {},
+    [Subphase.Idle]: undefined,
     [Subphase.Upgrading]: () => commitUpgrade(position),
     [Subphase.Deploying]: () => commitDeploy(position),
     [Subphase.Activating]: () => commitActivate(position),
