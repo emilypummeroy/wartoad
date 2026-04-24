@@ -19,7 +19,6 @@ export type GameActions = {
   // No different pickUnit, pickLeaf, etc.
   // The difference between activation and upgrading is not the concern of
   // Hand or Card.
-  // TODO 11: Make it operate on a card instead of a card class
   pickCard: (_: CardClass) => void;
   activate: (unit: UnitCard, position: Position) => void;
   commitUpgrade: (_: Position) => void;
@@ -27,7 +26,7 @@ export type GameActions = {
   commitActivate: (_: Position) => void;
 };
 
-// TODO 11: Remove the particular card
+// TODO 14: Remove the particular card instead of just any member of card class.
 const removeOne = (
   cards: readonly CardClass[],
   cardClass: CardClass,
@@ -36,8 +35,8 @@ const removeOne = (
   ...cards.slice(cards.lastIndexOf(cardClass) + 1),
 ];
 
-// TODO 10: test
-// TODO 10: make this move the cardclass from the hand and make a Card
+// TODO 13: test
+// TODO 13: make this remove the card class from the hand and make a Card
 export const pickCard =
   (pickedCard: CardClass) =>
   ({ flow, ...rest }: GameState): GameState => ({
@@ -45,7 +44,7 @@ export const pickCard =
     flow: {
       ...flow,
       subphase:
-        // TODO 11: pickedCard.type
+        // TODO 12: pickedCard.type
         pickedCard.type === CardType.Unit
           ? Subphase.Deploying
           : Subphase.Upgrading,
@@ -53,8 +52,8 @@ export const pickCard =
     pickedCard,
   });
 
-// TODO 11: test
-// TODO 11: Make this just for upgrading
+// TODO 12: test
+// TODO 12: Make this just for upgrading
 export const commitUpgrade =
   (getNextCardKey: () => number) =>
   (position: Position) =>
@@ -79,8 +78,7 @@ export const commitUpgrade =
       grid,
       position,
       subphase === Subphase.Upgrading
-        ? // TODO 11: Make it create a card for leaves too
-          { isUpgraded: true }
+        ? { isUpgraded: true }
         : old => ({
             ...old,
             units: [
@@ -94,8 +92,8 @@ export const commitUpgrade =
     ),
   });
 
-// TODO 11: test
-// TODO 11: Make this just for deploying
+// TODO 12: test
+// TODO 12: Make this just for deploying
 export const commitDeploy =
   (getNextCardKey: () => number) =>
   (position: Position) =>
@@ -121,7 +119,7 @@ export const commitDeploy =
       position,
       subphase === Subphase.Upgrading
         ? { isUpgraded: true }
-        : // TODO 11: Append a unit instead of setting units
+        : // TODO 12: Append a unit instead of setting units
           old => ({
             ...old,
             units: [

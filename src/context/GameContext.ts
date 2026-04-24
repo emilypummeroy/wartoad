@@ -36,7 +36,6 @@ export const DEFAULT_GAME_DISPATCH = {
   commitActivate: () => {},
 };
 
-// TODO 10: Unit test the context and default values
 export const GameContext = createContext<GameContext>([
   DEFAULT_GAME_STATE,
   DEFAULT_GAME_DISPATCH,

@@ -29,7 +29,6 @@ export function PondLeafCard({
   const isHome = arePositionsEqual(HOME[controller], position);
   return isUpgraded ? (
     // TODO 11: Implement a non-splay-row hack to display cards on leaves
-    // TODO 10: Set the controller based on ZoneState not on position
     <div className="stacking peeking">
       <div
         role="listitem"

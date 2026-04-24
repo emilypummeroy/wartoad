@@ -36,12 +36,12 @@ export const getThe = {
     return withinThe.main.getByRole('grid');
   },
   homeRow(player: Player) {
-    return getThe.nthRank(HOME[player].y);
+    return getThe.nthRow(HOME[player].y);
   },
-  nthRank(n: number) {
+  nthRow(n: number) {
     return withinThe.playArea.getAllByRole('row')[n];
   },
-  nthRankFor(player: Player, n: number) {
+  nthRowFor(player: Player, n: number) {
     return withinThe.playArea.getAllByRole('row')[
       player === Player.North ? n : 5 - n
     ];
@@ -212,9 +212,9 @@ export const withinThe = {
     return within(getThe.homeRow(player));
   },
   nthRow(n: number) {
-    return within(getThe.nthRank(n));
+    return within(getThe.nthRow(n));
   },
   nthRowFor(player: Player, n: number) {
-    return within(getThe.nthRankFor(player, n));
+    return within(getThe.nthRowFor(player, n));
   },
 };
