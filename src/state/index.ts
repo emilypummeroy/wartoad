@@ -11,6 +11,12 @@ import type { CardClass, UnitCard } from '../types/card';
 import { Phase, Player, Subphase, type Gameflow } from '../types/gameflow';
 import type { Position } from '../types/position';
 
+export type DataLift = (
+  f: (data: Read<GameData>) => GameState,
+) => (old: GameState) => GameState;
+
+export const data: DataLift = f => old => f(gameData(old));
+
 export type GameState = Read<{
   flow: Gameflow;
   pond: PondState;

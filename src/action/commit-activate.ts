@@ -1,18 +1,12 @@
-import { gameData, type GameData, type GameState } from '../state';
+import { data, type GameData } from '../state';
 import type { Read } from '../types';
-import { Phase } from '../types/gameflow';
 import { distanceBetween, type Position } from '../types/position';
 
-const commitActivateInner =
-  (target: Position) =>
-  ({ get, set, make }: Read<GameData>) => {
-    if (
-      get.phase !== Phase.Main ||
-      !get.activation ||
-      distanceBetween(get.activation.start, target) > 1
-    ) {
-      return get.out;
-    }
+export const commitActivate = (target: Position) =>
+  data(({ get, set, make }: Read<GameData>) => {
+    const didMeetPreconditions =
+      !!get.activation && distanceBetween(get.activation.start, target) <= 1;
+    if (!didMeetPreconditions) return get.out;
 
     const { start, unit } = get.activation;
     return start === target
@@ -25,9 +19,4 @@ const commitActivateInner =
           .set.leaf.at(target)
           .by(({ units }) => ({ units: [...units, unit] }))
           .make.idle().get.out;
-  };
-
-export const commitActivate =
-  (target: Position) =>
-  (old: GameState): GameState =>
-    commitActivateInner(target)(gameData(old));
+  });
