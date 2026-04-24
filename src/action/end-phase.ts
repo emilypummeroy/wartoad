@@ -1,4 +1,4 @@
-import type { GameState } from '../state';
+import type { GameState } from '../state-types';
 import type { CardClass } from '../types/card';
 import {
   Phase,

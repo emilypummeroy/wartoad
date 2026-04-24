@@ -1,4 +1,5 @@
-import { DEFAULT_GAME_STATE, type GameState } from '.';
+import { DEFAULT_GAME_STATE } from '.';
+import type { GameState } from '../state-types';
 import { createUnit, DETERMINISTIC_STARTING_HAND } from '../state-types/card';
 import {
   type UnitCard,

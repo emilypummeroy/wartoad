@@ -1,9 +1,8 @@
-import { data, type GameData } from '../state';
-import type { Read } from '../types';
+import { data } from '../state';
 import { distanceBetween, type Position } from '../types/position';
 
 export const commitActivate = (target: Position) =>
-  data(({ get, set, make }: Read<GameData>) => {
+  data(({ get, set, make }) => {
     const didMeetPreconditions =
       !!get.activation && distanceBetween(get.activation.start, target) <= 1;
     if (!didMeetPreconditions) return get.out;

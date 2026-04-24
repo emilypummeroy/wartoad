@@ -1,4 +1,4 @@
-import type { GameState } from '../state';
+import type { GameState } from '../state-types';
 import { createUnit } from '../state-types/card';
 import { activationOf, createStateWith, gameflowOf } from '../state/test-utils';
 import { UnitClass } from '../types/card';

@@ -9,7 +9,8 @@ import {
   pickCard,
   type GameActions,
 } from '../action';
-import { createState, DEFAULT_GAME_STATE, type GameState } from '../state';
+import { createState, DEFAULT_GAME_STATE } from '../state';
+import type { GameState } from '../state-types';
 import { type CardClass, type UnitCard } from '../types/card';
 import { type Position } from '../types/position';
 
