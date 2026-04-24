@@ -37,9 +37,9 @@ describe(commitActivate, () => {
     ['No activation', { x: 1, y: 3 }, undefined, North, Activating, Main],
     ['No activation', { x: 0, y: 4 }, undefined, South, Activating, Main],
     // Too far from start
-    ['Too far', { x: 1, y: 3 }, { x: 3, y: 1 }, North, Activating, Main],
-    ['Too far', { x: 0, y: 4 }, { x: 4, y: 0 }, South, Activating, Main],
-    ['Too far', { x: 1, y: 3 }, { x: 1, y: 1 }, North, Activating, Main],
+    ['Too far', { x: 1, y: 5 }, { x: 1, y: 3 }, North, Activating, Main],
+    ['Too far', { x: 0, y: 4 }, { x: 2, y: 0 }, South, Activating, Main],
+    ['Too far', { x: 1, y: 1 }, { x: 1, y: 3 }, North, Activating, Main],
     ['Too far', { x: 0, y: 4 }, { x: 2, y: 4 }, South, Activating, Main],
   ])(
     'when precondition failed: %s | target: %s | start: %s | flow: %s %s %s',
@@ -103,6 +103,10 @@ describe(commitActivate, () => {
       const result = commitActivate(target)(old);
       for (let x = 0; x < LEAF_COUNT_PER_ROW; x += 1) {
         for (let y = 0; y < ROW_COUNT; y += 1) {
+          assert(x === 0 || x === 1 || x === 2);
+          assert(
+            y === 0 || y === 1 || y === 2 || y === 3 || y === 4 || y === 5,
+          );
           if (x === start.x && y === start.y) continue;
           if (x === target.x && y === target.y) continue;
           const want = getPondStateAt(old.pond, { x, y });

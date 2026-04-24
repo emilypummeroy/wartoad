@@ -14,6 +14,7 @@ import { activationOf, gameflowOf } from '../state/test-utils';
 import type { Read } from '../types';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
+import { asPosition } from '../types/position.test-utils';
 import { Pond } from './Pond';
 
 const { North, South } = Player;
@@ -135,7 +136,7 @@ describe(Pond, () => {
         const zones = within(rows[y]).getAllByRole('gridcell');
         expect(zones).toHaveLength(LEAF_COUNT_PER_ROW);
         for (let x = 0; x < zones.length; x += 1) {
-          const { controller } = getPondStateAt(pond, { x, y });
+          const { controller } = getPondStateAt(pond, asPosition({ x, y }));
           const leafName = pond[y][x].isUpgraded ? 'Lily Pad' : 'leaf';
           expect(
             within(zones[x]).getByRole('region', { name: new RegExp(`${controller} (controlled|Home) ${leafName}`) }),
@@ -217,11 +218,9 @@ describe(Pond, () => {
   });
 
   // Four Move dropzones: Activating from middle column near centre
-  const MIDDLE_COLUMN = { x: 1, y: 3 };
-  const ANOTHER_POSITION = { x: 1, y: 2 };
   describe.for<[...Input, Position]>([
-    [North, Main, Activating, INITIAL_POND, MIDDLE_COLUMN],
-    [South, Main, Activating, FULL_POND, ANOTHER_POSITION],
+    [North, Main, Activating, INITIAL_POND, { x: 1, y: 3 }],
+    [South, Main, Activating, FULL_POND, { x: 1, y: 2 }],
   ])(
     'on %s turn %s phase while %s | in pond: %s | activation started at %s',
     ([player, phase, subphase, pondKey, start]) => {

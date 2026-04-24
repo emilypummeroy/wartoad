@@ -1,6 +1,22 @@
-export type Position = {
-  readonly x: number;
-  readonly y: number;
+import type { Read } from '.';
+
+export type Position = Read<{
+  x: 0 | 1 | 2;
+  y: 0 | 1 | 2 | 3 | 4 | 5;
+}>;
+
+export type UnsafePosition = Read<{
+  x: number;
+  y: number;
+}>;
+
+export const isPosition = (xy: UnsafePosition): xy is Position => {
+  const { x, y } = xy;
+  if (x !== 0 && x !== 1 && x !== 2) return false;
+  if (y !== 0 && y !== 1 && y !== 2 && y !== 3 && y !== 4 && y !== 5)
+    return false;
+  ({ x, y }) satisfies Position;
+  return true;
 };
 
 export const arePositionsEqual = (

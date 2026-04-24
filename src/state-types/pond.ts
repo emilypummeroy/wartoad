@@ -68,8 +68,10 @@ export const setPondStateAtEach = (
   );
 
 export const ROW_COUNT = 6 as const;
+export const LAST_ROW = 5 as const;
 export const ROW_COUNT_PER_PLAYER = 3 as const;
 export const LEAF_COUNT_PER_ROW = 3 as const;
+export const LAST_IN_ROW = 2 as const;
 
 export const NORTH_UPGRADED = {
   units: [],
@@ -102,5 +104,5 @@ export const INITIAL_POND: Read<PondState> = [
 
 export const HOME = {
   [Player.North]: { x: 1, y: 0 },
-  [Player.South]: { x: 1, y: ROW_COUNT - 1 },
-};
+  [Player.South]: { x: 1, y: LAST_ROW },
+} as const;

@@ -1,5 +1,6 @@
 // oxlint-disable no-magic-numbers
 import { distanceBetween, arePositionsEqual, type Position } from './position';
+import { asPosition } from './position.test-utils';
 
 const ALL_POSITIONS: Position[] = [
   { x: 0, y: 0 },
@@ -34,13 +35,20 @@ const SOUTH_POSITIONS: Position[] = [
   { x: 2, y: 5 },
 ];
 
-const CENTRE_POSITIONS: Position[] = [
+const MIDDLE_POSITIONS: Position[] = [
   { x: 1, y: 0 },
   { x: 1, y: 1 },
   { x: 1, y: 2 },
   { x: 1, y: 3 },
   { x: 1, y: 4 },
   { x: 1, y: 5 },
+];
+
+const CENTRE_POSITIONS: Position[] = [
+  { x: 1, y: 1 },
+  { x: 1, y: 2 },
+  { x: 1, y: 3 },
+  { x: 1, y: 4 },
 ];
 
 const SOUTH_CENTRE_POSITIONS: Position[] = [
@@ -57,7 +65,8 @@ describe(arePositionsEqual, () => {
   });
 
   describe.for(SOUTH_POSITIONS)('for south half position %s', ({ x, y }) => {
-    it.for([{ x: 2 - x, y: 5 - y }])(
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+    it.for([{ x: 2 - x, y: 5 - y } as Position])(
       'should return false for the opposite position %s',
       opposite => {
         expect(arePositionsEqual({ x, y }, opposite)).toBe(false);
@@ -68,25 +77,27 @@ describe(arePositionsEqual, () => {
 
   describe.for(CENTRE_POSITIONS)('for centre file position %s', ({ x, y }) => {
     it('should return false for the left neighbour', () => {
-      expect(arePositionsEqual({ x, y }, { x: x - 1, y })).toBe(false);
-      expect(arePositionsEqual({ x: x - 1, y }, { x, y })).toBe(false);
+      const neighbour = asPosition({ x: x - 1, y });
+      expect(arePositionsEqual({ x, y }, neighbour)).toBe(false);
+      expect(arePositionsEqual(neighbour, { x, y })).toBe(false);
     });
 
     it('should return false for the right neighbour', () => {
-      expect(arePositionsEqual({ x, y }, { x: x + 1, y })).toBe(false);
-      expect(arePositionsEqual({ x: x + 1, y }, { x, y })).toBe(false);
+      const neighbour = asPosition({ x: x + 1, y });
+      expect(arePositionsEqual({ x, y }, neighbour)).toBe(false);
+      expect(arePositionsEqual(neighbour, { x, y })).toBe(false);
     });
 
-    it('should return false for the north neighbour', ({ skip }) => {
-      skip(y === 0);
-      expect(arePositionsEqual({ x, y }, { x, y: y - 1 })).toBe(false);
-      expect(arePositionsEqual({ x, y: y - 1 }, { x, y })).toBe(false);
+    it('should return false for the north neighbour', () => {
+      const neighbour = asPosition({ x, y: y - 1 });
+      expect(arePositionsEqual({ x, y }, neighbour)).toBe(false);
+      expect(arePositionsEqual(neighbour, { x, y })).toBe(false);
     });
 
-    it('should return false for the south neighbour', ({ skip }) => {
-      skip(y === 5);
-      expect(arePositionsEqual({ x, y }, { x, y: y + 1 })).toBe(false);
-      expect(arePositionsEqual({ x, y: y + 1 }, { x, y })).toBe(false);
+    it('should return false for the south neighbour', () => {
+      const neighbour = asPosition({ x, y: y + 1 });
+      expect(arePositionsEqual({ x, y }, neighbour)).toBe(false);
+      expect(arePositionsEqual(neighbour, { x, y })).toBe(false);
     });
 
     it.for<[x: number, y: number]>([
@@ -101,7 +112,7 @@ describe(arePositionsEqual, () => {
       ([xx, yy], { skip }) => {
         skip(y + yy > 5 || y + yy < 0);
         const position = { x, y };
-        const other = { x: x + xx, y: y + yy };
+        const other = asPosition({ x: x + xx, y: y + yy });
         expect(arePositionsEqual(position, other)).toBe(false);
         expect(arePositionsEqual(other, position)).toBe(false);
       },
@@ -119,7 +130,7 @@ describe(arePositionsEqual, () => {
       ([xx, yy], { skip }) => {
         skip(y + yy > 5 || y + yy < 0);
         const position = { x, y };
-        const other = { x: x + xx, y: y + yy };
+        const other = asPosition({ x: x + xx, y: y + yy });
         expect(arePositionsEqual(position, other)).toBe(false);
         expect(arePositionsEqual(other, position)).toBe(false);
       },
@@ -138,7 +149,7 @@ describe(arePositionsEqual, () => {
         ([xx, yy], { skip }) => {
           skip(y + yy > 5 || y + yy < 0);
           const position = { x, y };
-          const other = { x: x + xx, y: y + yy };
+          const other = asPosition({ x: x + xx, y: y + yy });
           expect(arePositionsEqual(position, other)).toBe(false);
           expect(arePositionsEqual(other, position)).toBe(false);
         },
@@ -153,7 +164,7 @@ describe(arePositionsEqual, () => {
         ([xx, yy], { skip }) => {
           skip(x + xx > 2 || x + xx < 0 || y + yy > 5 || y + yy < 0);
           const position = { x, y };
-          const other = { x: x + xx, y: y + yy };
+          const other = asPosition({ x: x + xx, y: y + yy });
           expect(arePositionsEqual(position, other)).toBe(false);
           expect(arePositionsEqual(other, position)).toBe(false);
         },
@@ -161,21 +172,45 @@ describe(arePositionsEqual, () => {
     },
   );
 
-  it.for([
-    [0, 0, 1, 5],
-    [0, 0, 2, 4],
-    [1, 0, 2, 5],
-    [1, 0, 0, 5],
-    [2, 0, 1, 5],
-    [2, 0, 0, 4],
+  it.for<[Position, Position]>([
+    [
+      { x: 0, y: 0 },
+      { x: 1, y: 5 },
+    ],
+    [
+      { x: 0, y: 0 },
+      { x: 2, y: 4 },
+    ],
+    [
+      { x: 1, y: 0 },
+      { x: 2, y: 5 },
+    ],
+    [
+      { x: 1, y: 0 },
+      { x: 0, y: 5 },
+    ],
+    [
+      { x: 2, y: 0 },
+      { x: 1, y: 5 },
+    ],
+    [
+      { x: 2, y: 0 },
+      { x: 0, y: 4 },
+    ],
 
-    [0, 1, 2, 5],
-    [2, 1, 0, 5],
+    [
+      { x: 0, y: 1 },
+      { x: 2, y: 5 },
+    ],
+    [
+      { x: 2, y: 1 },
+      { x: 0, y: 5 },
+    ],
   ])(
     'should return false for the sixth degree neighbours %s and %s',
-    ([x1, y1, x2, y2]) => {
-      expect(arePositionsEqual({ x: x1, y: y1 }, { x: x2, y: y2 })).toBe(false);
-      expect(arePositionsEqual({ x: x2, y: y2 }, { x: x1, y: y1 })).toBe(false);
+    ([xy1, xy2]) => {
+      expect(arePositionsEqual(xy1, xy2)).toBe(false);
+      expect(arePositionsEqual(xy1, xy2)).toBe(false);
     },
   );
 
@@ -197,7 +232,7 @@ describe(distanceBetween, () => {
     //   = 2 * (|x - 1| + y - 2.5) -- since y > 2.5 for south positions
     //   = |2x - 2| + 2y - 5
     const d = Math.abs(2 * x - 2) + 2 * y - 5;
-    it.for<[number, Position]>([[d, { x: 2 - x, y: 5 - y }]])(
+    it.for<[number, Position]>([[d, asPosition({ x: 2 - x, y: 5 - y })]])(
       'should return %s for the opposite position %s',
       ([d, opposite]) => {
         expect(distanceBetween({ x, y }, opposite)).toBe(d);
@@ -206,27 +241,31 @@ describe(distanceBetween, () => {
     );
   });
 
-  describe.for(CENTRE_POSITIONS)('for centre file position %s', ({ x, y }) => {
+  describe.for(MIDDLE_POSITIONS)('for centre file position %s', ({ x, y }) => {
     it('should return 1 for the left neighbour', () => {
-      expect(distanceBetween({ x, y }, { x: x - 1, y })).toBe(1);
-      expect(distanceBetween({ x: x - 1, y }, { x, y })).toBe(1);
+      const neighbour = asPosition({ x: x - 1, y });
+      expect(distanceBetween({ x, y }, neighbour)).toBe(1);
+      expect(distanceBetween(neighbour, { x, y })).toBe(1);
     });
 
     it('should return 1 for the right neighbour', () => {
-      expect(distanceBetween({ x, y }, { x: x + 1, y })).toBe(1);
-      expect(distanceBetween({ x: x + 1, y }, { x, y })).toBe(1);
+      const neighbour = asPosition({ x: x + 1, y });
+      expect(distanceBetween({ x, y }, neighbour)).toBe(1);
+      expect(distanceBetween(neighbour, { x, y })).toBe(1);
     });
 
     it('should return 1 for the north neighbour', ({ skip }) => {
       skip(y === 0);
-      expect(distanceBetween({ x, y }, { x, y: y - 1 })).toBe(1);
-      expect(distanceBetween({ x, y: y - 1 }, { x, y })).toBe(1);
+      const neighbour = asPosition({ x, y: y - 1 });
+      expect(distanceBetween({ x, y }, neighbour)).toBe(1);
+      expect(distanceBetween(neighbour, { x, y })).toBe(1);
     });
 
     it('should return 1 for the south neighbour', ({ skip }) => {
       skip(y === 5);
-      expect(distanceBetween({ x, y }, { x, y: y + 1 })).toBe(1);
-      expect(distanceBetween({ x, y: y + 1 }, { x, y })).toBe(1);
+      const neighbour = asPosition({ x, y: y + 1 });
+      expect(distanceBetween({ x, y }, neighbour)).toBe(1);
+      expect(distanceBetween(neighbour, { x, y })).toBe(1);
     });
 
     it.for<[x: number, y: number]>([
@@ -241,7 +280,7 @@ describe(distanceBetween, () => {
       ([xx, yy], { skip }) => {
         skip(y + yy > 5 || y + yy < 0);
         const position = { x, y };
-        const other = { x: x + xx, y: y + yy };
+        const other = asPosition({ x: x + xx, y: y + yy });
         expect(distanceBetween(position, other)).toBe(2);
         expect(distanceBetween(other, position)).toBe(2);
       },
@@ -259,7 +298,7 @@ describe(distanceBetween, () => {
       ([xx, yy], { skip }) => {
         skip(y + yy > 5 || y + yy < 0);
         const position = { x, y };
-        const other = { x: x + xx, y: y + yy };
+        const other = asPosition({ x: x + xx, y: y + yy });
         expect(distanceBetween(position, other)).toBe(3);
         expect(distanceBetween(other, position)).toBe(3);
       },
@@ -278,7 +317,7 @@ describe(distanceBetween, () => {
         ([xx, yy], { skip }) => {
           skip(y + yy > 5 || y + yy < 0);
           const position = { x, y };
-          const other = { x: x + xx, y: y + yy };
+          const other = asPosition({ x: x + xx, y: y + yy });
           expect(distanceBetween(position, other)).toBe(4);
           expect(distanceBetween(other, position)).toBe(4);
         },
@@ -293,7 +332,7 @@ describe(distanceBetween, () => {
         ([xx, yy], { skip }) => {
           skip(x + xx > 2 || x + xx < 0 || y + yy > 5 || y + yy < 0);
           const position = { x, y };
-          const other = { x: x + xx, y: y + yy };
+          const other = asPosition({ x: x + xx, y: y + yy });
           expect(distanceBetween(position, other)).toBe(5);
           expect(distanceBetween(other, position)).toBe(5);
         },
@@ -301,21 +340,45 @@ describe(distanceBetween, () => {
     },
   );
 
-  it.for([
-    [0, 0, 1, 5],
-    [0, 0, 2, 4],
-    [1, 0, 2, 5],
-    [1, 0, 0, 5],
-    [2, 0, 1, 5],
-    [2, 0, 0, 4],
+  it.for<[Position, Position]>([
+    [
+      { x: 0, y: 0 },
+      { x: 1, y: 5 },
+    ],
+    [
+      { x: 0, y: 0 },
+      { x: 2, y: 4 },
+    ],
+    [
+      { x: 1, y: 0 },
+      { x: 2, y: 5 },
+    ],
+    [
+      { x: 1, y: 0 },
+      { x: 0, y: 5 },
+    ],
+    [
+      { x: 2, y: 0 },
+      { x: 1, y: 5 },
+    ],
+    [
+      { x: 2, y: 0 },
+      { x: 0, y: 4 },
+    ],
 
-    [0, 1, 2, 5],
-    [2, 1, 0, 5],
+    [
+      { x: 0, y: 1 },
+      { x: 2, y: 5 },
+    ],
+    [
+      { x: 2, y: 1 },
+      { x: 0, y: 5 },
+    ],
   ])(
     'should return 6 for the sixth degree neighbours %s and %s',
-    ([x1, y1, x2, y2]) => {
-      expect(distanceBetween({ x: x1, y: y1 }, { x: x2, y: y2 })).toBe(6);
-      expect(distanceBetween({ x: x1, y: y1 }, { x: x2, y: y2 })).toBe(6);
+    ([xy1, xy2]) => {
+      expect(distanceBetween(xy1, xy2)).toBe(6);
+      expect(distanceBetween(xy1, xy2)).toBe(6);
     },
   );
 

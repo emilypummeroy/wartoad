@@ -1,5 +1,7 @@
 import { CardClass } from '../types/card';
 import { Player } from '../types/gameflow';
+import type { Position } from '../types/position';
+import { asPosition } from '../types/position.test-utils';
 import { createUnit } from './card';
 import {
   NORTH_LEAF,
@@ -58,32 +60,32 @@ const removeUnits = () => ({
 
 // This one of the most important single functions in the app
 // and the tests run fast, so we produce a huge number of test cases.
-const describeForAllPositions = (block: (_: [x: number, y: number]) => void) =>
-  describe.for<[number, number]>([
-    [0, 0],
-    [0, 1],
-    [0, 2],
-    [0, 3],
-    [0, 4],
-    [0, 5],
-    [1, 0],
-    [1, 1],
-    [1, 2],
-    [1, 3],
-    [1, 4],
-    [1, 5],
-    [2, 0],
-    [2, 1],
-    [2, 2],
-    [2, 3],
-    [2, 4],
-    [2, 5],
+const describeForAllPositions = (block: (_: Position) => void) =>
+  describe.for<Position>([
+    { x: 0, y: 0 },
+    { x: 0, y: 1 },
+    { x: 0, y: 2 },
+    { x: 0, y: 3 },
+    { x: 0, y: 4 },
+    { x: 0, y: 5 },
+    { x: 1, y: 0 },
+    { x: 1, y: 1 },
+    { x: 1, y: 2 },
+    { x: 1, y: 3 },
+    { x: 1, y: 4 },
+    { x: 1, y: 5 },
+    { x: 2, y: 0 },
+    { x: 2, y: 1 },
+    { x: 2, y: 2 },
+    { x: 2, y: 3 },
+    { x: 2, y: 4 },
+    { x: 2, y: 5 },
   ])('when called for x=%s and y=%s', block);
 
 const itShouldNotChangeOtherZones = (
   pond: PondState,
   valueToSet: Partial<LeafState> | ((old: LeafState) => Partial<LeafState>),
-  [x, y]: [number, number],
+  { x, y }: Position,
 ) =>
   it('should not change other zones', () => {
     const newPond = setPondStateAt(pond, { x, y }, valueToSet);
@@ -92,7 +94,7 @@ const itShouldNotChangeOtherZones = (
       if (yy === y) continue;
       for (let xx = 0; xx < LEAF_COUNT_PER_ROW; xx += 1) {
         if (xx === x) continue;
-        const position = { x: xx, y: yy };
+        const position = asPosition({ x: xx, y: yy });
         const newValue = getPondStateAt(newPond, position);
         const oldValue = getPondStateAt(pond, position);
         expect(newValue).toBe(newPond[yy][xx]);
@@ -150,7 +152,7 @@ describe('the PondState type functions', () => {
     ])(
       'with known PondState: %s | updater functions: %s and %s',
       ([_, __, ___, pond, first, second]) => {
-        describeForAllPositions(([x, y]) => {
+        describeForAllPositions(({ x, y }) => {
           describe('if both updates are for the same position', () => {
             it('should not change other zones', () => {
               const newPond = setPondStateAtEach(
@@ -163,7 +165,7 @@ describe('the PondState type functions', () => {
                 if (yy === y) continue;
                 for (let xx = 0; xx < LEAF_COUNT_PER_ROW; xx += 1) {
                   if (xx === x) continue;
-                  const position = { x: xx, y: yy };
+                  const position = asPosition({ x: xx, y: yy });
                   const newValue = getPondStateAt(newPond, position);
                   const oldValue = getPondStateAt(pond, position);
                   expect(newValue).toBe(newPond[yy][xx]);
@@ -196,8 +198,10 @@ describe('the PondState type functions', () => {
             });
           });
 
-          const x2 = (x + 1) % 3;
-          const y2 = (y + 2) % 5;
+          const { x: x2, y: y2 } = asPosition({
+            x: (x + 1) % 3,
+            y: (y + 2) % 5,
+          });
           describe(`applying to a second position { x: ${x2} y: ${y2} }`, () => {
             it(`should set the value at x1=${x}, y1=${y}`, () => {
               const newPond = setPondStateAtEach(
@@ -247,7 +251,7 @@ describe('the PondState type functions', () => {
                 for (let xx = 0; xx < LEAF_COUNT_PER_ROW; xx += 1) {
                   if (xx === x && yy === y) continue;
                   if (xx === x2 && yy === y2) continue;
-                  const position = { x: xx, y: yy };
+                  const position = asPosition({ x: xx, y: yy });
                   const newValue = getPondStateAt(newPond, position);
                   const oldValue = getPondStateAt(pond, position);
                   expect(newValue).toBe(newPond[yy][xx]);
@@ -275,8 +279,8 @@ describe('the PondState type functions', () => {
     ])(
       'with known PondState: %s | updater function: %s',
       ([_, updaterName, pond, updater]) => {
-        describeForAllPositions(([x, y]) => {
-          itShouldNotChangeOtherZones(pond, updater, [x, y]);
+        describeForAllPositions(({ x, y }) => {
+          itShouldNotChangeOtherZones(pond, updater, { x, y });
 
           it(`should set the value at x=${x}, y=${y} to ${updaterName}`, () => {
             const newPond = setPondStateAt(pond, { x, y }, updater);
@@ -321,8 +325,8 @@ describe('the PondState type functions', () => {
         }
         pond satisfies PondState;
 
-        describeForAllPositions(([x, y]) => {
-          itShouldNotChangeOtherZones(pond, valueToSet, [x, y]);
+        describeForAllPositions(({ x, y }) => {
+          itShouldNotChangeOtherZones(pond, valueToSet, { x, y });
 
           it(`should set the value at x=${x}, y=${y} to ${newValueName}`, () => {
             const newPond = setPondStateAt(pond, { x, y }, valueToSet);
