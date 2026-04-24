@@ -160,7 +160,7 @@ const gameMake = (s: Read<GameState>): GameMake => ({
     gameData({
       ...s,
       flow: { ...s.flow, subphase: Subphase.Activating },
-      pickedCard: x.unit.cardClass,
+      pickedCard: undefined,
       activation: x,
     }),
   phase: phase =>
@@ -176,18 +176,24 @@ const gameMake = (s: Read<GameState>): GameMake => ({
     ),
 });
 
-const gameInvariants: GameInvariants = (s, get, { always, when, iff }) => {
+const gameInvariants: GameInvariants = (
+  s,
+  get,
+  { always, unless, when, iff },
+) => {
   always(get.leaf.at(HOME[Player.North]).isUpgraded);
   always(get.leaf.at(HOME[Player.South]).isUpgraded);
 
-  when(s.flow.subphase === Subphase.Idle).not(!!s.pickedCard);
-  when(s.flow.subphase === Subphase.Idle).not(!!s.activation);
+  when(get.subphase === Subphase.Idle).not(!!s.pickedCard);
+  when(get.subphase === Subphase.Idle).not(!!s.activation);
 
-  iff(s.flow.subphase === Subphase.Activating).must(!!s.activation);
-  when(s.flow.subphase === Subphase.Activating).not(!!s.pickedCard);
+  iff(get.subphase === Subphase.Activating).must(!!s.activation);
+  when(get.subphase === Subphase.Activating).not(!!s.pickedCard);
 
-  when(s.flow.subphase === Subphase.Upgrading).must(!!s.pickedCard);
-  when(s.flow.subphase === Subphase.Deploying).must(!!s.pickedCard);
+  when(get.subphase === Subphase.Upgrading).must(!!s.pickedCard);
+  when(get.subphase === Subphase.Deploying).must(!!s.pickedCard);
+
+  unless(get.phase === Phase.Main).must(get.subphase === Subphase.Idle);
 };
 
 const gameAccess: (s: Read<GameState>) => GameAccessInner = s => ({
@@ -260,7 +266,12 @@ const invariantChecks: InvariantChecks = {
 
 const assert = (i: boolean) => {
   console.assert(i);
-  if (!i) throw new Error('Invariant assertion failed');
+  if (!i) {
+    const error = new Error('Invariant assertion failed');
+    const line = error.stack?.match(/[^\n]*gameInvariants[^\n]*/)?.[0];
+    error.message = `Invariant assertion failed: ${line}`;
+    throw error;
+  }
 };
 type GameAccessInner = Omit<GameAccess, 'out'>;
 

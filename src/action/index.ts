@@ -10,6 +10,7 @@ import {
 import { Player, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 
+export { activate } from './activate';
 export { commitActivate } from './commit-activate';
 export { endPhase } from './end-phase';
 
@@ -50,19 +51,6 @@ export const pickCard =
           : Subphase.Upgrading,
     },
     pickedCard,
-  });
-
-// TODO 11: test
-export const activate =
-  (unit: UnitCard, position: Position) =>
-  ({ flow, ...rest }: GameState): GameState => ({
-    ...rest,
-    flow: {
-      ...flow,
-      subphase: Subphase.Activating,
-    },
-    pickedCard: unit.cardClass,
-    activation: { unit, start: position },
   });
 
 // TODO 11: test

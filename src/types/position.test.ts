@@ -1,61 +1,13 @@
 // oxlint-disable no-magic-numbers
 import { distanceBetween, arePositionsEqual, type Position } from './position';
-import { asPosition } from './position.test-utils';
-
-const ALL_POSITIONS: Position[] = [
-  { x: 0, y: 0 },
-  { x: 1, y: 0 },
-  { x: 2, y: 0 },
-  { x: 0, y: 1 },
-  { x: 1, y: 1 },
-  { x: 2, y: 1 },
-  { x: 0, y: 2 },
-  { x: 1, y: 2 },
-  { x: 2, y: 2 },
-  { x: 0, y: 3 },
-  { x: 1, y: 3 },
-  { x: 2, y: 3 },
-  { x: 0, y: 4 },
-  { x: 1, y: 4 },
-  { x: 2, y: 4 },
-  { x: 0, y: 5 },
-  { x: 1, y: 5 },
-  { x: 2, y: 5 },
-];
-
-const SOUTH_POSITIONS: Position[] = [
-  { x: 0, y: 3 },
-  { x: 1, y: 3 },
-  { x: 2, y: 3 },
-  { x: 0, y: 4 },
-  { x: 1, y: 4 },
-  { x: 2, y: 4 },
-  { x: 0, y: 5 },
-  { x: 1, y: 5 },
-  { x: 2, y: 5 },
-];
-
-const MIDDLE_POSITIONS: Position[] = [
-  { x: 1, y: 0 },
-  { x: 1, y: 1 },
-  { x: 1, y: 2 },
-  { x: 1, y: 3 },
-  { x: 1, y: 4 },
-  { x: 1, y: 5 },
-];
-
-const CENTRE_POSITIONS: Position[] = [
-  { x: 1, y: 1 },
-  { x: 1, y: 2 },
-  { x: 1, y: 3 },
-  { x: 1, y: 4 },
-];
-
-const SOUTH_CENTRE_POSITIONS: Position[] = [
-  { x: 1, y: 3 },
-  { x: 1, y: 4 },
-  { x: 1, y: 5 },
-];
+import {
+  ALL_POSITIONS,
+  asPosition,
+  CENTRE_POSITIONS,
+  MIDDLE_POSITIONS,
+  SOUTH_CENTRE_POSITIONS,
+  SOUTH_POSITIONS,
+} from './position.test-utils';
 
 describe(arePositionsEqual, () => {
   describe.for(ALL_POSITIONS)('for position %s', ({ x, y }) => {

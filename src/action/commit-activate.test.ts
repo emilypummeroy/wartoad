@@ -23,14 +23,11 @@ describe(commitActivate, () => {
     [string, Position, start: Position | undefined, Player, Subphase, Phase]
   >([
     // Not Main phase & Activation subphase
-    ['Wrong flow', { x: 0, y: 0 }, { x: 0, y: 0 }, North, Activating, Start],
     ['Wrong flow', { x: 1, y: 1 }, undefined, North, Idle, Start],
     ['Wrong flow', { x: 2, y: 4 }, undefined, South, Deploying, Main],
-    ['Wrong flow', { x: 1, y: 5 }, { x: 1, y: 5 }, South, Activating, Start],
     ['Wrong flow', { x: 2, y: 4 }, undefined, North, Idle, Main],
     ['Wrong flow', { x: 1, y: 2 }, undefined, South, Upgrading, Main],
     ['Wrong flow', { x: 2, y: 1 }, undefined, North, Idle, End],
-    ['Wrong flow', { x: 0, y: 0 }, { x: 0, y: 0 }, South, Activating, End],
     // Not Activating
     ['Not activating', { x: 1, y: 3 }, undefined, North, Idle, Main],
     ['Not activating', { x: 0, y: 4 }, undefined, South, Deploying, Main],
