@@ -24,18 +24,19 @@ describe(commitActivate, () => {
   >([
     // Not Main phase & Activation subphase
     ['Wrong flow', { x: 0, y: 0 }, { x: 0, y: 0 }, North, Activating, Start],
-    ['Wrong flow', { x: 1, y: 1 }, { x: 1, y: 1 }, North, Idle, Start],
-    ['Wrong flow', { x: 2, y: 4 }, { x: 2, y: 4 }, South, Deploying, Main],
+    ['Wrong flow', { x: 1, y: 1 }, undefined, North, Idle, Start],
+    ['Wrong flow', { x: 2, y: 4 }, undefined, South, Deploying, Main],
     ['Wrong flow', { x: 1, y: 5 }, { x: 1, y: 5 }, South, Activating, Start],
-    ['Wrong flow', { x: 2, y: 4 }, { x: 2, y: 4 }, North, Idle, Main],
-    ['Wrong flow', { x: 1, y: 2 }, { x: 1, y: 2 }, South, Upgrading, Main],
-    ['Wrong flow', { x: 2, y: 1 }, { x: 2, y: 1 }, North, Idle, End],
+    ['Wrong flow', { x: 2, y: 4 }, undefined, North, Idle, Main],
+    ['Wrong flow', { x: 1, y: 2 }, undefined, South, Upgrading, Main],
+    ['Wrong flow', { x: 2, y: 1 }, undefined, North, Idle, End],
     ['Wrong flow', { x: 0, y: 0 }, { x: 0, y: 0 }, South, Activating, End],
-    // No activation state
-    ['No activation', { x: 1, y: 3 }, undefined, North, Activating, Main],
-    ['No activation', { x: 0, y: 4 }, undefined, South, Activating, Main],
-    ['No activation', { x: 1, y: 3 }, undefined, North, Activating, Main],
-    ['No activation', { x: 0, y: 4 }, undefined, South, Activating, Main],
+    // Not Activating
+    ['Not activating', { x: 1, y: 3 }, undefined, North, Idle, Main],
+    ['Not activating', { x: 0, y: 4 }, undefined, South, Deploying, Main],
+    ['Not activating', { x: 1, y: 3 }, undefined, North, Upgrading, Main],
+    ['Not activating', { x: 0, y: 4 }, undefined, South, Idle, End],
+    ['Not activating', { x: 2, y: 5 }, undefined, North, Idle, Start],
     // Too far from start
     ['Too far', { x: 1, y: 5 }, { x: 1, y: 3 }, North, Activating, Main],
     ['Too far', { x: 0, y: 4 }, { x: 2, y: 0 }, South, Activating, Main],

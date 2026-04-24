@@ -1,5 +1,6 @@
 import { DETERMINISTIC_STARTING_HAND } from '../state-types/card';
 import {
+  HOME,
   INITIAL_POND,
   setPondStateAt,
   type LeafState,
@@ -35,7 +36,7 @@ export type GameData = {
 };
 
 export const gameData = (s: GameState): GameData => ({
-  get: gameAccess(s),
+  get: verifyAccess(s, gameInvariants, gameAccess(s)),
   set: gameUpdate(s),
   make: gameMake(s),
 });
@@ -53,7 +54,6 @@ export const DEFAULT_GAME_STATE = {
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 
-// TODO 11: test
 export const createState = (getStartingHand: () => CardClass[]) => ({
   ...DEFAULT_GAME_STATE,
   northHand: getStartingHand(),
@@ -105,7 +105,6 @@ type GameMake = {
   phase: (x: Phase) => GameData;
 };
 
-// TODO 10: Try make this a class instead
 const gameUpdate: (s: Read<GameState>) => GameUpdate = s => ({
   player: { to: player => gameData({ ...s, flow: { ...s.flow, player } }) },
 
@@ -135,7 +134,6 @@ const gameUpdate: (s: Read<GameState>) => GameUpdate = s => ({
   },
 });
 
-// TODO 10: Try make this a class instead
 const gameMake = (s: Read<GameState>): GameMake => ({
   idle: () =>
     gameData({
@@ -178,8 +176,21 @@ const gameMake = (s: Read<GameState>): GameMake => ({
     ),
 });
 
-// TODO 10: Try make this a class instead
-const gameAccess: (s: Read<GameState>) => GameAccess = s => ({
+const gameInvariants: GameInvariants = (s, get, { always, when, iff }) => {
+  always(get.leaf.at(HOME[Player.North]).isUpgraded);
+  always(get.leaf.at(HOME[Player.South]).isUpgraded);
+
+  when(s.flow.subphase === Subphase.Idle).not(!!s.pickedCard);
+  when(s.flow.subphase === Subphase.Idle).not(!!s.activation);
+
+  iff(s.flow.subphase === Subphase.Activating).must(!!s.activation);
+  when(s.flow.subphase === Subphase.Activating).not(!!s.pickedCard);
+
+  when(s.flow.subphase === Subphase.Upgrading).must(!!s.pickedCard);
+  when(s.flow.subphase === Subphase.Deploying).must(!!s.pickedCard);
+};
+
+const gameAccess: (s: Read<GameState>) => GameAccessInner = s => ({
   get flow() {
     return s.flow;
   },
@@ -211,8 +222,60 @@ const gameAccess: (s: Read<GameState>) => GameAccess = s => ({
   get activation() {
     return s.flow.subphase === Subphase.Activating ? s.activation : undefined;
   },
-
-  get out() {
-    return s;
-  },
 });
+
+const verifyAccess = (
+  s: GameState,
+  invariants: GameInvariants,
+  access: Read<GameAccessInner>,
+): GameAccess => {
+  invariants(s, access, invariantChecks);
+  return {
+    ...access,
+    get out() {
+      return s;
+    },
+  };
+};
+
+type GameInvariants = (
+  s: GameState,
+  access: Read<GameAccessInner>,
+  checks: Read<InvariantChecks>,
+) => void;
+
+const invariantChecks: InvariantChecks = {
+  always: p => assert(p),
+  never: p => assert(!p),
+  when: p => ({
+    must: q => assert(!p || q),
+    not: q => assert(!p || !q),
+  }),
+  unless: p => ({
+    must: q => assert(p || q),
+    not: q => assert(p || !q),
+  }),
+  iff: p => ({ must: q => assert(p === q) }),
+};
+
+const assert = (i: boolean) => {
+  console.assert(i);
+  if (!i) throw new Error('Invariant assertion failed');
+};
+type GameAccessInner = Omit<GameAccess, 'out'>;
+
+type InvariantChecks = {
+  always: (p: boolean) => void;
+  never: (p: boolean) => void;
+  when: (p: boolean) => {
+    must: (q: boolean) => void;
+    not: (q: boolean) => void;
+  };
+  unless: (p: boolean) => {
+    must: (q: boolean) => void;
+    not: (q: boolean) => void;
+  };
+  iff: (p: boolean) => {
+    must: (q: boolean) => void;
+  };
+};

@@ -1,8 +1,12 @@
 import { DEFAULT_GAME_STATE, type GameState } from '.';
 import { createUnit, DETERMINISTIC_STARTING_HAND } from '../state-types/card';
-import type { UnitCard, UnitKey, CardClass } from '../types/card';
-import { UnitClass } from '../types/card';
-import { Player, type Phase, type Subphase } from '../types/gameflow';
+import {
+  type UnitCard,
+  type UnitKey,
+  CardClass,
+  UnitClass,
+} from '../types/card';
+import { Player, Subphase, type Phase } from '../types/gameflow';
 import type { Position } from '../types/position';
 
 export const gameflowOf = (
@@ -15,6 +19,12 @@ export const gameflowOf = (
     phase,
     subphase,
   },
+  pickedCard:
+    subphase === Subphase.Deploying
+      ? CardClass.Froglet
+      : subphase === Subphase.Upgrading
+        ? CardClass.LilyPad
+        : undefined,
 });
 
 export const activationOf = (
