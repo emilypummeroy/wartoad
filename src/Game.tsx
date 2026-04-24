@@ -68,10 +68,10 @@ export function Game() {
 function PickedCard({
   owner,
   children,
-}: {
-  readonly owner: Player;
-  readonly children: ReactNode;
-}) {
+}: Readonly<{
+  owner: Player;
+  children: ReactNode;
+}>) {
   return (
     <section className="card-display" aria-labelledby="picked-card">
       <h3 id="picked-card">Picked card</h3>

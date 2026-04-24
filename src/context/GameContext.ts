@@ -7,13 +7,13 @@ import {
   commitUpgrade,
   endPhase,
   pickCard,
-  type GameDispatch,
+  type GameActions,
 } from '../action';
 import { createState, DEFAULT_GAME_STATE, type GameState } from '../state';
 import { type CardClass, type UnitCard } from '../types/card';
 import { type Position } from '../types/position';
 
-export type GameContext = readonly [GameState, GameDispatch];
+export type GameContext = [GameState, GameActions];
 
 export const useGameContextData = (
   getStartingHand: () => CardClass[],
@@ -43,7 +43,7 @@ export const GameContext = createContext<GameContext>([
 
 const createDispatch =
   (getDrawnCard: () => CardClass, getNextCardKey: () => number) =>
-  (setState: (_: (_: GameState) => GameState) => void): GameDispatch => ({
+  (setState: (_: (_: GameState) => GameState) => void): GameActions => ({
     endPhase: () => setState(endPhase(getDrawnCard)),
 
     pickCard: (card: CardClass) => setState(pickCard(card)),

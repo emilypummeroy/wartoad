@@ -1,28 +1,30 @@
 import { useContext } from 'react';
 
 import { GameContext } from '../context/GameContext';
-import { getPondStateAt, HOME, type PondState } from '../state-types/pond';
+import type { PondState } from '../state-types/pond';
+import { getPondStateAt, HOME } from '../state-types/pond';
 import { PLAYER_CLASSNAME } from '../types/gameflow';
-import { arePositionsEqual, type Position } from '../types/position';
+import type { Position } from '../types/position';
+import { arePositionsEqual } from '../types/position';
 import { CardBack, LilyPad } from '../view/Card';
 
-type PondLeafCardContext = readonly [
+type PondLeafCardSlice = [
   {
     pond: PondState;
   },
   unknown,
 ];
-type PondLeafCardProps = {
-  readonly leafSymbolId: string;
-  readonly leafNameId: string;
-  readonly position: Position;
-};
+type PondLeafCardProps = Readonly<{
+  leafSymbolId: string;
+  leafNameId: string;
+  position: Position;
+}>;
 export function PondLeafCard({
   leafSymbolId,
   leafNameId,
   position,
 }: PondLeafCardProps) {
-  const [{ pond }]: PondLeafCardContext = useContext(GameContext);
+  const [{ pond }]: PondLeafCardSlice = useContext(GameContext);
   const { controller, isUpgraded } = getPondStateAt(pond, position);
   const isHome = arePositionsEqual(HOME[controller], position);
   return isUpgraded ? (

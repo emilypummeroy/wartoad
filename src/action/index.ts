@@ -13,17 +13,17 @@ import type { Position } from '../types/position';
 export { commitActivate } from './commit-activate';
 export { endPhase } from './end-phase';
 
-export type GameDispatch = {
-  readonly endPhase: () => void;
+export type GameActions = {
+  endPhase: () => void;
   // No different pickUnit, pickLeaf, etc.
   // The difference between activation and upgrading is not the concern of
   // Hand or Card.
   // TODO 11: Make it operate on a card instead of a card class
-  readonly pickCard: (_: CardClass) => void;
-  readonly activate: (unit: UnitCard, position: Position) => void;
-  readonly commitUpgrade: (_: Position) => void;
-  readonly commitDeploy: (_: Position) => void;
-  readonly commitActivate: (_: Position) => void;
+  pickCard: (_: CardClass) => void;
+  activate: (unit: UnitCard, position: Position) => void;
+  commitUpgrade: (_: Position) => void;
+  commitDeploy: (_: Position) => void;
+  commitActivate: (_: Position) => void;
 };
 
 // TODO 11: Remove the particular card

@@ -7,15 +7,15 @@ import type { Player } from '../types/gameflow';
 import { Phase, PLAYER_CLASSNAME, Subphase } from '../types/gameflow';
 import { distanceBetween, type Position } from '../types/position';
 
-type PondLeafDropzoneContext = readonly [
+type PondLeafDropzoneSlice = [
   {
-    readonly pond: PondState;
-    readonly flow: {
+    pond: PondState;
+    flow: {
       subphase: Subphase;
       phase: Phase;
       player: Player;
     };
-    readonly activation?: { start: Position };
+    activation?: { start: Position };
   },
   {
     commitUpgrade: (target: Position) => void;
@@ -25,11 +25,11 @@ type PondLeafDropzoneContext = readonly [
 ];
 
 // TODO 11: Make this a view component with memo
-type PondLeafDropzoneProps = {
-  readonly children: ReactNode;
-  readonly targetLabelId: string;
-  readonly position: Position;
-};
+type PondLeafDropzoneProps = Readonly<{
+  children: ReactNode;
+  targetLabelId: string;
+  position: Position;
+}>;
 export function PondLeafDropzone({
   children,
   targetLabelId,
@@ -42,7 +42,7 @@ export function PondLeafDropzone({
       pond,
     },
     { commitUpgrade, commitDeploy, commitActivate },
-  ]: PondLeafDropzoneContext = useContext(GameContext);
+  ]: PondLeafDropzoneSlice = useContext(GameContext);
   const { isUpgraded, controller } = getPondStateAt(pond, position);
   const dropzoneId = useId();
 

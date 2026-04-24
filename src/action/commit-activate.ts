@@ -1,5 +1,6 @@
 import { gameData, type GameData, type GameState } from '../state';
 import { setPondStateAtEach } from '../state-types/pond';
+import type { Read } from '../types';
 import { Phase, Subphase } from '../types/gameflow';
 import {
   arePositionsEqual,
@@ -9,7 +10,7 @@ import {
 
 const commitActivateInner =
   (target: Position) =>
-  ({ get, set, make }: GameData) => {
+  ({ get, set, make }: Read<GameData>) => {
     if (
       get.phase !== Phase.Main ||
       !get.activation ||

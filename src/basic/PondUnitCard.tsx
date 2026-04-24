@@ -1,6 +1,7 @@
 import { useCallback, useContext, useId } from 'react';
 
 import { GameContext } from '../context/GameContext';
+import type { Read } from '../types';
 import type { UnitCard } from '../types/card';
 import {
   Phase,
@@ -11,18 +12,18 @@ import {
 import type { Position } from '../types/position';
 import { Froglet } from '../view/Card';
 
-type PondUnitCardContext = readonly [
+type PondUnitCardContext = [
   { flow: Gameflow },
   {
-    readonly activate: (unit: UnitCard, position: Position) => void;
+    activate: (unit: UnitCard, position: Position) => void;
   },
 ];
 type PondUnitCardProps = {
-  readonly card: UnitCard;
-  readonly position: Position;
+  card: UnitCard;
+  position: Position;
 };
 
-export const PondUnitCard = ({ card, position }: PondUnitCardProps) => {
+export const PondUnitCard = ({ card, position }: Read<PondUnitCardProps>) => {
   const [
     {
       flow: { player, phase, subphase },

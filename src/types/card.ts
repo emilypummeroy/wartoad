@@ -1,3 +1,4 @@
+import type { Read } from '.';
 import type { Player } from './gameflow';
 
 // Cards are the objects which you draw, have in your hand
@@ -12,13 +13,13 @@ import type { Player } from './gameflow';
 export type Card = UnitCard | LeafCard;
 export type UnitCard = CardOf<Unit>;
 export type LeafCard = CardOf<Leaf>;
-export type CardOf<T extends CardType> = {
-  readonly type: T;
-  readonly key: number;
-  readonly owner: Player;
-  readonly cardClass: CardClassOf<T>;
-  readonly values: CardValuesOf<T>;
-};
+export type CardOf<T extends CardType> = Read<{
+  type: T;
+  key: number;
+  owner: Player;
+  cardClass: CardClassOf<T>;
+  values: CardValuesOf<T>;
+}>;
 
 // All cards are either Leaves or Units.
 // This is the "type" of a card.
@@ -34,15 +35,15 @@ export const CardType = {
 // This could be a higher order type but it's unnecessary for
 // all constant card classes and a small number of card types.
 export type CardStats = UnitStats | LeafStats;
-export type UnitStats = {
-  readonly life: number;
-  readonly speed: number;
-  readonly power: number;
-  readonly range: number;
-};
-export type LeafStats = {
-  readonly gives: number;
-};
+export type UnitStats = Read<{
+  life: number;
+  speed: number;
+  power: number;
+  range: number;
+}>;
+export type LeafStats = Read<{
+  gives: number;
+}>;
 export type CardStatsOf<T extends CardType> = T extends Unit
   ? UnitStats
   : T extends Leaf
@@ -57,13 +58,13 @@ export type CardStatsOf<T extends CardType> = T extends Unit
 export type CardClass = UnitClass | LeafClass;
 export type UnitClass = CardClassOf<Unit>;
 export type LeafClass = CardClassOf<Leaf>;
-export type CardClassOf<T extends CardType> = {
-  readonly type: T;
-  readonly key: CardKeyOf<T>;
-  readonly name: string;
-  readonly cost: number;
-  readonly stats: CardStatsOf<T>;
-};
+export type CardClassOf<T extends CardType> = Read<{
+  type: T;
+  key: CardKeyOf<T>;
+  name: string;
+  cost: number;
+  stats: CardStatsOf<T>;
+}>;
 
 // CardKey is the canonical key for a CardClass
 export type CardKey = UnitKey | LeafKey;
@@ -78,7 +79,7 @@ export type CardKeyOf<T extends CardType> = T extends Unit
 // Individual cards have values attached to them which change over time.
 // For example, units take damage.
 export type CardValues = UnitValues | LeafValues;
-export type UnitValues = { readonly damage: number };
+export type UnitValues = Read<{ damage: number }>;
 export type LeafValues = typeof NoneValues;
 export type CardValuesOf<T extends CardType> = T extends Unit
   ? UnitValues

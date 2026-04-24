@@ -1,43 +1,46 @@
+import type { Read } from '../types';
 import type { UnitCard } from '../types/card';
 import { Player } from '../types/gameflow';
 import type { Position } from '../types/position';
 
-export type PondState = readonly [
-  readonly [LeafState, LeafState, LeafState],
-  readonly [LeafState, LeafState, LeafState],
-  readonly [LeafState, LeafState, LeafState],
-  readonly [LeafState, LeafState, LeafState],
-  readonly [LeafState, LeafState, LeafState],
-  readonly [LeafState, LeafState, LeafState],
-];
+export type PondState = Read<
+  [
+    [LeafState, LeafState, LeafState],
+    [LeafState, LeafState, LeafState],
+    [LeafState, LeafState, LeafState],
+    [LeafState, LeafState, LeafState],
+    [LeafState, LeafState, LeafState],
+    [LeafState, LeafState, LeafState],
+  ]
+>;
 
-export type LeafState = Readonly<{
-  units: readonly UnitCard[];
+export type LeafState = Read<{
+  units: UnitCard[];
   isUpgraded: boolean;
   controller: Player;
 }>;
 
-export const isPondState = (
-  array: ReadonlyArray<ReadonlyArray<LeafState>>,
-): array is PondState =>
+export const isPondState = (array: Read<LeafState[][]>): array is PondState =>
   array.length === ROW_COUNT &&
   array.every(row => row.length === LEAF_COUNT_PER_ROW);
 
 export const getPondStateAt = (
-  pond: PondState,
+  pond: Read<PondState>,
   { x, y }: Position,
-): LeafState => pond[y][x];
+): Read<LeafState> => pond[y][x];
 
 export const setPondStateAt = (
-  old: PondState,
+  old: Read<PondState>,
   { x, y }: Position,
-  newValue: Partial<LeafState> | ((old: LeafState) => Partial<LeafState>),
+  newValue:
+    | Read<Partial<LeafState>>
+    | ((old: Read<LeafState>) => Partial<LeafState>),
 ): PondState => {
   const array = old.map((row, yy) =>
     yy !== y
       ? row
       : row.map(
-          (oldValue, xx): LeafState =>
+          (oldValue, xx): Read<LeafState> =>
             xx !== x
               ? oldValue
               : typeof newValue === 'function'
@@ -53,12 +56,12 @@ export const setPondStateAt = (
 };
 
 export const setPondStateAtEach = (
-  init: PondState,
+  init: Read<PondState>,
   ...updates: readonly (readonly [
     Position,
-    (leaf: LeafState) => Partial<LeafState>,
+    (leaf: Read<LeafState>) => Partial<LeafState>,
   ])[]
-): PondState =>
+): Read<PondState> =>
   updates.reduce(
     (pond, [at, update]) => setPondStateAt(pond, at, update),
     init,
@@ -88,7 +91,7 @@ export const SOUTH_LEAF = {
   isUpgraded: false,
   controller: Player.South,
 } as const;
-export const INITIAL_POND: PondState = [
+export const INITIAL_POND: Read<PondState> = [
   [NORTH_LEAF, NORTH_UPGRADED, NORTH_LEAF],
   [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],
   [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],

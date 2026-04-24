@@ -5,33 +5,34 @@ import {
   type LeafState,
   type PondState,
 } from '../state-types/pond';
+import type { Read } from '../types';
 import type { CardClass, UnitCard } from '../types/card';
 import { Phase, Player, Subphase, type Gameflow } from '../types/gameflow';
 import type { Position } from '../types/position';
 
-export type GameState = Readonly<{
+export type GameState = Read<{
   flow: Gameflow;
   pond: PondState;
   // TODO 11: Card[]
-  northHand: readonly CardClass[];
+  northHand: CardClass[];
   // TODO 11: Card[]
-  southHand: readonly CardClass[];
+  southHand: CardClass[];
   // TODO 11: Card
   pickedCard?: CardClass;
   activation?: ActivationState;
 }>;
 
-export type ActivationState = Readonly<{
+export type ActivationState = {
   start: Position;
   unit: UnitCard;
-}>;
+};
 
 // Provides an interface for accessing state while maintaining invariants.
-export type GameData = Readonly<{
+export type GameData = {
   get: GameAccess;
   set: GameUpdate;
   make: GameMake;
-}>;
+};
 
 export const gameData = (s: GameState): GameData => ({
   get: gameAccess(s),
@@ -60,31 +61,31 @@ export const createState = (getStartingHand: () => CardClass[]) => ({
 });
 
 // Accessors for convenience
-export type GameAccess = Readonly<{
+export type GameAccess = {
   flow: Gameflow;
   player: Player;
   phase: Phase;
   subphase: Subphase;
 
-  pond: PondState;
-  leaf: { at: (p: Position) => LeafState };
+  pond: Read<PondState>;
+  leaf: { at: (p: Read<Position>) => Read<LeafState> };
 
-  hand: { of: (p: Player) => readonly CardClass[] };
+  hand: { of: (p: Player) => Read<CardClass[]> };
 
   activation?: ActivationState;
 
   out: GameState;
-}>;
+};
 
 // Updaters which preserve simple invariants
-export type GameUpdate = Readonly<{
+export type GameUpdate = {
   player: { to: (x: Player) => GameData };
 
-  pond: { to: (x: PondState) => GameData };
+  pond: { to: (x: Read<PondState>) => GameData };
   leaf: {
     at: (x: Position) => {
-      to: (x: Partial<LeafState>) => GameData;
-      by: (x: (old: LeafState) => Partial<LeafState>) => GameData;
+      to: (x: Read<Partial<LeafState>>) => GameData;
+      by: (x: (old: Read<LeafState>) => Partial<LeafState>) => GameData;
     };
   };
 
@@ -94,25 +95,25 @@ export type GameUpdate = Readonly<{
       by: (x: (old: readonly CardClass[]) => CardClass[]) => GameData;
     };
   };
-}>;
+};
 
-type GameMake = Readonly<{
+type GameMake = {
   idle: () => GameData;
   deploying: (x: CardClass) => GameData;
   upgrading: (x: CardClass) => GameData;
-  activating: (x: ActivationState) => GameData;
+  activating: (x: Read<ActivationState>) => GameData;
   phase: (x: Phase) => GameData;
-}>;
+};
 
 // TODO 10: Try make this a class instead
-const gameUpdate: (s: GameState) => GameUpdate = s => ({
+const gameUpdate: (s: Read<GameState>) => GameUpdate = s => ({
   player: { to: player => gameData({ ...s, flow: { ...s.flow, player } }) },
 
   pond: { to: pond => gameData({ ...s, pond }) },
   leaf: {
-    at: x => ({
-      to: v => gameData({ ...s, pond: setPondStateAt(s.pond, x, v) }),
-      by: u => gameData({ ...s, pond: setPondStateAt(s.pond, x, u) }),
+    at: xy => ({
+      to: v => gameData({ ...s, pond: setPondStateAt(s.pond, xy, v) }),
+      by: u => gameData({ ...s, pond: setPondStateAt(s.pond, xy, u) }),
     }),
   },
 
@@ -135,7 +136,7 @@ const gameUpdate: (s: GameState) => GameUpdate = s => ({
 });
 
 // TODO 10: Try make this a class instead
-const gameMake = (s: GameState): GameMake => ({
+const gameMake = (s: Read<GameState>): GameMake => ({
   idle: () =>
     gameData({
       ...s,
@@ -178,7 +179,7 @@ const gameMake = (s: GameState): GameMake => ({
 });
 
 // TODO 10: Try make this a class instead
-const gameAccess: (s: GameState) => GameAccess = s => ({
+const gameAccess: (s: Read<GameState>) => GameAccess = s => ({
   get flow() {
     return s.flow;
   },
@@ -196,7 +197,7 @@ const gameAccess: (s: GameState) => GameAccess = s => ({
     return s.pond;
   },
   leaf: {
-    at({ x, y }: Position) {
+    at({ x, y }: Read<Position>) {
       return s.pond[y][x];
     },
   },

@@ -32,6 +32,7 @@
     "no-ternary": "allow",
     "no-continue": "allow",
     "no-shadow": "allow",
+    "ban-types": "allow",
     "array-type": ["allow", { "default": "array-simple" }],
     "no-duplicate-imports": ["error", { "allowSeparateTypeImports": true }],
     "consistent-type-imports": "error",
