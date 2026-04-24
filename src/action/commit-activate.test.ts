@@ -7,7 +7,12 @@ import {
   ROW_COUNT,
   setPondStateAt,
 } from '../state-types/pond';
-import { activationOf, createStateWith, gameflowOf } from '../state/test-utils';
+import {
+  activationOf,
+  createStateWith,
+  gameflowOf,
+  pickedCardOf,
+} from '../state/test-utils';
 import { CardClass } from '../types/card';
 import { Phase, Player, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
@@ -22,15 +27,9 @@ describe(commitActivate, () => {
   describe.for<
     [string, Position, start: Position | undefined, Player, Subphase, Phase]
   >([
-    // Not Main phase & Activation subphase
-    ['Wrong flow', { x: 1, y: 1 }, undefined, North, Idle, Start],
-    ['Wrong flow', { x: 2, y: 4 }, undefined, South, Deploying, Main],
-    ['Wrong flow', { x: 2, y: 4 }, undefined, North, Idle, Main],
-    ['Wrong flow', { x: 1, y: 2 }, undefined, South, Upgrading, Main],
-    ['Wrong flow', { x: 2, y: 1 }, undefined, North, Idle, End],
     // Not Activating
     ['Not activating', { x: 1, y: 3 }, undefined, North, Idle, Main],
-    ['Not activating', { x: 0, y: 4 }, undefined, South, Deploying, Main],
+    ['Not activating', { x: 2, y: 4 }, undefined, South, Deploying, Main],
     ['Not activating', { x: 1, y: 3 }, undefined, North, Upgrading, Main],
     ['Not activating', { x: 0, y: 4 }, undefined, South, Idle, End],
     ['Not activating', { x: 2, y: 5 }, undefined, North, Idle, Start],
@@ -41,11 +40,13 @@ describe(commitActivate, () => {
     ['Too far', { x: 0, y: 4 }, { x: 2, y: 4 }, South, Activating, Main],
   ])(
     'when precondition failed: %s | target: %s | start: %s | flow: %s %s %s',
-    ([_, target, start, ...flow]) => {
+    ([_, target, start, player, subphase, phase]) => {
       it('should return the input unchanged', () => {
         const old = createStateWith({
           ...activationOf(start),
-          ...gameflowOf(...flow),
+          ...gameflowOf(player, subphase, phase),
+          ...(subphase === Deploying && pickedCardOf(CardClass.Froglet)),
+          ...(subphase === Upgrading && pickedCardOf(CardClass.LilyPad)),
         });
         const got = commitActivate(target)(old);
         expect(got).toStrictEqual(old);

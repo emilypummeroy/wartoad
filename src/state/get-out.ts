@@ -6,7 +6,6 @@ import {
   type PondState,
 } from '../state-types/pond';
 import type { Read } from '../types';
-import type { CardClass } from '../types/card';
 import { Phase, Player, Subphase, type Gameflow } from '../types/gameflow';
 import type { Position } from '../types/position';
 
@@ -58,35 +57,35 @@ export type GameAccess = {
   subphase: Subphase;
   pond: Read<PondState>;
   leaf: { at: (p: Read<Position>) => Read<LeafState> };
-  hand: { of: (p: Player) => Read<CardClass[]> };
+  // hand: { of: (p: Player) => Read<CardClass[]> };
   activation?: ActivationState;
 };
 
 // Updaters which preserve simple invariants
 export type GameUpdate = {
-  player: { to: (x: Player) => GameData };
-  pond: { to: (x: Read<PondState>) => GameData };
+  // player: { to: (x: Player) => GameData };
+  // pond: { to: (x: Read<PondState>) => GameData };
   leaf: {
     at: (x: Position) => {
-      to: (x: Read<Partial<LeafState>>) => GameData;
+      // to: (x: Read<Partial<LeafState>>) => GameData;
       by: (x: (old: Read<LeafState>) => Partial<LeafState>) => GameData;
     };
   };
-  hand: {
-    of: (x: Player) => {
-      to: (x: readonly CardClass[]) => GameData;
-      by: (x: (old: readonly CardClass[]) => CardClass[]) => GameData;
-    };
-  };
+  // hand: {
+  //   of: (x: Player) => {
+  //     to: (x: readonly CardClass[]) => GameData;
+  //     by: (x: (old: readonly CardClass[]) => CardClass[]) => GameData;
+  //   };
+  // };
 };
 
 // Operations which need to touch multiple places to maintain invariants
 type GameMake = {
   idle: () => GameData;
-  deploying: (x: CardClass) => GameData;
-  upgrading: (x: CardClass) => GameData;
+  // deploying: (x: CardClass) => GameData;
+  // upgrading: (x: CardClass) => GameData;
   activating: (x: Read<ActivationState>) => GameData;
-  phase: (x: Phase) => GameData;
+  // phase: (x: Phase) => GameData;
 };
 
 const gameAccess: (s: Read<GameState>) => GameAccessInner = s => ({
@@ -112,11 +111,11 @@ const gameAccess: (s: Read<GameState>) => GameAccessInner = s => ({
     },
   },
 
-  hand: {
-    of(p: Player) {
-      return p === Player.North ? s.northHand : s.southHand;
-    },
-  },
+  // hand: {
+  //   of(p: Player) {
+  //     return p === Player.North ? s.northHand : s.southHand;
+  //   },
+  // },
 
   get activation() {
     return s.flow.subphase === Subphase.Activating ? s.activation : undefined;
@@ -124,32 +123,32 @@ const gameAccess: (s: Read<GameState>) => GameAccessInner = s => ({
 });
 
 const gameUpdate: (s: Read<GameState>) => GameUpdate = s => ({
-  player: { to: player => gameData({ ...s, flow: { ...s.flow, player } }) },
-  pond: { to: pond => gameData({ ...s, pond }) },
+  // player: { to: player => gameData({ ...s, flow: { ...s.flow, player } }) },
+  // pond: { to: pond => gameData({ ...s, pond }) },
 
   leaf: {
     at: xy => ({
-      to: v => gameData({ ...s, pond: setPondStateAt(s.pond, xy, v) }),
+      // to: v => gameData({ ...s, pond: setPondStateAt(s.pond, xy, v) }),
       by: u => gameData({ ...s, pond: setPondStateAt(s.pond, xy, u) }),
     }),
   },
 
-  hand: {
-    of: x => ({
-      to: v =>
-        gameData({
-          ...s,
-          ...(x === Player.North ? { northHand: v } : { southHand: v }),
-        }),
-      by: u =>
-        gameData({
-          ...s,
-          ...(x === Player.North
-            ? { northHand: u(s.northHand) }
-            : { southHand: u(s.southHand) }),
-        }),
-    }),
-  },
+  // hand: {
+  //   of: x => ({
+  //     to: v =>
+  //       gameData({
+  //         ...s,
+  //         ...(x === Player.North ? { northHand: v } : { southHand: v }),
+  //       }),
+  //     by: u =>
+  //       gameData({
+  //         ...s,
+  //         ...(x === Player.North
+  //           ? { northHand: u(s.northHand) }
+  //           : { southHand: u(s.southHand) }),
+  //       }),
+  //   }),
+  // },
 });
 
 const gameMake = (s: Read<GameState>): GameMake => ({
@@ -160,20 +159,20 @@ const gameMake = (s: Read<GameState>): GameMake => ({
       pickedCard: undefined,
       activation: undefined,
     }),
-  upgrading: pickedCard =>
-    gameData({
-      ...s,
-      flow: { ...s.flow, subphase: Subphase.Upgrading },
-      pickedCard,
-      activation: undefined,
-    }),
-  deploying: pickedCard =>
-    gameData({
-      ...s,
-      flow: { ...s.flow, subphase: Subphase.Deploying },
-      pickedCard,
-      activation: undefined,
-    }),
+  // upgrading: pickedCard =>
+  //   gameData({
+  //     ...s,
+  //     flow: { ...s.flow, subphase: Subphase.Upgrading },
+  //     pickedCard,
+  //     activation: undefined,
+  //   }),
+  // deploying: pickedCard =>
+  //   gameData({
+  //     ...s,
+  //     flow: { ...s.flow, subphase: Subphase.Deploying },
+  //     pickedCard,
+  //     activation: undefined,
+  //   }),
   activating: x =>
     gameData({
       ...s,
@@ -181,17 +180,17 @@ const gameMake = (s: Read<GameState>): GameMake => ({
       pickedCard: undefined,
       activation: x,
     }),
-  phase: phase =>
-    gameData(
-      phase === Phase.Main
-        ? { ...s, flow: { ...s.flow, phase } }
-        : {
-            ...s,
-            flow: { ...s.flow, phase, subphase: Subphase.Idle },
-            activation: undefined,
-            pickedCard: undefined,
-          },
-    ),
+  // phase: phase =>
+  //   gameData(
+  //     phase === Phase.Main
+  //       ? { ...s, flow: { ...s.flow, phase } }
+  //       : {
+  //           ...s,
+  //           flow: { ...s.flow, phase, subphase: Subphase.Idle },
+  //           activation: undefined,
+  //           pickedCard: undefined,
+  //         },
+  //   ),
 });
 
 /////
@@ -205,14 +204,14 @@ type GameInvariants = (
 
 type InvariantChecks = {
   always: (p: boolean) => void;
-  never: (p: boolean) => void;
+  // never: (p: boolean) => void;
   when: (p: boolean) => {
     must: (q: boolean) => void;
     not: (q: boolean) => void;
   };
   unless: (p: boolean) => {
     must: (q: boolean) => void;
-    not: (q: boolean) => void;
+    // not: (q: boolean) => void;
   };
   iff: (p: boolean) => {
     must: (q: boolean) => void;
@@ -221,14 +220,14 @@ type InvariantChecks = {
 
 const invariantChecks: InvariantChecks = {
   always: p => assert(p),
-  never: p => assert(!p),
+  // never: p => assert(!p),
   when: p => ({
     must: q => assert(!p || q),
     not: q => assert(!p || !q),
   }),
   unless: p => ({
     must: q => assert(p || q),
-    not: q => assert(p || !q),
+    // not: q => assert(p || !q),
   }),
   iff: p => ({ must: q => assert(p === q) }),
 };
@@ -237,7 +236,7 @@ const assert = (i: boolean) => {
   console.assert(i);
   if (!i) {
     const error = new Error('Invariant assertion failed');
-    const line = error.stack?.match(/[^\n]*invariants[^\n]*/)?.[0];
+    const line = error.stack?.match(/[^\n]*[iI]nvariants[^\n]*/)?.[0];
     error.message = `Invariant assertion failed: ${line}`;
     throw error;
   }

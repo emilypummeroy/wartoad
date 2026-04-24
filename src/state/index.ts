@@ -14,6 +14,8 @@ export const DEFAULT_GAME_STATE = {
   pond: INITIAL_POND,
   northHand: DETERMINISTIC_STARTING_HAND,
   southHand: DETERMINISTIC_STARTING_HAND,
+  pickedCard: undefined,
+  activation: undefined,
 } as const;
 
 export const INITIAL_HAND_CARD_COUNT = 7;

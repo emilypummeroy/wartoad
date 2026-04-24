@@ -1,13 +1,10 @@
 import { DEFAULT_GAME_STATE } from '.';
 import type { GameState } from '../state-types';
-import { createUnit, DETERMINISTIC_STARTING_HAND } from '../state-types/card';
-import {
-  type UnitCard,
-  type UnitKey,
-  CardClass,
-  UnitClass,
-} from '../types/card';
-import { Player, Subphase, type Phase } from '../types/gameflow';
+import { createUnit } from '../state-types/card';
+import type { UnitCard, UnitKey, CardClass } from '../types/card';
+import { UnitClass } from '../types/card';
+import type { Subphase, Phase } from '../types/gameflow';
+import { Player } from '../types/gameflow';
 import type { Position } from '../types/position';
 
 export const gameflowOf = (
@@ -20,12 +17,6 @@ export const gameflowOf = (
     phase,
     subphase,
   },
-  pickedCard:
-    subphase === Subphase.Deploying
-      ? CardClass.Froglet
-      : subphase === Subphase.Upgrading
-        ? CardClass.LilyPad
-        : undefined,
 });
 
 export const activationOf = (
@@ -45,13 +36,13 @@ export const activationOf = (
       }
     : {};
 
-export const handsOf = (
-  northHand: readonly CardClass[] = DETERMINISTIC_STARTING_HAND,
-  southHand: readonly CardClass[] = northHand,
-): Partial<GameState> => ({
-  northHand,
-  southHand,
-});
+// export const handsOf = (
+//   northHand: readonly CardClass[] = DETERMINISTIC_STARTING_HAND,
+//   southHand: readonly CardClass[] = northHand,
+// ): Partial<GameState> => ({
+//   northHand,
+//   southHand,
+// });
 
 export const pickedCardOf = (pickedCard?: CardClass): Partial<GameState> =>
   pickedCard ? { pickedCard } : {};
