@@ -7,5 +7,12 @@ export const finishMainPhase = () =>
       get.phase === Phase.Main && get.subphase === Subphase.Idle;
     if (!didMeetPreconditions) return get.out;
 
-    return set.phase.to(Phase.End).get.out;
+    return set.leaf
+      .where(
+        ({ units }) =>
+          units.length > 0 && units.every(({ owner }) => owner === get.player),
+      )
+      .by(() => ({ controller: get.player }))
+
+      .set.phase.to(Phase.End).get.out;
   });

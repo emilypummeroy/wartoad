@@ -22,7 +22,7 @@ import {
   NORTH_LEAF_OTHER_UNIT,
   NORTH_LEAF_WITH_UNITS,
   NORTH_UPGRADED_UNITS,
-  NORTH_UPGRADED_OTHER_UNITS,
+  NORTH_UPGRADED_OTHER_UNIT,
   TestPondKey,
   ANOTHER_POND_POSITIONS as POSITIONS,
   TEST_PONDS_BY_KEY,
@@ -78,7 +78,7 @@ const describeForAllPositions = (block: (_: Position) => void) =>
     { x: 2, y: 3 },
     { x: 2, y: 4 },
     { x: 2, y: 5 },
-  ])('when called for x=%s and y=%s', block);
+  ])('when called for %s', block);
 
 const itShouldNotChangeOtherZones = (
   pond: PondState,
@@ -277,17 +277,18 @@ describe('the PondState type functions', () => {
       },
     );
 
+    // TODO 11: Replace with keys
     describe.for<[TestPondKey, string, LeafState]>([
-      [INITIAL_POND, 'LEAF', NORTH_LEAF],
-      [INITIAL_POND, 'LEAF_WITH_UNIT', NORTH_LEAF_WITH_UNIT],
-      [INITIAL_POND, 'UPGRADED', NORTH_UPGRADED],
-      [ANOTHER_POND, 'LEAF_WITH_UNIT', NORTH_LEAF_WITH_UNIT],
-      [FULL_POND, 'LEAF_WITH_UNITS', NORTH_LEAF_WITH_UNITS],
-      [FULL_POND, 'LEAF_OTHER_UNIT', NORTH_LEAF_OTHER_UNIT],
-      [INITIAL_POND, 'UPGRADED_UNITS', NORTH_UPGRADED_UNITS],
-      [INITIAL_POND, 'UPGRADED_OTHER_UNITS', NORTH_UPGRADED_OTHER_UNITS],
-      [UNITS_POND, 'LEAF_UNITS', NORTH_LEAF],
-      [UNITS_POND, 'UPGRADED', NORTH_UPGRADED],
+      [INITIAL_POND, 'NORTH_LEAF', NORTH_LEAF],
+      [INITIAL_POND, 'NORTH_LEAF_WITH_UNIT', NORTH_LEAF_WITH_UNIT],
+      [INITIAL_POND, 'NORTH_UPGRADED', NORTH_UPGRADED],
+      [ANOTHER_POND, 'NORTH_LEAF_WITH_UNIT', NORTH_LEAF_WITH_UNIT],
+      [FULL_POND, 'NORTH_LEAF_WITH_UNITS', NORTH_LEAF_WITH_UNITS],
+      [FULL_POND, 'NORTH_LEAF_OTHER_UNIT', NORTH_LEAF_OTHER_UNIT],
+      [INITIAL_POND, 'NORTH_UPGRADED_UNITS', NORTH_UPGRADED_UNITS],
+      [INITIAL_POND, 'NORTH_UPGRADED_OTHER_UNIT', NORTH_UPGRADED_OTHER_UNIT],
+      [UNITS_POND, 'NORTH_LEAF', NORTH_LEAF],
+      [UNITS_POND, 'NORTH_UPGRADED', NORTH_UPGRADED],
     ])(
       'with known PondState: %s | new value: %s',
       ([pondKey, newValueName, valueToSet]) => {

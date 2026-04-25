@@ -2,6 +2,7 @@ import type { ActivationState, GameState } from '../state-types';
 import {
   HOME,
   setPondStateAt,
+  setPondStateWhere,
   type LeafState,
   type PondState,
 } from '../state-types/pond';
@@ -64,11 +65,16 @@ export type GameAccess = {
 // Updaters which preserve simple invariants
 export type GameUpdate = {
   player: { to: (x: Player) => GameData };
-  // pond: { to: (x: Read<PondState>) => GameData };
+  // pond: {
+  //   //  to: (x: Read<PondState>) => GameData
+  // };
   leaf: {
     at: (x: Position) => {
       // to: (x: Read<Partial<LeafState>>) => GameData;
       by: (x: (old: Read<LeafState>) => Partial<LeafState>) => GameData;
+    };
+    where: (p: (v: LeafState, xy: Position) => boolean) => {
+      by: (u: (v: LeafState, xy: Position) => Partial<LeafState>) => GameData;
     };
   };
 
@@ -125,11 +131,12 @@ const gameAccess: (s: Read<GameState>) => GameAccessInner = s => ({
 
 const gameUpdate: (s: Read<GameState>) => GameUpdate = s => ({
   player: { to: player => gameData({ ...s, flow: { ...s.flow, player } }) },
-  // pond: { to: pond => gameData({ ...s, pond }) },
 
   leaf: {
+    where: p => ({
+      by: u => gameData({ ...s, pond: setPondStateWhere(s.pond, p, u) }),
+    }),
     at: xy => ({
-      // to: v => gameData({ ...s, pond: setPondStateAt(s.pond, xy, v) }),
       by: u => gameData({ ...s, pond: setPondStateAt(s.pond, xy, u) }),
     }),
   },

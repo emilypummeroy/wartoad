@@ -1,7 +1,11 @@
 import type { Read } from '../types';
 import type { UnitCard } from '../types/card';
 import { Player } from '../types/gameflow';
-import type { Position } from '../types/position';
+import {
+  arePositionsEqual,
+  isPosition,
+  type Position,
+} from '../types/position';
 
 export type PondState = Read<
   [
@@ -31,20 +35,41 @@ export const getPondStateAt = (
 
 export const setPondStateAt = (
   old: PondState,
-  { x, y }: Position,
+  target: Position,
   newValue: Partial<LeafState> | ((old: LeafState) => Partial<LeafState>),
+): PondState =>
+  setPondStateWhere(
+    old,
+    (_, xy) => arePositionsEqual(xy, target),
+    oldValue =>
+      typeof newValue === 'function'
+        ? { ...oldValue, ...newValue(oldValue) }
+        : { ...oldValue, ...newValue },
+  );
+
+export const setPondStateAtEach = (
+  init: Read<PondState>,
+  ...updates: readonly (readonly [
+    Position,
+    LeafState | ((leaf: Read<LeafState>) => Partial<LeafState>),
+  ])[]
+): Read<PondState> =>
+  updates.reduce(
+    (pond, [at, update]) => setPondStateAt(pond, at, update),
+    init,
+  );
+
+export const setPondStateWhere = (
+  init: PondState,
+  predicate: (v: LeafState, xy: Position) => boolean,
+  updater: (v: LeafState, xy: Position) => Partial<LeafState>,
 ): PondState => {
-  const array = old.map((row, yy) =>
-    yy !== y
-      ? row
-      : row.map(
-          (oldValue, xx): Read<LeafState> =>
-            xx !== x
-              ? oldValue
-              : typeof newValue === 'function'
-                ? { ...oldValue, ...newValue(oldValue) }
-                : { ...oldValue, ...newValue },
-        ),
+  const array: LeafState[][] = init.map((row, y) =>
+    row.map((leaf, x) => {
+      const xy = { x, y };
+      if (!isPosition(xy) || !predicate(leaf, xy)) return leaf;
+      return { ...leaf, ...updater(leaf, xy) };
+    }),
   );
   // v8 ignore if
   if (!isPondState(array)) {
@@ -52,18 +77,6 @@ export const setPondStateAt = (
   }
   return array;
 };
-
-export const setPondStateAtEach = (
-  init: Read<PondState>,
-  ...updates: readonly (readonly [
-    Position,
-    (leaf: Read<LeafState>) => Partial<LeafState>,
-  ])[]
-): Read<PondState> =>
-  updates.reduce(
-    (pond, [at, update]) => setPondStateAt(pond, at, update),
-    init,
-  );
 
 export const ROW_COUNT = 6 as const;
 export const LAST_ROW = 5 as const;

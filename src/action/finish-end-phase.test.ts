@@ -24,7 +24,6 @@ describe(finishEndPhase, () => {
   });
 
   // Postconditions:
-  // TODO 10: old.phase = End & p of positions: cancapture(p) -> capture(p, player)
   describe.for<Inputs>([[North], [South]])(
     'Postconditions | %s %s | drawing %s',
     ([player]) => {
