@@ -25,16 +25,14 @@ export const isPondState = (array: Read<LeafState[][]>): array is PondState =>
   array.every(row => row.length === LEAF_COUNT_PER_ROW);
 
 export const getPondStateAt = (
-  pond: Read<PondState>,
+  pond: PondState,
   { x, y }: Position,
-): Read<LeafState> => pond[y][x];
+): LeafState => pond[y][x];
 
 export const setPondStateAt = (
-  old: Read<PondState>,
+  old: PondState,
   { x, y }: Position,
-  newValue:
-    | Read<Partial<LeafState>>
-    | ((old: Read<LeafState>) => Partial<LeafState>),
+  newValue: Partial<LeafState> | ((old: LeafState) => Partial<LeafState>),
 ): PondState => {
   const array = old.map((row, yy) =>
     yy !== y

@@ -13,7 +13,7 @@ const { North, South } = Player;
 const { Start, Main, End } = Phase;
 const { Idle, Upgrading, Deploying, Activating } = Subphase;
 
-const { INITIAL_POND, ANOTHER_POND, FULL_POND, EMPTY_POND, UNITS_POND } = TestPondKey;
+const { INITIAL_POND, ANOTHER_POND, FULL_POND, UNITS_POND } = TestPondKey;
 const NORTH_POSITION = ANOTHER_POND_POSITIONS.North;
 const SOUTH_POSITION = ANOTHER_POND_POSITIONS.South;
 
@@ -82,17 +82,17 @@ describe(PondLeafDropzone, () => {
   describe.for<Inputs>([
     // < Start phase
     [North, North, { x: 0, y: 0 }, Idle, INITIAL_POND, Start],
-    [South, North, { x: 2, y: 0 }, Upgrading, EMPTY_POND, Start],
+    [South, North, { x: 2, y: 0 }, Upgrading, ANOTHER_POND, Start],
     [North, South, { x: 0, y: 5 }, Deploying, UNITS_POND, Start],
     [South, South, { x: 2, y: 5 }, Activating, FULL_POND, Start],
     // < End phase
     [North, North, { x: 1, y: 0 }, Idle, FULL_POND, End],
     [South, North, { x: 1, y: 1 }, Upgrading, INITIAL_POND, End],
-    [North, South, { x: 1, y: 5 }, Deploying, EMPTY_POND, End],
+    [North, South, { x: 1, y: 5 }, Deploying, ANOTHER_POND, End],
     [South, South, { x: 1, y: 4 }, Activating, UNITS_POND, End],
     // < Idle
     [North, North, { x: 0, y: 0 }, Idle, INITIAL_POND],
-    [South, North, { x: 2, y: 0 }, Idle, EMPTY_POND],
+    [South, North, { x: 2, y: 0 }, Idle, ANOTHER_POND],
     [North, South, { x: 0, y: 5 }, Idle, UNITS_POND],
     [South, South, { x: 2, y: 5 }, Idle, FULL_POND],
     // < Upgrading & not controller

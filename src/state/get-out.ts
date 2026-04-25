@@ -31,7 +31,6 @@ const gameInvariants: GameInvariants = (
   always(get.leaf.at(HOME[Player.South]).isUpgraded);
 
   when(get.subphase === Subphase.Idle).not(!!s.pickedCard);
-  when(get.subphase === Subphase.Idle).not(!!s.activation);
 
   iff(get.subphase === Subphase.Activating).must(!!s.activation);
   when(get.subphase === Subphase.Activating).not(!!s.pickedCard);
@@ -233,11 +232,13 @@ const invariantChecks: InvariantChecks = {
 };
 
 const assert = (i: boolean) => {
-  console.assert(i);
   if (!i) {
     const error = new Error('Invariant assertion failed');
-    const line = error.stack?.match(/[^\n]*[iI]nvariants[^\n]*/)?.[0];
-    error.message = `Invariant assertion failed: ${line}`;
+    const frame = error.stack?.match(/[^\n]*[iI]nvariants[^\n]*/)?.[0];
+    const fn = frame?.match(/\w*[iI]nvariants\w*/)?.[0];
+    const place = frame?.match(/[^/]*.ts:\d*:\d*/)?.[0];
+    error.stack = error.stack?.replace(/[\n][^\n]*assert[^\n]*\n/, '');
+    error.message = `Invariant assertion failed: ${fn} ${place}`;
     throw error;
   }
 };

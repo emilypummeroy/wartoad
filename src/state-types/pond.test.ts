@@ -5,7 +5,6 @@ import { asPosition } from '../types/position.test-utils';
 import { createUnit } from './card';
 import {
   NORTH_LEAF,
-  INITIAL_POND,
   isPondState,
   LEAF_COUNT_PER_ROW,
   ROW_COUNT,
@@ -19,18 +18,17 @@ import {
   setPondStateAtEach,
 } from './pond';
 import {
-  ANOTHER_POND,
-  EMPTY_POND,
-  FULL_POND,
   NORTH_LEAF_WITH_UNIT,
   NORTH_LEAF_OTHER_UNIT,
   NORTH_LEAF_WITH_UNITS,
-  UNITS_POND,
   NORTH_UPGRADED_UNITS,
   NORTH_UPGRADED_OTHER_UNITS,
   TestPondKey,
   ANOTHER_POND_POSITIONS as POSITIONS,
+  TEST_PONDS_BY_KEY,
 } from './pond.test-utils';
+
+const { INITIAL_POND, ANOTHER_POND, FULL_POND, UNITS_POND } = TestPondKey;
 
 const SOUTH_UNIT = createUnit({
   cardClass: CardClass.Froglet,
@@ -107,51 +105,29 @@ const itShouldNotChangeOtherZones = (
 describe('the PondState type functions', () => {
   type Updater = (old: LeafState) => Partial<LeafState>;
   describe(setPondStateAtEach, () => {
-    describe.for<[string, string, string, PondState, Updater, Updater]>([
+    describe.for<[TestPondKey, string, string, Updater, Updater]>([
       [
-        'INITIAL_POND',
-        'addNorthUnit',
-        'addSouthUnit',
         INITIAL_POND,
-        addNorthUnit,
-        addSouthUnit,
-      ],
-      [
-        'ANOTHER_POND',
-        'addSouthUnit',
-        'unupgrade',
-        ANOTHER_POND,
-        addSouthUnit,
-        unupgrade,
-      ],
-      [
-        'FULL_POND',
-        'unupgrade',
         'addNorthUnit',
-        FULL_POND,
-        unupgrade,
+        'addSouthUnit',
         addNorthUnit,
+        addSouthUnit,
       ],
+      [ANOTHER_POND, 'addSouthUnit', 'unupgrade', addSouthUnit, unupgrade],
+      [FULL_POND, 'unupgrade', 'addNorthUnit', unupgrade, addNorthUnit],
       [
-        'EMPTY_POND',
-        'upgradeAndSetUnits',
+        INITIAL_POND,
         'unupgrade',
-        EMPTY_POND,
+        'upgradeAndSetUnits',
         upgradeAndSetUnits,
         unupgrade,
       ],
-      ['FULL_POND', 'nupgrade', 'upgrade', FULL_POND, unupgrade, upgrade],
-      [
-        'UNITS_POND',
-        'addNorthUnit',
-        'removeUnits',
-        UNITS_POND,
-        addNorthUnit,
-        removeUnits,
-      ],
+      [FULL_POND, 'unupgrade', 'upgrade', unupgrade, upgrade],
+      [UNITS_POND, 'addNorthUnit', 'removeUnits', addNorthUnit, removeUnits],
     ])(
       'with known PondState: %s | updater functions: %s and %s',
-      ([_, __, ___, pond, first, second]) => {
+      ([pondKey, , _, first, second]) => {
+        const pond = TEST_PONDS_BY_KEY[pondKey];
         describeForAllPositions(({ x, y }) => {
           describe('if both updates are for the same position', () => {
             it('should not change other zones', () => {
@@ -267,18 +243,19 @@ describe('the PondState type functions', () => {
   });
 
   describe(`${setPondStateAt.name} and ${getPondStateAt.name}`, () => {
-    describe.for<
-      [string, string, PondState, (old: LeafState) => Partial<LeafState>]
-    >([
-      ['INITIAL_POND', 'addNorthUnit', INITIAL_POND, addNorthUnit],
-      ['ANOTHER_POND', 'addSouthUnit', ANOTHER_POND, addSouthUnit],
-      ['FULL_POND', 'unupgrade', FULL_POND, unupgrade],
-      ['EMPTY_POND', 'upgradeAndAddUnit', EMPTY_POND, upgradeAndSetUnits],
-      ['EMPTY_POND', 'upgrade', EMPTY_POND, upgrade],
-      ['UNITS_POND', 'removeUnits', UNITS_POND, removeUnits],
-    ])(
+    describe.for<[TestPondKey, string, (old: LeafState) => Partial<LeafState>]>(
+      [
+        [INITIAL_POND, 'addNorthUnit', addNorthUnit],
+        [ANOTHER_POND, 'addSouthUnit', addSouthUnit],
+        [FULL_POND, 'unupgrade', unupgrade],
+        [INITIAL_POND, 'upgradeAndAddUnit', upgradeAndSetUnits],
+        [INITIAL_POND, 'upgrade', upgrade],
+        [UNITS_POND, 'removeUnits', removeUnits],
+      ],
+    )(
       'with known PondState: %s | updater function: %s',
-      ([_, updaterName, pond, updater]) => {
+      ([pondKey, updaterName, updater]) => {
+        const pond = TEST_PONDS_BY_KEY[pondKey];
         describeForAllPositions(({ x, y }) => {
           itShouldNotChangeOtherZones(pond, updater, { x, y });
 
@@ -300,25 +277,21 @@ describe('the PondState type functions', () => {
       },
     );
 
-    describe.for<[string, string, PondState, LeafState]>([
-      ['INITIAL_POND', 'LEAF', INITIAL_POND, NORTH_LEAF],
-      ['INITIAL_POND', 'LEAF_WITH_UNIT', INITIAL_POND, NORTH_LEAF_WITH_UNIT],
-      ['INITIAL_POND', 'UPGRADED', INITIAL_POND, NORTH_UPGRADED],
-      ['ANOTHER_POND', 'LEAF_WITH_UNIT', ANOTHER_POND, NORTH_LEAF_WITH_UNIT],
-      ['FULL_POND', 'LEAF_WITH_UNITS', FULL_POND, NORTH_LEAF_WITH_UNITS],
-      ['FULL_POND', 'LEAF_OTHER_UNIT', FULL_POND, NORTH_LEAF_OTHER_UNIT],
-      ['EMPTY_POND', 'UPGRADED_UNITS', EMPTY_POND, NORTH_UPGRADED_UNITS],
-      [
-        'EMPTY_POND',
-        'UPGRADED_OTHER_UNITS',
-        EMPTY_POND,
-        NORTH_UPGRADED_OTHER_UNITS,
-      ],
-      ['POND_UNITS', 'LEAF_UNITS', UNITS_POND, NORTH_LEAF],
-      ['POND_UNITS', 'UPGRADED', UNITS_POND, NORTH_UPGRADED],
+    describe.for<[TestPondKey, string, LeafState]>([
+      [INITIAL_POND, 'LEAF', NORTH_LEAF],
+      [INITIAL_POND, 'LEAF_WITH_UNIT', NORTH_LEAF_WITH_UNIT],
+      [INITIAL_POND, 'UPGRADED', NORTH_UPGRADED],
+      [ANOTHER_POND, 'LEAF_WITH_UNIT', NORTH_LEAF_WITH_UNIT],
+      [FULL_POND, 'LEAF_WITH_UNITS', NORTH_LEAF_WITH_UNITS],
+      [FULL_POND, 'LEAF_OTHER_UNIT', NORTH_LEAF_OTHER_UNIT],
+      [INITIAL_POND, 'UPGRADED_UNITS', NORTH_UPGRADED_UNITS],
+      [INITIAL_POND, 'UPGRADED_OTHER_UNITS', NORTH_UPGRADED_OTHER_UNITS],
+      [UNITS_POND, 'LEAF_UNITS', NORTH_LEAF],
+      [UNITS_POND, 'UPGRADED', NORTH_UPGRADED],
     ])(
       'with known PondState: %s | new value: %s',
-      ([_, newValueName, pond, valueToSet]) => {
+      ([pondKey, newValueName, valueToSet]) => {
+        const pond = TEST_PONDS_BY_KEY[pondKey];
         if (!isPondState(pond)) {
           expect.unreachable();
           return;
@@ -372,21 +345,22 @@ describe('the PondState type functions', () => {
   });
 
   describe(isPondState, () => {
-    describe.for<[string, ReadonlyArray<ReadonlyArray<LeafState>>]>([
-      ['INITIAL_POND', INITIAL_POND],
-      ['ANOTHER_POND', ANOTHER_POND],
-      ['FULL_POND', FULL_POND],
-      ['EMPTY_POND', EMPTY_POND],
-      ['POND_UNITS', UNITS_POND],
-    ])('with known GridState: %s', ([name, array]) => {
-      it(`should verify ${name}`, () => {
+    describe.for<TestPondKey>([
+      INITIAL_POND,
+      ANOTHER_POND,
+      FULL_POND,
+      UNITS_POND,
+    ])('with known GridState: %s', pondKey => {
+      const array: ReadonlyArray<ReadonlyArray<LeafState>> =
+        TEST_PONDS_BY_KEY[pondKey];
+      it(`should verify the pond`, () => {
         expect(isPondState(array)).toBe(true);
         if (isPondState(array)) {
           array satisfies PondState;
         } else expect.unreachable();
       });
 
-      it(`should verify ${name} reversed`, () => {
+      it(`should verify the pond reversed`, () => {
         const reversed = array.toReversed();
         expect(isPondState(reversed)).toBe(true);
         if (isPondState(reversed)) {
@@ -394,7 +368,7 @@ describe('the PondState type functions', () => {
         } else expect.unreachable();
       });
 
-      it(`should verify ${name} with rows reversed`, () => {
+      it(`should verify the pond with rows reversed`, () => {
         const reversed = array.map(x => x.toReversed());
         expect(isPondState(reversed)).toBe(true);
         if (isPondState(reversed)) {
@@ -404,7 +378,7 @@ describe('the PondState type functions', () => {
 
       const PRIME = 83;
 
-      it(`should verify ${name} shuffled`, () => {
+      it(`should verify the pond shuffled`, () => {
         const shuffled = array.map((_, i) => array[(i * PRIME) % array.length]);
         expect(isPondState(shuffled)).toBe(true);
         if (isPondState(shuffled)) {
@@ -412,7 +386,7 @@ describe('the PondState type functions', () => {
         } else expect.unreachable();
       });
 
-      it(`should verify ${name} with rows shuffled`, () => {
+      it(`should verify the pond with rows shuffled`, () => {
         const shuffled = array.map(row =>
           row.map((_, i) => row[(i * PRIME) % row.length]),
         );
@@ -422,11 +396,11 @@ describe('the PondState type functions', () => {
         } else expect.unreachable();
       });
 
-      it(`should not verify ${name} with an extra row`, () => {
-        expect(isPondState([...array, INITIAL_POND[0]])).toBe(false);
+      it(`should not verify the pond with an extra row`, () => {
+        expect(isPondState([...array, array[0]])).toBe(false);
       });
 
-      it(`should not verify ${name} with an extra value in a row`, () => {
+      it(`should not verify the pond with an extra value in a row`, () => {
         for (let i = 0; i < array.length; i += 1) {
           expect(
             isPondState([
@@ -449,8 +423,9 @@ describe('the PondState type functions', () => {
 });
 
 describe.for([Player.North, Player.South])(
-  `Test positions for %s in ${TestPondKey.ANOTHER_POND}`,
+  `Test positions for %s in ${ANOTHER_POND}`,
   player => {
+    const anotherPond = TEST_PONDS_BY_KEY[ANOTHER_POND];
     it.for<keyof (typeof POSITIONS)[Player]>([
       'LeafHomeRow',
       'LeafEdge',
@@ -459,17 +434,17 @@ describe.for([Player.North, Player.South])(
       'UpgradedMiddle',
     ])(`should have ${player}.%s controlled by ${player}`, key => {
       const position = POSITIONS[player][key];
-      expect(getPondStateAt(ANOTHER_POND, position).controller).toBe(player);
+      expect(getPondStateAt(anotherPond, position).controller).toBe(player);
     });
 
     it(`should have all ${player}.LeafHomeRow unupgraded`, () => {
       const position = POSITIONS[player].LeafHomeRow;
-      expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(false);
+      expect(getPondStateAt(anotherPond, position).isUpgraded).toBe(false);
     });
 
     it(`should have ${player}.LeafHomeRow unupgraded`, () => {
       const position = POSITIONS[player].LeafHomeRow;
-      expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(false);
+      expect(getPondStateAt(anotherPond, position).isUpgraded).toBe(false);
     });
 
     it(`should have ${player}.LeafHomeRow be on the home row and not Home`, () => {
@@ -480,7 +455,7 @@ describe.for([Player.North, Player.South])(
 
     it(`should have ${player}.LeafEdge be unupgraded`, () => {
       const position = POSITIONS[player].LeafEdge;
-      expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(false);
+      expect(getPondStateAt(anotherPond, position).isUpgraded).toBe(false);
     });
 
     it(`should have ${player}.LeafEdge be on the edge and not the home row`, () => {
@@ -491,7 +466,7 @@ describe.for([Player.North, Player.South])(
 
     it(`should have ${player}.UpgradedEdge be unupgraded`, () => {
       const position = POSITIONS[player].UpgradedEdge;
-      expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(true);
+      expect(getPondStateAt(anotherPond, position).isUpgraded).toBe(true);
     });
 
     it(`should have ${player}.UpgradedEdge be on the edge and not the home row`, () => {
@@ -502,7 +477,7 @@ describe.for([Player.North, Player.South])(
 
     it(`should have ${player}.LeafMiddle be unupgraded`, () => {
       const position = POSITIONS[player].LeafMiddle;
-      expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(false);
+      expect(getPondStateAt(anotherPond, position).isUpgraded).toBe(false);
     });
 
     it(`should have ${player}.LeafMiddle be on the edge and not the home row`, () => {
@@ -513,7 +488,7 @@ describe.for([Player.North, Player.South])(
 
     it(`should have ${player}.UpgradedMiddle be unupgraded`, () => {
       const position = POSITIONS[player].UpgradedMiddle;
-      expect(getPondStateAt(ANOTHER_POND, position).isUpgraded).toBe(true);
+      expect(getPondStateAt(anotherPond, position).isUpgraded).toBe(true);
     });
 
     it(`should have ${player}.UpgradedMiddle be on the edge and not the home row`, () => {

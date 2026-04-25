@@ -19,8 +19,8 @@ import { Pond } from './Pond';
 
 const { North, South } = Player;
 const { Start, Main, End } = Phase;
-const { Idle, Deploying, Upgrading, Activating } = Subphase;
-const { INITIAL_POND, FULL_POND, EMPTY_POND, ANOTHER_POND, UNITS_POND } = TestPondKey;
+const { Idle, Upgrading, Activating } = Subphase;
+const { INITIAL_POND, FULL_POND, ANOTHER_POND, UNITS_POND } = TestPondKey;
 
 type Input = [turn: Player, Phase, Subphase, TestPondKey];
 
@@ -65,10 +65,10 @@ const it_should_have_the_right_controlling_player_and_leaves_in_each_row = (pond
 };
 
 describe(Pond, () => {
-  const getPlayerRows = (player: Player) =>
+  const getNonHomePlayerRows = (player: Player) =>
     player === North
-      ? screen.getAllByRole('row').slice(0, ROW_COUNT_PER_PLAYER)
-      : screen.getAllByRole('row').slice(ROW_COUNT_PER_PLAYER);
+      ? screen.getAllByRole('row').slice(HOME[North].y + 1, ROW_COUNT_PER_PLAYER)
+      : screen.getAllByRole('row').slice(ROW_COUNT_PER_PLAYER, HOME[South].y);
   const getOpponentRows = (player: Player) =>
     player === North
       ? screen.getAllByRole('row').slice(ROW_COUNT_PER_PLAYER)
@@ -101,9 +101,8 @@ describe(Pond, () => {
 
     // | Idle
     [North, Main, Idle, INITIAL_POND],
-    [North, Main, Idle, FULL_POND],
+    [South, Main, Idle, FULL_POND],
     [North, Main, Idle, UNITS_POND],
-    [South, Main, Idle, EMPTY_POND],
     [South, Main, Idle, UNITS_POND],
   ])('on %s turn %s phase while %s | in pond: %s', ([player, phase, subphase, pondKey]) => {
     const pond = TEST_PONDS_BY_KEY[pondKey];
@@ -153,8 +152,8 @@ describe(Pond, () => {
 
   // Upgrade dropzones in player-controlled leaves: Upgrading & empty pond
   describe.for<Input>([
-    [North, Main, Upgrading, EMPTY_POND],
-    [South, Main, Upgrading, EMPTY_POND],
+    [North, Main, Upgrading, INITIAL_POND],
+    [South, Main, Upgrading, INITIAL_POND],
   ])('on %s turn %s phase while %s | in pond: %s', ([player, phase, subphase, pondKey]) => {
     const opponent = PLAYER_AFTER[player];
     const pond = TEST_PONDS_BY_KEY[pondKey];
@@ -162,8 +161,8 @@ describe(Pond, () => {
       renderWithGameContext([{ ...gameflowOf(player, subphase, phase), pond }])(<Pond />);
     });
 
-    it(`should display ${LEAF_COUNT_PER_ROW} clickable leaves in the ${player} rows`, () => {
-      for (const row of getPlayerRows(player)) {
+    it(`should display ${LEAF_COUNT_PER_ROW} clickable leaves in non-home ${player} rows`, () => {
+      for (const row of getNonHomePlayerRows(player)) {
         const buttons = within(row).getAllByRole('button');
         expect(buttons).toHaveLength(LEAF_COUNT_PER_ROW);
 
@@ -188,16 +187,16 @@ describe(Pond, () => {
   });
 
   // Deploy dropzones in home row: Deploying & any pond
-  describe.for<Input>([
-    [North, Main, Deploying, INITIAL_POND],
-    [North, Main, Deploying, FULL_POND],
-    [South, Main, Deploying, ANOTHER_POND],
-    [South, Main, Deploying, EMPTY_POND],
-  ])('on %s turn %s phase while %s | in pond: %s', ([player, phase, subphase, pondKey]) => {
+  describe.for<[Player, TestPondKey]>([
+    [North, INITIAL_POND],
+    [North, FULL_POND],
+    [South, ANOTHER_POND],
+    [South, UNITS_POND],
+  ])('on %s turn %s phase while Deploying | in pond: %s', ([player, pondKey]) => {
     const opponent = PLAYER_AFTER[player];
     const pond = TEST_PONDS_BY_KEY[pondKey];
     beforeEach(() => {
-      renderWithGameContext([{ ...gameflowOf(player, subphase, phase), pond }])(<Pond />);
+      renderWithGameContext([{ ...gameflowOf(player, Subphase.Deploying, Phase.Main), pond }])(<Pond />);
     });
 
     it(`should display ${LEAF_COUNT_PER_ROW} Deploy dropzones in the ${player} home row`, () => {
