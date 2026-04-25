@@ -5,7 +5,7 @@ import {
   commitDeploy,
   commitActivate,
   commitUpgrade,
-  endPhase,
+  finishPhase,
   pickCard,
   type GameActions,
 } from '../action';
@@ -44,7 +44,7 @@ export const GameContext = createContext<GameContext>([
 const createDispatch =
   (getDrawnCard: () => CardClass, getNextCardKey: () => number) =>
   (setState: (_: (_: GameState) => GameState) => void): GameActions => ({
-    endPhase: () => setState(endPhase(getDrawnCard)),
+    endPhase: () => setState(finishPhase(getDrawnCard)),
 
     pickCard: (card: CardClass) => setState(pickCard(card)),
 

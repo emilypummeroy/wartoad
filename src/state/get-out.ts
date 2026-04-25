@@ -6,6 +6,7 @@ import {
   type PondState,
 } from '../state-types/pond';
 import type { Read } from '../types';
+import type { CardClass } from '../types/card';
 import { Phase, Player, Subphase, type Gameflow } from '../types/gameflow';
 import type { Position } from '../types/position';
 
@@ -62,7 +63,7 @@ export type GameAccess = {
 
 // Updaters which preserve simple invariants
 export type GameUpdate = {
-  // player: { to: (x: Player) => GameData };
+  player: { to: (x: Player) => GameData };
   // pond: { to: (x: Read<PondState>) => GameData };
   leaf: {
     at: (x: Position) => {
@@ -70,12 +71,14 @@ export type GameUpdate = {
       by: (x: (old: Read<LeafState>) => Partial<LeafState>) => GameData;
     };
   };
-  // hand: {
-  //   of: (x: Player) => {
-  //     to: (x: readonly CardClass[]) => GameData;
-  //     by: (x: (old: readonly CardClass[]) => CardClass[]) => GameData;
-  //   };
-  // };
+
+  phase: { to: (x: Phase) => GameData };
+  hand: {
+    of: (x: Player) => {
+      // to: (x: readonly CardClass[]) => GameData;
+      by: (x: (old: readonly CardClass[]) => CardClass[]) => GameData;
+    };
+  };
 };
 
 // Operations which need to touch multiple places to maintain invariants
@@ -84,7 +87,6 @@ type GameMake = {
   // deploying: (x: CardClass) => GameData;
   // upgrading: (x: CardClass) => GameData;
   activating: (x: Read<ActivationState>) => GameData;
-  // phase: (x: Phase) => GameData;
 };
 
 const gameAccess: (s: Read<GameState>) => GameAccessInner = s => ({
@@ -122,7 +124,7 @@ const gameAccess: (s: Read<GameState>) => GameAccessInner = s => ({
 });
 
 const gameUpdate: (s: Read<GameState>) => GameUpdate = s => ({
-  // player: { to: player => gameData({ ...s, flow: { ...s.flow, player } }) },
+  player: { to: player => gameData({ ...s, flow: { ...s.flow, player } }) },
   // pond: { to: pond => gameData({ ...s, pond }) },
 
   leaf: {
@@ -132,22 +134,36 @@ const gameUpdate: (s: Read<GameState>) => GameUpdate = s => ({
     }),
   },
 
-  // hand: {
-  //   of: x => ({
-  //     to: v =>
-  //       gameData({
-  //         ...s,
-  //         ...(x === Player.North ? { northHand: v } : { southHand: v }),
-  //       }),
-  //     by: u =>
-  //       gameData({
-  //         ...s,
-  //         ...(x === Player.North
-  //           ? { northHand: u(s.northHand) }
-  //           : { southHand: u(s.southHand) }),
-  //       }),
-  //   }),
-  // },
+  phase: {
+    to: phase =>
+      gameData(
+        phase === Phase.Main
+          ? { ...s, flow: { ...s.flow, phase } }
+          : {
+              ...s,
+              flow: { ...s.flow, phase, subphase: Subphase.Idle },
+              activation: undefined,
+              pickedCard: undefined,
+            },
+      ),
+  },
+
+  hand: {
+    of: x => ({
+      // to: v =>
+      //   gameData({
+      //     ...s,
+      //     ...(x === Player.North ? { northHand: v } : { southHand: v }),
+      //   }),
+      by: u =>
+        gameData({
+          ...s,
+          ...(x === Player.North
+            ? { northHand: u(s.northHand) }
+            : { southHand: u(s.southHand) }),
+        }),
+    }),
+  },
 });
 
 const gameMake = (s: Read<GameState>): GameMake => ({
@@ -179,17 +195,6 @@ const gameMake = (s: Read<GameState>): GameMake => ({
       pickedCard: undefined,
       activation: x,
     }),
-  // phase: phase =>
-  //   gameData(
-  //     phase === Phase.Main
-  //       ? { ...s, flow: { ...s.flow, phase } }
-  //       : {
-  //           ...s,
-  //           flow: { ...s.flow, phase, subphase: Subphase.Idle },
-  //           activation: undefined,
-  //           pickedCard: undefined,
-  //         },
-  //   ),
 });
 
 /////

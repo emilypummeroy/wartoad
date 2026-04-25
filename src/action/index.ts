@@ -12,7 +12,7 @@ import type { Position } from '../types/position';
 
 export { activate } from './activate';
 export { commitActivate } from './commit-activate';
-export { endPhase } from './end-phase';
+export { finishPhase } from './finish-phase';
 
 export type GameActions = {
   endPhase: () => void;
