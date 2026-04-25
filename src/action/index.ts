@@ -13,9 +13,12 @@ import type { Position } from '../types/position';
 export { activate } from './activate';
 export { commitActivate } from './commit-activate';
 export { finishPhase } from './finish-phase';
+export { finishEndPhase } from './finish-end-phase';
+export { finishMainPhase } from './finish-main-phase';
+export { finishStartPhase } from './finish-start-phase';
 
 export type GameActions = {
-  endPhase: () => void;
+  finishPhase: () => void;
   // No different pickUnit, pickLeaf, etc.
   // The difference between activation and upgrading is not the concern of
   // Hand or Card.

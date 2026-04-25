@@ -9,5 +9,5 @@ export const finishPhase = (draw: () => CardClass) => (state: GameState) =>
   state.flow.phase === Phase.Start
     ? finishStartPhase(draw)(state)
     : state.flow.phase === Phase.Main
-      ? finishMainPhase(draw)(state)
-      : finishEndPhase(draw)(state);
+      ? finishMainPhase()(state)
+      : finishEndPhase()(state);

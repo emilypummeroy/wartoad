@@ -5,9 +5,9 @@ import {
   commitDeploy,
   commitActivate,
   commitUpgrade,
-  finishPhase,
-  pickCard,
   type GameActions,
+  pickCard,
+  finishPhase,
 } from '../action';
 import { createState, DEFAULT_GAME_STATE } from '../state';
 import type { GameState } from '../state-types';
@@ -27,8 +27,8 @@ export const useGameContextData = (
   return [state, dispatch];
 };
 
-export const DEFAULT_GAME_DISPATCH = {
-  endPhase: () => {},
+export const DEFAULT_GAME_DISPATCH: GameActions = {
+  finishPhase: () => {},
   pickCard: () => {},
   activate: () => {},
   commitUpgrade: () => {},
@@ -44,7 +44,7 @@ export const GameContext = createContext<GameContext>([
 const createDispatch =
   (getDrawnCard: () => CardClass, getNextCardKey: () => number) =>
   (setState: (_: (_: GameState) => GameState) => void): GameActions => ({
-    endPhase: () => setState(finishPhase(getDrawnCard)),
+    finishPhase: () => setState(finishPhase(getDrawnCard)),
 
     pickCard: (card: CardClass) => setState(pickCard(card)),
 
@@ -57,3 +57,13 @@ const createDispatch =
       setState(commitDeploy(getNextCardKey)(position)),
     commitActivate: (position: Position) => setState(commitActivate(position)),
   });
+
+// type GameStateDrop = (
+//   setState: (_: (_: GameState) => GameState) => void,
+// ) => (gsa: GameStateActions) => GameActions;
+
+// type GameStateActions = {
+//   [K in keyof GameActions]: (
+//     ..._: Parameters<GameActions[K]>
+//   ) => (_: GameState) => GameState;
+// };

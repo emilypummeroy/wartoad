@@ -17,7 +17,7 @@ export function Game() {
       southHand,
       pickedCard,
     },
-    { endPhase, pickCard },
+    { finishPhase, pickCard },
   ] = useContext(GameContext);
 
   return (
@@ -28,7 +28,7 @@ export function Game() {
             War<span className="accent">toad</span>
           </h1>
         </div>
-        <PhaseTracker flow={flow} onNextPhaseClicked={endPhase} />
+        <PhaseTracker flow={flow} onNextPhaseClicked={finishPhase} />
       </header>
       <main>
         <section className="handarea">
