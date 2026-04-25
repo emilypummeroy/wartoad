@@ -1,18 +1,13 @@
-import { data } from '../state';
+import type { GameState } from '../state-types';
 import type { CardClass } from '../types/card';
-import { Phase, PHASE_AFTER, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import { Phase } from '../types/gameflow';
+import { finishEndPhase } from './finish-end-phase';
+import { finishMainPhase } from './finish-main-phase';
+import { finishStartPhase } from './finish-start-phase';
 
-export const finishPhase = (draw: () => CardClass) =>
-  data(({ get, ...data }) => {
-    const didMeetPreconditions = get.subphase === Subphase.Idle;
-    if (!didMeetPreconditions) return get.out;
-
-    const { phase, player } = get;
-    return (
-      phase === Phase.End
-        ? data.set.player.to(PLAYER_AFTER[player])
-        : phase === Phase.Start
-          ? data.set.hand.of(player).by(cards => [...cards, draw()])
-          : data
-    ).set.phase.to(PHASE_AFTER[phase]).get.out;
-  });
+export const finishPhase = (draw: () => CardClass) => (state: GameState) =>
+  state.flow.phase === Phase.Start
+    ? finishStartPhase(draw)(state)
+    : state.flow.phase === Phase.Main
+      ? finishMainPhase(draw)(state)
+      : finishEndPhase(draw)(state);
