@@ -12,7 +12,6 @@ import {
 } from '../actions';
 import { createState, DEFAULT_GAME_STATE } from '../state';
 import type { GameState } from '../state-types';
-import type { Read } from '../types';
 import { type CardClass, type UnitCard } from '../types/card';
 import { type Position } from '../types/position';
 
@@ -83,7 +82,7 @@ type Drop<S> = (
 
 type DropAll<A extends Record<string, (...p: readonly any[]) => void>, S> = (
   set: (updater: (s: S) => S) => void,
-) => (gameStateActions: Read<Actions<A, S>>) => A;
+) => (gameStateActions: Readonly<Actions<A, S>>) => A;
 
 type Actions<
   out A extends Record<string, (...p: readonly any[]) => void>,

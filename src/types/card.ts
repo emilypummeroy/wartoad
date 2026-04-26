@@ -1,4 +1,3 @@
-import type { Read } from '.';
 import type { Player } from './gameflow';
 
 // Cards are the objects which you draw, have in your hand
@@ -33,15 +32,15 @@ export const CardType = {
 // This could be a higher order type but it's unnecessary for
 // all constant card classes and a small number of card types.
 export type CardStats = UnitStats | LeafStats;
-export type UnitStats = Read<{
-  life: number;
-  speed: number;
-  power: number;
-  range: number;
-}>;
-export type LeafStats = Read<{
-  gives: number;
-}>;
+export type UnitStats = {
+  readonly life: number;
+  readonly speed: number;
+  readonly power: number;
+  readonly range: number;
+};
+export type LeafStats = {
+  readonly gives: number;
+};
 export type CardStatsOf<T extends CardType> = T extends Unit
   ? UnitStats
   : T extends Leaf

@@ -1,4 +1,3 @@
-import type { Read } from '../types';
 import type { UnitCard } from '../types/card';
 import { Player } from '../types/gameflow';
 import {
@@ -36,14 +35,16 @@ export const getPondStateAt = (
 export const setPondStateAt = (
   old: PondState,
   target: Position,
-  newValue: Partial<LeafState> | ((old: LeafState) => Partial<LeafState>),
+  newValue:
+    | Partial<LeafState>
+    | ((old: LeafState, xy: Position) => Partial<LeafState>),
 ): PondState =>
   setPondStateWhere(
     old,
     (_, xy) => arePositionsEqual(xy, target),
-    oldValue =>
+    (oldValue, xy) =>
       typeof newValue === 'function'
-        ? { ...oldValue, ...newValue(oldValue) }
+        ? { ...oldValue, ...newValue(oldValue, xy) }
         : { ...oldValue, ...newValue },
   );
 
@@ -51,7 +52,7 @@ export const setPondStateAtEach = (
   init: PondState,
   ...updates: readonly (readonly [
     Position,
-    LeafState | ((leaf: LeafState) => Partial<LeafState>),
+    Partial<LeafState> | ((old: LeafState, xy: Position) => Partial<LeafState>),
   ])[]
 ): PondState =>
   updates.reduce(
@@ -77,6 +78,20 @@ export const setPondStateWhere = (
   }
   return array;
 };
+
+// If we need a getPondStateWhere, just use a double for loop
+// and push matching leaves.
+
+export const doesAnyPondLeafSatisfy = (
+  pond: PondState,
+  predicate: (v: LeafState, xy: Position) => boolean,
+): boolean =>
+  pond.some((row, y) =>
+    row.some((leaf, x) => {
+      const xy = { x, y };
+      return isPosition(xy) && predicate(leaf, xy);
+    }),
+  );
 
 export const ROW_COUNT = 6 as const;
 export const LAST_ROW = 5 as const;
@@ -104,7 +119,7 @@ export const SOUTH_LEAF = {
   isUpgraded: false,
   controller: Player.South,
 } as const;
-export const INITIAL_POND: Read<PondState> = [
+export const INITIAL_POND: PondState = [
   [NORTH_LEAF, NORTH_UPGRADED, NORTH_LEAF],
   [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],
   [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],

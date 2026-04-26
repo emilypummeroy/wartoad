@@ -1,7 +1,6 @@
 import { useCallback, useContext, useId } from 'react';
 
 import { GameContext } from '../context/GameContext';
-import type { Read } from '../types';
 import type { UnitCard } from '../types/card';
 import {
   Phase,
@@ -18,12 +17,12 @@ type PondUnitCardContext = [
     activate: (unit: UnitCard, position: Position) => void;
   },
 ];
-type PondUnitCardProps = {
+type PondUnitCardProps = Readonly<{
   card: UnitCard;
   position: Position;
-};
+}>;
 
-export const PondUnitCard = ({ card, position }: Read<PondUnitCardProps>) => {
+export const PondUnitCard = ({ card, position }: PondUnitCardProps) => {
   const [
     {
       flow: { player, phase, subphase },

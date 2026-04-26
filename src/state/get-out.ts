@@ -1,28 +1,31 @@
 import type { ActivationState, GameState } from '../state-types';
 import {
+  doesAnyPondLeafSatisfy,
   HOME,
   setPondStateAt,
   setPondStateWhere,
   type LeafState,
   type PondState,
 } from '../state-types/pond';
-import type { Read } from '../types';
 import type { CardClass } from '../types/card';
 import { Phase, Player, Subphase, type Gameflow } from '../types/gameflow';
 import type { Position } from '../types/position';
 
-export type DataLift = (
-  f: (data: GameData) => GameState,
-) => (old: GameState) => GameState;
+export type StateAction = (s: GameState) => GameState;
+export type DataAction = (d: GameData) => GameState;
 
+export type DataLift = (f: DataAction) => StateAction;
 export const data: DataLift = f => old => f(gameData(old));
 
-export type DataDrop = (
-  fn: (d: GameAccess) => (s: GameState) => GameState,
-) => (s: GameState) => GameState;
-
-export const pick: DataDrop = fn => s => fn(gameData(s).get)(s);
+export type DataPick = (fn: (d: GameAccess) => StateAction) => StateAction;
+export const pick: DataPick = fn => s => fn(gameData(s).get)(s);
 export const never = (_: never) => (state: GameState) => state;
+
+export type Chain = (...actions: readonly StateAction[]) => StateAction;
+export const chain: Chain =
+  (...actions) =>
+  state =>
+    actions.reduce((s, a) => a(s), state);
 
 // Provides an interface for accessing state while maintaining invariants.
 export type GameData = {
@@ -51,10 +54,12 @@ const gameInvariants: GameInvariants = (
 };
 
 export const gameData = (s: GameState): GameData => ({
-  get: verifyAccess(s, gameInvariants, gameAccess(s)),
-  set: gameUpdate(s),
-  make: gameMake(s),
+  get: verifyAccess(s, gameInvariants, access(s)),
+  set: update(s),
+  make: make(s),
 });
+
+type GameOut = GameAccess & { readonly out: GameState };
 
 // Accessors for convenience
 export type GameAccess = {
@@ -63,7 +68,10 @@ export type GameAccess = {
   readonly phase: Phase;
   readonly subphase: Subphase;
   readonly pond: PondState;
-  readonly leaf: { readonly at: (p: Position) => LeafState };
+  readonly leaf: {
+    readonly at: (xy: Position) => LeafState;
+    readonly exists: (p: (v: LeafState, xy: Position) => boolean) => boolean;
+  };
   // hand: { of: (p: Player) => Read<CardClass[]> };
   readonly activation?: ActivationState;
 };
@@ -77,9 +85,7 @@ export type GameUpdate = {
   readonly leaf: {
     readonly at: (x: Position) => {
       // to: (x: Read<Partial<LeafState>>) => GameData;
-      readonly update: (
-        x: (old: Read<LeafState>) => Partial<LeafState>,
-      ) => GameData;
+      readonly update: (x: (old: LeafState) => Partial<LeafState>) => GameData;
     };
     readonly where: (p: (v: LeafState, xy: Position) => boolean) => {
       readonly update: (
@@ -104,10 +110,10 @@ type GameMake = {
   readonly idle: () => GameData;
   // deploying: (x: CardClass) => GameData;
   // upgrading: (x: CardClass) => GameData;
-  readonly activating: (x: Read<ActivationState>) => GameData;
+  readonly activating: (x: ActivationState) => GameData;
 };
 
-const gameAccess: (s: Read<GameState>) => GameAccess = s => ({
+const access: (s: GameState) => GameAccess = s => ({
   get flow() {
     return s.flow;
   },
@@ -125,8 +131,11 @@ const gameAccess: (s: Read<GameState>) => GameAccess = s => ({
     return s.pond;
   },
   leaf: {
-    at({ x, y }: Read<Position>) {
+    at({ x, y }) {
       return s.pond[y][x];
+    },
+    exists(p) {
+      return doesAnyPondLeafSatisfy(s.pond, p);
     },
   },
 
@@ -141,7 +150,7 @@ const gameAccess: (s: Read<GameState>) => GameAccess = s => ({
   },
 });
 
-const gameUpdate: (s: Read<GameState>) => GameUpdate = s => ({
+const update: (s: GameState) => GameUpdate = s => ({
   player: { to: player => gameData({ ...s, flow: { ...s.flow, player } }) },
 
   leaf: {
@@ -185,7 +194,7 @@ const gameUpdate: (s: Read<GameState>) => GameUpdate = s => ({
   },
 });
 
-const gameMake = (s: GameState): GameMake => ({
+const make = (s: GameState): GameMake => ({
   idle: () =>
     gameData({
       ...s,
@@ -216,6 +225,20 @@ const gameMake = (s: GameState): GameMake => ({
     }),
 });
 
+const verifyAccess = (
+  s: GameState,
+  invariants: GameInvariants,
+  access: GameAccess,
+): GameOut => {
+  invariants(s, access, invariantChecks);
+  return {
+    ...access,
+    get out() {
+      return s;
+    },
+  };
+};
+
 /////
 // Invariants:
 
@@ -225,21 +248,21 @@ type GameInvariants = (
   checks: InvariantChecks,
 ) => void;
 
-type InvariantChecks = Read<{
-  always: (p: boolean) => void;
+type InvariantChecks = {
+  readonly always: (p: boolean) => void;
   // never: (p: boolean) => void;
-  when: (p: boolean) => {
-    must: (q: boolean) => void;
-    not: (q: boolean) => void;
+  readonly when: (p: boolean) => {
+    readonly must: (q: boolean) => void;
+    readonly not: (q: boolean) => void;
   };
-  unless: (p: boolean) => {
-    must: (q: boolean) => void;
+  readonly unless: (p: boolean) => {
+    readonly must: (q: boolean) => void;
     // not: (q: boolean) => void;
   };
-  iff: (p: boolean) => {
-    must: (q: boolean) => void;
+  readonly iff: (p: boolean) => {
+    readonly must: (q: boolean) => void;
   };
-}>;
+};
 
 const invariantChecks: InvariantChecks = {
   always: p => assert(p),
@@ -265,19 +288,4 @@ const assert = (i: boolean) => {
     error.message = `Invariant assertion failed: ${fn} ${place}`;
     throw error;
   }
-};
-
-type GameOut = GameAccess & { readonly out: GameState };
-export const verifyAccess = (
-  s: GameState,
-  invariants: GameInvariants,
-  access: GameAccess,
-): GameOut => {
-  invariants(s, access, invariantChecks);
-  return {
-    ...access,
-    get out() {
-      return s;
-    },
-  };
 };

@@ -11,7 +11,6 @@ import {
 } from '../state-types/pond';
 import { TestPondKey, TEST_PONDS_BY_KEY } from '../state-types/pond.test-utils';
 import { activationOf, gameflowOf } from '../state/test-utils';
-import type { Read } from '../types';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { asPosition } from '../types/position.test-utils';
@@ -44,7 +43,7 @@ const it_should_have_a_6x3_grid_with_leaves = () => {
 
 // South rows and North rows: Always
 // But this is a slightly slow test, so don't do it in every describe block,
-const it_should_have_the_right_controlling_player_and_leaves_in_each_row = (pond: Read<PondState>) => {
+const it_should_have_the_right_controlling_player_and_leaves_in_each_row = (pond: PondState) => {
   it.for<[Player, number]>([
     [North, 0],
     [South, ROW_COUNT_PER_PLAYER],
