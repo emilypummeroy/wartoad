@@ -12,7 +12,7 @@ export const finishMainPhase = () =>
         ({ units }) =>
           units.length > 0 && units.every(({ owner }) => owner === get.player),
       )
-      .by(() => ({ controller: get.player }))
+      .update(() => ({ controller: get.player }))
 
       .set.phase.to(Phase.End).get.out;
   });

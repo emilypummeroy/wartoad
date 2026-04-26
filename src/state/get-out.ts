@@ -17,6 +17,13 @@ export type DataLift = (
 
 export const data: DataLift = f => old => f(gameData(old));
 
+export type DataDrop = (
+  fn: (d: Read<GameAccess>) => (s: GameState) => GameState,
+) => (s: GameState) => GameState;
+
+export const pick: DataDrop = fn => s => fn(gameData(s).get)(s);
+export const never = (_: never) => (state: GameState) => state;
+
 // Provides an interface for accessing state while maintaining invariants.
 export type GameData = {
   get: GameAccess;
@@ -71,10 +78,12 @@ export type GameUpdate = {
   leaf: {
     at: (x: Position) => {
       // to: (x: Read<Partial<LeafState>>) => GameData;
-      by: (x: (old: Read<LeafState>) => Partial<LeafState>) => GameData;
+      update: (x: (old: Read<LeafState>) => Partial<LeafState>) => GameData;
     };
     where: (p: (v: LeafState, xy: Position) => boolean) => {
-      by: (u: (v: LeafState, xy: Position) => Partial<LeafState>) => GameData;
+      update: (
+        u: (v: LeafState, xy: Position) => Partial<LeafState>,
+      ) => GameData;
     };
   };
 
@@ -82,7 +91,7 @@ export type GameUpdate = {
   hand: {
     of: (x: Player) => {
       // to: (x: readonly CardClass[]) => GameData;
-      by: (x: (old: readonly CardClass[]) => CardClass[]) => GameData;
+      update: (x: (old: readonly CardClass[]) => CardClass[]) => GameData;
     };
   };
 };
@@ -134,10 +143,10 @@ const gameUpdate: (s: Read<GameState>) => GameUpdate = s => ({
 
   leaf: {
     where: p => ({
-      by: u => gameData({ ...s, pond: setPondStateWhere(s.pond, p, u) }),
+      update: u => gameData({ ...s, pond: setPondStateWhere(s.pond, p, u) }),
     }),
     at: xy => ({
-      by: u => gameData({ ...s, pond: setPondStateAt(s.pond, xy, u) }),
+      update: u => gameData({ ...s, pond: setPondStateAt(s.pond, xy, u) }),
     }),
   },
 
@@ -162,7 +171,7 @@ const gameUpdate: (s: Read<GameState>) => GameUpdate = s => ({
       //     ...s,
       //     ...(x === Player.North ? { northHand: v } : { southHand: v }),
       //   }),
-      by: u =>
+      update: u =>
         gameData({
           ...s,
           ...(x === Player.North

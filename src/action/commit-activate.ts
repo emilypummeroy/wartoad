@@ -12,10 +12,10 @@ export const commitActivate = (target: Position) =>
       ? make.idle().get.out
       : set.leaf
           .at(start)
-          .by(({ units }) => ({
+          .update(({ units }) => ({
             units: units.filter(({ key }) => key !== unit.key),
           }))
           .set.leaf.at(target)
-          .by(({ units }) => ({ units: [...units, unit] }))
+          .update(({ units }) => ({ units: [...units, unit] }))
           .make.idle().get.out;
   });

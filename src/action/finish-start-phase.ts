@@ -10,6 +10,6 @@ export const finishStartPhase = (draw: () => CardClass) =>
     const { phase, player } = get;
     return data.set.hand
       .of(player)
-      .by(cards => [...cards, draw()])
+      .update(cards => [...cards, draw()])
       .set.phase.to(PHASE_AFTER[phase]).get.out;
   });
