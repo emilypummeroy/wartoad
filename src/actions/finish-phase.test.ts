@@ -1,147 +1,184 @@
 import {
+  getPondStateAt,
+  HOME,
+  INITIAL_POND,
+  setPondStateAt,
+} from '../state-types/pond';
+import {
+  TEST_LEAVES_BY_KEY,
+  TestLeafKey,
+} from '../state-types/pond.test-utils';
+import {
   activationOf,
   createStateWith,
   gameflowOf,
   pickedCardOf,
+  winningPondOf,
 } from '../state/test-utils';
-import { CardClass, type CardKey } from '../types/card';
+import { CardClass, CardKey } from '../types/card';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { finishPhase } from './finish-phase';
 
 const { Idle, Upgrading, Deploying, Activating } = Subphase;
 const { North, South } = Player;
-const { Froglet, LilyPad } = CardClass;
-const { Start, Main, End } = Phase;
+const { Froglet, LilyPad } = CardKey;
+const { Start, Main, End, GameOver } = Phase;
 
-type Preconditions = [Player, Subphase];
-type Inputs = [Player, Phase, draw: CardClass];
+const {
+  SOUTH_UPGRADED_UNIT,
+  SOUTH_UPGRADED_OTHER_UNIT,
+  NORTH_UPGRADED_UNIT,
+  NORTH_UPGRADED_OTHER_UNIT,
+} = TestLeafKey;
+
+type Preconditions = [Player, Phase, Subphase?];
+type Invariants = [CardKey?, Position?, Player?];
+type Inputs = [Player, Phase];
+
+const _ = undefined;
 
 describe(finishPhase, () => {
-  // Preconditions:
-  // subphase = Idle
-  describe.for<[...Preconditions, CardKey, Position]>([
-    [North, Upgrading, 'Froglet', { x: 2, y: 2 }],
-    [North, Deploying, 'LilyPad', { x: 1, y: 3 }],
-    [North, Activating, 'Froglet', { x: 0, y: 4 }],
-    [South, Upgrading, 'Froglet', { x: 2, y: 5 }],
-    [South, Deploying, 'LilyPad', { x: 0, y: 0 }],
-    [South, Activating, 'Froglet', { x: 1, y: 1 }],
+  // Preconditions
+  it.for<[...Preconditions, ...Invariants]>([
+    // < Subphase is Idle
+    [North, Main, Upgrading, LilyPad],
+    [North, Main, Deploying, Froglet],
+    [North, Main, Activating, _, { x: 1, y: 4 }],
+    [South, Main, Upgrading, LilyPad],
+    [South, Main, Deploying, Froglet],
+    [South, Main, Activating, _, { x: 1, y: 4 }],
+    // < Phase is not GameOver
+    [North, GameOver, _, _, _, North],
+    [North, GameOver, _, _, _, South],
+    [South, GameOver, _, _, _, North],
+    [South, GameOver, _, _, _, South],
   ])(
-    'Precondition failed: need Idle | %s %s | %s %s',
-    ([player, subphase, cardKey, position]) => {
-      const draw = () => CardClass[cardKey];
-      it('should not change state', () => {
-        const old = createStateWith({
-          ...gameflowOf(player, subphase),
-          ...(subphase === Activating
-            ? activationOf(position)
-            : pickedCardOf(CardClass[cardKey])),
-        });
-        expect(finishPhase(draw)(old)).toStrictEqual(old);
+    'Preconditions failed: should not make any changes during %s %s %s',
+    ([player, phase, subphase = Idle, pickedCard, activationStart, winner]) => {
+      const before = createStateWith({
+        ...gameflowOf(player, subphase, phase),
+        ...pickedCardOf(pickedCard),
+        ...activationOf(activationStart),
+        ...winningPondOf(winner),
       });
+      const after = finishPhase(() => CardClass.Froglet)(before);
+      expect(after).toStrictEqual(before);
     },
   );
 
-  // Postconditions:
-  describe.for<Inputs>([
+  // Postconditions
+  describe.for<[...Inputs, draw: CardKey]>([
+    // < Start > Main & card drawn
     [North, Start, Froglet],
     [North, Start, LilyPad],
     [South, Start, Froglet],
     [South, Start, LilyPad],
-  ])('Postconditions | %s %s | drawing %s', ([player, phase, card]) => {
-    const draw = () => card;
-    const before = createStateWith(gameflowOf(player, Idle, phase));
-    const opponent = PLAYER_AFTER[player];
+  ])(
+    'Preconditions met | during %s %s | drawing %s',
+    ([player, phase, drawKey]) => {
+      const before = createStateWith({
+        ...gameflowOf(player, _, phase),
+      });
+      const draw = () => CardClass[drawKey];
 
-    // > old.phase = Start -> phase = Main
-    it('should go to the Main phase', () => {
-      const after = finishPhase(draw)(before);
-      expect(after.flow.phase).toBe(Main);
-    });
+      it('should set phase to Main', () => {
+        const after = finishPhase(draw)(before);
+        expect(after.flow.phase).toBe(Main);
+      });
 
-    // > old.phase = Start -> player unchanged
-    it('should not change the player', () => {
-      const after = finishPhase(draw)(before);
-      expect(after.flow.player).toBe(player);
-    });
+      it(`should draw a ${drawKey} for ${player}`, () => {
+        const after = finishPhase(draw)(before);
+        const gotHand = player === North ? after.northHand : after.southHand;
+        const beforeHand =
+          player === North ? before.northHand : before.southHand;
+        expect(gotHand).toHaveLength(beforeHand.length + 1);
+        expect(gotHand.at(-1)?.key).toBe(drawKey);
+      });
+    },
+  );
 
-    // > old.phase = Start -> draw(player)
-    it(`should add a ${card.name} to the ${player} hand`, () => {
-      const after = finishPhase(draw)(before);
-      const beforeHand = player === North ? before.northHand : before.southHand;
-      const afterHand = player === North ? after.northHand : after.southHand;
-      expect(afterHand).toHaveLength(beforeHand.length + 1);
-      expect(afterHand).toStrictEqual([...beforeHand, card]);
-    });
+  // Postconditions
+  describe.for<[...Inputs, opponentLeaf: TestLeafKey, wantController: Player]>([
+    // < Main & Idle & cannot capture > End
+    [North, Main, SOUTH_UPGRADED_UNIT, South],
+    [South, Main, NORTH_UPGRADED_UNIT, North],
 
-    // > opponent hand unchanged
-    it(`should not change the ${opponent} hand`, () => {
-      const after = finishPhase(draw)(before);
-      const beforeHand = player === South ? before.northHand : before.southHand;
-      const afterHand = player === South ? after.northHand : after.southHand;
-      expect(afterHand).toStrictEqual(beforeHand);
-    });
-  });
+    // < Main & Idle & can capture other leaf > End & capture
+    [North, Main, SOUTH_UPGRADED_OTHER_UNIT, North],
+    [South, Main, NORTH_UPGRADED_OTHER_UNIT, South],
+  ])(
+    'Preconditions met | during %s %s | when a centre leaf is %s',
+    ([player, phase, opponentLeaf, wantController]) => {
+      const POSITION: Position = { x: 1, y: 2 };
+      const draw = () => CardClass.Froglet;
+      const before = createStateWith({
+        ...gameflowOf(player, _, phase),
+        pond: setPondStateAt(
+          INITIAL_POND,
+          POSITION,
+          TEST_LEAVES_BY_KEY[opponentLeaf],
+        ),
+      });
 
-  // Postconditions:
+      it('should set phase to End', () => {
+        const after = finishPhase(draw)(before);
+        expect(after.flow.phase).toBe(End);
+      });
+
+      it(`should result in that central leaf controller being ${wantController}`, () => {
+        const after = finishPhase(draw)(before);
+        const got = getPondStateAt(after.pond, POSITION);
+        expect(got.controller).toStrictEqual(wantController);
+      });
+    },
+  );
+
+  // Postconditions
+  describe.for<[...Inputs, opponentHome: TestLeafKey]>([
+    // < Main & Idle & can capture opponent Home > GameOver
+    [North, Main, SOUTH_UPGRADED_OTHER_UNIT],
+    [South, Main, NORTH_UPGRADED_OTHER_UNIT],
+  ])(
+    'Preconditions met | during %s %s | when opponent Home is %s',
+    ([player, phase, opponentLeaf]) => {
+      const draw = () => CardClass.Froglet;
+      const before = createStateWith({
+        ...gameflowOf(player, _, phase),
+        pond: setPondStateAt(
+          INITIAL_POND,
+          HOME[PLAYER_AFTER[player]],
+          TEST_LEAVES_BY_KEY[opponentLeaf],
+        ),
+      });
+
+      it('should set phase to GameOver', () => {
+        const after = finishPhase(draw)(before);
+        expect(after.flow.phase).toBe(GameOver);
+      });
+    },
+  );
+
+  // Postconditions
   describe.for<Inputs>([
-    [North, Main, Froglet],
-    [North, Main, LilyPad],
-    [South, Main, Froglet],
-    [South, Main, LilyPad],
-  ])('Postconditions | %s %s | drawing %s', ([player, phase, card]) => {
-    const draw = () => card;
-    const before = createStateWith(gameflowOf(player, Idle, phase));
-
-    // > old.phase = Main -> phase = End
-    it('should go to the End phase', () => {
-      const after = finishPhase(draw)(before);
-      expect(after.flow.phase).toBe(End);
+    // < End > opponent Start
+    [North, End],
+    [South, End],
+  ])('Preconditions met | during %s %s', ([player, phase]) => {
+    const draw = () => CardClass.Froglet;
+    const before = createStateWith({
+      ...gameflowOf(player, _, phase),
     });
 
-    // > old.phase = Main -> player unchanged
-    it('should not change the player', () => {
-      const after = finishPhase(draw)(before);
-      expect(after.flow.player).toBe(player);
-    });
-
-    // > old.phase = Main -> hands unchanged
-    it('should not change the hands', () => {
-      const after = finishPhase(draw)(before);
-      expect(after.northHand).toBe(before.northHand);
-      expect(after.southHand).toBe(before.southHand);
-    });
-  });
-
-  // Postconditions:
-  // TODO 10: old.phase = End & p of positions: cancapture(p) -> capture(p, player)
-  describe.for<Inputs>([
-    [North, End, Froglet],
-    [North, End, LilyPad],
-    [South, End, Froglet],
-    [South, End, LilyPad],
-  ])('Postconditions | %s %s | drawing %s', ([player, phase, card]) => {
-    const draw = () => card;
-    const before = createStateWith(gameflowOf(player, Idle, phase));
-
-    // > old.phase = End -> phase = Start
-    it('should go to the Start phase', () => {
+    it('should set phase to Start', () => {
       const after = finishPhase(draw)(before);
       expect(after.flow.phase).toBe(Start);
     });
 
-    // > old.phase = End -> player = after(old.player)
-    it(`should start the ${PLAYER_AFTER[player]} turn`, () => {
+    const opponent = PLAYER_AFTER[player];
+    it(`should go to ${opponent} turn]`, () => {
       const after = finishPhase(draw)(before);
-      expect(after.flow.player).toBe(PLAYER_AFTER[player]);
-    });
-
-    // > old.phase = End -> hands unchanged
-    it('should not change the hands', () => {
-      const after = finishPhase(draw)(before);
-      expect(after.northHand).toBe(before.northHand);
-      expect(after.southHand).toBe(before.southHand);
+      expect(after.flow.player).toBe(opponent);
     });
   });
 });

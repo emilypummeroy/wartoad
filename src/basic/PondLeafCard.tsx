@@ -1,11 +1,9 @@
 import { useContext } from 'react';
 
 import { GameContext } from '../context/GameContext';
-import type { PondState } from '../state-types/pond';
-import { getPondStateAt, HOME } from '../state-types/pond';
+import { type PondState, getPondStateAt, HOME } from '../state-types/pond';
 import { PLAYER_CLASSNAME } from '../types/gameflow';
-import type { Position } from '../types/position';
-import { arePositionsEqual } from '../types/position';
+import { type Position, arePositionsEqual } from '../types/position';
 import { CardBack, LilyPad } from '../view/Card';
 
 type PondLeafCardSlice = [
@@ -28,7 +26,7 @@ export function PondLeafCard({
   const { controller, isUpgraded } = getPondStateAt(pond, position);
   const isHome = arePositionsEqual(HOME[controller], position);
   return isUpgraded ? (
-    // TODO 11: Implement a non-splay-row hack to display cards on leaves
+    // TODO 14: Implement a non-splay-row hack to display cards on leaves
     <div className="stacking peeking">
       <div
         role="listitem"

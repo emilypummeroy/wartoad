@@ -3,8 +3,12 @@ import { useContext, useId, type ReactNode } from 'react';
 
 import { GameContext } from '../context/GameContext';
 import { getPondStateAt, HOME, type PondState } from '../state-types/pond';
-import type { Player } from '../types/gameflow';
-import { Phase, PLAYER_CLASSNAME, Subphase } from '../types/gameflow';
+import {
+  type Player,
+  Phase,
+  PLAYER_CLASSNAME,
+  Subphase,
+} from '../types/gameflow';
 import { distanceBetween, type Position } from '../types/position';
 
 type PondLeafDropzoneSlice = [
@@ -24,7 +28,7 @@ type PondLeafDropzoneSlice = [
   },
 ];
 
-// TODO 11: Make this a view component with memo
+// TODO 14: Make this a view component with memo
 type PondLeafDropzoneProps = Readonly<{
   children: ReactNode;
   targetLabelId: string;

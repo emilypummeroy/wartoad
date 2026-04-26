@@ -27,7 +27,7 @@ describe('Smoke test: Deploying Units and Activating them', () => {
       fireEvent.click(getThe.nthRowDropzoneFor(player, 1));
       expect(getThe.nthRowUnitControlledBy(player, 1)).toBeVisible();
       expect(queryA.nthRowUnitControlledBy(player, 0)).not.toBeInTheDocument();
-      // TODO 11: Should not have a clickable unit anymore
+      // TODO 14: Should not have a clickable unit anymore
     });
 
     it(`should allow ${player} to deploy multiple units and move them onto Home`, () => {
@@ -45,7 +45,7 @@ describe('Smoke test: Deploying Units and Activating them', () => {
       fireEvent.click(getAll.unitsControlledByOfClass(player, Froglet)[0]);
       fireEvent.click(getAll.homeRowDropzones(player)[1]);
       expect(getAll.nthRowUnitsControlledBy(player, 0)).toHaveLength(3);
-      // TODO 11: Should not have a clickable unit anymore
+      // TODO 14: Should not have a clickable unit anymore
     });
   });
 

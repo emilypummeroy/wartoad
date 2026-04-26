@@ -34,8 +34,14 @@
     "no-shadow": "allow",
     "ban-types": "allow",
     "array-type": ["allow", { "default": "array-simple" }],
-    "no-duplicate-imports": ["error", { "allowSeparateTypeImports": true }],
-    "consistent-type-imports": "error",
+    "no-duplicate-imports": ["error"],
+    "consistent-type-imports": [
+      "error",
+      {
+        "prefer": "type-imports",
+        "fixStyle": "inline-type-imports"
+      }
+    ],
     "no-nested-ternary": "allow",
     "unicorn/no-nested-ternary": "allow",
     "no-negated-condition": "allow",
