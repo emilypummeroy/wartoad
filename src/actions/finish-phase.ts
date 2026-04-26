@@ -14,7 +14,7 @@ export const finishPhase = (draw: () => CardClass) =>
         return finishMainPhase();
       case Phase.End:
         return finishEndPhase();
-      default:
-        return never(get.phase);
     }
+    /* v8 ignore next line -- @preserve */
+    return never(get.phase);
   });

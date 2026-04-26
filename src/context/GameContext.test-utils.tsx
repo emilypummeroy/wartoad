@@ -1,10 +1,11 @@
 import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
-import type { GameActions } from '../action';
+import type { GameActions } from '../actions';
+import { DEFAULT_GAME_ACTIONS } from '../actions';
 import { DEFAULT_GAME_STATE } from '../state';
 import type { GameState } from '../state-types';
-import { DEFAULT_GAME_DISPATCH, GameContext } from './GameContext';
+import { GameContext } from './GameContext';
 
 // (Not a component):
 // oxlint-disable-next-line react/display-name
@@ -22,7 +23,7 @@ export const renderWithGameContext =
             ...state,
           },
           {
-            ...DEFAULT_GAME_DISPATCH,
+            ...DEFAULT_GAME_ACTIONS,
             ...dispatch,
           },
         ]}

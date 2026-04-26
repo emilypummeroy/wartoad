@@ -7,24 +7,24 @@ import {
   type Position,
 } from '../types/position';
 
-export type PondState = Read<
-  [
-    [LeafState, LeafState, LeafState],
-    [LeafState, LeafState, LeafState],
-    [LeafState, LeafState, LeafState],
-    [LeafState, LeafState, LeafState],
-    [LeafState, LeafState, LeafState],
-    [LeafState, LeafState, LeafState],
-  ]
->;
+export type PondState = readonly [
+  readonly [LeafState, LeafState, LeafState],
+  readonly [LeafState, LeafState, LeafState],
+  readonly [LeafState, LeafState, LeafState],
+  readonly [LeafState, LeafState, LeafState],
+  readonly [LeafState, LeafState, LeafState],
+  readonly [LeafState, LeafState, LeafState],
+];
 
-export type LeafState = Read<{
-  units: UnitCard[];
-  isUpgraded: boolean;
-  controller: Player;
-}>;
+export type LeafState = {
+  readonly units: readonly UnitCard[];
+  readonly isUpgraded: boolean;
+  readonly controller: Player;
+};
 
-export const isPondState = (array: Read<LeafState[][]>): array is PondState =>
+export const isPondState = (
+  array: ReadonlyArray<ReadonlyArray<LeafState>>,
+): array is PondState =>
   array.length === ROW_COUNT &&
   array.every(row => row.length === LEAF_COUNT_PER_ROW);
 
@@ -48,12 +48,12 @@ export const setPondStateAt = (
   );
 
 export const setPondStateAtEach = (
-  init: Read<PondState>,
+  init: PondState,
   ...updates: readonly (readonly [
     Position,
-    LeafState | ((leaf: Read<LeafState>) => Partial<LeafState>),
+    LeafState | ((leaf: LeafState) => Partial<LeafState>),
   ])[]
-): Read<PondState> =>
+): PondState =>
   updates.reduce(
     (pond, [at, update]) => setPondStateAt(pond, at, update),
     init,

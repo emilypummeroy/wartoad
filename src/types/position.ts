@@ -1,14 +1,12 @@
-import type { Read } from '.';
+export type Position = {
+  readonly x: 0 | 1 | 2;
+  readonly y: 0 | 1 | 2 | 3 | 4 | 5;
+};
 
-export type Position = Read<{
-  x: 0 | 1 | 2;
-  y: 0 | 1 | 2 | 3 | 4 | 5;
-}>;
-
-export type UnsafePosition = Read<{
-  x: number;
-  y: number;
-}>;
+export type UnsafePosition = {
+  readonly x: number;
+  readonly y: number;
+};
 
 export const isPosition = (xy: UnsafePosition): xy is Position => {
   const { x, y } = xy;

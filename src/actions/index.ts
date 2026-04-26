@@ -29,6 +29,15 @@ export type GameActions = {
   commitActivate: (_: Position) => void;
 };
 
+export const DEFAULT_GAME_ACTIONS: GameActions = {
+  finishPhase: () => {},
+  pickCard: () => {},
+  activate: () => {},
+  commitUpgrade: () => {},
+  commitDeploy: () => {},
+  commitActivate: () => {},
+};
+
 // TODO 14: Remove the particular card instead of just any member of card class.
 const removeOne = (
   cards: readonly CardClass[],
