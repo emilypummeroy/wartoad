@@ -29,7 +29,7 @@ describe(App, () => {
     });
 
     it('should have the Phase indicator after the heading', () => {
-      const indicator = getThe.phaseIndicator(South, Main);
+      const indicator = getThe.phaseTracker(South, Main);
       expect(indicator).toHaveTextContent('South: Main phase');
       expect(screen.getByRole('banner')).toContainElement(indicator);
       const heading = screen.getByRole('heading', { level: 1 });
@@ -38,7 +38,7 @@ describe(App, () => {
 
     describe('Phase indicatar', () => {
       it('should start in the South Main phase', () => {
-        expect(getThe.phaseIndicator(South, Main)).toBeVisible();
+        expect(getThe.phaseTracker(South, Main)).toBeVisible();
         expect(screen.queryByLabelText('End Phase')).not.toBeInTheDocument();
       });
 
@@ -49,24 +49,24 @@ describe(App, () => {
           fireEvent.click(getAll.handCards(player)[Math.floor(INITIAL_HAND_CARD_COUNT * Math.random())]);
           fireEvent.click(screen.getByText('Next phase'));
 
-          expect(getThe.phaseIndicator(player, Main)).toBeVisible();
+          expect(getThe.phaseTracker(player, Main)).toBeVisible();
           expect(queryA.phaseIndicator(player, End)).not.toBeInTheDocument();
         },
       );
 
       it('should cycle between all turns and phases as the button is clicked', () => {
         for (let x = 0; x < FEW; x += 1) {
-          expect(getThe.phaseIndicator(South, Main)).toBeVisible();
+          expect(getThe.phaseTracker(South, Main)).toBeVisible();
           fireEvent.click(screen.getByText('Next phase'));
-          expect(getThe.phaseIndicator(South, End)).toBeVisible();
+          expect(getThe.phaseTracker(South, End)).toBeVisible();
           fireEvent.click(screen.getByText('Next phase'));
-          expect(getThe.phaseIndicator(North, Start)).toBeVisible();
+          expect(getThe.phaseTracker(North, Start)).toBeVisible();
           fireEvent.click(screen.getByText('Next phase'));
-          expect(getThe.phaseIndicator(North, Main)).toBeVisible();
+          expect(getThe.phaseTracker(North, Main)).toBeVisible();
           fireEvent.click(screen.getByText('Next phase'));
-          expect(getThe.phaseIndicator(North, End)).toBeVisible();
+          expect(getThe.phaseTracker(North, End)).toBeVisible();
           fireEvent.click(screen.getByText('Next phase'));
-          expect(getThe.phaseIndicator(South, Start)).toBeVisible();
+          expect(getThe.phaseTracker(South, Start)).toBeVisible();
           fireEvent.click(screen.getByText('Next phase'));
         }
       });

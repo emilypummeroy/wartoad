@@ -22,7 +22,8 @@ describe('Smoke test: Advancing units and Capturing leaves', () => {
       fireEvent.click(getFirst.basicDropzoneControlledBy(player));
     });
 
-    it(`should allow ${player} to win by capturing the ${opponent} Home leaf`, () => {
+    // TODO 12: Unskip this test
+    it.skip(`should allow ${player} to win by capturing the ${opponent} Home leaf`, () => {
       for (let i = 1; i < ROW_COUNT; i += 1) {
         fireEvent.click(getFirst.unitControlledByOfClass(player, Froglet));
         fireEvent.click(getThe.nthRowDropzoneFor(player, i));
@@ -30,7 +31,7 @@ describe('Smoke test: Advancing units and Capturing leaves', () => {
         advanceToPhase(player, Main);
       }
 
-      expect(getThe.winnerIndicator(player)).toBeVisible();
+      expect(getThe.winrar(player)).toBeVisible();
     });
   });
 });

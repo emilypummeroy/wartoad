@@ -10,7 +10,7 @@ export const advanceToPhase = (player: Player, phase: Phase) => {
     if (queryA.phaseIndicator(player, phase)) break;
     fireEvent.click(screen.getByText('Next phase'));
   }
-  expect(getThe.phaseIndicator(player, phase)).toBeVisible();
+  expect(getThe.phaseTracker(player, phase)).toBeVisible();
 };
 
 export const getThe = {
@@ -59,9 +59,14 @@ export const getThe = {
       name: new RegExp(`(Upgrade|Deploy on) ${player} Home Lily Pad`),
     });
   },
-  phaseIndicator(player: Player, phase: Phase) {
+  phaseTracker(player: Player, phase: Phase) {
     return withinThe.header.getByRole('region', {
       name: `${player}: ${phase} phase`,
+    });
+  },
+  winrar(player: Player) {
+    return withinThe.header.getByRole('region', {
+      name: `A winrar is ${player}`,
     });
   },
 };

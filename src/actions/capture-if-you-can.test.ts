@@ -111,12 +111,10 @@ describe(captureIfYouCan, () => {
     [North, ANOTHER_POND, { x: 1, y: 2 }, SOUTH_UPGRADED_OTHER_UNIT],
     [North, ANOTHER_POND, { x: 2, y: 3 }, SOUTH_UPGRADED_OTHER_UNIT],
     [North, INITIAL_POND, { x: 0, y: 2 }, SOUTH_LEAF_OTHER_UNIT],
-    // TODO 11: Should win the game [North, ANOTHER_POND, [{ x: 1, y: 5 }], SOUTH_UPGRADED_OTHER_UNIT],
     [South, INITIAL_POND, { x: 1, y: 3 }, NORTH_LEAF_OTHER_UNIT],
     [South, INITIAL_POND, { x: 0, y: 3 }, NORTH_LEAF_OTHER_UNIT],
     [South, ANOTHER_POND, { x: 1, y: 2 }, NORTH_UPGRADED_OTHER_UNIT],
     [South, ANOTHER_POND, { x: 2, y: 3 }, NORTH_LEAF_OTHER_UNIT],
-    // TODO 11: Should win the game [South, INITIAL_POND, [{ x: 1, y: 0 }], NORTH_UPGRADED_OTHER_UNIT],
   ])(
     'Postconditions | %s turn | %s with %s set to %s',
     ([player, pondKey, xy1, leafKey, xy2]) => {
