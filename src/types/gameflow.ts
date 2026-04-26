@@ -13,12 +13,14 @@ export const Phase = {
   Start: 'Start',
   Main: 'Main',
   End: 'End',
+  GameOver: 'GameOver',
 } as const;
 
 export const PHASE_AFTER = {
   [Phase.Start]: Phase.Main,
   [Phase.Main]: Phase.End,
   [Phase.End]: Phase.Start,
+  [Phase.GameOver]: Phase.GameOver,
 } as const;
 
 export const Player = {

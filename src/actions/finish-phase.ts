@@ -5,6 +5,7 @@ import { captureIfYouCan } from './capture-if-you-can';
 import { finishEndPhase } from './finish-end-phase';
 import { finishMainPhase } from './finish-main-phase';
 import { finishStartPhase } from './finish-start-phase';
+import { winIfYouCan } from './win-if-you-can';
 
 export const finishPhase = (draw: () => CardClass) =>
   pick(get => {
@@ -12,9 +13,11 @@ export const finishPhase = (draw: () => CardClass) =>
       case Phase.Start:
         return finishStartPhase(draw);
       case Phase.Main:
-        return chain(finishMainPhase(), captureIfYouCan());
+        return chain(finishMainPhase(), winIfYouCan(), captureIfYouCan());
       case Phase.End:
         return finishEndPhase();
+      case Phase.GameOver:
+        return x => x;
     }
     /* v8 ignore next line -- @preserve */
     return never(get.phase);

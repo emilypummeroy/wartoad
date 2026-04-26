@@ -1,7 +1,7 @@
 import { HOME, setPondStateAt } from '../state-types/pond';
 import { TEST_PONDS_BY_KEY, TestPondKey } from '../state-types/pond.test-utils';
 import { CardClass } from '../types/card';
-import { Phase, Player, Subphase } from '../types/gameflow';
+import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import { gameData } from './get-out';
 import {
   activationOf,
@@ -107,6 +107,51 @@ describe(gameData, () => {
             pond,
             ...gameflowOf(undefined, Subphase.Activating, phase),
             ...activationOf({ x: 0, y: 3 }),
+          });
+          expect(() => gameData(state)).toThrow();
+        },
+      );
+
+      it.for<[Player | undefined, Phase]>([
+        [Player.North, Phase.Start],
+        [Player.North, Phase.Main],
+        [Player.North, Phase.End],
+        [Player.South, Phase.Start],
+        [Player.South, Phase.Main],
+        [Player.South, Phase.End],
+        [undefined, Phase.GameOver],
+        [undefined, Phase.GameOver],
+      ])(
+        'should throw when winner is %s but phase is %s',
+        ([winner, phase]) => {
+          const state = createStateWith({
+            pond,
+            ...gameflowOf(undefined, undefined, phase),
+            winner,
+          });
+          expect(() => gameData(state)).toThrow();
+        },
+      );
+
+      it.for<Player>([Player.North, Player.South])(
+        'should throw when winner is %s but has not captured opponent Home',
+        winner => {
+          const state = createStateWith({
+            pond,
+            ...gameflowOf(undefined, undefined, Phase.GameOver),
+            winner,
+          });
+          expect(() => gameData(state)).toThrow();
+        },
+      );
+
+      it.for<Player>([Player.North, Player.South])(
+        'should throw %s has captured opponent Home but is not the winner',
+        winner => {
+          const opponentHome = HOME[PLAYER_AFTER[winner]];
+          const state = createStateWith({
+            pond: setPondStateAt(pond, opponentHome, { controller: winner }),
+            ...gameflowOf(undefined, undefined, Phase.GameOver),
           });
           expect(() => gameData(state)).toThrow();
         },

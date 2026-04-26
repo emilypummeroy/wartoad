@@ -1,7 +1,7 @@
 import { setPondStateAtEach, type LeafState } from '../state-types/pond';
 import {
   TestPondKey,
-  TestLeavesKey,
+  TestLeafKey,
   TEST_PONDS_BY_KEY,
   TEST_LEAVES_BY_KEY,
 } from '../state-types/pond.test-utils';
@@ -37,10 +37,10 @@ const {
   SOUTH_UPGRADED_UNITS,
   SOUTH_UPGRADED_UNIT,
   SOUTH_UPGRADED_OTHER_UNIT,
-} = TestLeavesKey;
+} = TestLeafKey;
 
 type Preconditions = [Player, Phase, Subphase];
-type Inputs = [Player, TestPondKey, Position[], TestLeavesKey];
+type Inputs = [Player, TestPondKey, Position[], TestLeafKey];
 
 describe(finishMainPhase, () => {
   // Preconditions:

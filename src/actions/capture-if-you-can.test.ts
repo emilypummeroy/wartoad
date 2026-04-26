@@ -6,7 +6,7 @@ import {
 } from '../state-types/pond';
 import {
   TestPondKey,
-  TestLeavesKey,
+  TestLeafKey,
   TEST_PONDS_BY_KEY,
   TEST_LEAVES_BY_KEY,
 } from '../state-types/pond.test-utils';
@@ -35,10 +35,10 @@ const {
   SOUTH_UPGRADED_UNITS,
   SOUTH_UPGRADED_UNIT,
   SOUTH_UPGRADED_OTHER_UNIT,
-} = TestLeavesKey;
+} = TestLeafKey;
 
-type Preconditions = [Player, Phase, TestPondKey, Position, TestLeavesKey];
-type Inputs = [Player, TestPondKey, Position, TestLeavesKey, Position?];
+type Preconditions = [Player, Phase, TestPondKey, Position, TestLeafKey];
+type Inputs = [Player, TestPondKey, Position, TestLeafKey, Position?];
 
 describe(captureIfYouCan, () => {
   const it_should_not_change_state = ([

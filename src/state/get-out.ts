@@ -8,7 +8,13 @@ import {
   type PondState,
 } from '../state-types/pond';
 import type { CardClass } from '../types/card';
-import { Phase, Player, Subphase, type Gameflow } from '../types/gameflow';
+import {
+  Phase,
+  Player,
+  PLAYER_AFTER,
+  Subphase,
+  type Gameflow,
+} from '../types/gameflow';
 import type { Position } from '../types/position';
 
 export type StateAction = (s: GameState) => GameState;
@@ -34,6 +40,7 @@ export type GameData = {
   readonly make: GameMake;
 };
 
+// oxlint-disable-next-line max-statements
 const gameInvariants: GameInvariants = (
   s,
   get,
@@ -51,6 +58,14 @@ const gameInvariants: GameInvariants = (
   when(get.subphase === Subphase.Deploying).must(!!s.pickedCard);
 
   unless(get.phase === Phase.Main).must(get.subphase === Subphase.Idle);
+
+  iff(get.phase === Phase.GameOver).must(!!s.winner);
+  iff(s.winner === Player.North).must(
+    get.leaf.at(HOME[Player.South]).controller === Player.North,
+  );
+  iff(s.winner === Player.South).must(
+    get.leaf.at(HOME[Player.North]).controller === Player.South,
+  );
 };
 
 export const gameData = (s: GameState): GameData => ({
@@ -103,6 +118,8 @@ export type GameUpdate = {
       ) => GameData;
     };
   };
+
+  readonly winner: { readonly to: (x: Player) => GameData };
 };
 
 // Operations which need to touch multiple places to maintain invariants
@@ -111,6 +128,7 @@ type GameMake = {
   // deploying: (x: CardClass) => GameData;
   // upgrading: (x: CardClass) => GameData;
   readonly activating: (x: ActivationState) => GameData;
+  readonly winner: (x: Player) => GameData;
 };
 
 const access: (s: GameState) => GameAccess = s => ({
@@ -192,6 +210,10 @@ const update: (s: GameState) => GameUpdate = s => ({
         }),
     }),
   },
+
+  winner: {
+    to: x => gameData({ ...s, winner: x }),
+  },
 });
 
 const make = (s: GameState): GameMake => ({
@@ -216,12 +238,22 @@ const make = (s: GameState): GameMake => ({
   //     pickedCard,
   //     activation: undefined,
   //   }),
-  activating: x =>
+  activating: activation =>
     gameData({
       ...s,
       flow: { ...s.flow, subphase: Subphase.Activating },
       pickedCard: undefined,
-      activation: x,
+      activation,
+    }),
+
+  winner: winner =>
+    gameData({
+      ...s,
+      flow: { ...s.flow, phase: Phase.GameOver },
+      winner,
+      pond: setPondStateAt(s.pond, HOME[PLAYER_AFTER[winner]], {
+        controller: winner,
+      }),
     }),
 });
 
