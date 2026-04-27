@@ -13,6 +13,14 @@ export const advanceToPhase = (player: Player, phase: Phase) => {
   expect(getThe.phaseTracker(player, phase)).toBeVisible();
 };
 
+export const advanceToGameOver = (winrar: Player) => {
+  for (let i = 0; i < MANY; i += 1) {
+    if (queryA.winrar(winrar)) break;
+    fireEvent.click(screen.getByText('Next phase'));
+  }
+  expect(getThe.winrar(winrar)).toBeVisible();
+};
+
 export const getThe = {
   get header() {
     return screen.getByRole('banner');
@@ -66,7 +74,7 @@ export const getThe = {
   },
   winrar(player: Player) {
     return withinThe.header.getByRole('region', {
-      name: `A winrar is ${player}`,
+      name: `A WINRAR is ${player}`,
     });
   },
 };
@@ -193,6 +201,11 @@ export const queryA = {
   upgradeDropzoneOnLeafNamed(name: string) {
     return withinThe.playArea.queryByRole('button', {
       name: new RegExp(`(controlled|Home) ${name}`),
+    });
+  },
+  winrar(player: Player) {
+    return withinThe.header.queryByRole('region', {
+      name: `A WINRAR is ${player}`,
     });
   },
 };

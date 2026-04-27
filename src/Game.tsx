@@ -1,12 +1,12 @@
 import { useContext, type ReactNode } from 'react';
 
 import { Hand } from './basic/Hand';
+import { PhaseTracker } from './basic/PhaseTracker';
 import { Pond } from './composite/Pond';
 import { GameContext } from './context/GameContext';
 import { CardClass } from './types/card';
 import { Phase, Player, PLAYER_CLASSNAME, Subphase } from './types/gameflow';
 import { Froglet, LilyPad } from './view/Card';
-import { PhaseTracker } from './view/PhaseTracker';
 
 export function Game() {
   const [
