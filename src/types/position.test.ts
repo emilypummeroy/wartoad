@@ -1,5 +1,10 @@
 // oxlint-disable no-magic-numbers
-import { distanceBetween, arePositionsEqual, type Position } from './position';
+import {
+  isPosition,
+  distanceBetween,
+  arePositionsEqual,
+  type Position,
+} from './position';
 import {
   ALL_POSITIONS,
   asPosition,
@@ -8,6 +13,34 @@ import {
   SOUTH_CENTRE_POSITIONS,
   SOUTH_POSITIONS,
 } from './position.test-utils';
+
+describe(isPosition, () => {
+  describe.for(ALL_POSITIONS)('for position %s', xy => {
+    it('should return true', () => {
+      expect(isPosition(xy)).toBe(true);
+      if (isPosition(xy)) xy satisfies Position;
+    });
+  });
+
+  describe.for([
+    { x: -1, y: 0 },
+    { x: -1, y: 1 },
+    { x: -1, y: 5 },
+    { x: 3, y: 0 },
+    { x: 3, y: 3 },
+    { x: 3, y: 5 },
+    { x: 0, y: -1 },
+    { x: 1, y: -1 },
+    { x: 2, y: -1 },
+    { x: 0, y: 6 },
+    { x: 1, y: 6 },
+    { x: 2, y: 6 },
+  ])('for illegal position %s', xy => {
+    it('should return true', () => {
+      expect(isPosition(xy)).toBe(false);
+    });
+  });
+});
 
 describe(arePositionsEqual, () => {
   describe.for(ALL_POSITIONS)('for position %s', ({ x, y }) => {
