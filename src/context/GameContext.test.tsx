@@ -14,7 +14,14 @@ describe('The context', () => {
 
       for (const x of Object.values(dispatch)) expect(x).not.toThrow();
 
-      const { finishPhase, pickCard, activate, commitUpgrade, commitDeploy, commitActivate } = dispatch;
+      const {
+        finishPhase,
+        pickCard,
+        activate,
+        commitUpgrade,
+        commitDeployment: commitDeploy,
+        commitActivation: commitActivate,
+      } = dispatch;
       expect(() => finishPhase()).not.toThrow();
       expect(() => pickCard(CardClass.LilyPad)).not.toThrow();
       expect(() => commitUpgrade({ x: 0, y: 0 })).not.toThrow();
@@ -30,7 +37,14 @@ describe('The context', () => {
           { x: 0, y: 0 },
         ),
       ).not.toThrow();
-      ({ finishPhase, pickCard, activate, commitUpgrade, commitDeploy, commitActivate }) satisfies GameActions;
+      ({
+        finishPhase,
+        pickCard,
+        activate,
+        commitUpgrade,
+        commitDeployment: commitDeploy,
+        commitActivation: commitActivate,
+      }) satisfies GameActions;
 
       return '';
     }

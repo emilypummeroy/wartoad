@@ -1,7 +1,7 @@
 import { data } from '../state';
 import { distanceBetween, type Position } from '../types/position';
 
-export const commitActivate = (target: Position) =>
+export const commitActivation = (target: Position) =>
   data(({ get, set, make }) => {
     const didMeetPreconditions =
       !!get.activation && distanceBetween(get.activation.start, target) <= 1;

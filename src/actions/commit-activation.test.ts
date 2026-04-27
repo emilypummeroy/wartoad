@@ -17,7 +17,7 @@ import { CardClass, CardKey, type UnitCard } from '../types/card';
 import { Phase, Player, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { _, counter } from '../types/test-utils';
-import { commitActivate } from './commit-activate';
+import { commitActivation } from './commit-activation';
 
 const { Froglet, LilyPad } = CardKey;
 const { North, South } = Player;
@@ -40,7 +40,7 @@ type Preconditions = [
   CardKey?,
 ];
 
-describe(commitActivate, () => {
+describe(commitActivation, () => {
   describe.for<Preconditions>([
     // Not Activating
     [{ x: 1, y: 3 }, North, Idle, Main, _],
@@ -78,7 +78,7 @@ describe(commitActivate, () => {
         ...activationOf(start),
         ...pickedCardOf(pickedCard),
       });
-      const got = commitActivate(target)(old);
+      const got = commitActivation(target)(old);
       expect(got).toStrictEqual(old);
     });
   };
@@ -100,7 +100,7 @@ describe(commitActivate, () => {
       const [before] = state_for(input);
 
       it('should not affect the target position', () => {
-        const result = commitActivate(target)(before);
+        const result = commitActivation(target)(before);
         const got = getPondStateAt(result.pond, target);
         const want = getPondStateAt(before.pond, target);
         expect(got).toStrictEqual(want);
@@ -131,14 +131,14 @@ describe(commitActivate, () => {
       const [before, unit] = state_for(input);
 
       it('should move the unit to the target position', () => {
-        const result = commitActivate(target)(before);
+        const result = commitActivation(target)(before);
         const { units } = getPondStateAt(result.pond, target);
         expect(units).toHaveLength(targetCount + 1);
         expect(units[targetCount]).toStrictEqual(unit);
       });
 
       it('should move the unit from the start position', () => {
-        const result = commitActivate(target)(before);
+        const result = commitActivation(target)(before);
         const { units } = getPondStateAt(result.pond, start);
         expect(units).toHaveLength(startCount - 1);
         expect(units.find(({ key }) => key === unit.key)).toBe(undefined);
@@ -205,12 +205,12 @@ describe(commitActivate, () => {
     old: GameState,
   ) => {
     it('should unset the activation state', () => {
-      const result = commitActivate(target)(old);
+      const result = commitActivation(target)(old);
       expect(result.activation).toBeUndefined();
     });
 
     it('should set subphase to Idle', () => {
-      const result = commitActivate(target)(old);
+      const result = commitActivation(target)(old);
       expect(result.flow.subphase).toStrictEqual(Idle);
     });
   };
@@ -220,7 +220,7 @@ describe(commitActivate, () => {
     before: GameState,
   ) => {
     it('should not affect the rest of gameflow state', () => {
-      const after = commitActivate(target)(before);
+      const after = commitActivation(target)(before);
       let got = {};
       let want = {};
       {
@@ -241,7 +241,7 @@ describe(commitActivate, () => {
     before: GameState,
   ) =>
     it('should not affect any other positions', () => {
-      const after = commitActivate(target)(before);
+      const after = commitActivation(target)(before);
       // Excluding rows/leaves by spreading shenanigans isn't
       // worth it, it's more annoying than just iterating.
       for (let x = 0; x < LEAF_COUNT_PER_ROW; x += 1) {
@@ -264,7 +264,7 @@ describe(commitActivate, () => {
     before: GameState,
   ) =>
     it(`should not affect the rest of the leaf at ${JSON.stringify(xy)}`, () => {
-      const after = commitActivate(xy)(before);
+      const after = commitActivation(xy)(before);
       const { units: _, ...got } = getPondStateAt(after.pond, xy);
       const { units: __, ...want } = getPondStateAt(before.pond, xy);
       expect(got).toStrictEqual(want);
@@ -275,7 +275,7 @@ describe(commitActivate, () => {
     before: GameState,
   ) =>
     it('should not affect the rest of game state', () => {
-      const after = commitActivate(target)(before);
+      const after = commitActivation(target)(before);
       let got = {};
       let want = {};
       {

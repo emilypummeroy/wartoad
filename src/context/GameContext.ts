@@ -2,8 +2,8 @@ import { createContext, useMemo, useRef, useState } from 'react';
 
 import {
   activate,
-  commitDeploy,
-  commitActivate,
+  commitDeployment,
+  commitActivation,
   commitUpgrade,
   type GameActions,
   pickCard,
@@ -36,11 +36,11 @@ export const useGameContextData = (
 
         commitUpgrade: (position: Position) =>
           commitUpgrade(getNextCardKey)(position),
-        commitDeploy: (position: Position) =>
-          commitDeploy(getNextCardKey)(position),
-        commitActivate: (position: Position) => commitActivate(position),
+        commitDeployment: (position: Position) =>
+          commitDeployment(position, getNextCardKey),
+        commitActivation: (position: Position) => commitActivation(position),
       }),
-    [setState, getDrawnCard],
+    [getDrawnCard],
   );
   return [state, actions];
 };
@@ -57,15 +57,15 @@ const dropAll: DropAll<GameActions, GameState> =
     pickCard,
     activate,
     commitUpgrade,
-    commitDeploy,
-    commitActivate,
+    commitDeployment,
+    commitActivation: commitActivate,
   }) => ({
     finishPhase: drop(set)(finishPhase),
     pickCard: drop(set)(pickCard),
     activate: drop(set)(activate),
     commitUpgrade: drop(set)(commitUpgrade),
-    commitDeploy: drop(set)(commitDeploy),
-    commitActivate: drop(set)(commitActivate),
+    commitDeployment: drop(set)(commitDeployment),
+    commitActivation: drop(set)(commitActivate),
   });
 
 const drop: Drop<GameState> =

@@ -45,15 +45,15 @@ describe(PondLeafDropzone, () => {
   };
 
   const commitUpgrade = vi.fn<(p: Position) => void>();
-  const commitDeploy = vi.fn<(p: Position) => void>();
-  const commitActivate = vi.fn<(p: Position) => void>();
+  const commitDeployment = vi.fn<(p: Position) => void>();
+  const commitActivation = vi.fn<(p: Position) => void>();
   const activate = vi.fn<(c: UnitCard, p: Position) => void>();
   const beforeEach_render_with_subphase = ([controller, player, position, subphase, pondKey, phase, start]: Inputs) => {
     beforeEach(() => {
       const pond = setPondStateAt(TEST_PONDS_BY_KEY[pondKey ?? INITIAL_POND], position, { controller });
       renderWithGameContext([
         { pond, ...gameflowOf(player, subphase, phase), ...activationOf(start) },
-        { activate, commitUpgrade, commitDeploy, commitActivate },
+        { activate, commitUpgrade, commitDeployment, commitActivation },
       ])(
         <PondLeafDropzone targetLabelId={TEST_TARGET_ID} position={position}>
           <div id={TEST_TARGET_ID} aria-label={TEST_LABEL}>
@@ -130,12 +130,12 @@ describe(PondLeafDropzone, () => {
 
     it('should not call commitDeploy when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitDeploy).not.toHaveBeenCalled();
+      expect(commitDeployment).not.toHaveBeenCalled();
     });
 
     it('should not call commitActivate when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitActivate).not.toHaveBeenCalled();
+      expect(commitActivation).not.toHaveBeenCalled();
     });
   });
 
@@ -169,7 +169,7 @@ describe(PondLeafDropzone, () => {
 
     it('should not call commitDeploy when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitDeploy).not.toHaveBeenCalled();
+      expect(commitDeployment).not.toHaveBeenCalled();
     });
 
     it('should have no Move dropzone', () => {
@@ -178,7 +178,7 @@ describe(PondLeafDropzone, () => {
 
     it('should not call commitActivate when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitActivate).not.toHaveBeenCalled();
+      expect(commitActivation).not.toHaveBeenCalled();
     });
   });
 
@@ -203,7 +203,7 @@ describe(PondLeafDropzone, () => {
 
     it('should call commitDeploy when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitDeploy).toHaveBeenCalledExactlyOnceWith(position);
+      expect(commitDeployment).toHaveBeenCalledExactlyOnceWith(position);
     });
 
     it('should have no Upgrade dropzone', () => {
@@ -221,7 +221,7 @@ describe(PondLeafDropzone, () => {
 
     it('should not call commitActivate when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitActivate).not.toHaveBeenCalled();
+      expect(commitActivation).not.toHaveBeenCalled();
     });
   });
 
@@ -249,7 +249,7 @@ describe(PondLeafDropzone, () => {
 
     it('should call commitActivate when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitActivate).toHaveBeenCalledExactlyOnceWith(position);
+      expect(commitActivation).toHaveBeenCalledExactlyOnceWith(position);
     });
 
     it('should have no Upgrade dropzone', () => {
@@ -267,7 +267,7 @@ describe(PondLeafDropzone, () => {
 
     it('should not call commitDeploy when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitDeploy).not.toHaveBeenCalled();
+      expect(commitDeployment).not.toHaveBeenCalled();
     });
   });
 });

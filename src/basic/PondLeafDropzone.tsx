@@ -23,8 +23,8 @@ type PondLeafDropzoneSlice = [
   },
   {
     commitUpgrade: (target: Position) => void;
-    commitDeploy: (on: Position) => void;
-    commitActivate: (end: Position) => void;
+    commitDeployment: (on: Position) => void;
+    commitActivation: (end: Position) => void;
   },
 ];
 
@@ -45,7 +45,7 @@ export function PondLeafDropzone({
       activation,
       pond,
     },
-    { commitUpgrade, commitDeploy, commitActivate },
+    { commitUpgrade, commitDeployment, commitActivation },
   ]: PondLeafDropzoneSlice = useContext(GameContext);
   const { isUpgraded, controller } = getPondStateAt(pond, position);
   const dropzoneId = useId();
@@ -63,8 +63,8 @@ export function PondLeafDropzone({
   const handleClick = {
     [Subphase.Idle]: undefined,
     [Subphase.Upgrading]: () => commitUpgrade(position),
-    [Subphase.Deploying]: () => commitDeploy(position),
-    [Subphase.Activating]: () => commitActivate(position),
+    [Subphase.Deploying]: () => commitDeployment(position),
+    [Subphase.Activating]: () => commitActivation(position),
   }[subphase];
 
   const dropzoneVerb = {
