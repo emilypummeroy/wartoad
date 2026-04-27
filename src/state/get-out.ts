@@ -7,7 +7,7 @@ import {
   type LeafState,
   type PondState,
 } from '../state-types/pond';
-import type { CardClass } from '../types/card';
+import type { CardClass, LeafClass } from '../types/card';
 import {
   Phase,
   Player,
@@ -127,6 +127,7 @@ type GameMake = {
   // upgrading: (x: CardClass) => GameData;
   readonly activating: (x: ActivationState) => GameData;
   readonly winner: (x: Player) => GameData;
+  readonly upgrading: (x: LeafClass) => GameData;
 };
 
 const access: (s: GameState) => GameAccess = s => ({
@@ -162,6 +163,9 @@ const access: (s: GameState) => GameAccess = s => ({
   // },
 
   get activation() {
+    return s.flow.subphase === Subphase.Activating ? s.activation : undefined;
+  },
+  get upgrading() {
     return s.flow.subphase === Subphase.Activating ? s.activation : undefined;
   },
 });
@@ -218,13 +222,14 @@ const make = (s: GameState): GameMake => ({
       pickedCard: undefined,
       activation: undefined,
     }),
-  // upgrading: pickedCard =>
-  //   gameData({
-  //     ...s,
-  //     flow: { ...s.flow, subphase: Subphase.Upgrading },
-  //     pickedCard,
-  //     activation: undefined,
-  //   }),
+
+  upgrading: pickedCard =>
+    gameData({
+      ...s,
+      flow: { ...s.flow, subphase: Subphase.Upgrading },
+      pickedCard,
+    }),
+
   // deploying: pickedCard =>
   //   gameData({
   //     ...s,
@@ -236,7 +241,6 @@ const make = (s: GameState): GameMake => ({
     gameData({
       ...s,
       flow: { ...s.flow, subphase: Subphase.Activating },
-      pickedCard: undefined,
       activation,
     }),
 

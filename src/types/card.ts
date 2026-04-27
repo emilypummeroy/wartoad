@@ -117,10 +117,13 @@ export const NoneValues = 'None' as const;
 
 export const CardClass = { ...UnitClass, ...LeafClass } as const;
 
-export const CardKey: Record<CardKey, CardKey> = {
+export const CardKey = {
   Froglet: CardClass.Froglet.key,
-  LilyPad: CardClass.LilyPad.key,
-};
+  LilyPad: LeafClass.LilyPad.key,
+} as const;
+CardKey satisfies Record<CardKey, CardKey>;
+CardKey satisfies Record<UnitKey, UnitKey>;
+CardKey satisfies Record<LeafKey, LeafKey>;
 
 CardClass satisfies Record<UnitKey, UnitClass>;
 CardClass satisfies Record<LeafKey, LeafClass>;
