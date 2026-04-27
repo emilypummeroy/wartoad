@@ -1,7 +1,7 @@
 import { useCallback, useId } from 'react';
 
-import { CardClass, type CardKey } from '../types/card';
-import { Player, PLAYER_CLASSNAME } from '../types/gameflow';
+import { CardClass, type Card } from '../types/card';
+import { type Player, PLAYER_CLASSNAME } from '../types/gameflow';
 import { CardBack, Froglet, LilyPad } from '../view/Card';
 
 export const INITIAL_HAND_SIZE = 7;
@@ -10,19 +10,12 @@ export const BIG_HAND_HAND_SIZE = 12;
 
 type HandCardProps = Readonly<{
   isEnabled?: boolean;
-  // TODO 11: use card: Card
-  cardClass: CardClass;
+  card: Card;
   player: Player;
-  // TODO 11: use onPick(Card), fix parameter name
-  onPick: (cardKey: CardClass) => void;
+  onPick: (cardKey: Card) => void;
 }>;
-function HandCard({
-  isEnabled = false,
-  cardClass,
-  player,
-  onPick,
-}: HandCardProps) {
-  const handleClick = useCallback(() => onPick(cardClass), [cardClass, onPick]);
+function HandCard({ isEnabled = false, card, player, onPick }: HandCardProps) {
+  const handleClick = useCallback(() => onPick(card), [card, onPick]);
   const buttonId = useId();
   const titleId = useId();
   return isEnabled ? (
@@ -35,7 +28,7 @@ function HandCard({
       className={`highlighting-card pickable-card ${PLAYER_CLASSNAME[player]}`}
       onClick={handleClick}
     >
-      {cardClass === CardClass.Froglet ? (
+      {card.cardClass === CardClass.Froglet ? (
         <Froglet nameId={titleId} />
       ) : (
         <LilyPad nameId={titleId} />
@@ -48,7 +41,7 @@ function HandCard({
       tabIndex={0}
       className={`highlighting-card ${PLAYER_CLASSNAME[player]}`}
     >
-      {cardClass === CardClass.Froglet ? (
+      {card.cardClass === CardClass.Froglet ? (
         <Froglet nameId={titleId} />
       ) : (
         <LilyPad nameId={titleId} />
@@ -57,7 +50,7 @@ function HandCard({
   );
 }
 
-export const classForHand = (cards: readonly CardClass[]): string => {
+export const classForHand = (cards: readonly unknown[]): string => {
   if (cards.length <= SMALL_HAND_SIZE) return '';
   if (cards.length <= BIG_HAND_HAND_SIZE) return 'compact';
   return 'super-compact';
@@ -68,10 +61,8 @@ type HandProps = Readonly<{
   isMainPhase: boolean;
   isPlayerTurn: boolean;
   isPlacing: boolean;
-  // TODO 11: use Card[]
-  handCards: readonly CardClass[];
-  // TODO 11: use onPick(Card)
-  onPick: (cardClass: CardClass) => void;
+  handCards: readonly Card[];
+  onPick: (cardClass: Card) => void;
 }>;
 declare module 'react' {
   // oxlint-disable-next-line typescript/consistent-type-definitions
@@ -90,18 +81,11 @@ export function Hand({
   onPick,
 }: HandProps) {
   const id = useId();
-  // TODO 11: use central Player.STYLES
-  const playerStyle = {
-    [Player.North]: 'north',
-    [Player.South]: 'south',
-  }[player];
-  // TODO 11: use card.key instead of counts, can remove the record
-  const countsSoFar: Partial<Record<CardKey, number>> = {};
   const isJiggling = isMainPhase && !isPlacing && isPlayerTurn;
 
   return (
     <section className="hand" aria-labelledby={id}>
-      <h3 id={id} className={playerStyle}>
+      <h3 id={id} className={PLAYER_CLASSNAME[player]}>
         {player} hand
       </h3>
       <div
@@ -111,30 +95,22 @@ export function Hand({
           '--hand-size': handCards.length,
         }}
       >
-        {handCards.map((cardClass: CardClass) => {
-          // TODO 11: card.key instead of counts
-          const i = countsSoFar[cardClass.key] ?? 0;
-          countsSoFar[cardClass.key] = i + 1;
-
-          // TODO 11: card.key
-          // TODO 11: card.owner
-          return isPlayerTurn ? (
-            <div key={`${cardClass.key} ${i}`} className="stacking jiggling">
+        {handCards.map(card =>
+          isPlayerTurn ? (
+            <div key={card.key} className="stacking jiggling">
               <HandCard
-                cardClass={cardClass}
+                card={card}
                 player={player}
                 isEnabled={isMainPhase && !isPlacing}
                 onPick={onPick}
               />
             </div>
           ) : (
-            // TODO 11: card.key
-            // TODO 11: card.owner
-            <div key={`${cardClass.key} ${i}`} className="stacking">
+            <div key={card.key} className="stacking">
               <CardBack player={player} />
             </div>
-          );
-        })}
+          ),
+        )}
       </div>
     </section>
   );

@@ -12,7 +12,7 @@ import {
   type Unit,
   type UnitValues,
 } from '../types/card';
-import type { Player } from '../types/gameflow';
+import { Player } from '../types/gameflow';
 
 export const isUnit = (card: Card): card is UnitCard =>
   card.type === CardType.Unit && Boolean(card satisfies UnitCard);
@@ -73,12 +73,38 @@ const INITIAL_VALUES = {
   [CardType.Unit]: { damage: 0 },
 } as const satisfies Record<Unit, UnitValues> & Record<Leaf, LeafValues>;
 
-export const DETERMINISTIC_STARTING_HAND = [
-  CardClass.LilyPad,
-  CardClass.Froglet,
-  CardClass.LilyPad,
-  CardClass.Froglet,
-  CardClass.Froglet,
-  CardClass.Froglet,
-  CardClass.LilyPad,
+export const deterministicStartingHand = (
+  owner: Player,
+  getNextCardKey: () => number,
+) =>
+  [
+    CardClass.LilyPad,
+    CardClass.Froglet,
+    CardClass.LilyPad,
+    CardClass.Froglet,
+    CardClass.Froglet,
+    CardClass.Froglet,
+    CardClass.LilyPad,
+  ]
+    .map(cardClass => ({ cardClass, owner, key: getNextCardKey() }))
+    .map(x => createCard(x));
+
+export const DETERMINISTIC_NORTH_HAND = [
+  createCard({ cardClass: CardClass.LilyPad, owner: Player.North, key: -1 }),
+  createCard({ cardClass: CardClass.Froglet, owner: Player.North, key: -2 }),
+  createCard({ cardClass: CardClass.LilyPad, owner: Player.North, key: -3 }),
+  createCard({ cardClass: CardClass.Froglet, owner: Player.North, key: -4 }),
+  createCard({ cardClass: CardClass.Froglet, owner: Player.North, key: -5 }),
+  createCard({ cardClass: CardClass.Froglet, owner: Player.North, key: -6 }),
+  createCard({ cardClass: CardClass.LilyPad, owner: Player.North, key: -7 }),
+];
+
+export const DETERMINISTIC_SOUTH_HAND = [
+  createCard({ cardClass: CardClass.LilyPad, owner: Player.South, key: -8 }),
+  createCard({ cardClass: CardClass.Froglet, owner: Player.South, key: -9 }),
+  createCard({ cardClass: CardClass.LilyPad, owner: Player.South, key: -10 }),
+  createCard({ cardClass: CardClass.Froglet, owner: Player.South, key: -11 }),
+  createCard({ cardClass: CardClass.Froglet, owner: Player.South, key: -12 }),
+  createCard({ cardClass: CardClass.Froglet, owner: Player.South, key: -13 }),
+  createCard({ cardClass: CardClass.LilyPad, owner: Player.South, key: -14 }),
 ];

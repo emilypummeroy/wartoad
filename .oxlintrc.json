@@ -33,6 +33,10 @@
     "no-continue": "allow",
     "no-shadow": "allow",
     "ban-types": "allow",
+    "prefer-readonly-parameter-types": [
+      "error",
+      { "ignoreInferredTypes": true }
+    ],
     "array-type": ["allow", { "default": "array-simple" }],
     "no-duplicate-imports": ["error"],
     "consistent-type-imports": [

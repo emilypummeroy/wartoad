@@ -1,3 +1,4 @@
+import { draw } from '../state-types/card.test-utils';
 import { createStateWith, gameflowOf } from '../state/test-utils';
 import { CardClass, CardKey } from '../types/card';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
@@ -22,13 +23,13 @@ describe(finishStartPhase, () => {
     [South, End, LilyPad, { x: 0, y: 0 }],
   ])(
     'Precondition failed: need Idle | %s %s | %s %s',
-    ([player, phase, cardClass]) => {
-      const draw = () => CardClass[cardClass];
+    ([player, phase, cardKey]) => {
+      const cardClass = CardClass[cardKey];
       it('should not change state', () => {
         const old = createStateWith({
           ...gameflowOf(player, undefined, phase),
         });
-        expect(finishStartPhase(draw)(old)).toStrictEqual(old);
+        expect(finishStartPhase(draw(cardClass))(old)).toStrictEqual(old);
       });
     },
   );
@@ -40,34 +41,35 @@ describe(finishStartPhase, () => {
     [South, Froglet],
     [South, LilyPad],
   ])('Postconditions | %s | drawing %s', ([player, cardKey]) => {
-    const draw = () => CardClass[cardKey];
+    const cardClass = CardClass[cardKey];
     const before = createStateWith(gameflowOf(player, Idle, Start));
     const opponent = PLAYER_AFTER[player];
 
     // > old.phase = Start -> phase = Main
     it('should go to the Main phase', () => {
-      const after = finishStartPhase(draw)(before);
+      const after = finishStartPhase(draw(cardClass))(before);
       expect(after.flow.phase).toBe(Main);
     });
 
     // > old.phase = Start -> player unchanged
     it('should not change the player', () => {
-      const after = finishStartPhase(draw)(before);
+      const after = finishStartPhase(draw(cardClass))(before);
       expect(after.flow.player).toBe(player);
     });
 
     // > old.phase = Start -> draw(player)
     it(`should add a ${cardKey} to the ${player} hand`, () => {
-      const after = finishStartPhase(draw)(before);
+      const card = draw(cardClass)(player);
+      const after = finishStartPhase(() => card)(before);
       const beforeHand = player === North ? before.northHand : before.southHand;
       const afterHand = player === North ? after.northHand : after.southHand;
       expect(afterHand).toHaveLength(beforeHand.length + 1);
-      expect(afterHand).toStrictEqual([...beforeHand, CardClass[cardKey]]);
+      expect(afterHand).toStrictEqual([...beforeHand, card]);
     });
 
     // > opponent hand unchanged
     it(`should not change the ${opponent} hand`, () => {
-      const after = finishStartPhase(draw)(before);
+      const after = finishStartPhase(draw(cardClass))(before);
       const beforeHand = player === South ? before.northHand : before.southHand;
       const afterHand = player === South ? after.northHand : after.southHand;
       expect(afterHand).toStrictEqual(beforeHand);

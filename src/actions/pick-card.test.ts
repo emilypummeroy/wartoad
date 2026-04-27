@@ -1,8 +1,7 @@
-import { createCard } from '../state-types/card';
+import { draw } from '../state-types/card.test-utils';
 import { createStateWith, gameflowOf } from '../state/test-utils';
 import { CardClass, CardKey } from '../types/card';
 import { Player, Subphase } from '../types/gameflow';
-import { counter } from '../types/test-utils';
 import { pickCard } from './pick-card';
 
 const { North, South } = Player;
@@ -16,39 +15,32 @@ describe(pickCard, () => {
     [North, LilyPad, Upgrading],
     [South, LilyPad, Upgrading],
   ])('Postconditions | %s turn | called with %s', ([player, cardKey, want]) => {
-    const card = createCard({
-      cardClass: CardClass[cardKey],
-      owner: player,
-      key: counter(),
-    });
+    const card = draw(CardClass[cardKey])(player);
     const before = createStateWith({
       ...gameflowOf(player),
     });
 
     // > Subphase set to appropriate subphase
     it(`should set the subphase to ${want}`, () => {
-      const after = pickCard(card.cardClass, counter)(before);
+      const after = pickCard(card)(before);
       expect(after.flow.subphase).toBe(want);
     });
 
     it('should not change the rest of the gameflow state', () => {
-      const { subphase: _, ...got } = pickCard(
-        card.cardClass,
-        counter,
-      )(before).flow;
+      const { subphase: _, ...got } = pickCard(card)(before).flow;
       const { subphase: __, ...want } = before.flow;
       expect(got).toStrictEqual(want);
     });
 
     // > pickedCard set
     it(`should set the picked card to a ${cardKey}`, () => {
-      const after = pickCard(card.cardClass, counter)(before);
+      const after = pickCard(card)(before);
       const pickedCard = after.upgrade?.leaf ?? after.deployment?.unit;
       expect(pickedCard?.cardClass).toBe(card.cardClass);
     });
 
     it(`should not affect the rest of the state`, () => {
-      const after = pickCard(card.cardClass, counter)(before);
+      const after = pickCard(card)(before);
       let got = {};
       let want = {};
       {

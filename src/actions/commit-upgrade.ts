@@ -16,8 +16,6 @@ export const commitUpgrade = (target: Position) =>
       .at(target)
       .to({ isUpgraded: true })
       .set.hand.of(get.player)
-      .update(hand =>
-        hand.filter((_, i) => i !== hand.indexOf(upgrade.leaf.cardClass)),
-      )
+      .update(hand => hand.filter(card => card !== upgrade.leaf))
       .make.idle().get.out;
   });

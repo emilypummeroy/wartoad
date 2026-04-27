@@ -1,4 +1,4 @@
-import { type CardClass, type UnitCard } from '../types/card';
+import { type Card, type UnitCard } from '../types/card';
 import type { Position } from '../types/position';
 
 export { activate } from './activate';
@@ -13,7 +13,7 @@ export type GameActions = {
   // No different pickUnit, pickLeaf, etc.
   // The difference between activation and upgrading is not the concern of
   // Hand or Card.
-  pickCard: (_: CardClass) => void;
+  pickCard: (_: Card) => void;
   activate: (unit: UnitCard, position: Position) => void;
   commitUpgrade: (_: Position) => void;
   commitDeployment: (_: Position) => void;

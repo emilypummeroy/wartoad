@@ -1,5 +1,5 @@
 import type { GameState } from '../state-types';
-import { createUnit, DETERMINISTIC_STARTING_HAND } from '../state-types/card';
+import { createUnit, deterministicStartingHand } from '../state-types/card';
 import {
   getPondStateAt,
   INITIAL_POND,
@@ -94,12 +94,10 @@ describe(commitDeployment, () => {
 
       const restOfHand =
         player === North
-          ? DETERMINISTIC_STARTING_HAND
-          : DETERMINISTIC_STARTING_HAND.toReversed();
+          ? deterministicStartingHand(Player.North, counter)
+          : deterministicStartingHand(Player.South, counter).toReversed();
       const playerHand =
-        player === North
-          ? [...restOfHand, unit.cardClass]
-          : [unit.cardClass, ...restOfHand];
+        player === North ? [...restOfHand, unit] : [unit, ...restOfHand];
 
       const before = createStateWith({
         ...deploymentOf(player, unit),
@@ -126,8 +124,8 @@ describe(commitDeployment, () => {
       it(`should remove the card from the ${player} hand`, () => {
         const after = commitDeployment(target)(before);
         const got = player === North ? after.northHand : after.southHand;
-        // TODO 11: Check for individual card
-        expect(got).toHaveLength(restOfHand.length);
+        for (const card of restOfHand) expect(got).toContain(card);
+        expect(got).not.toContain(unit);
       });
 
       const opponent = PLAYER_AFTER[player];

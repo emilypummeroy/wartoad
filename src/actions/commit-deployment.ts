@@ -15,8 +15,6 @@ export const commitDeployment = (target: Position) =>
         units: [...units, deployment.unit],
       }))
       .set.hand.of(get.player)
-      .update(hand =>
-        hand.filter((_, i) => i !== hand.indexOf(deployment.unit.cardClass)),
-      )
+      .update(hand => hand.filter(card => card !== deployment.unit))
       .make.idle().get.out;
   });

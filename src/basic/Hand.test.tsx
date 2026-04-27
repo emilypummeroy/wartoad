@@ -1,12 +1,13 @@
 import { screen, within, render, fireEvent } from '@testing-library/react';
 
-import { CardClass, type CardKey } from '../types/card';
+import { draw } from '../state-types/card.test-utils';
+import { CardClass, type Card, type CardKey } from '../types/card';
 import { Phase, Player } from '../types/gameflow';
 import { Hand, classForHand, INITIAL_HAND_SIZE, SMALL_HAND_SIZE, BIG_HAND_HAND_SIZE } from './Hand';
 
 const MANY = 15;
 
-const cards = (length: number, cardClass: CardClass): CardClass[] => Array.from({ length }, () => cardClass);
+const cards = (length: number, cardClass: CardClass): Card[] => Array.from({ length }, draw(cardClass));
 
 describe(classForHand, () => {
   describe.for([CardClass.Froglet.key, CardClass.LilyPad.key])('with a hand full of %s', cardKey => {
@@ -51,7 +52,7 @@ describe(Hand, () => {
 
     const withinHand = () => within(screen.getByRole('region', { name: `${player} hand` }));
 
-    const pickCard = vi.fn<(_: CardClass) => void>();
+    const pickCard = vi.fn<(_: Card) => void>();
 
     describe.for<[Phase, isPlacing: boolean]>([
       [Phase.Start, true],
@@ -82,22 +83,14 @@ describe(Hand, () => {
     });
 
     it(`should allow ${cardClass.name}s to be picked during the ${player} Main phase `, () => {
-      render(
-        <Hand
-          player={player}
-          handCards={cards(handSize, cardClass)}
-          isPlacing={false}
-          isMainPhase
-          isPlayerTurn
-          onPick={pickCard}
-        />,
-      );
+      const hand = cards(handSize, cardClass);
+      render(<Hand player={player} handCards={hand} isPlacing={false} isMainPhase isPlayerTurn onPick={pickCard} />);
       const clickableCards = withinHand().getAllByRole('button', {
         name: `Pick ${cardClass.name}`,
       });
-      for (const card of clickableCards) {
-        fireEvent.click(card);
-        expect(pickCard).toHaveBeenCalledExactlyOnceWith(cardClass);
+      for (let i = 0; i < clickableCards.length; i += 1) {
+        fireEvent.click(clickableCards[i]);
+        expect(pickCard).toHaveBeenCalledExactlyOnceWith(hand[i]);
         pickCard.mockClear();
       }
     });

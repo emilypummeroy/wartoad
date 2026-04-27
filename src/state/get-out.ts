@@ -13,7 +13,7 @@ import {
   type LeafState,
   type PondState,
 } from '../state-types/pond';
-import type { CardClass, LeafCard, UnitCard } from '../types/card';
+import type { Card, LeafCard, UnitCard } from '../types/card';
 import {
   Phase,
   Player,
@@ -85,7 +85,6 @@ export type GameAccess = {
     readonly at: (xy: Position) => LeafState;
     readonly exists: (p: (v: LeafState, xy: Position) => boolean) => boolean;
   };
-  // hand: { of: (p: Player) => Read<CardClass[]> };
   readonly upgrade: UpgradeState | undefined;
   readonly deployment: DeploymentState | undefined;
   readonly activation: ActivationState | undefined;
@@ -94,9 +93,6 @@ export type GameAccess = {
 // Updaters which preserve simple invariants
 export type GameUpdate = {
   readonly player: { readonly to: (x: Player) => GameData };
-  // pond: {
-  //   //  to: (x: Read<PondState>) => GameData
-  // };
   readonly leaf: {
     readonly at: (x: Position) => {
       readonly to: (x: Partial<LeafState>) => GameData;
@@ -112,10 +108,7 @@ export type GameUpdate = {
   readonly phase: { readonly to: (x: Phase) => GameData };
   readonly hand: {
     readonly of: (x: Player) => {
-      // to: (x: readonly CardClass[]) => GameData;
-      readonly update: (
-        x: (old: readonly CardClass[]) => CardClass[],
-      ) => GameData;
+      readonly update: (x: (old: readonly Card[]) => Card[]) => GameData;
     };
   };
 };
@@ -156,12 +149,6 @@ const access: (s: GameState) => GameAccess = s => ({
     },
   },
 
-  // hand: {
-  //   of(p: Player) {
-  //     return p === Player.North ? s.northHand : s.southHand;
-  //   },
-  // },
-
   get upgrade() {
     return s.flow.subphase === Subphase.Upgrading ? s.upgrade : undefined;
   },
@@ -192,11 +179,6 @@ const update: (s: GameState) => GameUpdate = s => ({
 
   hand: {
     of: x => ({
-      // to: v =>
-      //   gameData({
-      //     ...s,
-      //     ...(x === Player.North ? { northHand: v } : { southHand: v }),
-      //   }),
       update: u =>
         gameData({
           ...s,
@@ -275,14 +257,8 @@ type GameInvariants = (
 
 type InvariantChecks = {
   readonly always: (p: boolean) => void;
-  // never: (p: boolean) => void;
-  // readonly when: (p: boolean) => {
-  //   readonly must: (q: boolean) => void;
-  //   readonly not: (q: boolean) => void;
-  // };
   readonly unless: (p: boolean) => {
     readonly must: (q: boolean) => void;
-    // not: (q: boolean) => void;
   };
   readonly iff: (p: boolean) => {
     readonly must: (q: boolean) => void;
@@ -291,14 +267,8 @@ type InvariantChecks = {
 
 const invariantChecks: InvariantChecks = {
   always: p => assert(p),
-  // never: p => assert(!p),
-  // when: p => ({
-  //   must: q => assert(!p || q),
-  //   not: q => assert(!p || !q),
-  // }),
   unless: p => ({
     must: q => assert(p || q),
-    // not: q => assert(p || !q),
   }),
   iff: p => ({ must: q => assert(p === q) }),
 };

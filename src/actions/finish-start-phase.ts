@@ -1,8 +1,8 @@
 import { data } from '../state';
-import type { CardClass } from '../types/card';
-import { Phase, PHASE_AFTER } from '../types/gameflow';
+import type { Card } from '../types/card';
+import { Phase, PHASE_AFTER, type Player } from '../types/gameflow';
 
-export const finishStartPhase = (draw: () => CardClass) =>
+export const finishStartPhase = (draw: (owner: Player) => Card) =>
   data(({ get, ...data }) => {
     const didMeetPreconditions = get.phase === Phase.Start;
     if (!didMeetPreconditions) return get.out;
@@ -10,6 +10,6 @@ export const finishStartPhase = (draw: () => CardClass) =>
     const { phase, player } = get;
     return data.set.hand
       .of(player)
-      .update(cards => [...cards, draw()])
+      .update(cards => [...cards, draw(get.player)])
       .set.phase.to(PHASE_AFTER[phase]).get.out;
   });

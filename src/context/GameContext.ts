@@ -12,31 +12,32 @@ import {
 } from '../actions';
 import { createState, DEFAULT_GAME_STATE } from '../state';
 import type { GameState } from '../state-types';
-import { type CardClass, type UnitCard } from '../types/card';
-import { type Position } from '../types/position';
+import { type Card } from '../types/card';
+import type { Player } from '../types/gameflow';
 
 export type GameContext = [GameState, GameActions];
 
 export const useGameContextData = (
-  getStartingHand: () => CardClass[],
-  getDrawnCard: () => CardClass,
+  getStartingHand: (owner: Player, getNextCardKey: () => number) => Card[],
+  getDrawnCard: (owner: Player, getNextCardKey: () => number) => Card,
 ): GameContext => {
   const cardKey = useRef(0);
   const getNextCardKey = () => (cardKey.current += 1);
-  const [state, setState] = useState<GameState>(createState(getStartingHand));
+  const [state, setState] = useState<GameState>(
+    createState(p => getStartingHand(p, getNextCardKey)),
+  );
   const actions = useMemo(
     () =>
       dropAll(setState)({
-        finishPhase: () => finishPhase(getDrawnCard),
+        finishPhase: () =>
+          finishPhase(player => getDrawnCard(player, getNextCardKey)),
 
-        pickCard: (cardClass: CardClass) => pickCard(cardClass, getNextCardKey),
+        pickCard,
+        activate,
 
-        activate: (unit: UnitCard, position: Position) =>
-          activate(unit, position),
-
-        commitUpgrade: (position: Position) => commitUpgrade(position),
-        commitDeployment: (position: Position) => commitDeployment(position),
-        commitActivation: (position: Position) => commitActivation(position),
+        commitUpgrade,
+        commitDeployment,
+        commitActivation,
       }),
     [getDrawnCard],
   );

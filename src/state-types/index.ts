@@ -1,4 +1,4 @@
-import type { CardClass, LeafCard, UnitCard } from '../types/card';
+import type { Card, LeafCard, UnitCard } from '../types/card';
 import type { Gameflow, Player } from '../types/gameflow';
 import type { Position } from '../types/position';
 import type { PondState } from './pond';
@@ -6,10 +6,8 @@ import type { PondState } from './pond';
 export type GameState = {
   readonly flow: Gameflow;
   readonly pond: PondState;
-  // TODO 11: Card[]
-  readonly northHand: readonly CardClass[];
-  // TODO 11: Card[]
-  readonly southHand: readonly CardClass[];
+  readonly northHand: readonly Card[];
+  readonly southHand: readonly Card[];
   readonly activation?: ActivationState;
   readonly deployment?: DeploymentState;
   readonly upgrade?: UpgradeState;

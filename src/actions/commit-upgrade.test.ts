@@ -1,5 +1,5 @@
 import type { GameState } from '../state-types';
-import { createLeaf, DETERMINISTIC_STARTING_HAND } from '../state-types/card';
+import { createLeaf, deterministicStartingHand } from '../state-types/card';
 import {
   getPondStateAt,
   INITIAL_POND,
@@ -114,12 +114,10 @@ describe(commitUpgrade, () => {
       });
       const restOfHand =
         player === North
-          ? DETERMINISTIC_STARTING_HAND
-          : DETERMINISTIC_STARTING_HAND.toReversed();
+          ? deterministicStartingHand(Player.North, counter)
+          : deterministicStartingHand(Player.South, counter).toReversed();
       const playerHand =
-        player === North
-          ? [...restOfHand, leaf.cardClass]
-          : [leaf.cardClass, ...restOfHand];
+        player === North ? [...restOfHand, leaf] : [leaf, ...restOfHand];
 
       const before = createStateWith({
         ...upgradeOf(player, leaf),
@@ -147,8 +145,8 @@ describe(commitUpgrade, () => {
       it(`should remove the card from the ${player} hand`, () => {
         const after = commitUpgrade(target)(before);
         const got = player === North ? after.northHand : after.southHand;
-        // TODO 11: Check for individual card
-        expect(got).toHaveLength(restOfHand.length);
+        for (const card of restOfHand) expect(got).toContain(card);
+        expect(got).not.toContain(leaf);
       });
 
       const opponent = PLAYER_AFTER[player];

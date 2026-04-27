@@ -116,14 +116,6 @@ export const winningPondOf = (
       }
     : {};
 
-// export const handsOf = (
-//   northHand: readonly CardClass[] = DETERMINISTIC_STARTING_HAND,
-//   southHand: readonly CardClass[] = northHand,
-// ): Partial<GameState> => ({
-//   northHand,
-//   southHand,
-// });
-
 export const createStateWith = (partial: Partial<GameState>): GameState => ({
   ...DEFAULT_GAME_STATE,
   ...partial,

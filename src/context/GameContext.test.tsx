@@ -3,6 +3,7 @@ import { useContext } from 'react';
 
 import type { GameActions } from '../actions';
 import { createUnit } from '../state-types/card';
+import { draw } from '../state-types/card.test-utils';
 import { CardClass, UnitClass } from '../types/card';
 import { Player } from '../types/gameflow';
 import { GameContext } from './GameContext';
@@ -23,7 +24,7 @@ describe('The context', () => {
         commitActivation: commitActivate,
       } = dispatch;
       expect(() => finishPhase()).not.toThrow();
-      expect(() => pickCard(CardClass.LilyPad)).not.toThrow();
+      expect(() => pickCard(draw(CardClass.LilyPad)(Player.North))).not.toThrow();
       expect(() => commitUpgrade({ x: 0, y: 0 })).not.toThrow();
       expect(() => commitDeploy({ x: 0, y: 0 })).not.toThrow();
       expect(() => commitActivate({ x: 0, y: 0 })).not.toThrow();

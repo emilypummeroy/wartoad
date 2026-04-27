@@ -1,13 +1,13 @@
 import { chain, never, pick } from '../state/get-out';
-import type { CardClass } from '../types/card';
-import { Phase } from '../types/gameflow';
+import type { Card } from '../types/card';
+import { Phase, type Player } from '../types/gameflow';
 import { captureIfYouCan } from './capture-if-you-can';
 import { finishEndPhase } from './finish-end-phase';
 import { finishMainPhase } from './finish-main-phase';
 import { finishStartPhase } from './finish-start-phase';
 import { winIfYouCan } from './win-if-you-can';
 
-export const finishPhase = (draw: () => CardClass) =>
+export const finishPhase = (draw: (owner: Player) => Card) =>
   pick(get => {
     switch (get.phase) {
       case Phase.Start:

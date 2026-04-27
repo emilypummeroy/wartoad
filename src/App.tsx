@@ -2,13 +2,14 @@ import './App.css';
 import { GameContext, useGameContextData } from './context/GameContext';
 import { Game } from './Game';
 import { INITIAL_HAND_CARD_COUNT } from './state';
-import { DETERMINISTIC_STARTING_HAND } from './state-types/card';
+import { createCard, deterministicStartingHand } from './state-types/card';
 import { CardClass } from './types/card';
+import type { Player } from './types/gameflow';
 
 export function DeterministicApp() {
   const context: GameContext = useGameContextData(
-    () => shuffled(DETERMINISTIC_STARTING_HAND),
-    () => CardClass.Froglet,
+    shuffledDeterministicStartingHand,
+    deterministicDraw,
   );
 
   return (
@@ -20,8 +21,8 @@ export function DeterministicApp() {
 
 export function App() {
   const context: GameContext = useGameContextData(
-    () => Array.from({ length: INITIAL_HAND_CARD_COUNT }, randomCardClass),
-    randomCardClass,
+    drawStartingHand,
+    drawNextCard,
   );
 
   return (
@@ -30,6 +31,22 @@ export function App() {
     </GameContext>
   );
 }
+
+const drawStartingHand = (owner: Player, getNextCardKey: () => number) =>
+  Array.from({ length: INITIAL_HAND_CARD_COUNT }, () =>
+    createCard({
+      cardClass: randomCardClass(),
+      owner,
+      key: getNextCardKey(),
+    }),
+  );
+
+const drawNextCard = (owner: Player, getNextCardKey: () => number) =>
+  createCard({
+    cardClass: randomCardClass(),
+    owner,
+    key: getNextCardKey(),
+  });
 
 const randomCardClass = (): CardClass =>
   Object.values(CardClass)[
@@ -44,3 +61,15 @@ const shuffled: <T>(cards: readonly T[]) => T[] = cards => {
   }
   return result;
 };
+
+const shuffledDeterministicStartingHand = (
+  player: Player,
+  getNextCardKey: () => number,
+) => shuffled(deterministicStartingHand(player, getNextCardKey));
+
+const deterministicDraw = (owner: Player, getNextCardKey: () => number) =>
+  createCard({
+    cardClass: CardClass.Froglet,
+    owner,
+    key: getNextCardKey(),
+  });

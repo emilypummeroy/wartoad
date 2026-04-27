@@ -1,7 +1,10 @@
 import type { GameState } from '../state-types';
-import { DETERMINISTIC_STARTING_HAND } from '../state-types/card';
+import {
+  DETERMINISTIC_NORTH_HAND,
+  DETERMINISTIC_SOUTH_HAND,
+} from '../state-types/card';
 import { INITIAL_POND } from '../state-types/pond';
-import type { CardClass } from '../types/card';
+import type { Card } from '../types/card';
 import { Phase, Player, Subphase } from '../types/gameflow';
 
 export { data } from './get-out';
@@ -13,8 +16,8 @@ export const DEFAULT_GAME_STATE: GameState = {
     subphase: Subphase.Idle,
   },
   pond: INITIAL_POND,
-  northHand: DETERMINISTIC_STARTING_HAND,
-  southHand: DETERMINISTIC_STARTING_HAND,
+  northHand: DETERMINISTIC_NORTH_HAND,
+  southHand: DETERMINISTIC_SOUTH_HAND,
   upgrade: undefined,
   deployment: undefined,
   activation: undefined,
@@ -22,8 +25,8 @@ export const DEFAULT_GAME_STATE: GameState = {
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 
-export const createState = (getStartingHand: () => CardClass[]) => ({
+export const createState = (getStartingHand: (owner: Player) => Card[]) => ({
   ...DEFAULT_GAME_STATE,
-  northHand: getStartingHand(),
-  southHand: getStartingHand(),
+  northHand: getStartingHand(Player.North),
+  southHand: getStartingHand(Player.South),
 });
