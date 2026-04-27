@@ -10,16 +10,16 @@ import {
 import {
   activationOf,
   createStateWith,
+  deploymentOf,
   gameflowOf,
-  pickedCardOf,
+  upgradeOf,
 } from '../state/test-utils';
-import { CardClass, CardKey, type UnitCard } from '../types/card';
+import { CardClass, type UnitCard } from '../types/card';
 import { Phase, Player, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
-import { _, counter } from '../types/test-utils';
+import { _, counter, type SubphasePlayer } from '../types/test-utils';
 import { commitActivation } from './commit-activation';
 
-const { Froglet, LilyPad } = CardKey;
 const { North, South } = Player;
 const { Idle, Upgrading, Deploying, Activating } = Subphase;
 const { Start, Main, End } = Phase;
@@ -31,21 +31,22 @@ type Input = [
   startUnits?: number,
   start?: Position,
 ];
+
 type Preconditions = [
   Position,
   Player,
   Subphase,
   Phase,
+  ...SubphasePlayer,
   start?: Position,
-  CardKey?,
 ];
 
 describe(commitActivation, () => {
   describe.for<Preconditions>([
     // Not Activating
     [{ x: 1, y: 3 }, North, Idle, Main, _],
-    [{ x: 2, y: 4 }, South, Deploying, Main, _, Froglet],
-    [{ x: 1, y: 3 }, North, Upgrading, Main, _, LilyPad],
+    [{ x: 2, y: 4 }, South, Deploying, Main, _, South],
+    [{ x: 1, y: 3 }, North, Upgrading, Main, North],
     [{ x: 0, y: 4 }, South, Idle, End, _],
     [{ x: 2, y: 5 }, North, Idle, Start, _],
   ])(
@@ -53,12 +54,12 @@ describe(commitActivation, () => {
     input => it_should_return_state_unchanged(input),
   );
 
-  describe.for<Preconditions>([
+  describe.for<[...Preconditions]>([
     // Too far from start
-    [{ x: 1, y: 5 }, North, Activating, Main, { x: 1, y: 3 }],
-    [{ x: 0, y: 4 }, South, Activating, Main, { x: 2, y: 0 }],
-    [{ x: 1, y: 1 }, North, Activating, Main, { x: 1, y: 3 }],
-    [{ x: 0, y: 4 }, South, Activating, Main, { x: 2, y: 4 }],
+    [{ x: 1, y: 5 }, North, Activating, Main, _, _, North, { x: 1, y: 3 }],
+    [{ x: 0, y: 4 }, South, Activating, Main, _, _, South, { x: 2, y: 0 }],
+    [{ x: 1, y: 1 }, North, Activating, Main, _, _, North, { x: 1, y: 3 }],
+    [{ x: 0, y: 4 }, South, Activating, Main, _, _, South, { x: 2, y: 4 }],
   ])(
     'Precondition failed: Too far to move | target: %s | flow: %s %s %s | start: %s',
     input => it_should_return_state_unchanged(input),
@@ -69,14 +70,17 @@ describe(commitActivation, () => {
     player,
     subphase,
     phase,
+    upgrader,
+    deployer,
+    activator,
     start,
-    pickedCard,
   ]: Preconditions) => {
     it('should return the input unchanged', () => {
       const old = createStateWith({
         ...gameflowOf(player, subphase, phase),
-        ...activationOf(start),
-        ...pickedCardOf(pickedCard),
+        ...upgradeOf(upgrader),
+        ...deploymentOf(deployer),
+        ...activationOf(activator, _, start),
       });
       const got = commitActivation(target)(old);
       expect(got).toStrictEqual(old);
@@ -183,7 +187,7 @@ describe(commitActivation, () => {
           )
         : [];
     const before = createStateWith({
-      ...activationOf(start, unit),
+      ...activationOf(player, unit, start),
       ...gameflowOf(player, Activating),
       pond:
         start !== target

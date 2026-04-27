@@ -6,19 +6,16 @@ import {
   TEST_LEAVES_BY_KEY,
 } from '../state-types/pond.test-utils';
 import {
-  activationOf,
   createStateWith,
   gameflowOf,
-  pickedCardOf,
+  subphaseStateOf,
 } from '../state/test-utils';
-import { CardClass, CardKey } from '../types/card';
 import { Phase, Player, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { finishMainPhase } from './finish-main-phase';
 
 const { Idle, Upgrading, Deploying, Activating } = Subphase;
 const { North, South } = Player;
-const { Froglet, LilyPad } = CardKey;
 const { Start, Main, End } = Phase;
 
 const { INITIAL_POND, ANOTHER_POND } = TestPondKey;
@@ -44,14 +41,14 @@ type Inputs = [Player, TestPondKey, Position[], TestLeafKey];
 
 describe(finishMainPhase, () => {
   // Preconditions:
-  describe.for<[...Preconditions, CardKey?, Position?]>([
+  describe.for<Preconditions>([
     // < subphase = Idle
-    [North, Main, Upgrading, Froglet],
-    [North, Main, Deploying, LilyPad],
-    [North, Main, Activating, undefined, { x: 0, y: 4 }],
-    [South, Main, Upgrading, Froglet],
-    [South, Main, Deploying, LilyPad],
-    [South, Main, Activating, undefined, { x: 1, y: 1 }],
+    [North, Main, Upgrading],
+    [North, Main, Deploying],
+    [North, Main, Activating],
+    [South, Main, Upgrading],
+    [South, Main, Deploying],
+    [South, Main, Activating],
 
     // < phase = Main
     [North, Start, Idle],
@@ -60,14 +57,11 @@ describe(finishMainPhase, () => {
     [South, End, Idle],
   ])(
     'Precondition failed: need Main & Idle | %s %s %s',
-    ([player, phase, subphase, cardKey, position]) => {
-      const cardClass = cardKey && CardClass[cardKey];
+    ([player, phase, subphase]) => {
       it('should not change state', () => {
         const old = createStateWith({
           ...gameflowOf(player, subphase, phase),
-          ...(subphase === Activating
-            ? activationOf(position)
-            : pickedCardOf(cardClass)),
+          ...subphaseStateOf(player, subphase),
         });
         expect(finishMainPhase()(old)).toStrictEqual(old);
       });

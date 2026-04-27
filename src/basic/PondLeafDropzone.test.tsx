@@ -7,6 +7,7 @@ import { activationOf, gameflowOf } from '../state/test-utils';
 import type { UnitCard } from '../types/card';
 import { Player, Phase, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
+import { _ } from '../types/test-utils';
 import { PondLeafDropzone } from './PondLeafDropzone';
 
 const { North, South } = Player;
@@ -52,7 +53,7 @@ describe(PondLeafDropzone, () => {
     beforeEach(() => {
       const pond = setPondStateAt(TEST_PONDS_BY_KEY[pondKey ?? INITIAL_POND], position, { controller });
       renderWithGameContext([
-        { pond, ...gameflowOf(player, subphase, phase), ...activationOf(start) },
+        { pond, ...gameflowOf(player, subphase, phase), ...activationOf(player, _, start) },
         { activate, commitUpgrade, commitDeployment, commitActivation },
       ])(
         <PondLeafDropzone targetLabelId={TEST_TARGET_ID} position={position}>

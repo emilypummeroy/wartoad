@@ -1,6 +1,6 @@
 import { DEFAULT_GAME_STATE } from '.';
 import type { GameState } from '../state-types';
-import { createUnit } from '../state-types/card';
+import { createLeaf, createUnit } from '../state-types/card';
 import {
   HOME,
   INITIAL_POND,
@@ -8,19 +8,17 @@ import {
   type PondState,
 } from '../state-types/pond';
 import {
-  type CardKey,
   type UnitCard,
   type UnitKey,
   UnitClass,
   CardClass,
+  LeafClass,
+  type LeafKey,
+  type LeafCard,
 } from '../types/card';
-import {
-  type Subphase,
-  type Phase,
-  Player,
-  PLAYER_AFTER,
-} from '../types/gameflow';
+import { type Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
+import { counter } from '../types/test-utils';
 
 export const gameflowOf = (
   player: Player = DEFAULT_GAME_STATE.flow.player,
@@ -34,18 +32,72 @@ export const gameflowOf = (
   },
 });
 
-export const activationOf = (
-  start?: Position,
-  unit: UnitCard | UnitKey = UnitClass.Froglet.key,
-  owner: Player = typeof unit === 'object' ? unit.owner : Player.North,
+export const subphaseStateOf = (
+  player: Player,
+  subphase?: Subphase,
 ): Partial<GameState> =>
-  start
+  subphase === Subphase.Upgrading
+    ? upgradeOf(player)
+    : subphase === Subphase.Deploying
+      ? deploymentOf(player)
+      : subphase === Subphase.Activating
+        ? activationOf(player)
+        : {};
+
+export const upgradeOf = (
+  owner?: Player,
+  leaf: LeafCard | LeafKey = CardClass.LilyPad.key,
+): Partial<GameState> =>
+  owner
+    ? {
+        upgrade: {
+          leaf:
+            typeof leaf === 'string'
+              ? createLeaf({
+                  cardClass: LeafClass[leaf],
+                  key: counter(),
+                  owner,
+                })
+              : { ...leaf, owner },
+        },
+      }
+    : {};
+
+export const deploymentOf = (
+  owner?: Player,
+  unit: UnitCard | UnitKey = UnitClass.Froglet.key,
+): Partial<GameState> =>
+  owner
+    ? {
+        deployment: {
+          unit:
+            typeof unit === 'string'
+              ? createUnit({
+                  cardClass: UnitClass[unit],
+                  key: counter(),
+                  owner,
+                })
+              : { ...unit, owner },
+        },
+      }
+    : {};
+
+export const activationOf = (
+  owner?: Player,
+  unit: UnitCard | UnitKey = UnitClass.Froglet.key,
+  start: Position = owner === Player.North ? { x: 1, y: 1 } : { x: 1, y: 4 },
+): Partial<GameState> =>
+  owner
     ? {
         activation: {
           start,
           unit:
             typeof unit === 'string'
-              ? createUnit({ cardClass: UnitClass[unit], key: -1, owner })
+              ? createUnit({
+                  cardClass: UnitClass[unit],
+                  key: counter(),
+                  owner,
+                })
               : { ...unit, owner },
         },
       }
@@ -71,16 +123,6 @@ export const winningPondOf = (
 //   northHand,
 //   southHand,
 // });
-
-export const pickedCardOf = (
-  pickedCard?: CardClass | CardKey,
-): Partial<GameState> =>
-  pickedCard !== undefined
-    ? {
-        pickedCard:
-          typeof pickedCard === 'string' ? CardClass[pickedCard] : pickedCard,
-      }
-    : {};
 
 export const createStateWith = (partial: Partial<GameState>): GameState => ({
   ...DEFAULT_GAME_STATE,

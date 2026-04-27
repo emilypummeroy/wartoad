@@ -29,7 +29,7 @@ export const useGameContextData = (
       dropAll(setState)({
         finishPhase: () => finishPhase(getDrawnCard),
 
-        pickCard: (card: CardClass) => pickCard(card),
+        pickCard: (cardClass: CardClass) => pickCard(cardClass, getNextCardKey),
 
         activate: (unit: UnitCard, position: Position) =>
           activate(unit, position),

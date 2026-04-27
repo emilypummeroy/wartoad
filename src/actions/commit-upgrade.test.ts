@@ -12,18 +12,18 @@ import {
   TestLeafKey,
 } from '../state-types/pond.test-utils';
 import {
-  activationOf,
   createStateWith,
   gameflowOf,
-  pickedCardOf,
+  subphaseStateOf,
+  upgradeOf,
 } from '../state/test-utils';
 import { CardClass, CardKey, type LeafKey } from '../types/card';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
-import { _, counter } from '../types/test-utils';
+import { counter } from '../types/test-utils';
 import { commitUpgrade } from './commit-upgrade';
 
-const { Froglet, LilyPad } = CardKey;
+const { LilyPad } = CardKey;
 const { North, South } = Player;
 const { Idle, Upgrading, Deploying, Activating } = Subphase;
 const { Start, Main, End } = Phase;
@@ -31,22 +31,14 @@ const { Start, Main, End } = Phase;
 const { NORTH_LEAF, SOUTH_LEAF, NORTH_UPGRADED, SOUTH_UPGRADED } = TestLeafKey;
 
 type Input = [Position, Player, LeafKey];
-type Preconditions = [
-  Position,
-  TestLeafKey,
-  turn: Player,
-  Subphase,
-  Phase,
-  CardKey?,
-  Position?,
-];
+type Preconditions = [Position, TestLeafKey, turn: Player, Subphase, Phase];
 
 describe(commitUpgrade, () => {
   describe.for<Preconditions>([
     // < Upgrading
     [{ x: 1, y: 1 }, NORTH_LEAF, North, Idle, Main],
-    [{ x: 2, y: 5 }, SOUTH_LEAF, South, Activating, Main, _, { x: 2, y: 4 }],
-    [{ x: 2, y: 0 }, NORTH_LEAF, North, Deploying, Main, Froglet],
+    [{ x: 2, y: 5 }, SOUTH_LEAF, South, Activating, Main],
+    [{ x: 2, y: 0 }, NORTH_LEAF, North, Deploying, Main],
     [{ x: 0, y: 4 }, SOUTH_LEAF, South, Idle, End],
     [{ x: 0, y: 2 }, NORTH_LEAF, North, Idle, Start],
   ])(
@@ -56,10 +48,10 @@ describe(commitUpgrade, () => {
 
   describe.for<Preconditions>([
     // < Target is controlled by player
-    [{ x: 2, y: 5 }, SOUTH_LEAF, North, Upgrading, Main, LilyPad],
-    [{ x: 0, y: 4 }, SOUTH_LEAF, North, Upgrading, Main, LilyPad],
-    [{ x: 2, y: 1 }, NORTH_LEAF, South, Upgrading, Main, LilyPad],
-    [{ x: 0, y: 2 }, NORTH_LEAF, South, Upgrading, Main, LilyPad],
+    [{ x: 2, y: 5 }, SOUTH_LEAF, North, Upgrading, Main],
+    [{ x: 0, y: 4 }, SOUTH_LEAF, North, Upgrading, Main],
+    [{ x: 2, y: 1 }, NORTH_LEAF, South, Upgrading, Main],
+    [{ x: 0, y: 2 }, NORTH_LEAF, South, Upgrading, Main],
   ])(
     'Precondition failed: Target controlled by player | target: %s %s | flow: %s %s %s',
     input => it_should_return_state_unchanged(input),
@@ -67,10 +59,10 @@ describe(commitUpgrade, () => {
 
   describe.for<Preconditions>([
     // < Target is not upgraded
-    [{ x: 2, y: 5 }, NORTH_UPGRADED, North, Upgrading, Main, LilyPad],
-    [{ x: 0, y: 4 }, NORTH_UPGRADED, North, Upgrading, Main, LilyPad],
-    [{ x: 2, y: 1 }, SOUTH_UPGRADED, South, Upgrading, Main, LilyPad],
-    [{ x: 0, y: 2 }, SOUTH_UPGRADED, South, Upgrading, Main, LilyPad],
+    [{ x: 2, y: 5 }, NORTH_UPGRADED, North, Upgrading, Main],
+    [{ x: 0, y: 4 }, NORTH_UPGRADED, North, Upgrading, Main],
+    [{ x: 2, y: 1 }, SOUTH_UPGRADED, South, Upgrading, Main],
+    [{ x: 0, y: 2 }, SOUTH_UPGRADED, South, Upgrading, Main],
   ])(
     'Precondition failed: Target not already upgraded | target: %s %s | flow: %s %s %s',
     input => it_should_return_state_unchanged(input),
@@ -82,14 +74,11 @@ describe(commitUpgrade, () => {
     player,
     subphase,
     phase,
-    pickedCard,
-    start,
   ]: Preconditions) => {
-    it('should return the state unchanged', () => {
+    it('should return the input unchanged', () => {
       const old = createStateWith({
         ...gameflowOf(player, subphase, phase),
-        ...activationOf(start),
-        ...pickedCardOf(pickedCard),
+        ...subphaseStateOf(player, subphase),
         pond: setPondStateAt(INITIAL_POND, target, TEST_LEAVES_BY_KEY[leafKey]),
       });
       const got = commitUpgrade(target)(old);
@@ -133,7 +122,7 @@ describe(commitUpgrade, () => {
           : [leaf.cardClass, ...restOfHand];
 
       const before = createStateWith({
-        ...pickedCardOf(leaf.cardClass),
+        ...upgradeOf(player, leaf),
         ...gameflowOf(player, Upgrading),
         ...(player === North
           ? { northHand: playerHand }
@@ -150,9 +139,9 @@ describe(commitUpgrade, () => {
         expect(got.isUpgraded).toBe(true);
       });
 
-      it('should unset the pickedCard', () => {
+      it('should unset the upgrade state', () => {
         const result = commitUpgrade(target)(before);
-        expect(result.pickedCard).toBeUndefined();
+        expect(result.upgrade).toBeUndefined();
       });
 
       it(`should remove the card from the ${player} hand`, () => {
@@ -231,7 +220,7 @@ describe(commitUpgrade, () => {
         const {
           flow: _,
           pond: __,
-          pickedCard: ___,
+          upgrade: ___,
           northHand: ____,
           southHand: _____,
           ...rest
@@ -242,7 +231,7 @@ describe(commitUpgrade, () => {
         const {
           flow: _,
           pond: __,
-          pickedCard: ___,
+          upgrade: ___,
           northHand: ____,
           southHand: _____,
           ...rest

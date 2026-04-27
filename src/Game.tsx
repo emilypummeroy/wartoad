@@ -4,7 +4,6 @@ import { Hand } from './basic/Hand';
 import { PhaseTracker } from './basic/PhaseTracker';
 import { Pond } from './composite/Pond';
 import { GameContext } from './context/GameContext';
-import { CardClass } from './types/card';
 import { Phase, Player, PLAYER_CLASSNAME, Subphase } from './types/gameflow';
 import { Froglet, LilyPad } from './view/Card';
 
@@ -15,7 +14,8 @@ export function Game() {
       flow,
       northHand,
       southHand,
-      pickedCard,
+      deployment,
+      activation,
     },
     { finishPhase, pickCard },
   ] = useContext(GameContext);
@@ -43,7 +43,7 @@ export function Game() {
           {subphase !== Subphase.Idle && (
             // TODO 18: Make cards zoomable/inspectable/something outside of deploys and upgrades
             <PickedCard owner={player}>
-              {pickedCard === CardClass.Froglet ? <Froglet /> : <LilyPad />}
+              {deployment || activation ? <Froglet /> : <LilyPad />}
             </PickedCard>
           )}
           <Hand

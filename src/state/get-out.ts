@@ -1,4 +1,10 @@
-import type { ActivationState, GameState } from '../state-types';
+// oxlint-disable max-lines
+import type {
+  ActivationState,
+  DeploymentState,
+  GameState,
+  UpgradeState,
+} from '../state-types';
 import {
   doesAnyPondLeafSatisfy,
   HOME,
@@ -7,7 +13,7 @@ import {
   type LeafState,
   type PondState,
 } from '../state-types/pond';
-import type { CardClass, LeafClass, UnitClass } from '../types/card';
+import type { CardClass, LeafCard, UnitCard } from '../types/card';
 import {
   Phase,
   Player,
@@ -41,21 +47,13 @@ export type GameData = {
 };
 
 // oxlint-disable-next-line max-statements
-const gameInvariants: GameInvariants = (
-  s,
-  get,
-  { always, unless, when, iff },
-) => {
+const gameInvariants: GameInvariants = (s, get, { always, unless, iff }) => {
   always(get.leaf.at(HOME[Player.North]).isUpgraded);
   always(get.leaf.at(HOME[Player.South]).isUpgraded);
 
-  when(get.subphase === Subphase.Idle).not(!!s.pickedCard);
-
   iff(get.subphase === Subphase.Activating).must(!!s.activation);
-  when(get.subphase === Subphase.Activating).not(!!s.pickedCard);
-
-  when(get.subphase === Subphase.Upgrading).must(!!s.pickedCard);
-  when(get.subphase === Subphase.Deploying).must(!!s.pickedCard);
+  iff(get.subphase === Subphase.Deploying).must(!!s.deployment);
+  iff(get.subphase === Subphase.Upgrading).must(!!s.upgrade);
 
   unless(get.phase === Phase.Main).must(get.subphase === Subphase.Idle);
 
@@ -88,8 +86,9 @@ export type GameAccess = {
     readonly exists: (p: (v: LeafState, xy: Position) => boolean) => boolean;
   };
   // hand: { of: (p: Player) => Read<CardClass[]> };
+  readonly upgrade: UpgradeState | undefined;
+  readonly deployment: DeploymentState | undefined;
   readonly activation: ActivationState | undefined;
-  readonly pickedCard: CardClass | undefined;
 };
 
 // Updaters which preserve simple invariants
@@ -126,11 +125,12 @@ type GameMake = {
   readonly idle: () => GameData;
   readonly activating: (x: ActivationState) => GameData;
   readonly winner: (x: Player) => GameData;
-  readonly upgrading: (x: LeafClass) => GameData;
-  readonly deploying: (x: UnitClass) => GameData;
+  readonly upgrading: (x: LeafCard) => GameData;
+  readonly deploying: (x: UnitCard) => GameData;
 };
 
 const access: (s: GameState) => GameAccess = s => ({
+  // TODO 12: Make PhaseTracker use this
   get flow() {
     return s.flow;
   },
@@ -162,14 +162,14 @@ const access: (s: GameState) => GameAccess = s => ({
   //   },
   // },
 
+  get upgrade() {
+    return s.flow.subphase === Subphase.Upgrading ? s.upgrade : undefined;
+  },
+  get deployment() {
+    return s.flow.subphase === Subphase.Deploying ? s.deployment : undefined;
+  },
   get activation() {
     return s.flow.subphase === Subphase.Activating ? s.activation : undefined;
-  },
-  get pickedCard() {
-    return s.flow.subphase === Subphase.Upgrading ||
-      s.flow.subphase === Subphase.Deploying
-      ? s.pickedCard
-      : undefined;
   },
 });
 
@@ -187,17 +187,7 @@ const update: (s: GameState) => GameUpdate = s => ({
   },
 
   phase: {
-    to: phase =>
-      gameData(
-        phase === Phase.Main
-          ? { ...s, flow: { ...s.flow, phase } }
-          : {
-              ...s,
-              flow: { ...s.flow, phase, subphase: Subphase.Idle },
-              activation: undefined,
-              pickedCard: undefined,
-            },
-      ),
+    to: phase => gameData({ ...s, flow: { ...s.flow, phase } }),
   },
 
   hand: {
@@ -223,22 +213,23 @@ const make = (s: GameState): GameMake => ({
     gameData({
       ...s,
       flow: { ...s.flow, subphase: Subphase.Idle },
-      pickedCard: undefined,
+      upgrade: undefined,
+      deployment: undefined,
       activation: undefined,
     }),
 
-  upgrading: pickedCard =>
+  upgrading: leaf =>
     gameData({
       ...s,
       flow: { ...s.flow, subphase: Subphase.Upgrading },
-      pickedCard,
+      upgrade: { leaf },
     }),
 
-  deploying: pickedCard =>
+  deploying: unit =>
     gameData({
       ...s,
       flow: { ...s.flow, subphase: Subphase.Deploying },
-      pickedCard,
+      deployment: { unit },
     }),
 
   activating: activation =>
@@ -285,10 +276,10 @@ type GameInvariants = (
 type InvariantChecks = {
   readonly always: (p: boolean) => void;
   // never: (p: boolean) => void;
-  readonly when: (p: boolean) => {
-    readonly must: (q: boolean) => void;
-    readonly not: (q: boolean) => void;
-  };
+  // readonly when: (p: boolean) => {
+  //   readonly must: (q: boolean) => void;
+  //   readonly not: (q: boolean) => void;
+  // };
   readonly unless: (p: boolean) => {
     readonly must: (q: boolean) => void;
     // not: (q: boolean) => void;
@@ -301,10 +292,10 @@ type InvariantChecks = {
 const invariantChecks: InvariantChecks = {
   always: p => assert(p),
   // never: p => assert(!p),
-  when: p => ({
-    must: q => assert(!p || q),
-    not: q => assert(!p || !q),
-  }),
+  // when: p => ({
+  //   must: q => assert(!p || q),
+  //   not: q => assert(!p || !q),
+  // }),
   unless: p => ({
     must: q => assert(p || q),
     // not: q => assert(p || !q),

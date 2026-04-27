@@ -3,10 +3,11 @@ import { createUnit } from '../state-types/card';
 import {
   activationOf,
   createStateWith,
+  deploymentOf,
   gameflowOf,
-  pickedCardOf,
+  upgradeOf,
 } from '../state/test-utils';
-import { CardClass, UnitClass } from '../types/card';
+import { UnitClass } from '../types/card';
 import { Phase, Player, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { ALL_POSITIONS } from '../types/position.test-utils';
@@ -44,9 +45,9 @@ describe(activate, () => {
         });
         const oldState = createStateWith({
           ...gameflowOf(player, subphase, phase),
-          ...(subphase === Activating && activationOf(xy, unit)),
-          ...(subphase === Upgrading && pickedCardOf(CardClass.LilyPad)),
-          ...(subphase === Deploying && pickedCardOf(CardClass.LilyPad)),
+          ...(subphase === Activating && activationOf(player)),
+          ...(subphase === Upgrading && upgradeOf(player)),
+          ...(subphase === Deploying && deploymentOf(player)),
         });
 
         it('should not change the state', () => {

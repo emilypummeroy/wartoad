@@ -1,13 +1,14 @@
 import { HOME, setPondStateAt } from '../state-types/pond';
 import { TEST_PONDS_BY_KEY, TestPondKey } from '../state-types/pond.test-utils';
-import { CardClass } from '../types/card';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import { _ } from '../types/test-utils';
 import { gameData } from './get-out';
 import {
   activationOf,
   createStateWith,
+  deploymentOf,
   gameflowOf,
-  pickedCardOf,
+  upgradeOf,
 } from './test-utils';
 
 describe(gameData, () => {
@@ -33,27 +34,8 @@ describe(gameData, () => {
         },
       );
 
-      it('should throw when subphase is Idle but pickedCard is present', () => {
-        const state = createStateWith({
-          pond,
-          ...gameflowOf(undefined, Subphase.Idle),
-          ...pickedCardOf(CardClass.Froglet),
-        });
-        expect(() => gameData(state)).toThrow();
-      });
-
-      it('should throw when subphase is Activating but pickedCard is present', () => {
-        const state = createStateWith({
-          pond,
-          ...gameflowOf(undefined, Subphase.Activating),
-          ...pickedCardOf(CardClass.Froglet),
-          ...activationOf({ x: 2, y: 2 }),
-        });
-        expect(() => gameData(state)).toThrow();
-      });
-
-      it.for([Subphase.Upgrading, Subphase.Deploying])(
-        'should throw when subphase is %s but pickedCard is missing',
+      it.for([Subphase.Upgrading, Subphase.Deploying, Subphase.Activating])(
+        'should throw when subphase is %s but subphase state is missing',
         subphase => {
           const state = createStateWith({
             pond,
@@ -69,32 +51,60 @@ describe(gameData, () => {
           const state = createStateWith({
             pond,
             ...gameflowOf(undefined, subphase),
-            ...activationOf({ x: 1, y: 1 }),
+            ...activationOf(Player.North),
           });
           expect(() => gameData(state)).toThrow();
         },
       );
 
-      it('should throw when subphase is Activating but activation state is missing', () => {
-        const state = createStateWith({
-          pond,
-          ...gameflowOf(undefined, Subphase.Activating),
-        });
-        expect(() => gameData(state)).toThrow();
-      });
+      it.for([Subphase.Idle, Subphase.Activating, Subphase.Deploying])(
+        'should throw when subphase is %s but upgrade state is present',
+        subphase => {
+          const state = createStateWith({
+            pond,
+            ...gameflowOf(undefined, subphase),
+            ...upgradeOf(Player.North),
+          });
+          expect(() => gameData(state)).toThrow();
+        },
+      );
 
-      it.for<[Phase, Subphase]>([
-        [Phase.Start, Subphase.Upgrading],
-        [Phase.Start, Subphase.Deploying],
-        [Phase.End, Subphase.Upgrading],
-        [Phase.End, Subphase.Deploying],
+      it.for([Subphase.Idle, Subphase.Activating, Subphase.Upgrading])(
+        'should throw when subphase is %s but deployment state is present',
+        subphase => {
+          const state = createStateWith({
+            pond,
+            ...gameflowOf(undefined, subphase),
+            ...deploymentOf(Player.North),
+          });
+          expect(() => gameData(state)).toThrow();
+        },
+      );
+
+      it.for<
+        [
+          Phase,
+          Subphase,
+          upgrader?: Player,
+          deployer?: Player,
+          activater?: Player,
+        ]
+      >([
+        [Phase.Start, Subphase.Upgrading, Player.North, _, _],
+        [Phase.Start, Subphase.Deploying, _, Player.South, _],
+        [Phase.Start, Subphase.Activating, _, _, Player.North],
+        [Phase.End, Subphase.Upgrading, Player.South, _, _],
+        [Phase.End, Subphase.Deploying, _, Player.North],
+        [Phase.End, Subphase.Activating, _, _, Player.South],
       ])(
         'should throw when phase is Start but subphase is %s',
-        ([phase, subphase]) => {
+        ([phase, subphase, upgrader, deployer, activater]) => {
           const state = createStateWith({
             pond,
             ...gameflowOf(undefined, subphase, phase),
-            ...pickedCardOf(CardClass.Froglet),
+            ...upgradeOf(upgrader),
+            ...deploymentOf(deployer),
+            ...activationOf(activater),
           });
           expect(() => gameData(state)).toThrow();
         },
@@ -106,7 +116,7 @@ describe(gameData, () => {
           const state = createStateWith({
             pond,
             ...gameflowOf(undefined, Subphase.Activating, phase),
-            ...activationOf({ x: 0, y: 3 }),
+            ...activationOf(Player.South),
           });
           expect(() => gameData(state)).toThrow();
         },

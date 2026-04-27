@@ -14,6 +14,7 @@ import { activationOf, gameflowOf } from '../state/test-utils';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { asPosition } from '../types/position.test-utils';
+import { _ } from '../types/test-utils';
 import { Pond } from './Pond';
 
 const { North, South } = Player;
@@ -224,7 +225,9 @@ describe(Pond, () => {
     ([player, phase, subphase, pondKey, start]) => {
       const pond = TEST_PONDS_BY_KEY[pondKey];
       beforeEach(() => {
-        renderWithGameContext([{ ...gameflowOf(player, subphase, phase), ...activationOf(start), pond }])(<Pond />);
+        renderWithGameContext([{ ...gameflowOf(player, subphase, phase), ...activationOf(player, _, start), pond }])(
+          <Pond />,
+        );
       });
 
       const CARDINAL_DIRECTIONS = 4;

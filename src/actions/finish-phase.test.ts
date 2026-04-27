@@ -9,10 +9,9 @@ import {
   TestLeafKey,
 } from '../state-types/pond.test-utils';
 import {
-  activationOf,
   createStateWith,
   gameflowOf,
-  pickedCardOf,
+  subphaseStateOf,
   winningPondOf,
 } from '../state/test-utils';
 import { CardClass, CardKey } from '../types/card';
@@ -32,34 +31,32 @@ const {
   NORTH_UPGRADED_OTHER_UNIT,
 } = TestLeafKey;
 
-type Preconditions = [Player, Phase, Subphase?];
-type Invariants = [CardKey?, Position?, Player?];
+type Preconditions = [Player, Phase, Subphase?, Player?];
 type Inputs = [Player, Phase];
 
 const _ = undefined;
 
 describe(finishPhase, () => {
   // Preconditions
-  it.for<[...Preconditions, ...Invariants]>([
+  it.for<Preconditions>([
     // < Subphase is Idle
-    [North, Main, Upgrading, LilyPad],
-    [North, Main, Deploying, Froglet],
-    [North, Main, Activating, _, { x: 1, y: 4 }],
-    [South, Main, Upgrading, LilyPad],
-    [South, Main, Deploying, Froglet],
-    [South, Main, Activating, _, { x: 1, y: 4 }],
+    [North, Main, Upgrading],
+    [North, Main, Deploying],
+    [North, Main, Activating],
+    [South, Main, Upgrading],
+    [South, Main, Deploying],
+    [South, Main, Activating],
     // < Phase is not GameOver
-    [North, GameOver, _, _, _, North],
-    [North, GameOver, _, _, _, South],
-    [South, GameOver, _, _, _, North],
-    [South, GameOver, _, _, _, South],
+    [North, GameOver, _, North],
+    [North, GameOver, _, South],
+    [South, GameOver, _, North],
+    [South, GameOver, _, South],
   ])(
     'Preconditions failed: should not make any changes during %s %s %s',
-    ([player, phase, subphase = Idle, pickedCard, activationStart, winner]) => {
+    ([player, phase, subphase = Idle, winner]) => {
       const before = createStateWith({
         ...gameflowOf(player, subphase, phase),
-        ...pickedCardOf(pickedCard),
-        ...activationOf(activationStart),
+        ...subphaseStateOf(player, subphase),
         ...winningPondOf(winner),
       });
       const after = finishPhase(() => CardClass.Froglet)(before);

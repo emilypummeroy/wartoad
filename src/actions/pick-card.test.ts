@@ -27,32 +27,36 @@ describe(pickCard, () => {
 
     // > Subphase set to appropriate subphase
     it(`should set the subphase to ${want}`, () => {
-      const after = pickCard(card.cardClass)(before);
+      const after = pickCard(card.cardClass, counter)(before);
       expect(after.flow.subphase).toBe(want);
     });
 
     it('should not change the rest of the gameflow state', () => {
-      const { subphase: _, ...got } = pickCard(card.cardClass)(before).flow;
+      const { subphase: _, ...got } = pickCard(
+        card.cardClass,
+        counter,
+      )(before).flow;
       const { subphase: __, ...want } = before.flow;
       expect(got).toStrictEqual(want);
     });
 
     // > pickedCard set
     it(`should set the picked card to a ${cardKey}`, () => {
-      const after = pickCard(card.cardClass)(before);
-      expect(after.pickedCard).toBe(card.cardClass);
+      const after = pickCard(card.cardClass, counter)(before);
+      const pickedCard = after.upgrade?.leaf ?? after.deployment?.unit;
+      expect(pickedCard?.cardClass).toBe(card.cardClass);
     });
 
     it(`should not affect the rest of the state`, () => {
-      const after = pickCard(card.cardClass)(before);
+      const after = pickCard(card.cardClass, counter)(before);
       let got = {};
       let want = {};
       {
-        const { flow: _, pickedCard: __, ...rest } = after;
+        const { flow: _, deployment: __, upgrade: ___, ...rest } = after;
         got = rest;
       }
       {
-        const { flow: _, pickedCard: __, ...rest } = before;
+        const { flow: _, deployment: __, upgrade: ___, ...rest } = before;
         want = rest;
       }
       expect(got).toStrictEqual(want);

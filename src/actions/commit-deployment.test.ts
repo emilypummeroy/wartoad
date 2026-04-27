@@ -8,38 +8,30 @@ import {
   setPondStateAt,
 } from '../state-types/pond';
 import {
-  activationOf,
   createStateWith,
+  deploymentOf,
   gameflowOf,
-  pickedCardOf,
+  subphaseStateOf,
 } from '../state/test-utils';
-import { CardClass, CardKey } from '../types/card';
+import { CardClass } from '../types/card';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
-import { _, counter } from '../types/test-utils';
+import { counter } from '../types/test-utils';
 import { commitDeployment } from './commit-deployment';
 
-const { Froglet, LilyPad } = CardKey;
 const { North, South } = Player;
 const { Idle, Upgrading, Deploying, Activating } = Subphase;
 const { Start, Main, End } = Phase;
 
 type Input = [target: Position, Player, targetUnits: number];
-type Preconditions = [
-  Position,
-  Player,
-  Subphase,
-  Phase,
-  CardKey?,
-  start?: Position,
-];
+type Preconditions = [Position, Player, Subphase, Phase];
 
 describe(commitDeployment, () => {
   describe.for<Preconditions>([
     // < Deploying
     [{ x: 1, y: 0 }, North, Idle, Main],
-    [{ x: 2, y: 5 }, South, Activating, Main, _, { x: 1, y: 5 }],
-    [{ x: 1, y: 0 }, North, Upgrading, Main, LilyPad],
+    [{ x: 2, y: 5 }, South, Activating, Main],
+    [{ x: 1, y: 0 }, North, Upgrading, Main],
     [{ x: 0, y: 5 }, South, Idle, End],
     [{ x: 2, y: 0 }, North, Idle, Start],
   ])(
@@ -49,10 +41,10 @@ describe(commitDeployment, () => {
 
   describe.for<Preconditions>([
     // < Target on home row
-    [{ x: 1, y: 5 }, North, Deploying, Main, Froglet],
-    [{ x: 0, y: 1 }, North, Deploying, Main, Froglet],
-    [{ x: 2, y: 0 }, South, Deploying, Main, Froglet],
-    [{ x: 1, y: 4 }, South, Deploying, Main, Froglet],
+    [{ x: 1, y: 5 }, North, Deploying, Main],
+    [{ x: 0, y: 1 }, North, Deploying, Main],
+    [{ x: 2, y: 0 }, South, Deploying, Main],
+    [{ x: 1, y: 4 }, South, Deploying, Main],
   ])(
     'Precondition failed: Target not in Home row | target: %s | flow: %s %s %s',
     input => it_should_return_state_unchanged(input),
@@ -63,14 +55,11 @@ describe(commitDeployment, () => {
     player,
     subphase,
     phase,
-    pickedCard,
-    start,
   ]: Preconditions) => {
     it('should return the input unchanged', () => {
       const old = createStateWith({
         ...gameflowOf(player, subphase, phase),
-        ...activationOf(start),
-        ...pickedCardOf(pickedCard),
+        ...subphaseStateOf(player, subphase),
       });
       const got = commitDeployment(target, counter)(old);
       expect(got).toStrictEqual(old);
@@ -113,7 +102,7 @@ describe(commitDeployment, () => {
           : [unit.cardClass, ...restOfHand];
 
       const before = createStateWith({
-        ...pickedCardOf(unit.cardClass),
+        ...deploymentOf(player, unit),
         ...gameflowOf(player, Deploying),
         ...(player === North
           ? { northHand: playerHand }
@@ -130,9 +119,9 @@ describe(commitDeployment, () => {
         expect(got).toHaveLength(beforeTarget.units.length + 1);
       });
 
-      it('should unset the pickedCard', () => {
+      it('should unset the deployment', () => {
         const result = commitDeployment(target, counter)(before);
-        expect(result.pickedCard).toBeUndefined();
+        expect(result.deployment).toBeUndefined();
       });
 
       it(`should remove the card from the ${player} hand`, () => {
@@ -211,7 +200,7 @@ describe(commitDeployment, () => {
         const {
           flow: _,
           pond: __,
-          pickedCard: ___,
+          deployment: ___,
           northHand: ____,
           southHand: _____,
           ...rest
@@ -222,7 +211,7 @@ describe(commitDeployment, () => {
         const {
           flow: _,
           pond: __,
-          pickedCard: ___,
+          deployment: ___,
           northHand: ____,
           southHand: _____,
           ...rest
