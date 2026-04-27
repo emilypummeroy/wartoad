@@ -4,28 +4,34 @@ import type { Position } from '../types/position';
 import { asPosition } from '../types/position.test-utils';
 import { createUnit } from './card';
 import {
-  NORTH_LEAF,
   isPondState,
   LEAF_COUNT_PER_ROW,
   ROW_COUNT,
   setPondStateAt,
-  NORTH_UPGRADED,
   type PondState,
   type LeafState,
   getPondStateAt,
-  SOUTH_LEAF,
   setPondStateAtEach,
 } from './pond';
 import {
-  NORTH_LEAF_WITH_UNIT,
-  NORTH_LEAF_OTHER_UNIT,
-  NORTH_LEAF_WITH_UNITS,
-  NORTH_UPGRADED_UNITS,
-  NORTH_UPGRADED_OTHER_UNIT,
   TestPondKey,
   TEST_PONDS_BY_KEY,
+  TestLeafKey,
+  TEST_LEAVES_BY_KEY,
 } from './pond.test-utils';
 
+const {
+  NORTH_LEAF,
+  NORTH_LEAF_WITH_UNIT,
+  NORTH_LEAF_OTHER_UNIT,
+  NORTH_UPGRADED,
+  NORTH_UPGRADED_UNITS,
+  SOUTH_LEAF,
+  SOUTH_LEAF_WITH_UNIT,
+  SOUTH_LEAF_OTHER_UNIT,
+  SOUTH_UPGRADED,
+  SOUTH_UPGRADED_UNITS,
+} = TestLeafKey;
 const { INITIAL_POND, ANOTHER_POND, FULL_POND, UNITS_POND } = TestPondKey;
 
 const SOUTH_UNIT = createUnit({
@@ -275,21 +281,21 @@ describe('the PondState type functions', () => {
       },
     );
 
-    // TODO 11: Replace with keys
-    describe.for<[TestPondKey, string, LeafState]>([
-      [INITIAL_POND, 'NORTH_LEAF', NORTH_LEAF],
-      [INITIAL_POND, 'NORTH_LEAF_WITH_UNIT', NORTH_LEAF_WITH_UNIT],
-      [INITIAL_POND, 'NORTH_UPGRADED', NORTH_UPGRADED],
-      [ANOTHER_POND, 'NORTH_LEAF_WITH_UNIT', NORTH_LEAF_WITH_UNIT],
-      [FULL_POND, 'NORTH_LEAF_WITH_UNITS', NORTH_LEAF_WITH_UNITS],
-      [FULL_POND, 'NORTH_LEAF_OTHER_UNIT', NORTH_LEAF_OTHER_UNIT],
-      [INITIAL_POND, 'NORTH_UPGRADED_UNITS', NORTH_UPGRADED_UNITS],
-      [INITIAL_POND, 'NORTH_UPGRADED_OTHER_UNIT', NORTH_UPGRADED_OTHER_UNIT],
-      [UNITS_POND, 'NORTH_LEAF', NORTH_LEAF],
-      [UNITS_POND, 'NORTH_UPGRADED', NORTH_UPGRADED],
+    describe.for<[TestPondKey, TestLeafKey]>([
+      [INITIAL_POND, NORTH_LEAF],
+      [INITIAL_POND, SOUTH_LEAF],
+      [UNITS_POND, NORTH_UPGRADED],
+      [UNITS_POND, SOUTH_UPGRADED],
+      [ANOTHER_POND, NORTH_LEAF_WITH_UNIT],
+      [ANOTHER_POND, SOUTH_LEAF_WITH_UNIT],
+      [FULL_POND, NORTH_LEAF_OTHER_UNIT],
+      [FULL_POND, SOUTH_LEAF_OTHER_UNIT],
+      [INITIAL_POND, NORTH_UPGRADED_UNITS],
+      [INITIAL_POND, SOUTH_UPGRADED_UNITS],
     ])(
       'with known PondState: %s | new value: %s',
-      ([pondKey, newValueName, valueToSet]) => {
+      ([pondKey, newValueName]) => {
+        const valueToSet = TEST_LEAVES_BY_KEY[newValueName];
         const pond = TEST_PONDS_BY_KEY[pondKey];
         if (!isPondState(pond)) {
           expect.unreachable();
@@ -404,14 +410,14 @@ describe('the PondState type functions', () => {
           expect(
             isPondState([
               ...array.slice(0, i),
-              [...array[i], NORTH_LEAF],
+              [...array[i], TEST_LEAVES_BY_KEY.NORTH_LEAF],
               ...array.slice(i + 1),
             ]),
           ).toBe(false);
           expect(
             isPondState([
               ...array.slice(0, i),
-              [...array[i], SOUTH_LEAF],
+              [...array[i], TEST_LEAVES_BY_KEY.SOUTH_LEAF],
               ...array.slice(i + 1),
             ]),
           ).toBe(false);
