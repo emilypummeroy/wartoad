@@ -9,6 +9,7 @@ import {
 import { CardClass, CardKey, type LeafKey } from '../types/card';
 import { Phase, Player, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
+import { _, counter } from '../types/test-utils';
 import { upgrade } from './upgrade';
 
 const { LilyPad, Froglet } = CardKey;
@@ -17,8 +18,6 @@ const { Start, Main, End, GameOver } = Phase;
 const { Idle, Upgrading, Deploying, Activating } = Subphase;
 
 describe(upgrade, () => {
-  const _ = undefined;
-  let key = 0;
   // Preconditions:
   describe.for<[Player, Phase, Subphase, CardKey?, Position?, Player?]>([
     // < Idle
@@ -44,7 +43,7 @@ describe(upgrade, () => {
       const card = createLeaf({
         cardClass: CardClass.LilyPad,
         owner: player,
-        key: key++,
+        key: counter(),
       });
       const before = createStateWith({
         ...gameflowOf(player, subphase, phase),
@@ -67,7 +66,7 @@ describe(upgrade, () => {
     const card = createLeaf({
       cardClass: CardClass.LilyPad,
       owner: player,
-      key: key++,
+      key: counter(),
     });
     const before = createStateWith({
       ...gameflowOf(player),
