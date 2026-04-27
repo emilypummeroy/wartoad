@@ -1,4 +1,4 @@
-import { createLeaf } from '../state-types/card';
+import { createUnit } from '../state-types/card';
 import {
   activationOf,
   createStateWith,
@@ -6,18 +6,18 @@ import {
   pickedCardOf,
   winningPondOf,
 } from '../state/test-utils';
-import { CardClass, CardKey, type LeafKey } from '../types/card';
+import { CardClass, CardKey, type UnitKey } from '../types/card';
 import { Phase, Player, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { _, counter } from '../types/test-utils';
-import { upgrade } from './upgrade';
+import { deploy } from './deploy';
 
 const { LilyPad, Froglet } = CardKey;
 const { North, South } = Player;
 const { Start, Main, End, GameOver } = Phase;
 const { Idle, Upgrading, Deploying, Activating } = Subphase;
 
-describe(upgrade, () => {
+describe(deploy, () => {
   // Preconditions:
   describe.for<[Player, Phase, Subphase, CardKey?, Position?, Player?]>([
     // < Idle
@@ -40,8 +40,8 @@ describe(upgrade, () => {
   ])(
     'Preconditions failed: need Idle during Main phase | %s %s %s',
     ([player, phase, subphase, cardKey, position, winner]) => {
-      const card = createLeaf({
-        cardClass: CardClass.LilyPad,
+      const card = createUnit({
+        cardClass: CardClass.Froglet,
         owner: player,
         key: counter(),
       });
@@ -53,17 +53,17 @@ describe(upgrade, () => {
       });
 
       it('should not change state', () => {
-        expect(upgrade(card.cardClass)(before)).toStrictEqual(before);
+        expect(deploy(card.cardClass)(before)).toStrictEqual(before);
       });
     },
   );
 
   // Postconditions
-  describe.for<[Player, LeafKey]>([
-    [North, LilyPad],
-    [South, LilyPad],
+  describe.for<[Player, UnitKey]>([
+    [North, Froglet],
+    [South, Froglet],
   ])('Postconditions | %s turn | called with %s', ([player, cardKey]) => {
-    const card = createLeaf({
+    const card = createUnit({
       cardClass: CardClass[cardKey],
       owner: player,
       key: counter(),
@@ -72,26 +72,26 @@ describe(upgrade, () => {
       ...gameflowOf(player),
     });
 
-    // > Subphase := Upgrading
-    it('should set the subphase to upgrading', () => {
-      const after = upgrade(card.cardClass)(before);
-      expect(after.flow.subphase).toBe(Upgrading);
+    // > Subphase := Deploying
+    it('should set the subphase to Deploying', () => {
+      const after = deploy(card.cardClass)(before);
+      expect(after.flow.subphase).toBe(Deploying);
     });
 
     it('should not change the rest of the gameflow state', () => {
-      const { subphase: _, ...got } = upgrade(card.cardClass)(before).flow;
+      const { subphase: _, ...got } = deploy(card.cardClass)(before).flow;
       const { subphase: __, ...want } = before.flow;
       expect(got).toStrictEqual(want);
     });
 
     // > pickedCard set
     it(`should set the picked card to a ${cardKey}`, () => {
-      const after = upgrade(card.cardClass)(before);
+      const after = deploy(card.cardClass)(before);
       expect(after.pickedCard).toBe(card.cardClass);
     });
 
     it(`should set affect the rest of the state`, () => {
-      const after = upgrade(card.cardClass)(before);
+      const after = deploy(card.cardClass)(before);
       let got = {};
       let want = {};
       {

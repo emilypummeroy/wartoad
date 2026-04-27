@@ -7,7 +7,7 @@ import {
   type LeafState,
   type PondState,
 } from '../state-types/pond';
-import type { CardClass, LeafClass } from '../types/card';
+import type { CardClass, LeafClass, UnitClass } from '../types/card';
 import {
   Phase,
   Player,
@@ -123,11 +123,10 @@ export type GameUpdate = {
 // Operations which need to touch multiple places to maintain invariants
 type GameMake = {
   readonly idle: () => GameData;
-  // deploying: (x: CardClass) => GameData;
-  // upgrading: (x: CardClass) => GameData;
   readonly activating: (x: ActivationState) => GameData;
   readonly winner: (x: Player) => GameData;
   readonly upgrading: (x: LeafClass) => GameData;
+  readonly deploying: (x: UnitClass) => GameData;
 };
 
 const access: (s: GameState) => GameAccess = s => ({
@@ -230,13 +229,13 @@ const make = (s: GameState): GameMake => ({
       pickedCard,
     }),
 
-  // deploying: pickedCard =>
-  //   gameData({
-  //     ...s,
-  //     flow: { ...s.flow, subphase: Subphase.Deploying },
-  //     pickedCard,
-  //     activation: undefined,
-  //   }),
+  deploying: pickedCard =>
+    gameData({
+      ...s,
+      flow: { ...s.flow, subphase: Subphase.Deploying },
+      pickedCard,
+    }),
+
   activating: activation =>
     gameData({
       ...s,
