@@ -92,7 +92,6 @@ export type GameAccess = {
 
 // Updaters which preserve simple invariants
 export type GameUpdate = {
-  readonly player: { readonly to: (x: Player) => GameData };
   readonly leaf: {
     readonly at: (x: Position) => {
       readonly to: (x: Partial<LeafState>) => GameData;
@@ -105,7 +104,6 @@ export type GameUpdate = {
     };
   };
 
-  readonly phase: { readonly to: (x: Phase) => GameData };
   readonly hand: {
     readonly of: (x: Player) => {
       readonly update: (x: (old: readonly Card[]) => Card[]) => GameData;
@@ -115,9 +113,13 @@ export type GameUpdate = {
 
 // Operations which need to touch multiple places to maintain invariants
 type GameMake = {
+  readonly nextTurn: () => GameData;
+  readonly mainPhase: () => GameData;
+  readonly endPhase: () => GameData;
+  readonly winner: (x: Player) => GameData;
+
   readonly idle: () => GameData;
   readonly activating: (x: ActivationState) => GameData;
-  readonly winner: (x: Player) => GameData;
   readonly upgrading: (x: LeafCard) => GameData;
   readonly deploying: (x: UnitCard) => GameData;
 };
@@ -161,8 +163,6 @@ const access: (s: GameState) => GameAccess = s => ({
 });
 
 const update: (s: GameState) => GameUpdate = s => ({
-  player: { to: player => gameData({ ...s, flow: { ...s.flow, player } }) },
-
   leaf: {
     where: p => ({
       update: u => gameData({ ...s, pond: setPondStateWhere(s.pond, p, u) }),
@@ -171,10 +171,6 @@ const update: (s: GameState) => GameUpdate = s => ({
       to: v => gameData({ ...s, pond: setPondStateAt(s.pond, xy, v) }),
       update: u => gameData({ ...s, pond: setPondStateAt(s.pond, xy, u) }),
     }),
-  },
-
-  phase: {
-    to: phase => gameData({ ...s, flow: { ...s.flow, phase } }),
   },
 
   hand: {
@@ -190,7 +186,40 @@ const update: (s: GameState) => GameUpdate = s => ({
   },
 });
 
+// oxlint-disable-next-line max-lines-per-function
 const make = (s: GameState): GameMake => ({
+  nextTurn: () =>
+    gameData({
+      ...s,
+      flow: {
+        ...s.flow,
+        phase: Phase.Start,
+        player: PLAYER_AFTER[s.flow.player],
+      },
+    }),
+
+  mainPhase: () =>
+    gameData({
+      ...s,
+      flow: { ...s.flow, phase: Phase.Main },
+    }),
+
+  endPhase: () =>
+    gameData({
+      ...s,
+      flow: { ...s.flow, phase: Phase.End },
+    }),
+
+  winner: winner =>
+    gameData({
+      ...s,
+      flow: { ...s.flow, phase: Phase.GameOver },
+      winner,
+      pond: setPondStateAt(s.pond, HOME[PLAYER_AFTER[winner]], {
+        controller: winner,
+      }),
+    }),
+
   idle: () =>
     gameData({
       ...s,
@@ -219,16 +248,6 @@ const make = (s: GameState): GameMake => ({
       ...s,
       flow: { ...s.flow, subphase: Subphase.Activating },
       activation,
-    }),
-
-  winner: winner =>
-    gameData({
-      ...s,
-      flow: { ...s.flow, phase: Phase.GameOver },
-      winner,
-      pond: setPondStateAt(s.pond, HOME[PLAYER_AFTER[winner]], {
-        controller: winner,
-      }),
     }),
 });
 
