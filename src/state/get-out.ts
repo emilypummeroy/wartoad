@@ -100,7 +100,7 @@ export type GameUpdate = {
   // };
   readonly leaf: {
     readonly at: (x: Position) => {
-      // to: (x: Read<Partial<LeafState>>) => GameData;
+      readonly to: (x: Partial<LeafState>) => GameData;
       readonly update: (x: (old: LeafState) => Partial<LeafState>) => GameData;
     };
     readonly where: (p: (v: LeafState, xy: Position) => boolean) => {
@@ -181,6 +181,7 @@ const update: (s: GameState) => GameUpdate = s => ({
       update: u => gameData({ ...s, pond: setPondStateWhere(s.pond, p, u) }),
     }),
     at: xy => ({
+      to: v => gameData({ ...s, pond: setPondStateAt(s.pond, xy, v) }),
       update: u => gameData({ ...s, pond: setPondStateAt(s.pond, xy, u) }),
     }),
   },
