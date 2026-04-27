@@ -243,8 +243,7 @@ describe(commitActivate, () => {
     it('should not affect any other positions', () => {
       const after = commitActivate(target)(before);
       // Excluding rows/leaves by spreading shenanigans isn't
-      // worth it, too many edge cases for stuff like overlapping
-      // ordinates between start & target.
+      // worth it, it's more annoying than just iterating.
       for (let x = 0; x < LEAF_COUNT_PER_ROW; x += 1) {
         for (let y = 0; y < ROW_COUNT; y += 1) {
           assert(x === 0 || x === 1 || x === 2);

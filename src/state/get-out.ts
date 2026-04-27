@@ -88,7 +88,8 @@ export type GameAccess = {
     readonly exists: (p: (v: LeafState, xy: Position) => boolean) => boolean;
   };
   // hand: { of: (p: Player) => Read<CardClass[]> };
-  readonly activation?: ActivationState;
+  readonly activation: ActivationState | undefined;
+  readonly pickedCard: CardClass | undefined;
 };
 
 // Updaters which preserve simple invariants
@@ -164,8 +165,11 @@ const access: (s: GameState) => GameAccess = s => ({
   get activation() {
     return s.flow.subphase === Subphase.Activating ? s.activation : undefined;
   },
-  get upgrading() {
-    return s.flow.subphase === Subphase.Activating ? s.activation : undefined;
+  get pickedCard() {
+    return s.flow.subphase === Subphase.Upgrading ||
+      s.flow.subphase === Subphase.Deploying
+      ? s.pickedCard
+      : undefined;
   },
 });
 
