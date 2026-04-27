@@ -90,7 +90,7 @@ describe(upgrade, () => {
       expect(after.pickedCard).toBe(card.cardClass);
     });
 
-    it(`should set affect the rest of the state`, () => {
+    it(`should not affect the rest of the state`, () => {
       const after = upgrade(card.cardClass)(before);
       let got = {};
       let want = {};

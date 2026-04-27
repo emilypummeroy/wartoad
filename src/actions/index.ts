@@ -1,21 +1,14 @@
 import type { GameState } from '../state-types';
 import { createUnit } from '../state-types/card';
 import { setPondStateAt } from '../state-types/pond';
-import {
-  CardType,
-  UnitClass,
-  type CardClass,
-  type UnitCard,
-} from '../types/card';
+import { UnitClass, type CardClass, type UnitCard } from '../types/card';
 import { Player, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 
 export { activate } from './activate';
 export { commitActivate } from './commit-activate';
+export { pickCard } from './pick-card';
 export { finishPhase } from './finish-phase';
-export { finishEndPhase } from './finish-end-phase';
-export { finishMainPhase } from './finish-main-phase';
-export { finishStartPhase } from './finish-start-phase';
 
 export type GameActions = {
   finishPhase: () => void;
@@ -46,23 +39,6 @@ const removeOne = (
   ...cards.slice(0, cards.lastIndexOf(cardClass)),
   ...cards.slice(cards.lastIndexOf(cardClass) + 1),
 ];
-
-// TODO 13: test
-// TODO 13: make this remove the card class from the hand and make a Card
-export const pickCard =
-  (pickedCard: CardClass) =>
-  ({ flow, ...rest }: GameState): GameState => ({
-    ...rest,
-    flow: {
-      ...flow,
-      subphase:
-        // TODO 12: pickedCard.type
-        pickedCard.type === CardType.Unit
-          ? Subphase.Deploying
-          : Subphase.Upgrading,
-    },
-    pickedCard,
-  });
 
 // TODO 12: test
 // TODO 12: Make this just for upgrading

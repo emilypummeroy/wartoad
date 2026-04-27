@@ -90,7 +90,7 @@ describe(deploy, () => {
       expect(after.pickedCard).toBe(card.cardClass);
     });
 
-    it(`should set affect the rest of the state`, () => {
+    it(`should not affect the rest of the state`, () => {
       const after = deploy(card.cardClass)(before);
       let got = {};
       let want = {};

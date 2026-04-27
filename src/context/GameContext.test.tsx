@@ -7,7 +7,7 @@ import { CardClass, UnitClass } from '../types/card';
 import { Player } from '../types/gameflow';
 import { GameContext } from './GameContext';
 
-describe(GameContext, () => {
+describe('The context', () => {
   describe('when consumed without a context provider', () => {
     function TestConsumer() {
       const [, dispatch] = useContext(GameContext);
