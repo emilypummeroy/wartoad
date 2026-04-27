@@ -118,8 +118,6 @@ export type GameUpdate = {
       ) => GameData;
     };
   };
-
-  readonly winner: { readonly to: (x: Player) => GameData };
 };
 
 // Operations which need to touch multiple places to maintain invariants
@@ -209,10 +207,6 @@ const update: (s: GameState) => GameUpdate = s => ({
             : { southHand: u(s.southHand) }),
         }),
     }),
-  },
-
-  winner: {
-    to: x => gameData({ ...s, winner: x }),
   },
 });
 
