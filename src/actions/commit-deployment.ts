@@ -1,12 +1,8 @@
 import { data } from '../state';
-import { createUnit } from '../state-types/card';
 import { HOME } from '../state-types/pond';
 import { type Position } from '../types/position';
 
-export const commitDeployment = (
-  target: Position,
-  getNextCardKey: () => number,
-) =>
+export const commitDeployment = (target: Position) =>
   data(({ get, set }) => {
     const { deployment } = get;
     const didMeetPreconditions =
@@ -16,14 +12,7 @@ export const commitDeployment = (
     return set.leaf
       .at(target)
       .update(({ units }) => ({
-        units: [
-          ...units,
-          createUnit({
-            cardClass: deployment.unit.cardClass,
-            key: getNextCardKey(),
-            owner: get.player,
-          }),
-        ],
+        units: [...units, deployment.unit],
       }))
       .set.hand.of(get.player)
       .update(hand =>

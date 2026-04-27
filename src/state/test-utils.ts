@@ -58,7 +58,7 @@ export const upgradeOf = (
                   key: counter(),
                   owner,
                 })
-              : { ...leaf, owner },
+              : leaf,
         },
       }
     : {};
@@ -77,7 +77,7 @@ export const deploymentOf = (
                   key: counter(),
                   owner,
                 })
-              : { ...unit, owner },
+              : unit,
         },
       }
     : {};

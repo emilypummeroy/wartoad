@@ -35,8 +35,7 @@ export const useGameContextData = (
           activate(unit, position),
 
         commitUpgrade: (position: Position) => commitUpgrade(position),
-        commitDeployment: (position: Position) =>
-          commitDeployment(position, getNextCardKey),
+        commitDeployment: (position: Position) => commitDeployment(position),
         commitActivation: (position: Position) => commitActivation(position),
       }),
     [getDrawnCard],

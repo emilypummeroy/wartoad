@@ -61,7 +61,7 @@ describe(commitDeployment, () => {
         ...gameflowOf(player, subphase, phase),
         ...subphaseStateOf(player, subphase),
       });
-      const got = commitDeployment(target, counter)(old);
+      const got = commitDeployment(target)(old);
       expect(got).toStrictEqual(old);
     });
   };
@@ -111,21 +111,20 @@ describe(commitDeployment, () => {
       });
 
       it('should add the card to the target position', () => {
-        const after = commitDeployment(target, counter)(before);
+        const after = commitDeployment(target)(before);
         const got = getPondStateAt(after.pond, target).units;
         const beforeTarget = getPondStateAt(before.pond, target);
         for (const card of beforeTarget.units) expect(got).toContain(card);
-        // TODO 11: Check for individual card
-        expect(got).toHaveLength(beforeTarget.units.length + 1);
+        expect(got).toContain(unit);
       });
 
       it('should unset the deployment', () => {
-        const result = commitDeployment(target, counter)(before);
+        const result = commitDeployment(target)(before);
         expect(result.deployment).toBeUndefined();
       });
 
       it(`should remove the card from the ${player} hand`, () => {
-        const after = commitDeployment(target, counter)(before);
+        const after = commitDeployment(target)(before);
         const got = player === North ? after.northHand : after.southHand;
         // TODO 11: Check for individual card
         expect(got).toHaveLength(restOfHand.length);
@@ -133,14 +132,14 @@ describe(commitDeployment, () => {
 
       const opponent = PLAYER_AFTER[player];
       it(`should not change the ${opponent} hand`, () => {
-        const after = commitDeployment(target, counter)(before);
+        const after = commitDeployment(target)(before);
         const got = opponent === North ? after.northHand : after.southHand;
         const want = opponent === North ? before.northHand : before.southHand;
         expect(got).toStrictEqual(want);
       });
 
       it('should set subphase to Idle', () => {
-        const result = commitDeployment(target, counter)(before);
+        const result = commitDeployment(target)(before);
         expect(result.flow.subphase).toBe(Idle);
       });
 
@@ -153,7 +152,7 @@ describe(commitDeployment, () => {
     before: GameState,
   ) => {
     it('should not affect the rest of gameflow state', () => {
-      const after = commitDeployment(target, counter)(before);
+      const after = commitDeployment(target)(before);
       let got = {};
       let want = {};
       {
@@ -168,7 +167,7 @@ describe(commitDeployment, () => {
     });
 
     it('should not affect any other positions', () => {
-      const after = commitDeployment(target, counter)(before);
+      const after = commitDeployment(target)(before);
       // Excluding rows/leaves by spreading shenanigans isn't
       // worth it, it's more annoying than just iterating.
       for (let x = 0; x < LEAF_COUNT_PER_ROW; x += 1) {
@@ -186,14 +185,14 @@ describe(commitDeployment, () => {
     });
 
     it(`should not affect the rest of the leaf at the target`, () => {
-      const after = commitDeployment(target, counter)(before);
+      const after = commitDeployment(target)(before);
       const { units: _, ...got } = getPondStateAt(after.pond, target);
       const { units: __, ...want } = getPondStateAt(before.pond, target);
       expect(got).toStrictEqual(want);
     });
 
     it('should not affect the rest of game state', () => {
-      const after = commitDeployment(target, counter)(before);
+      const after = commitDeployment(target)(before);
       let got = {};
       let want = {};
       {
