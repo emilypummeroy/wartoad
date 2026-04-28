@@ -11,13 +11,13 @@ import { _ } from '../types/test-utils';
 import { PondLeaf } from './PondLeaf';
 
 const { North, South } = Player;
-const { Start, Main, End } = Phase;
-const { Idle, Deploying, Upgrading, Activating } = Subphase;
+const { Start, End, Main, GameOver } = Phase;
+const { Deploying, Upgrading, Activating } = Subphase;
 
 type Inputs = [
   controller: Player,
   turn: Player,
-  Subphase,
+  Phase,
   Position,
   upgraded: boolean,
   unitOwners: [] | [Player] | [Player, Player], // More is generally irrelevant
@@ -87,14 +87,14 @@ const itShouldNotHaveOpponentUpgradeOrActivateButtons = ([, player]: Inputs) => 
 };
 
 describe(PondLeaf, () => {
-  const renderForInputsInMainPhase = (
-    [controller, player, subphase, position, isUpgraded, unitOwners, activationStart]: Inputs,
+  const renderForInputs = (
+    [controller, player, phase, position, isUpgraded, unitOwners, activationStart]: Inputs,
     units: UnitCard[] = frogletsOwnedBy(unitOwners),
   ) => {
     renderWithGameContext([
       {
-        ...activationOf(player, _, activationStart),
-        ...gameflowOf(player, subphase, Main),
+        ...(phase === Activating && activationOf(player, _, activationStart)),
+        ...gameflowOf(player, phase),
         pond: setPondStateAt(INITIAL_POND, position, { isUpgraded, units, controller }),
       },
     ])(<PondLeaf position={position} />);
@@ -102,13 +102,13 @@ describe(PondLeaf, () => {
 
   // Home Lily Pad: upgraded & Home
   describe.for<Inputs>([
-    [North, North, Idle, HOME[North], true, []],
+    [North, North, Main, HOME[North], true, []],
     [North, South, Deploying, HOME[North], true, [South]],
     [South, North, Upgrading, HOME[South], true, []],
     [South, South, Activating, HOME[South], true, [North, North]],
   ])('controlled by %s | Home position %s | upgraded %s | units owned by %s | turn of %s | subphase %s', inputs => {
     const [controller] = inputs;
-    beforeEach(() => renderForInputsInMainPhase(inputs));
+    beforeEach(() => renderForInputs(inputs));
     itShouldHaveTheRightFroglets(inputs);
     itShouldNotHaveOpponentUpgradeOrActivateButtons(inputs);
 
@@ -121,13 +121,13 @@ describe(PondLeaf, () => {
   describe.for<Inputs>([
     [North, North, Upgrading, { x: 1, y: 2 }, true, [North, South]],
     [North, South, Activating, { x: 2, y: 0 }, true, [North]],
-    [South, North, Idle, { x: 1, y: 4 }, true, []],
+    [South, North, Main, { x: 1, y: 4 }, true, []],
     [South, South, Deploying, { x: 0, y: 5 }, true, [South]],
   ])(
     'controlled by %s | turn of %s | subphase %s | non-Home position %s | upgraded? %s | units owned by %s',
     inputs => {
       const [controller] = inputs;
-      beforeEach(() => renderForInputsInMainPhase(inputs));
+      beforeEach(() => renderForInputs(inputs));
       itShouldHaveTheRightFroglets(inputs);
       itShouldNotHaveOpponentUpgradeOrActivateButtons(inputs);
 
@@ -143,13 +143,13 @@ describe(PondLeaf, () => {
   describe.for<Inputs>([
     [North, South, Upgrading, { x: 0, y: 2 }, false, []],
     [North, South, Deploying, { x: 1, y: 5 }, false, [South]],
-    [South, North, Idle, { x: 1, y: 0 }, false, [North, South]],
+    [South, North, Main, { x: 1, y: 0 }, false, [North, South]],
     [South, North, Activating, { x: 2, y: 3 }, false, [North]],
   ])(
     'controlled by %s | turn of %s | subphase %s | non-Home position %s | upgraded? %s | units owned by %s',
     inputs => {
       const [controller] = inputs;
-      beforeEach(() => renderForInputsInMainPhase(inputs));
+      beforeEach(() => renderForInputs(inputs));
       itShouldHaveTheRightFroglets(inputs);
       itShouldNotHaveOpponentUpgradeOrActivateButtons(inputs);
 
@@ -165,11 +165,26 @@ describe(PondLeaf, () => {
   // No dropzone on zone:
   describe.for<Inputs>([
     // | Idle
-    [North, North, Idle, { x: 0, y: 0 }, false, [South]],
-    [South, North, Idle, { x: 1, y: 2 }, true, [North, South]],
-    [North, South, Idle, { x: 2, y: 3 }, false, []],
-    [South, South, Idle, { x: 0, y: 5 }, true, [North]],
+    [North, North, Main, { x: 0, y: 0 }, false, [South]],
+    [South, North, Main, { x: 1, y: 2 }, true, [North, South]],
+    [North, South, Main, { x: 2, y: 3 }, false, []],
+    [South, South, Main, { x: 0, y: 5 }, true, [North]],
 
+    // | Start
+    [North, North, Start, { x: 0, y: 0 }, false, [South]],
+    [South, North, Start, { x: 1, y: 2 }, true, [North, South]],
+    [North, South, Start, { x: 2, y: 3 }, false, []],
+    [South, South, Start, { x: 0, y: 5 }, true, [North]],
+    // | End
+    [North, North, End, { x: 0, y: 0 }, false, [South]],
+    [South, North, End, { x: 1, y: 2 }, true, [North, South]],
+    [North, South, End, { x: 2, y: 3 }, false, []],
+    [South, South, End, { x: 0, y: 5 }, true, [North]],
+    // | GameOver
+    [North, North, GameOver, { x: 0, y: 0 }, false, [South]],
+    [South, North, GameOver, { x: 1, y: 2 }, true, [North, South]],
+    [North, South, GameOver, { x: 2, y: 3 }, false, []],
+    [South, South, GameOver, { x: 0, y: 5 }, true, [North]],
     // | Activating & not in range of start
     // Offsets: x+2, y-2, y+2, x-2
     [North, North, Activating, { x: 0, y: 0 }, false, [South], { x: 2, y: 0 }],
@@ -197,7 +212,7 @@ describe(PondLeaf, () => {
   ])(
     'controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s | activated from %s',
     inputs => {
-      beforeEach(() => renderForInputsInMainPhase(inputs));
+      beforeEach(() => renderForInputs(inputs));
       itShouldHaveTheRightFroglets(inputs);
       itShouldNotHaveOpponentUpgradeOrActivateButtons(inputs);
 
@@ -211,65 +226,6 @@ describe(PondLeaf, () => {
 
       it('should not have a Move dropzone', () => {
         expect(screen.queryByRole('button', { name: /Move/ })).not.toBeInTheDocument();
-      });
-    },
-  );
-
-  // No dropzones or activation buttons if:
-  // | Start phase & even if all other conditions are satisfied
-  // | End phase & even if all other conditions are satisfied
-  describe.for<[Phase, ...Inputs]>([
-    [Start, North, North, Idle, { x: 0, y: 0 }, false, [North, North], { x: 1, y: 0 }],
-    [Start, North, North, Activating, { x: 0, y: 0 }, false, [North, North], { x: 1, y: 0 }],
-    [Start, North, North, Deploying, { x: 2, y: 0 }, false, [North, North], { x: 1, y: 0 }],
-    [Start, North, North, Upgrading, { x: 2, y: 0 }, false, [North, North], { x: 1, y: 0 }],
-    [Start, South, South, Idle, { x: 0, y: 5 }, false, [South, South], { x: 1, y: 5 }],
-    [Start, South, South, Activating, { x: 0, y: 5 }, false, [South, South], { x: 1, y: 5 }],
-    [Start, South, South, Deploying, { x: 2, y: 5 }, false, [South, South], { x: 1, y: 5 }],
-    [Start, South, South, Upgrading, { x: 2, y: 5 }, false, [South, South], { x: 1, y: 5 }],
-    [End, North, North, Idle, { x: 0, y: 0 }, false, [North, North], { x: 0, y: 1 }],
-    [End, North, North, Activating, { x: 0, y: 0 }, false, [North, North], { x: 0, y: 1 }],
-    [End, North, North, Deploying, { x: 2, y: 0 }, false, [North, North], { x: 2, y: 1 }],
-    [End, North, North, Upgrading, { x: 2, y: 0 }, false, [North, North], { x: 2, y: 1 }],
-    [End, South, South, Idle, { x: 0, y: 5 }, false, [South, South], { x: 0, y: 4 }],
-    [End, South, South, Activating, { x: 0, y: 5 }, false, [South, South], { x: 0, y: 4 }],
-    [End, South, South, Deploying, { x: 2, y: 5 }, false, [South, South], { x: 2, y: 4 }],
-    [End, South, South, Upgrading, { x: 2, y: 5 }, false, [South, South], { x: 2, y: 4 }],
-  ])(
-    '<<Special case>> during %s phase | controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s | activated from %s',
-    ([phase, ...input]) => {
-      const [controller, player, subphase, position, isUpgraded, unitOwners, activationStart] = input;
-
-      beforeEach(() => {
-        renderWithGameContext([
-          {
-            ...gameflowOf(player, subphase, phase),
-            ...activationOf(player, _, activationStart),
-            pond: setPondStateAt(INITIAL_POND, position, {
-              isUpgraded,
-              controller,
-              units: frogletsOwnedBy(unitOwners),
-            }),
-          },
-        ])(<PondLeaf position={position} />);
-      });
-      itShouldHaveTheRightFroglets(input);
-      itShouldNotHaveOpponentUpgradeOrActivateButtons(input);
-
-      it('should not have a Deploy dropzone', () => {
-        expect(screen.queryByRole('button', { name: /Deploy/ })).not.toBeInTheDocument();
-      });
-
-      it('should not have a Upgrade dropzone', () => {
-        expect(screen.queryByRole('button', { name: /Upgrade/ })).not.toBeInTheDocument();
-      });
-
-      it('should not have a Move dropzone', () => {
-        expect(screen.queryByRole('button', { name: /Move/ })).not.toBeInTheDocument();
-      });
-
-      it('should not have any Activate buttons', () => {
-        expect(screen.queryByRole('button', { name: /Activate/ })).not.toBeInTheDocument();
       });
     },
   );
@@ -290,7 +246,7 @@ describe(PondLeaf, () => {
     'controlled by %s | turn of %s | subphase %s | non-Home position %s | upgraded? %s | units owned by %s',
     inputs => {
       const [controller] = inputs;
-      beforeEach(() => renderForInputsInMainPhase(inputs));
+      beforeEach(() => renderForInputs(inputs));
       itShouldHaveTheRightFroglets(inputs);
       itShouldNotHaveOpponentUpgradeOrActivateButtons(inputs);
 
@@ -327,7 +283,7 @@ describe(PondLeaf, () => {
     'controlled by %s | turn of %s | subphase %s | back row position %s | upgraded? %s | units owned by %s',
     inputs => {
       const [controller, , _, , isUpgraded] = inputs;
-      beforeEach(() => renderForInputsInMainPhase(inputs));
+      beforeEach(() => renderForInputs(inputs));
       itShouldHaveTheRightFroglets(inputs);
       itShouldNotHaveOpponentUpgradeOrActivateButtons(inputs);
 
@@ -369,7 +325,7 @@ describe(PondLeaf, () => {
     'controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s | activated from %s',
     inputs => {
       const [controller, , _, , isUpgraded] = inputs;
-      beforeEach(() => renderForInputsInMainPhase(inputs));
+      beforeEach(() => renderForInputs(inputs));
       itShouldHaveTheRightFroglets(inputs);
       itShouldNotHaveOpponentUpgradeOrActivateButtons(inputs);
 
@@ -398,19 +354,19 @@ describe(PondLeaf, () => {
   // Can click units to activate:
   // Idle & units in [player] | [opponent, player] | [player, opponent] | [player, player]
   describe.for<Inputs>([
-    [South, North, Idle, { x: 2, y: 0 }, false, [North]],
-    [South, North, Idle, { x: 1, y: 1 }, true, [North, South]],
-    [North, North, Idle, { x: 0, y: 2 }, false, [South, North]],
-    [North, North, Idle, { x: 2, y: 3 }, true, [North, North]],
-    [South, South, Idle, { x: 0, y: 4 }, true, [South]],
-    [South, South, Idle, { x: 1, y: 5 }, false, [North, South]],
-    [North, South, Idle, { x: 2, y: 0 }, true, [South, North]],
-    [North, South, Idle, { x: 0, y: 1 }, false, [South, South]],
+    [South, North, Main, { x: 2, y: 0 }, false, [North]],
+    [South, North, Main, { x: 1, y: 1 }, true, [North, South]],
+    [North, North, Main, { x: 0, y: 2 }, false, [South, North]],
+    [North, North, Main, { x: 2, y: 3 }, true, [North, North]],
+    [South, South, Main, { x: 0, y: 4 }, true, [South]],
+    [South, South, Main, { x: 1, y: 5 }, false, [North, South]],
+    [North, South, Main, { x: 2, y: 0 }, true, [South, North]],
+    [North, South, Main, { x: 0, y: 1 }, false, [South, South]],
   ])('controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s', inputs => {
     const [, player, , _, , unitOwners] = inputs;
     const units = frogletsOwnedBy(unitOwners);
     const playerUnits = units.filter(({ owner }) => owner === player);
-    beforeEach(() => renderForInputsInMainPhase(inputs, units));
+    beforeEach(() => renderForInputs(inputs, units));
     itShouldHaveTheRightFroglets(inputs);
     itShouldNotHaveOpponentUpgradeOrActivateButtons(inputs);
 
@@ -433,19 +389,28 @@ describe(PondLeaf, () => {
   // Activating & units = [player]
   // Deploying & units = [player]
   // Upgrading & units = [player]
+  // Start phase
+  // End phase
+  // GameOver
   describe.for<Inputs>([
-    [North, North, Idle, { x: 2, y: 3 }, true, []],
-    [North, North, Idle, { x: 1, y: 4 }, false, [South]],
+    [North, North, Start, { x: 2, y: 3 }, true, []],
+    [North, North, End, { x: 2, y: 3 }, true, []],
+    [North, North, GameOver, { x: 2, y: 3 }, true, []],
+    [North, North, Main, { x: 2, y: 3 }, true, []],
+    [North, North, Main, { x: 1, y: 4 }, false, [South]],
     [North, North, Activating, { x: 0, y: 5 }, true, [North]],
     [South, North, Deploying, { x: 2, y: 0 }, false, [North]],
     [South, North, Upgrading, { x: 1, y: 1 }, true, [North]],
-    [South, South, Idle, { x: 0, y: 2 }, true, []],
-    [North, South, Idle, { x: 2, y: 3 }, false, [North]],
+    [South, South, Start, { x: 2, y: 3 }, true, []],
+    [South, South, End, { x: 2, y: 3 }, true, []],
+    [South, South, GameOver, { x: 2, y: 3 }, true, []],
+    [South, South, Main, { x: 0, y: 2 }, true, []],
+    [North, South, Main, { x: 2, y: 3 }, false, [North]],
     [North, South, Activating, { x: 1, y: 4 }, true, [South]],
     [South, South, Deploying, { x: 0, y: 5 }, false, [South]],
     [South, South, Upgrading, { x: 2, y: 0 }, true, [South]],
   ])('controlled by %s | turn of %s | subphase %s | position %s | upgraded? %s | units owned by %s', inputs => {
-    beforeEach(() => renderForInputsInMainPhase(inputs));
+    beforeEach(() => renderForInputs(inputs));
     itShouldHaveTheRightFroglets(inputs);
     itShouldNotHaveOpponentUpgradeOrActivateButtons(inputs);
 

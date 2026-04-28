@@ -5,12 +5,16 @@ import {
   TestLeafKey,
   TestPondKey,
 } from '../state-types/pond.test-utils';
-import { createStateWith, gameflowOf } from '../state/test-utils';
+import {
+  createStateWith,
+  gameflowOf,
+  subphaseStateOf,
+} from '../state/test-utils';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import { winIfYouCan } from './win-if-you-can';
 
 const { North, South } = Player;
-const { Idle } = Subphase;
+const { Upgrading, Deploying, Activating } = Subphase;
 const { Start, Main, End, GameOver } = Phase;
 
 const { INITIAL_POND, ANOTHER_POND, UNITS_POND } = TestPondKey;
@@ -34,10 +38,16 @@ describe(winIfYouCan, () => {
     // < Is End phase
     [North, Main, INITIAL_POND],
     [North, Start, ANOTHER_POND],
+    [North, Upgrading, INITIAL_POND],
+    [North, Deploying, ANOTHER_POND],
+    [North, Activating, INITIAL_POND],
     [North, GameOver, INITIAL_POND, North],
     [North, GameOver, ANOTHER_POND, South],
     [South, Main, INITIAL_POND],
     [South, Start, ANOTHER_POND],
+    [South, Upgrading, INITIAL_POND],
+    [South, Deploying, ANOTHER_POND],
+    [South, Activating, ANOTHER_POND],
     [South, GameOver, INITIAL_POND, North],
     [South, GameOver, ANOTHER_POND, South],
   ])(
@@ -45,7 +55,8 @@ describe(winIfYouCan, () => {
     ([player, phase, pondKey, winner]) => {
       const pond = TEST_PONDS_BY_KEY[pondKey];
       const before = createStateWith({
-        ...gameflowOf(player, Idle, phase),
+        ...gameflowOf(player, phase),
+        ...subphaseStateOf(player, phase),
         pond: winner
           ? setPondStateAt(pond, HOME[PLAYER_AFTER[winner]], {
               controller: winner,
@@ -73,7 +84,7 @@ describe(winIfYouCan, () => {
     ([player, phase, pondKey, opponentHome]) => {
       const pond = TEST_PONDS_BY_KEY[pondKey];
       const before = createStateWith({
-        ...gameflowOf(player, Idle, phase),
+        ...gameflowOf(player, phase),
         pond: setPondStateAt(
           pond,
           HOME[PLAYER_AFTER[player]],
@@ -100,7 +111,7 @@ describe(winIfYouCan, () => {
       const position = HOME[PLAYER_AFTER[player]];
       const leaf = TEST_LEAVES_BY_KEY[leafKey];
       const before = createStateWith({
-        ...gameflowOf(player, Idle, End),
+        ...gameflowOf(player, End),
         pond: setPondStateAt(pond, position, leaf),
       });
       const opponent = player === North ? South : North;

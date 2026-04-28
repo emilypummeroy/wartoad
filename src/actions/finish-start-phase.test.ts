@@ -1,35 +1,50 @@
 import { draw } from '../state-types/card.test-utils';
-import { createStateWith, gameflowOf } from '../state/test-utils';
+import {
+  createStateWith,
+  gameflowOf,
+  subphaseStateOf,
+  winningPondOf,
+} from '../state/test-utils';
 import { CardClass, CardKey } from '../types/card';
 import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
-import type { Position } from '../types/position';
 import { finishStartPhase } from './finish-start-phase';
 
-const { Idle } = Subphase;
+const { Upgrading, Deploying, Activating } = Subphase;
 const { North, South } = Player;
 const { Froglet, LilyPad } = CardKey;
-const { Start, Main, End } = Phase;
+const { Start, Main, End, GameOver } = Phase;
 
-type Preconditions = [Player, Phase];
+type Preconditions = [Player, Phase, winner?: Player];
 type Inputs = [Player, draw: CardKey];
 
 describe(finishStartPhase, () => {
   // Preconditions:
-  // phase = Start
-  describe.for<[...Preconditions, CardKey, Position?]>([
-    [North, Main, Froglet, { x: 2, y: 2 }],
-    [North, End, LilyPad, { x: 1, y: 3 }],
-    [South, Main, Froglet, { x: 2, y: 5 }],
-    [South, End, LilyPad, { x: 0, y: 0 }],
+  describe.for<Preconditions>([
+    // < phase = Start
+    [North, Main],
+    [North, End],
+    [North, Upgrading],
+    [North, Deploying],
+    [North, Activating],
+    [North, GameOver, North],
+    [North, GameOver, South],
+    [South, Main],
+    [South, End],
+    [South, Upgrading],
+    [South, Deploying],
+    [South, Activating],
+    [North, GameOver, North],
+    [North, GameOver, South],
   ])(
-    'Precondition failed: need Idle | %s %s | %s %s',
-    ([player, phase, cardKey]) => {
-      const cardClass = CardClass[cardKey];
+    'Precondition failed: need Main phase Idle | %s %s | winner %s',
+    ([player, phase, winner]) => {
       it('should not change state', () => {
-        const old = createStateWith({
-          ...gameflowOf(player, undefined, phase),
+        const before = createStateWith({
+          ...gameflowOf(player, phase),
+          ...subphaseStateOf(player, phase),
+          ...winningPondOf(winner),
         });
-        expect(finishStartPhase(draw(cardClass))(old)).toStrictEqual(old);
+        expect(finishStartPhase(draw())(before)).toStrictEqual(before);
       });
     },
   );
@@ -42,7 +57,7 @@ describe(finishStartPhase, () => {
     [South, LilyPad],
   ])('Postconditions | %s | drawing %s', ([player, cardKey]) => {
     const cardClass = CardClass[cardKey];
-    const before = createStateWith(gameflowOf(player, Idle, Start));
+    const before = createStateWith(gameflowOf(player, Start));
     const opponent = PLAYER_AFTER[player];
 
     // > old.phase = Start -> phase = Main

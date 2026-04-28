@@ -46,17 +46,17 @@ describe(PhaseTracker, () => {
     expect(onNextPhaseClicked).toHaveBeenCalledOnce();
   });
 
-  it.for<[Subphase, Player]>([
+  it.for<[Phase & Subphase, Player]>([
     [Deploying, North],
     [Upgrading, North],
     [Activating, North],
     [Deploying, South],
     [Upgrading, South],
     [Activating, South],
-  ])('should not allow clicking to progress phase when %s in the %s Main phase', ([subphase, player]) => {
+  ])('should not allow clicking to progress phase when %s in the %s Main phase', ([phase, player]) => {
     const onNextPhaseClicked = vi.fn<() => void>();
     renderWithGameContext()(
-      <PhaseTracker flow={{ player, phase: Main, subphase }} onNextPhaseClicked={onNextPhaseClicked} />,
+      <PhaseTracker flow={{ player, phase, subphase: phase }} onNextPhaseClicked={onNextPhaseClicked} />,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Next phase' }));
     expect(onNextPhaseClicked).not.toHaveBeenCalled();

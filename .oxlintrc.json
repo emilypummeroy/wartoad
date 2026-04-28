@@ -39,6 +39,7 @@
     ],
     "array-type": ["allow", { "default": "array-simple" }],
     "no-duplicate-imports": ["error"],
+    "no-fallthrough": ["allow"],
     "consistent-type-imports": [
       "error",
       {

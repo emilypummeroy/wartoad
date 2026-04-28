@@ -35,7 +35,6 @@ type Input = [
 type Preconditions = [
   Position,
   Player,
-  Subphase,
   Phase,
   ...SubphasePlayer,
   start?: Position,
@@ -44,31 +43,30 @@ type Preconditions = [
 describe(commitActivation, () => {
   describe.for<Preconditions>([
     // Not Activating
-    [{ x: 1, y: 3 }, North, Idle, Main, _],
-    [{ x: 2, y: 4 }, South, Deploying, Main, _, South],
-    [{ x: 1, y: 3 }, North, Upgrading, Main, North],
-    [{ x: 0, y: 4 }, South, Idle, End, _],
-    [{ x: 2, y: 5 }, North, Idle, Start, _],
+    [{ x: 1, y: 3 }, North, Main, _],
+    [{ x: 2, y: 4 }, South, Deploying, _, South],
+    [{ x: 1, y: 3 }, North, Upgrading, North],
+    [{ x: 0, y: 4 }, South, End, _],
+    [{ x: 2, y: 5 }, North, Start, _],
   ])(
-    'Precondition failed: Need Activating | target: %s | flow: %s %s %s | start: %s | pickedCard: %s',
+    'Precondition failed: Need Activating | target: %s | flow: %s %s | start: %s | pickedCard: %s',
     input => it_should_return_state_unchanged(input),
   );
 
-  describe.for<[...Preconditions]>([
+  describe.for<Preconditions>([
     // Too far from start
-    [{ x: 1, y: 5 }, North, Activating, Main, _, _, North, { x: 1, y: 3 }],
-    [{ x: 0, y: 4 }, South, Activating, Main, _, _, South, { x: 2, y: 0 }],
-    [{ x: 1, y: 1 }, North, Activating, Main, _, _, North, { x: 1, y: 3 }],
-    [{ x: 0, y: 4 }, South, Activating, Main, _, _, South, { x: 2, y: 4 }],
+    [{ x: 1, y: 5 }, North, Activating, _, _, North, { x: 1, y: 3 }],
+    [{ x: 0, y: 4 }, South, Activating, _, _, South, { x: 2, y: 0 }],
+    [{ x: 1, y: 1 }, North, Activating, _, _, North, { x: 1, y: 3 }],
+    [{ x: 0, y: 4 }, South, Activating, _, _, South, { x: 2, y: 4 }],
   ])(
-    'Precondition failed: Too far to move | target: %s | flow: %s %s %s | start: %s',
+    'Precondition failed: Too far to move | target: %s | flow: %s %s | start: %s',
     input => it_should_return_state_unchanged(input),
   );
 
   const it_should_return_state_unchanged = ([
     target,
     player,
-    subphase,
     phase,
     upgrader,
     deployer,
@@ -77,7 +75,7 @@ describe(commitActivation, () => {
   ]: Preconditions) => {
     it('should return the input unchanged', () => {
       const old = createStateWith({
-        ...gameflowOf(player, subphase, phase),
+        ...gameflowOf(player, phase),
         ...upgradeOf(upgrader),
         ...deploymentOf(deployer),
         ...activationOf(activator, _, start),
@@ -217,6 +215,10 @@ describe(commitActivation, () => {
       const result = commitActivation(target)(old);
       expect(result.flow.subphase).toStrictEqual(Idle);
     });
+    it('should set phase to Main', () => {
+      const result = commitActivation(target)(old);
+      expect(result.flow.phase).toStrictEqual(Main);
+    });
   };
 
   const it_should_not_affect_the_rest_of_gameflow = (
@@ -228,11 +230,11 @@ describe(commitActivation, () => {
       let got = {};
       let want = {};
       {
-        const { subphase: _, ...rest } = after.flow;
+        const { subphase: _, phase: __, ...rest } = after.flow;
         got = rest;
       }
       {
-        const { subphase: _, ...rest } = before.flow;
+        const { subphase: _, phase: __, ...rest } = before.flow;
         want = rest;
       }
       expect(got).toStrictEqual(want);

@@ -47,15 +47,27 @@ export type GameData = {
 };
 
 // oxlint-disable-next-line max-statements
-const gameInvariants: GameInvariants = (s, get, { always, unless, iff }) => {
+const gameInvariants: GameInvariants = (s, get, { always, when, iff }) => {
   always(get.leaf.at(HOME[Player.North]).isUpgraded);
   always(get.leaf.at(HOME[Player.South]).isUpgraded);
+
+  iff(get.subphase === Subphase.Activating).must(
+    get.phase === Subphase.Activating,
+  );
+  iff(get.subphase === Subphase.Deploying).must(
+    get.subphase === Subphase.Deploying,
+  );
+  iff(get.subphase === Subphase.Upgrading).must(
+    get.subphase === Subphase.Upgrading,
+  );
 
   iff(get.subphase === Subphase.Activating).must(!!s.activation);
   iff(get.subphase === Subphase.Deploying).must(!!s.deployment);
   iff(get.subphase === Subphase.Upgrading).must(!!s.upgrade);
 
-  unless(get.phase === Phase.Main).must(get.subphase === Subphase.Idle);
+  when(get.phase === Phase.Start).must(get.subphase === Subphase.Idle);
+  when(get.phase === Phase.End).must(get.subphase === Subphase.Idle);
+  when(get.phase === Phase.GameOver).must(get.subphase === Subphase.Idle);
 
   iff(get.phase === Phase.GameOver).must(!!s.winner);
   iff(s.winner === Player.North).must(
@@ -223,7 +235,7 @@ const make = (s: GameState): GameMake => ({
   idle: () =>
     gameData({
       ...s,
-      flow: { ...s.flow, subphase: Subphase.Idle },
+      flow: { ...s.flow, phase: Phase.Main, subphase: Subphase.Idle },
       upgrade: undefined,
       deployment: undefined,
       activation: undefined,
@@ -232,21 +244,33 @@ const make = (s: GameState): GameMake => ({
   upgrading: leaf =>
     gameData({
       ...s,
-      flow: { ...s.flow, subphase: Subphase.Upgrading },
+      flow: {
+        ...s.flow,
+        phase: Subphase.Upgrading,
+        subphase: Subphase.Upgrading,
+      },
       upgrade: { leaf },
     }),
 
   deploying: unit =>
     gameData({
       ...s,
-      flow: { ...s.flow, subphase: Subphase.Deploying },
+      flow: {
+        ...s.flow,
+        phase: Subphase.Deploying,
+        subphase: Subphase.Deploying,
+      },
       deployment: { unit },
     }),
 
   activating: activation =>
     gameData({
       ...s,
-      flow: { ...s.flow, subphase: Subphase.Activating },
+      flow: {
+        ...s.flow,
+        phase: Subphase.Activating,
+        subphase: Subphase.Activating,
+      },
       activation,
     }),
 });
@@ -276,9 +300,12 @@ type GameInvariants = (
 
 type InvariantChecks = {
   readonly always: (p: boolean) => void;
-  readonly unless: (p: boolean) => {
-    readonly must: (q: boolean) => void;
+  readonly when: (p: boolean) => {
+    must: (p: boolean) => void;
   };
+  // readonly unless: (p: boolean) => {
+  //   readonly must: (q: boolean) => void;
+  // };
   readonly iff: (p: boolean) => {
     readonly must: (q: boolean) => void;
   };
@@ -286,9 +313,12 @@ type InvariantChecks = {
 
 const invariantChecks: InvariantChecks = {
   always: p => assert(p),
-  unless: p => ({
-    must: q => assert(p || q),
+  when: p => ({
+    must: q => assert(!p || q),
   }),
+  // unless: p => ({
+  //   must: q => assert(p || q),
+  // }),
   iff: p => ({ must: q => assert(p === q) }),
 };
 

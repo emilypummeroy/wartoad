@@ -1,33 +1,56 @@
-import { createStateWith, gameflowOf } from '../state/test-utils';
-import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
+import {
+  createStateWith,
+  gameflowOf,
+  subphaseStateOf,
+  winningPondOf,
+} from '../state/test-utils';
+import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import { finishEndPhase } from './finish-end-phase';
 
 const { North, South } = Player;
-const { Start, Main, End } = Phase;
+const { Start, Main, End, GameOver } = Phase;
+const { Upgrading, Deploying, Activating } = Subphase;
 
-type Preconditions = [Player, Phase];
+type Preconditions = [Player, Phase, winner?: Player];
 type Inputs = [Player];
 
 describe(finishEndPhase, () => {
   // Preconditions:
-  describe.for<[...Preconditions]>([
+  describe.for<Preconditions>([
     // < phase = End
     [North, Start],
     [North, Main],
+    [North, Upgrading],
+    [North, Deploying],
+    [North, Activating],
+    [North, GameOver, North],
+    [North, GameOver, South],
     [South, Start],
     [South, Main],
-  ])('Precondition failed: need End phase | %s %s', ([player, phase]) => {
-    it('should not change state', () => {
-      const old = createStateWith(gameflowOf(player, undefined, phase));
-      expect(finishEndPhase()(old)).toStrictEqual(old);
-    });
-  });
+    [South, Upgrading],
+    [South, Deploying],
+    [South, Activating],
+    [North, GameOver, North],
+    [North, GameOver, South],
+  ])(
+    'Precondition failed: need End phase | %s %s | winner %s',
+    ([player, phase, winner]) => {
+      it('should not change state', () => {
+        const before = createStateWith({
+          ...gameflowOf(player, phase),
+          ...subphaseStateOf(player, phase),
+          ...winningPondOf(winner),
+        });
+        expect(finishEndPhase()(before)).toStrictEqual(before);
+      });
+    },
+  );
 
   // Postconditions:
   describe.for<Inputs>([[North], [South]])(
     'Postconditions | %s %s | drawing %s',
     ([player]) => {
-      const before = createStateWith(gameflowOf(player, undefined, End));
+      const before = createStateWith(gameflowOf(player, End));
 
       // > old.phase = End -> phase = Start
       it('should go to the Start phase', () => {

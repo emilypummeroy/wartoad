@@ -12,13 +12,25 @@ type PhaseTrackerSlice = [
   {},
 ];
 export function PhaseTracker({
-  flow: { player, phase, subphase },
+  flow: { player, phase },
   onNextPhaseClicked,
 }: {
   readonly flow: Gameflow;
   readonly onNextPhaseClicked: () => void;
 }) {
   const [{ winner }]: PhaseTrackerSlice = useContext(GameContext);
+  const isBusy =
+    phase === Subphase.Upgrading ||
+    phase === Subphase.Deploying ||
+    phase === Subphase.Activating ||
+    phase === Phase.GameOver;
+  const phaseName =
+    phase === Phase.Main ||
+    phase === Subphase.Upgrading ||
+    phase === Subphase.Deploying ||
+    phase === Subphase.Activating
+      ? Phase.Main
+      : phase;
   return phase === Phase.GameOver && !!winner ? (
     <section aria-labelledby="current-phase" className="phases">
       <h3 id="current-phase">
@@ -34,11 +46,11 @@ export function PhaseTracker({
         <span className={player === Player.North ? 'north' : 'south'}>
           {player}
         </span>
-        : <span className="accent">{phase}</span> phase
+        : <span className="accent">{phaseName}</span> phase
       </h3>
       <button
         className="icon-text accent"
-        disabled={subphase !== Subphase.Idle}
+        disabled={isBusy}
         onClick={onNextPhaseClicked}
       >
         <StepForward />

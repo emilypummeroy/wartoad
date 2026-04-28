@@ -9,14 +9,15 @@ import {
   createStateWith,
   gameflowOf,
   subphaseStateOf,
+  winningPondOf,
 } from '../state/test-utils';
 import { Phase, Player, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { finishMainPhase } from './finish-main-phase';
 
-const { Idle, Upgrading, Deploying, Activating } = Subphase;
+const { Upgrading, Deploying, Activating } = Subphase;
 const { North, South } = Player;
-const { Start, Main, End } = Phase;
+const { Start, Main, End, GameOver } = Phase;
 
 const { INITIAL_POND, ANOTHER_POND } = TestPondKey;
 const {
@@ -36,34 +37,37 @@ const {
   SOUTH_UPGRADED_OTHER_UNIT,
 } = TestLeafKey;
 
-type Preconditions = [Player, Phase, Subphase];
+type Preconditions = [Player, Phase, winner?: Player];
 type Inputs = [Player, TestPondKey, Position[], TestLeafKey];
 
 describe(finishMainPhase, () => {
   // Preconditions:
   describe.for<Preconditions>([
-    // < subphase = Idle
-    [North, Main, Upgrading],
-    [North, Main, Deploying],
-    [North, Main, Activating],
-    [South, Main, Upgrading],
-    [South, Main, Deploying],
-    [South, Main, Activating],
-
-    // < phase = Main
-    [North, Start, Idle],
-    [North, End, Idle],
-    [South, Start, Idle],
-    [South, End, Idle],
+    // < phase = Main Idle
+    [North, Start],
+    [North, End],
+    [North, Upgrading],
+    [North, Deploying],
+    [North, Activating],
+    [North, GameOver, North],
+    [North, GameOver, South],
+    [South, Start],
+    [South, End],
+    [South, Upgrading],
+    [South, Deploying],
+    [South, Activating],
+    [North, GameOver, North],
+    [North, GameOver, South],
   ])(
-    'Precondition failed: need Main & Idle | %s %s %s',
-    ([player, phase, subphase]) => {
+    'Precondition failed: need Main phase Idle | %s %s | winner %s',
+    ([player, phase, winner]) => {
       it('should not change state', () => {
-        const old = createStateWith({
-          ...gameflowOf(player, subphase, phase),
-          ...subphaseStateOf(player, subphase),
+        const before = createStateWith({
+          ...gameflowOf(player, phase),
+          ...subphaseStateOf(player, phase),
+          ...winningPondOf(winner),
         });
-        expect(finishMainPhase()(old)).toStrictEqual(old);
+        expect(finishMainPhase()(before)).toStrictEqual(before);
       });
     },
   );
@@ -104,7 +108,7 @@ describe(finishMainPhase, () => {
       const updates: [Position, LeafState][] = positions.map(xy => [xy, leaf]);
 
       const before = createStateWith({
-        ...gameflowOf(player, Idle, Main),
+        ...gameflowOf(player, Main),
         pond: setPondStateAtEach(pond, ...updates),
       });
 

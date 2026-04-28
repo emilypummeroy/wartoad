@@ -31,38 +31,38 @@ const { Start, Main, End } = Phase;
 const { NORTH_LEAF, SOUTH_LEAF, NORTH_UPGRADED, SOUTH_UPGRADED } = TestLeafKey;
 
 type Input = [Position, Player, LeafKey];
-type Preconditions = [Position, TestLeafKey, turn: Player, Subphase, Phase];
+type Preconditions = [Position, TestLeafKey, turn: Player, Phase];
 
 describe(commitUpgrade, () => {
   describe.for<Preconditions>([
     // < Upgrading
-    [{ x: 1, y: 1 }, NORTH_LEAF, North, Idle, Main],
-    [{ x: 2, y: 5 }, SOUTH_LEAF, South, Activating, Main],
-    [{ x: 2, y: 0 }, NORTH_LEAF, North, Deploying, Main],
-    [{ x: 0, y: 4 }, SOUTH_LEAF, South, Idle, End],
-    [{ x: 0, y: 2 }, NORTH_LEAF, North, Idle, Start],
+    [{ x: 1, y: 1 }, NORTH_LEAF, North, Main],
+    [{ x: 2, y: 5 }, SOUTH_LEAF, South, Activating],
+    [{ x: 2, y: 0 }, NORTH_LEAF, North, Deploying],
+    [{ x: 0, y: 4 }, SOUTH_LEAF, South, End],
+    [{ x: 0, y: 2 }, NORTH_LEAF, North, Start],
   ])(
-    'Precondition failed: Need Upgrading | target: %s %s | flow: %s %s %s',
+    'Precondition failed: Need Upgrading | target: %s %s | flow: %s %s',
     input => it_should_return_state_unchanged(input),
   );
 
   describe.for<Preconditions>([
     // < Target is controlled by player
-    [{ x: 2, y: 5 }, SOUTH_LEAF, North, Upgrading, Main],
-    [{ x: 0, y: 4 }, SOUTH_LEAF, North, Upgrading, Main],
-    [{ x: 2, y: 1 }, NORTH_LEAF, South, Upgrading, Main],
-    [{ x: 0, y: 2 }, NORTH_LEAF, South, Upgrading, Main],
+    [{ x: 2, y: 5 }, SOUTH_LEAF, North, Upgrading],
+    [{ x: 0, y: 4 }, SOUTH_LEAF, North, Upgrading],
+    [{ x: 2, y: 1 }, NORTH_LEAF, South, Upgrading],
+    [{ x: 0, y: 2 }, NORTH_LEAF, South, Upgrading],
   ])(
-    'Precondition failed: Target controlled by player | target: %s %s | flow: %s %s %s',
+    'Precondition failed: Target controlled by player | target: %s %s | flow: %s %s',
     input => it_should_return_state_unchanged(input),
   );
 
   describe.for<Preconditions>([
     // < Target is not upgraded
-    [{ x: 2, y: 5 }, NORTH_UPGRADED, North, Upgrading, Main],
-    [{ x: 0, y: 4 }, NORTH_UPGRADED, North, Upgrading, Main],
-    [{ x: 2, y: 1 }, SOUTH_UPGRADED, South, Upgrading, Main],
-    [{ x: 0, y: 2 }, SOUTH_UPGRADED, South, Upgrading, Main],
+    [{ x: 2, y: 5 }, NORTH_UPGRADED, North, Upgrading],
+    [{ x: 0, y: 4 }, NORTH_UPGRADED, North, Upgrading],
+    [{ x: 2, y: 1 }, SOUTH_UPGRADED, South, Upgrading],
+    [{ x: 0, y: 2 }, SOUTH_UPGRADED, South, Upgrading],
   ])(
     'Precondition failed: Target not already upgraded | target: %s %s | flow: %s %s %s',
     input => it_should_return_state_unchanged(input),
@@ -72,13 +72,12 @@ describe(commitUpgrade, () => {
     target,
     leafKey,
     player,
-    subphase,
     phase,
   ]: Preconditions) => {
     it('should return the input unchanged', () => {
       const old = createStateWith({
-        ...gameflowOf(player, subphase, phase),
-        ...subphaseStateOf(player, subphase),
+        ...gameflowOf(player, phase),
+        ...subphaseStateOf(player, phase),
         pond: setPondStateAt(INITIAL_POND, target, TEST_LEAVES_BY_KEY[leafKey]),
       });
       const got = commitUpgrade(target)(old);
@@ -162,6 +161,11 @@ describe(commitUpgrade, () => {
         expect(result.flow.subphase).toBe(Idle);
       });
 
+      it('should set phase to Main', () => {
+        const result = commitUpgrade(target)(before);
+        expect(result.flow.phase).toBe(Main);
+      });
+
       it_should_not_affect_anything_else(target, before);
     },
   );
@@ -175,11 +179,11 @@ describe(commitUpgrade, () => {
       let got = {};
       let want = {};
       {
-        const { subphase: _, ...rest } = after.flow;
+        const { subphase: _, phase: __, ...rest } = after.flow;
         got = rest;
       }
       {
-        const { subphase: _, ...rest } = before.flow;
+        const { subphase: _, phase: __, ...rest } = before.flow;
         want = rest;
       }
       expect(got).toStrictEqual(want);

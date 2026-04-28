@@ -24,42 +24,40 @@ const { Idle, Upgrading, Deploying, Activating } = Subphase;
 const { Start, Main, End } = Phase;
 
 type Input = [target: Position, Player, targetUnits: number];
-type Preconditions = [Position, Player, Subphase, Phase];
+type Preconditions = [Position, Player, Phase];
 
 describe(commitDeployment, () => {
   describe.for<Preconditions>([
     // < Deploying
-    [{ x: 1, y: 0 }, North, Idle, Main],
-    [{ x: 2, y: 5 }, South, Activating, Main],
-    [{ x: 1, y: 0 }, North, Upgrading, Main],
-    [{ x: 0, y: 5 }, South, Idle, End],
-    [{ x: 2, y: 0 }, North, Idle, Start],
-  ])(
-    'Precondition failed: Need Deploying | target: %s | flow: %s %s %s',
-    input => it_should_return_state_unchanged(input),
+    [{ x: 1, y: 0 }, North, Main],
+    [{ x: 2, y: 5 }, South, Activating],
+    [{ x: 1, y: 0 }, North, Upgrading],
+    [{ x: 0, y: 5 }, South, End],
+    [{ x: 2, y: 0 }, North, Start],
+  ])('Precondition failed: Need Deploying | target: %s | flow: %s %s', input =>
+    it_should_return_state_unchanged(input),
   );
 
   describe.for<Preconditions>([
     // < Target on home row
-    [{ x: 1, y: 5 }, North, Deploying, Main],
-    [{ x: 0, y: 1 }, North, Deploying, Main],
-    [{ x: 2, y: 0 }, South, Deploying, Main],
-    [{ x: 1, y: 4 }, South, Deploying, Main],
+    [{ x: 1, y: 5 }, North, Deploying],
+    [{ x: 0, y: 1 }, North, Deploying],
+    [{ x: 2, y: 0 }, South, Deploying],
+    [{ x: 1, y: 4 }, South, Deploying],
   ])(
-    'Precondition failed: Target not in Home row | target: %s | flow: %s %s %s',
+    'Precondition failed: Target not in Home row | target: %s | flow: %s %s',
     input => it_should_return_state_unchanged(input),
   );
 
   const it_should_return_state_unchanged = ([
     target,
     player,
-    subphase,
     phase,
   ]: Preconditions) => {
     it('should return the input unchanged', () => {
       const old = createStateWith({
-        ...gameflowOf(player, subphase, phase),
-        ...subphaseStateOf(player, subphase),
+        ...gameflowOf(player, phase),
+        ...subphaseStateOf(player, phase),
       });
       const got = commitDeployment(target)(old);
       expect(got).toStrictEqual(old);
@@ -141,6 +139,11 @@ describe(commitDeployment, () => {
         expect(result.flow.subphase).toBe(Idle);
       });
 
+      it('should set phase to Main', () => {
+        const result = commitDeployment(target)(before);
+        expect(result.flow.phase).toBe(Main);
+      });
+
       it_should_not_affect_anything_else(target, before);
     },
   );
@@ -149,16 +152,17 @@ describe(commitDeployment, () => {
     target: Position,
     before: GameState,
   ) => {
+    // Parts of state changed by the action.
     it('should not affect the rest of gameflow state', () => {
       const after = commitDeployment(target)(before);
       let got = {};
       let want = {};
       {
-        const { subphase: _, ...rest } = after.flow;
+        const { subphase: _, phase: __, ...rest } = after.flow;
         got = rest;
       }
       {
-        const { subphase: _, ...rest } = before.flow;
+        const { subphase: _, phase: __, ...rest } = before.flow;
         want = rest;
       }
       expect(got).toStrictEqual(want);

@@ -26,9 +26,14 @@ describe(pickCard, () => {
       expect(after.flow.subphase).toBe(want);
     });
 
+    it(`should set the phase to ${want}`, () => {
+      const after = pickCard(card)(before);
+      expect(after.flow.phase).toBe(want);
+    });
+
     it('should not change the rest of the gameflow state', () => {
-      const { subphase: _, ...got } = pickCard(card)(before).flow;
-      const { subphase: __, ...want } = before.flow;
+      const { subphase: _, phase: ____, ...got } = pickCard(card)(before).flow;
+      const { subphase: __, phase: ___, ...want } = before.flow;
       expect(got).toStrictEqual(want);
     });
 

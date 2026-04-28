@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { renderWithGameContext } from '../context/GameContext.test-utils';
 import { HOME, setPondStateAt } from '../state-types/pond';
 import { TEST_PONDS_BY_KEY, ANOTHER_POND_POSITIONS, TestPondKey } from '../state-types/pond.test-utils';
-import { activationOf, gameflowOf } from '../state/test-utils';
+import { activationOf, gameflowOf, winningPondOf } from '../state/test-utils';
 import type { UnitCard } from '../types/card';
 import { Player, Phase, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
@@ -11,8 +11,8 @@ import { _ } from '../types/test-utils';
 import { PondLeafDropzone } from './PondLeafDropzone';
 
 const { North, South } = Player;
-const { Start, Main, End } = Phase;
-const { Idle, Upgrading, Deploying, Activating } = Subphase;
+const { Start, Main, End, GameOver } = Phase;
+const { Upgrading, Deploying, Activating } = Subphase;
 
 const { INITIAL_POND, ANOTHER_POND, FULL_POND, UNITS_POND } = TestPondKey;
 const NORTH_POSITION = ANOTHER_POND_POSITIONS.North;
@@ -22,10 +22,10 @@ type Inputs = [
   controller: Player,
   turnOf: Player,
   Position,
-  Subphase,
+  Phase,
   pond?: TestPondKey,
-  phase?: Phase,
   start?: Position,
+  winner?: Player,
 ];
 
 // ###
@@ -49,11 +49,15 @@ describe(PondLeafDropzone, () => {
   const commitDeployment = vi.fn<(p: Position) => void>();
   const commitActivation = vi.fn<(p: Position) => void>();
   const activate = vi.fn<(c: UnitCard, p: Position) => void>();
-  const beforeEach_render_with_subphase = ([controller, player, position, subphase, pondKey, phase, start]: Inputs) => {
+  const beforeEach_render_with_subphase = ([controller, player, position, phase, pondKey, start, winner]: Inputs) => {
     beforeEach(() => {
       const pond = setPondStateAt(TEST_PONDS_BY_KEY[pondKey ?? INITIAL_POND], position, { controller });
       renderWithGameContext([
-        { pond, ...gameflowOf(player, subphase, phase), ...activationOf(player, _, start) },
+        {
+          ...winningPondOf(winner, pond),
+          ...gameflowOf(player, phase),
+          ...(phase === Activating && activationOf(player, _, start)),
+        },
         { activate, commitUpgrade, commitDeployment, commitActivation },
       ])(
         <PondLeafDropzone targetLabelId={TEST_TARGET_ID} position={position}>
@@ -82,20 +86,29 @@ describe(PondLeafDropzone, () => {
   // # Inputs for > No dropzones
   describe.for<Inputs>([
     // < Start phase
-    [North, North, { x: 0, y: 0 }, Idle, INITIAL_POND, Start],
-    [South, North, { x: 2, y: 0 }, Upgrading, ANOTHER_POND, Start],
-    [North, South, { x: 0, y: 5 }, Deploying, UNITS_POND, Start],
-    [South, South, { x: 2, y: 5 }, Activating, FULL_POND, Start],
+    [North, North, { x: 0, y: 0 }, Start, INITIAL_POND],
+    [South, North, { x: 2, y: 0 }, Start, ANOTHER_POND],
+    [North, South, { x: 0, y: 5 }, Start, UNITS_POND],
+    [South, South, { x: 2, y: 5 }, Start, FULL_POND],
     // < End phase
-    [North, North, { x: 1, y: 0 }, Idle, FULL_POND, End],
-    [South, North, { x: 1, y: 1 }, Upgrading, INITIAL_POND, End],
-    [North, South, { x: 1, y: 5 }, Deploying, ANOTHER_POND, End],
-    [South, South, { x: 1, y: 4 }, Activating, UNITS_POND, End],
-    // < Idle
-    [North, North, { x: 0, y: 0 }, Idle, INITIAL_POND],
-    [South, North, { x: 2, y: 0 }, Idle, ANOTHER_POND],
-    [North, South, { x: 0, y: 5 }, Idle, UNITS_POND],
-    [South, South, { x: 2, y: 5 }, Idle, FULL_POND],
+    [North, North, { x: 1, y: 0 }, End, FULL_POND],
+    [South, North, { x: 1, y: 1 }, End, INITIAL_POND],
+    [North, South, { x: 1, y: 5 }, End, ANOTHER_POND],
+    [South, South, { x: 1, y: 4 }, End, UNITS_POND],
+    // < GameOver
+    [North, North, { x: 2, y: 1 }, GameOver, FULL_POND, _, North],
+    [South, North, { x: 2, y: 2 }, GameOver, INITIAL_POND, _, North],
+    [North, South, { x: 2, y: 3 }, GameOver, ANOTHER_POND, _, North],
+    [South, South, { x: 2, y: 1 }, GameOver, UNITS_POND, _, North],
+    [North, North, { x: 2, y: 1 }, GameOver, FULL_POND, _, South],
+    [South, North, { x: 2, y: 2 }, GameOver, INITIAL_POND, _, South],
+    [North, South, { x: 2, y: 3 }, GameOver, ANOTHER_POND, _, South],
+    [South, South, { x: 2, y: 1 }, GameOver, UNITS_POND, _, South],
+    // < Main/Idle
+    [North, North, { x: 0, y: 0 }, Main, INITIAL_POND],
+    [South, North, { x: 2, y: 0 }, Main, ANOTHER_POND],
+    [North, South, { x: 0, y: 5 }, Main, UNITS_POND],
+    [South, South, { x: 2, y: 5 }, Main, FULL_POND],
     // < Upgrading & not controller
     [South, North, SOUTH_POSITION.LeafMiddle, Upgrading, ANOTHER_POND],
     [South, North, SOUTH_POSITION.LeafEdge, Upgrading, ANOTHER_POND],
@@ -112,11 +125,11 @@ describe(PondLeafDropzone, () => {
     [South, South, { x: 2, y: 4 }, Deploying],
     [North, South, { x: 1, y: 0 }, Deploying],
     // < Activating & out of range of start
-    [North, North, { x: 0, y: 0 }, Activating, UNITS_POND, Main, { x: 2, y: 0 }],
-    [South, North, { x: 2, y: 0 }, Activating, UNITS_POND, Main, { x: 0, y: 0 }],
-    [South, South, { x: 0, y: 5 }, Activating, UNITS_POND, Main, { x: 2, y: 5 }],
-    [North, South, { x: 2, y: 5 }, Activating, UNITS_POND, Main, { x: 0, y: 5 }],
-  ])('controlled by %s on %s turn at %s while %s | pond?: %s | phase?: %s | start?: %s', inputs => {
+    [North, North, { x: 0, y: 0 }, Activating, UNITS_POND, { x: 2, y: 0 }],
+    [South, North, { x: 2, y: 0 }, Activating, UNITS_POND, { x: 0, y: 0 }],
+    [South, South, { x: 0, y: 5 }, Activating, UNITS_POND, { x: 2, y: 5 }],
+    [North, South, { x: 2, y: 5 }, Activating, UNITS_POND, { x: 0, y: 5 }],
+  ])('Idle | controlled by %s on %s turn at %s while %s | pond?: %s | start?: %s', inputs => {
     beforeEach_render_with_subphase(inputs);
     it_should_render_its_children();
 
@@ -230,15 +243,15 @@ describe(PondLeafDropzone, () => {
   // # Inputs for > Move dropzone
   describe.for<Inputs>([
     // < Activating & in range & not same position
-    [South, North, { x: 2, y: 3 }, Activating, UNITS_POND, Main, { x: 2, y: 2 }],
-    [North, South, { x: 0, y: 2 }, Activating, FULL_POND, Main, { x: 0, y: 3 }],
-    [South, South, { x: 1, y: 1 }, Activating, INITIAL_POND, Main, { x: 2, y: 1 }],
-    [North, North, { x: 1, y: 4 }, Activating, ANOTHER_POND, Main, { x: 0, y: 4 }],
+    [South, North, { x: 2, y: 3 }, Activating, UNITS_POND, { x: 2, y: 2 }],
+    [North, South, { x: 0, y: 2 }, Activating, FULL_POND, { x: 0, y: 3 }],
+    [South, South, { x: 1, y: 1 }, Activating, INITIAL_POND, { x: 2, y: 1 }],
+    [North, North, { x: 1, y: 4 }, Activating, ANOTHER_POND, { x: 0, y: 4 }],
     // < Activating & same position as start
-    [North, North, { x: 0, y: 0 }, Activating, UNITS_POND, Main, { x: 0, y: 0 }],
-    [South, North, { x: 2, y: 0 }, Activating, UNITS_POND, Main, { x: 2, y: 0 }],
-    [South, South, { x: 0, y: 5 }, Activating, UNITS_POND, Main, { x: 0, y: 5 }],
-    [North, South, { x: 2, y: 5 }, Activating, UNITS_POND, Main, { x: 2, y: 5 }],
+    [North, North, { x: 0, y: 0 }, Activating, UNITS_POND, { x: 0, y: 0 }],
+    [South, North, { x: 2, y: 0 }, Activating, UNITS_POND, { x: 2, y: 0 }],
+    [South, South, { x: 0, y: 5 }, Activating, UNITS_POND, { x: 0, y: 5 }],
+    [North, South, { x: 2, y: 5 }, Activating, UNITS_POND, { x: 2, y: 5 }],
   ])('controlled by %s on %s turn at %s while %s | pond: %s | phase: %s | start: %s', inputs => {
     const [_, __, position] = inputs;
     beforeEach_render_with_subphase(inputs);

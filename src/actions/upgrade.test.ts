@@ -12,41 +12,41 @@ import { upgrade } from './upgrade';
 
 const { LilyPad } = CardKey;
 const { North, South } = Player;
-const { Start, Main, End, GameOver } = Phase;
-const { Idle, Upgrading, Deploying, Activating } = Subphase;
+const { Start, End, GameOver } = Phase;
+const { Upgrading, Deploying, Activating } = Subphase;
 
 describe(upgrade, () => {
   // Preconditions:
-  describe.for<[Player, Phase, Subphase, Player?]>([
+  describe.for<[Player, Phase, Player?]>([
     // < Idle
-    [North, Start, Idle],
-    [North, End, Idle],
-    [North, GameOver, Idle, North],
-    [North, GameOver, Idle, South],
-    [South, Start, Idle],
-    [South, End, Idle],
-    [South, GameOver, Idle, North],
-    [South, GameOver, Idle, South],
+    [North, Start],
+    [North, End],
+    [North, GameOver, North],
+    [North, GameOver, South],
+    [South, Start],
+    [South, End],
+    [South, GameOver, North],
+    [South, GameOver, South],
 
     // < Main phase
-    [North, Main, Upgrading],
-    [North, Main, Deploying],
-    [North, Main, Activating],
-    [South, Main, Upgrading],
-    [South, Main, Deploying],
-    [South, Main, Activating],
+    [North, Upgrading],
+    [North, Deploying],
+    [North, Activating],
+    [South, Upgrading],
+    [South, Deploying],
+    [South, Activating],
   ])(
     'Preconditions failed: need Idle during Main phase | %s %s %s',
-    ([player, phase, subphase, winner]) => {
+    ([player, phase, winner]) => {
       const card = createLeaf({
         cardClass: CardClass.LilyPad,
         owner: player,
         key: counter(),
       });
       const before = createStateWith({
-        ...gameflowOf(player, subphase, phase),
+        ...gameflowOf(player, phase),
         ...winningPondOf(winner),
-        ...subphaseStateOf(player, subphase),
+        ...subphaseStateOf(player, phase),
       });
 
       it('should not change state', () => {
@@ -75,9 +75,14 @@ describe(upgrade, () => {
       expect(after.flow.subphase).toBe(Upgrading);
     });
 
+    it('should set the phase to upgrading', () => {
+      const after = upgrade(leaf)(before);
+      expect(after.flow.phase).toBe(Upgrading);
+    });
+
     it('should not change the rest of the gameflow state', () => {
-      const { subphase: _, ...got } = upgrade(leaf)(before).flow;
-      const { subphase: __, ...want } = before.flow;
+      const { subphase: _, phase: ____, ...got } = upgrade(leaf)(before).flow;
+      const { subphase: __, phase: ___, ...want } = before.flow;
       expect(got).toStrictEqual(want);
     });
 

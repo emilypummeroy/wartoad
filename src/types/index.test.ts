@@ -1,4 +1,4 @@
-import { noop } from '.';
+import { identity, noop } from '.';
 import { _, counter } from './test-utils';
 
 describe(noop, () => {
@@ -12,6 +12,15 @@ describe(noop, () => {
       noop([0, 'ieacntieant']);
     }).not.toThrow();
   });
+});
+
+describe(identity, () => {
+  it.for([_, 0, 'shthldyoup,.', '', {}, [], [0], ['pldyx.', 5]])(
+    'return its input when called with %s',
+    x => {
+      expect(identity(x)).toBe(x);
+    },
+  );
 });
 
 describe(counter, () => {

@@ -4,8 +4,8 @@ import { useContext, useId, type ReactNode } from 'react';
 import { GameContext } from '../context/GameContext';
 import { getPondStateAt, HOME, type PondState } from '../state-types/pond';
 import {
+  type Phase,
   type Player,
-  Phase,
   PLAYER_CLASSNAME,
   Subphase,
 } from '../types/gameflow';
@@ -15,7 +15,6 @@ type PondLeafDropzoneSlice = [
   {
     pond: PondState;
     flow: {
-      subphase: Subphase;
       phase: Phase;
       player: Player;
     };
@@ -41,7 +40,7 @@ export function PondLeafDropzone({
 }: PondLeafDropzoneProps) {
   const [
     {
-      flow: { player, phase, subphase },
+      flow: { player, phase },
       activation,
       pond,
     },
@@ -50,15 +49,19 @@ export function PondLeafDropzone({
   const { isUpgraded, controller } = getPondStateAt(pond, position);
   const dropzoneId = useId();
 
-  const isDropzone =
-    phase === Phase.Main &&
-    {
-      [Subphase.Idle]: false,
-      [Subphase.Upgrading]: player === controller && !isUpgraded,
-      [Subphase.Deploying]: position.y === HOME[player].y,
-      [Subphase.Activating]:
-        distanceBetween(position, activation?.start ?? position) <= 1,
-    }[subphase];
+  const subphase =
+    phase === Subphase.Upgrading ||
+    phase === Subphase.Deploying ||
+    phase === Subphase.Activating
+      ? phase
+      : Subphase.Idle;
+  const isDropzone = {
+    [Subphase.Idle]: false,
+    [Subphase.Upgrading]: player === controller && !isUpgraded,
+    [Subphase.Deploying]: position.y === HOME[player].y,
+    [Subphase.Activating]:
+      distanceBetween(position, activation?.start ?? position) <= 1,
+  }[subphase];
 
   const handleClick = {
     [Subphase.Idle]: undefined,

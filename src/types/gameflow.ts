@@ -14,13 +14,9 @@ export const Phase = {
   Main: 'Main',
   End: 'End',
   GameOver: 'GameOver',
-} as const;
-
-export const PHASE_AFTER = {
-  [Phase.Start]: Phase.Main,
-  [Phase.Main]: Phase.End,
-  [Phase.End]: Phase.Start,
-  [Phase.GameOver]: Phase.GameOver,
+  Upgrading: 'Upgrading',
+  Deploying: 'Deploying',
+  Activating: 'Activating',
 } as const;
 
 export const Player = {

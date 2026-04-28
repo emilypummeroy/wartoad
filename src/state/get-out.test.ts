@@ -34,89 +34,93 @@ describe(gameData, () => {
         },
       );
 
+      it.for<[Player, Subphase, Phase]>([
+        [Player.North, Subphase.Upgrading, Phase.Start],
+        [Player.North, Subphase.Upgrading, Phase.End],
+        [Player.South, Subphase.Upgrading, Phase.GameOver],
+        [Player.North, Subphase.Deploying, Phase.Start],
+        [Player.North, Subphase.Deploying, Phase.End],
+        [Player.South, Subphase.Deploying, Phase.GameOver],
+        [Player.North, Subphase.Activating, Phase.Start],
+        [Player.North, Subphase.Activating, Phase.End],
+        [Player.South, Subphase.Activating, Phase.GameOver],
+      ])(
+        'player %s | should throw when subphase is %s but phase is %s',
+        ([player, subphase, phase]) => {
+          const state = createStateWith({
+            pond,
+            flow: { player, phase, subphase },
+            ...(subphase === Subphase.Upgrading && upgradeOf(player)),
+            ...(subphase === Subphase.Deploying && deploymentOf(player)),
+            ...(subphase === Subphase.Activating && activationOf(player)),
+          });
+          expect(() => gameData(state)).toThrow();
+        },
+      );
+
       it.for([Subphase.Upgrading, Subphase.Deploying, Subphase.Activating])(
         'should throw when subphase is %s but subphase state is missing',
-        subphase => {
+        phase => {
           const state = createStateWith({
             pond,
-            ...gameflowOf(undefined, subphase),
+            ...gameflowOf(undefined, phase),
           });
           expect(() => gameData(state)).toThrow();
         },
       );
 
-      it.for([Subphase.Idle, Subphase.Upgrading, Subphase.Deploying])(
-        'should throw when subphase is %s but activation state is present',
-        subphase => {
+      it.for([
+        Phase.Start,
+        Phase.End,
+        Phase.GameOver,
+        Phase.Main,
+        Subphase.Deploying,
+        Subphase.Activating,
+      ])(
+        'should throw when phase is %s but upgrade state is present',
+        phase => {
           const state = createStateWith({
             pond,
-            ...gameflowOf(undefined, subphase),
-            ...activationOf(Player.North),
-          });
-          expect(() => gameData(state)).toThrow();
-        },
-      );
-
-      it.for([Subphase.Idle, Subphase.Activating, Subphase.Deploying])(
-        'should throw when subphase is %s but upgrade state is present',
-        subphase => {
-          const state = createStateWith({
-            pond,
-            ...gameflowOf(undefined, subphase),
+            ...gameflowOf(undefined, phase),
             ...upgradeOf(Player.North),
           });
           expect(() => gameData(state)).toThrow();
         },
       );
 
-      it.for([Subphase.Idle, Subphase.Activating, Subphase.Upgrading])(
-        'should throw when subphase is %s but deployment state is present',
-        subphase => {
+      it.for([
+        Phase.Start,
+        Phase.End,
+        Phase.GameOver,
+        Phase.Main,
+        Subphase.Activating,
+        Subphase.Upgrading,
+      ])(
+        'should throw when phase is %s but deployment state is present',
+        phase => {
           const state = createStateWith({
             pond,
-            ...gameflowOf(undefined, subphase),
+            ...gameflowOf(undefined, phase),
             ...deploymentOf(Player.North),
           });
           expect(() => gameData(state)).toThrow();
         },
       );
 
-      it.for<
-        [
-          Phase,
-          Subphase,
-          upgrader?: Player,
-          deployer?: Player,
-          activater?: Player,
-        ]
-      >([
-        [Phase.Start, Subphase.Upgrading, Player.North, _, _],
-        [Phase.Start, Subphase.Deploying, _, Player.South, _],
-        [Phase.Start, Subphase.Activating, _, _, Player.North],
-        [Phase.End, Subphase.Upgrading, Player.South, _, _],
-        [Phase.End, Subphase.Deploying, _, Player.North],
-        [Phase.End, Subphase.Activating, _, _, Player.South],
+      it.for([
+        Phase.Start,
+        Phase.End,
+        Phase.GameOver,
+        Phase.Main,
+        Subphase.Deploying,
+        Subphase.Upgrading,
       ])(
-        'should throw when phase is Start but subphase is %s',
-        ([phase, subphase, upgrader, deployer, activater]) => {
-          const state = createStateWith({
-            pond,
-            ...gameflowOf(undefined, subphase, phase),
-            ...upgradeOf(upgrader),
-            ...deploymentOf(deployer),
-            ...activationOf(activater),
-          });
-          expect(() => gameData(state)).toThrow();
-        },
-      );
-
-      it.for([Phase.Start, Phase.End])(
-        'should throw when phase is %s but subphase is Activating',
+        'should throw when phase is %s but activation state is present',
         phase => {
           const state = createStateWith({
             pond,
-            ...gameflowOf(undefined, Subphase.Activating, phase),
-            ...activationOf(Player.South),
+            ...gameflowOf(undefined, phase),
+            ...activationOf(Player.North),
           });
           expect(() => gameData(state)).toThrow();
         },
@@ -136,7 +140,7 @@ describe(gameData, () => {
         ([winner, phase]) => {
           const state = createStateWith({
             pond,
-            ...gameflowOf(undefined, undefined, phase),
+            ...gameflowOf(undefined, phase),
             winner,
           });
           expect(() => gameData(state)).toThrow();
@@ -148,7 +152,7 @@ describe(gameData, () => {
         winner => {
           const state = createStateWith({
             pond,
-            ...gameflowOf(undefined, undefined, Phase.GameOver),
+            ...gameflowOf(undefined, Phase.GameOver),
             winner,
           });
           expect(() => gameData(state)).toThrow();
@@ -156,12 +160,12 @@ describe(gameData, () => {
       );
 
       it.for<Player>([Player.North, Player.South])(
-        'should throw %s has captured opponent Home but is not the winner',
+        'should throw when %s has captured opponent Home but is not the winner',
         winner => {
           const opponentHome = HOME[PLAYER_AFTER[winner]];
           const state = createStateWith({
             pond: setPondStateAt(pond, opponentHome, { controller: winner }),
-            ...gameflowOf(undefined, undefined, Phase.GameOver),
+            ...gameflowOf(undefined, Phase.GameOver),
           });
           expect(() => gameData(state)).toThrow();
         },

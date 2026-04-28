@@ -10,14 +10,19 @@ import {
   TEST_PONDS_BY_KEY,
   TEST_LEAVES_BY_KEY,
 } from '../state-types/pond.test-utils';
-import { createStateWith, gameflowOf } from '../state/test-utils';
+import {
+  createStateWith,
+  gameflowOf,
+  subphaseStateOf,
+  winningPondOf,
+} from '../state/test-utils';
 import { Phase, Player, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { captureIfYouCan } from './capture-if-you-can';
 
-const { Idle } = Subphase;
+const { Activating, Deploying, Upgrading } = Subphase;
 const { North, South } = Player;
-const { Start, Main, End } = Phase;
+const { Start, Main, End, GameOver } = Phase;
 
 const { INITIAL_POND, ANOTHER_POND } = TestPondKey;
 const {
@@ -37,7 +42,14 @@ const {
   SOUTH_UPGRADED_OTHER_UNIT,
 } = TestLeafKey;
 
-type Preconditions = [Player, Phase, TestPondKey, Position, TestLeafKey];
+type Preconditions = [
+  Player,
+  Phase,
+  TestPondKey,
+  Position,
+  TestLeafKey,
+  winner?: Player,
+];
 type Inputs = [Player, TestPondKey, Position, TestLeafKey, Position?];
 
 describe(captureIfYouCan, () => {
@@ -47,13 +59,15 @@ describe(captureIfYouCan, () => {
     pondKey,
     position,
     leafKey,
+    winner,
   ]: Preconditions) => {
     const pond = TEST_PONDS_BY_KEY[pondKey];
     const leaf = TEST_LEAVES_BY_KEY[leafKey];
     it('should not change state', () => {
       const old = createStateWith({
-        ...gameflowOf(player, Idle, phase),
-        pond: setPondStateAt(pond, position, leaf),
+        ...gameflowOf(player, phase),
+        ...subphaseStateOf(player, phase),
+        ...winningPondOf(winner, setPondStateAt(pond, position, leaf)),
       });
       expect(captureIfYouCan()(old)).toStrictEqual(old);
     });
@@ -62,10 +76,19 @@ describe(captureIfYouCan, () => {
   // Preconditions:
   // < need phase = End
   describe.for<Preconditions>([
-    [North, Start, INITIAL_POND, { x: 1, y: 2 }, SOUTH_LEAF_OTHER_UNIT],
-    [North, Main, INITIAL_POND, { x: 2, y: 3 }, SOUTH_LEAF_OTHER_UNIT],
-    [South, Start, INITIAL_POND, { x: 2, y: 3 }, NORTH_LEAF_OTHER_UNIT],
+    [North, Start, INITIAL_POND, { x: 2, y: 5 }, SOUTH_LEAF_OTHER_UNIT],
     [South, Main, INITIAL_POND, { x: 1, y: 2 }, NORTH_LEAF_OTHER_UNIT],
+    [
+      North,
+      GameOver,
+      INITIAL_POND,
+      { x: 0, y: 4 },
+      SOUTH_LEAF_OTHER_UNIT,
+      North,
+    ],
+    [South, Upgrading, INITIAL_POND, { x: 2, y: 1 }, NORTH_LEAF_OTHER_UNIT],
+    [North, Deploying, INITIAL_POND, { x: 1, y: 3 }, SOUTH_LEAF_OTHER_UNIT],
+    [South, Activating, INITIAL_POND, { x: 0, y: 0 }, NORTH_LEAF_OTHER_UNIT],
   ])(
     'Precondition failed: need End phase | %s %s | %s with %s set to %s',
     inputs => it_should_not_change_state(inputs),
@@ -124,7 +147,7 @@ describe(captureIfYouCan, () => {
       const updates: [Position, LeafState][] = positions.map(xy => [xy, leaf]);
 
       const before = createStateWith({
-        ...gameflowOf(player, Idle, End),
+        ...gameflowOf(player, End),
         pond: setPondStateAtEach(pond, ...updates),
       });
 

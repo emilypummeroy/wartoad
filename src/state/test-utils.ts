@@ -22,19 +22,23 @@ import { counter } from '../types/test-utils';
 
 export const gameflowOf = (
   player: Player = DEFAULT_GAME_STATE.flow.player,
-  subphase: Subphase = DEFAULT_GAME_STATE.flow.subphase,
   phase: Phase = DEFAULT_GAME_STATE.flow.phase,
 ): Partial<GameState> => ({
   flow: {
     player,
     phase,
-    subphase,
+    subphase:
+      phase === Subphase.Upgrading ||
+      phase === Subphase.Deploying ||
+      phase === Subphase.Activating
+        ? phase
+        : Subphase.Idle,
   },
 });
 
 export const subphaseStateOf = (
   player: Player,
-  subphase?: Subphase,
+  subphase?: Phase,
 ): Partial<GameState> =>
   subphase === Subphase.Upgrading
     ? upgradeOf(player)
@@ -105,16 +109,18 @@ export const activationOf = (
 
 export const winningPondOf = (
   winner?: Player,
-  pond: PondState = INITIAL_POND,
+  pond?: PondState,
 ): Partial<GameState> =>
   winner
     ? {
         winner,
-        pond: setPondStateAt(pond, HOME[PLAYER_AFTER[winner]], {
+        pond: setPondStateAt(pond ?? INITIAL_POND, HOME[PLAYER_AFTER[winner]], {
           controller: winner,
         }),
       }
-    : {};
+    : pond
+      ? { pond }
+      : {};
 
 export const createStateWith = (partial: Partial<GameState>): GameState => ({
   ...DEFAULT_GAME_STATE,

@@ -12,40 +12,40 @@ import { deploy } from './deploy';
 
 const { Froglet } = CardKey;
 const { North, South } = Player;
-const { Start, Main, End, GameOver } = Phase;
-const { Idle, Upgrading, Deploying, Activating } = Subphase;
+const { Start, End, GameOver } = Phase;
+const { Upgrading, Deploying, Activating } = Subphase;
 
 describe(deploy, () => {
   // Preconditions:
-  describe.for<[Player, Phase, Subphase, Player?]>([
+  describe.for<[Player, Phase, Player?]>([
     // < Idle
-    [North, Start, Idle],
-    [North, End, Idle],
-    [North, GameOver, Idle, North],
-    [North, GameOver, Idle, South],
-    [South, Start, Idle],
-    [South, End, Idle],
-    [South, GameOver, Idle, North],
-    [South, GameOver, Idle, South],
+    [North, Start],
+    [North, End],
+    [North, GameOver, North],
+    [North, GameOver, South],
+    [South, Start],
+    [South, End],
+    [South, GameOver, North],
+    [South, GameOver, South],
 
     // < Main phase
-    [North, Main, Upgrading],
-    [North, Main, Deploying],
-    [North, Main, Activating],
-    [South, Main, Upgrading],
-    [South, Main, Deploying],
-    [South, Main, Activating],
+    [North, Upgrading],
+    [North, Deploying],
+    [North, Activating],
+    [South, Upgrading],
+    [South, Deploying],
+    [South, Activating],
   ])(
-    'Preconditions failed: need Idle during Main phase | %s %s %s',
-    ([player, phase, subphase, winner]) => {
+    'Preconditions failed: need Main phase | %s %s | winner: %s',
+    ([player, phase, winner]) => {
       const unit = createUnit({
         cardClass: CardClass.Froglet,
         owner: player,
         key: counter(),
       });
       const before = createStateWith({
-        ...gameflowOf(player, subphase, phase),
-        ...subphaseStateOf(player, subphase),
+        ...gameflowOf(player, phase),
+        ...subphaseStateOf(player, phase),
         ...winningPondOf(winner),
       });
 
@@ -75,9 +75,14 @@ describe(deploy, () => {
       expect(after.flow.subphase).toBe(Deploying);
     });
 
+    it('should set the phase to Deploying', () => {
+      const after = deploy(unit)(before);
+      expect(after.flow.phase).toBe(Deploying);
+    });
+
     it('should not change the rest of the gameflow state', () => {
-      const { subphase: _, ...got } = deploy(unit)(before).flow;
-      const { subphase: __, ...want } = before.flow;
+      const { subphase: _, phase: ____, ...got } = deploy(unit)(before).flow;
+      const { subphase: __, phase: ___, ...want } = before.flow;
       expect(got).toStrictEqual(want);
     });
 

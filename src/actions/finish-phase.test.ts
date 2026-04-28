@@ -22,7 +22,7 @@ import type { Position } from '../types/position';
 import { counter } from '../types/test-utils';
 import { finishPhase } from './finish-phase';
 
-const { Idle, Upgrading, Deploying, Activating } = Subphase;
+const { Upgrading, Deploying, Activating } = Subphase;
 const { North, South } = Player;
 const { Froglet, LilyPad } = CardKey;
 const { Start, Main, End, GameOver } = Phase;
@@ -34,32 +34,30 @@ const {
   NORTH_UPGRADED_OTHER_UNIT,
 } = TestLeafKey;
 
-type Preconditions = [Player, Phase, Subphase?, Player?];
+type Preconditions = [Player, Phase, Player?];
 type Inputs = [Player, Phase];
-
-const _ = undefined;
 
 describe(finishPhase, () => {
   // Preconditions
   it.for<Preconditions>([
-    // < Subphase is Idle
-    [North, Main, Upgrading],
-    [North, Main, Deploying],
-    [North, Main, Activating],
-    [South, Main, Upgrading],
-    [South, Main, Deploying],
-    [South, Main, Activating],
+    // < Not a subphase
+    [North, Upgrading],
+    [North, Deploying],
+    [North, Activating],
+    [South, Upgrading],
+    [South, Deploying],
+    [South, Activating],
     // < Phase is not GameOver
-    [North, GameOver, _, North],
-    [North, GameOver, _, South],
-    [South, GameOver, _, North],
-    [South, GameOver, _, South],
+    [North, GameOver, North],
+    [North, GameOver, South],
+    [South, GameOver, North],
+    [South, GameOver, South],
   ])(
-    'Preconditions failed: should not make any changes during %s %s %s',
-    ([player, phase, subphase = Idle, winner]) => {
+    'Preconditions failed: should not make any changes during %s %s | winner %s',
+    ([player, phase, winner]) => {
       const before = createStateWith({
-        ...gameflowOf(player, subphase, phase),
-        ...subphaseStateOf(player, subphase),
+        ...gameflowOf(player, phase),
+        ...subphaseStateOf(player, phase),
         ...winningPondOf(winner),
       });
       const after = finishPhase(draw(CardClass.Froglet))(before);
@@ -78,7 +76,7 @@ describe(finishPhase, () => {
     'Preconditions met | during %s %s | drawing %s',
     ([player, phase, drawKey]) => {
       const before = createStateWith({
-        ...gameflowOf(player, _, phase),
+        ...gameflowOf(player, phase),
       });
 
       it('should set phase to Main', () => {
@@ -116,7 +114,7 @@ describe(finishPhase, () => {
     ([player, phase, opponentLeaf, wantController]) => {
       const POSITION: Position = { x: 1, y: 2 };
       const before = createStateWith({
-        ...gameflowOf(player, _, phase),
+        ...gameflowOf(player, phase),
         pond: setPondStateAt(
           INITIAL_POND,
           POSITION,
@@ -146,7 +144,7 @@ describe(finishPhase, () => {
     'Preconditions met | during %s %s | when opponent Home is %s',
     ([player, phase, opponentLeaf]) => {
       const before = createStateWith({
-        ...gameflowOf(player, _, phase),
+        ...gameflowOf(player, phase),
         pond: setPondStateAt(
           INITIAL_POND,
           HOME[PLAYER_AFTER[player]],
@@ -168,7 +166,7 @@ describe(finishPhase, () => {
     [South, End],
   ])('Preconditions met | during %s %s', ([player, phase]) => {
     const before = createStateWith({
-      ...gameflowOf(player, _, phase),
+      ...gameflowOf(player, phase),
     });
 
     it('should set phase to Start', () => {
