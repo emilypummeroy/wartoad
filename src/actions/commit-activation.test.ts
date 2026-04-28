@@ -100,6 +100,7 @@ describe(commitActivation, () => {
       const [target] = input;
       const [before] = state_for(input);
 
+      // TODO 14: It should make the unit exhausted.
       it('should not affect the target position', () => {
         const result = commitActivation(target)(before);
         const got = getPondStateAt(result.pond, target);
@@ -137,6 +138,8 @@ describe(commitActivation, () => {
         expect(units).toHaveLength(targetCount + 1);
         expect(units[targetCount]).toStrictEqual(unit);
       });
+
+      // TODO 14: It should make the unit exhausted.
 
       it('should move the unit from the start position', () => {
         const result = commitActivation(target)(before);

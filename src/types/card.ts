@@ -76,7 +76,10 @@ export type CardKeyOf<T extends CardType> = T extends Unit
 // Individual cards have values attached to them which change over time.
 // For example, units take damage.
 export type CardValues = UnitValues | LeafValues;
-export type UnitValues = { readonly damage: number };
+export type UnitValues = {
+  readonly damage: number;
+  readonly isExhausted: boolean;
+};
 export type LeafValues = typeof NoneValues;
 export type CardValuesOf<T extends CardType> = T extends Unit
   ? UnitValues

@@ -28,6 +28,7 @@ describe(activate, () => {
 
       ['player must own unit', North, Main, South],
       ['player must own unit', South, Main, North],
+      // TODO 14: Unit must not be exhausted
     ])(
       'Precondition failed: %s | %s %s | %s owner',
       ([_, player, phase, owner]) => {

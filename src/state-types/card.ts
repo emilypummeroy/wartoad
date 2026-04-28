@@ -70,7 +70,7 @@ export const createCard = ({ cardClass, ...baseData }: BaseData): Card => {
 
 const INITIAL_VALUES = {
   [CardType.Leaf]: NoneValues,
-  [CardType.Unit]: { damage: 0 },
+  [CardType.Unit]: { damage: 0, isExhausted: false },
 } as const satisfies Record<Unit, UnitValues> & Record<Leaf, LeafValues>;
 
 export const deterministicStartingHand = (

@@ -19,6 +19,7 @@ exports[`for cards owned by North with key 0 > createCard > should produce a sta
   "type": "Unit",
   "values": {
     "damage": 0,
+    "isExhausted": false,
   },
 }
 `;
@@ -78,6 +79,7 @@ exports[`for cards owned by North with key 0 > createUnit > for the card Froglet
   "type": "Unit",
   "values": {
     "damage": 0,
+    "isExhausted": false,
   },
 }
 `;
@@ -101,6 +103,7 @@ exports[`for cards owned by North with key 3 > createCard > should produce a sta
   "type": "Unit",
   "values": {
     "damage": 0,
+    "isExhausted": false,
   },
 }
 `;
@@ -160,6 +163,7 @@ exports[`for cards owned by North with key 3 > createUnit > for the card Froglet
   "type": "Unit",
   "values": {
     "damage": 0,
+    "isExhausted": false,
   },
 }
 `;
@@ -183,6 +187,7 @@ exports[`for cards owned by South with key 1 > createCard > should produce a sta
   "type": "Unit",
   "values": {
     "damage": 0,
+    "isExhausted": false,
   },
 }
 `;
@@ -242,6 +247,7 @@ exports[`for cards owned by South with key 1 > createUnit > for the card Froglet
   "type": "Unit",
   "values": {
     "damage": 0,
+    "isExhausted": false,
   },
 }
 `;
@@ -265,6 +271,7 @@ exports[`for cards owned by South with key 2 > createCard > should produce a sta
   "type": "Unit",
   "values": {
     "damage": 0,
+    "isExhausted": false,
   },
 }
 `;
@@ -324,6 +331,7 @@ exports[`for cards owned by South with key 2 > createUnit > for the card Froglet
   "type": "Unit",
   "values": {
     "damage": 0,
+    "isExhausted": false,
   },
 }
 `;

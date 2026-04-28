@@ -18,19 +18,22 @@ describe.for<[Player, number]>([
   [Player.North, 3],
 ])('for cards owned by %s with key %s', ([owner, key]) => {
   describe(isUnit, () => {
-    it.for<[string, number, UnitClass]>(
-      Object.values(UnitClass).map((x, i) => [x.key, i, x]),
-    )('should allow %s with %s damage', ([_, damage, cardClass]) => {
-      const card: Card = {
-        key,
-        cardClass: cardClass,
-        type: CardType.Unit,
-        owner,
-        values: { damage },
-      };
-      expect(isUnit(card)).toBe(true);
-      if (isUnit(card)) card satisfies UnitCard;
-    });
+    it.for<[string, number, boolean, UnitClass]>(
+      Object.values(UnitClass).map((x, i) => [x.key, i, i % 2 === 0, x]),
+    )(
+      'should allow %s with %s damage',
+      ([_, damage, isExhausted, cardClass]) => {
+        const card: Card = {
+          key,
+          cardClass: cardClass,
+          type: CardType.Unit,
+          owner,
+          values: { damage, isExhausted },
+        };
+        expect(isUnit(card)).toBe(true);
+        if (isUnit(card)) card satisfies UnitCard;
+      },
+    );
 
     it.for<[string, LeafClass]>(Object.entries(LeafClass))(
       'should filter %s',
@@ -63,19 +66,22 @@ describe.for<[Player, number]>([
         if (isLeaf(card)) card satisfies LeafCard;
       },
     );
-    it.for<[string, number, UnitClass]>(
-      Object.values(UnitClass).map((x, i) => [x.key, i, x]),
-    )('should filter %s with %s damage', ([_, damage, cardClass]) => {
-      const card: Card = {
-        key,
-        cardClass: cardClass,
-        type: CardType.Unit,
-        owner,
-        values: { damage },
-      };
-      expect(isLeaf(card)).toBe(false);
-      if (!isLeaf(card)) card satisfies UnitCard;
-    });
+    it.for<[string, number, boolean, UnitClass]>(
+      Object.values(UnitClass).map((x, i) => [x.key, i, i % 2 === 0, x]),
+    )(
+      'should filter %s with %s damage',
+      ([_, damage, isExhausted, cardClass]) => {
+        const card: Card = {
+          key,
+          cardClass: cardClass,
+          type: CardType.Unit,
+          owner,
+          values: { damage, isExhausted },
+        };
+        expect(isLeaf(card)).toBe(false);
+        if (!isLeaf(card)) card satisfies UnitCard;
+      },
+    );
   });
 
   describe(createUnit, () => {

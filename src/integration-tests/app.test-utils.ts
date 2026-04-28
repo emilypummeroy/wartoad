@@ -129,6 +129,11 @@ export const getAll = {
       name: new RegExp(`${player} unit ${cardClass.name}`),
     });
   },
+  clickableUnits() {
+    return withinThe.playArea.getAllByRole('button', {
+      name: /unit/,
+    });
+  },
   nthRowUnitsControlledBy(player: Player, n: number) {
     return withinThe
       .nthRowFor(player, n)
@@ -152,6 +157,9 @@ export const getFirst = {
   cardsControlledByWithName(player: Player, name: string) {
     return getAll.cardsControlledByWithName(player, name)[0];
   },
+  clickableUnits() {
+    return getAll.clickableUnits()[0];
+  },
   unitControlledByOfClass(player: Player, cardClass: UnitClass) {
     return getAll.unitsControlledByOfClass(player, cardClass)[0];
   },
@@ -164,6 +172,11 @@ export const queryAll = {
   cardsControlledByWithName(player: Player, name: string) {
     return withinThe.playArea.queryAllByRole('region', {
       name: `${player} controlled ${name}`,
+    });
+  },
+  clickableUnits() {
+    return withinThe.playArea.queryAllByRole('button', {
+      name: /unit/,
     });
   },
   unitsControlledBy(player: Player) {
@@ -206,6 +219,11 @@ export const queryA = {
   winrar(player: Player) {
     return withinThe.header.queryByRole('region', {
       name: `A WINRAR is ${player}`,
+    });
+  },
+  clickableUnit() {
+    return withinThe.playArea.queryByRole('button', {
+      name: /unit/,
     });
   },
 };

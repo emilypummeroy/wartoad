@@ -77,6 +77,8 @@ export function LilyPad({
     </section>
   );
 }
+
+// TODO 14: Unit should be dulled out if exhausted
 type UnitCardProps = {
   readonly isOnLeaf?: boolean;
   readonly player?: Player;

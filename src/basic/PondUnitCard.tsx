@@ -17,6 +17,8 @@ type PondUnitCardProps = Readonly<{
   position: Position;
 }>;
 
+// TODO 14: Unit should be dulled out and not have pickable styles if exhausted.
+// TODO 14: Unit should not be clickable if exhausted.
 export const PondUnitCard = ({ card, position }: PondUnitCardProps) => {
   const [
     {
