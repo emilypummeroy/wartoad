@@ -3,12 +3,8 @@ import { useContext, useId, type ReactNode } from 'react';
 
 import { GameContext } from '../context/GameContext';
 import { getPondStateAt, HOME, type PondState } from '../state-types/pond';
-import {
-  type Phase,
-  type Player,
-  PLAYER_CLASSNAME,
-  Subphase,
-} from '../types/gameflow';
+import { noop } from '../types';
+import { Phase, type Player, PLAYER_CLASSNAME } from '../types/gameflow';
 import { distanceBetween, type Position } from '../types/position';
 
 type PondLeafDropzoneSlice = [
@@ -49,40 +45,45 @@ export function PondLeafDropzone({
   const { isUpgraded, controller } = getPondStateAt(pond, position);
   const dropzoneId = useId();
 
-  const subphase =
-    phase === Subphase.Upgrading ||
-    phase === Subphase.Deploying ||
-    phase === Subphase.Activating
+  const dropzoneType =
+    phase === Phase.Upgrading ||
+    phase === Phase.Deploying ||
+    phase === Phase.Activating
       ? phase
-      : Subphase.Idle;
-  const isDropzone = {
-    [Subphase.Idle]: false,
-    [Subphase.Upgrading]: player === controller && !isUpgraded,
-    [Subphase.Deploying]: position.y === HOME[player].y,
-    [Subphase.Activating]:
-      distanceBetween(position, activation?.start ?? position) <= 1,
-  }[subphase];
+      : undefined;
 
-  const handleClick = {
-    [Subphase.Idle]: undefined,
-    [Subphase.Upgrading]: () => commitUpgrade(position),
-    [Subphase.Deploying]: () => commitDeployment(position),
-    [Subphase.Activating]: () => commitActivation(position),
-  }[subphase];
+  const isDropzone = dropzoneType
+    ? {
+        [Phase.Upgrading]: player === controller && !isUpgraded,
+        [Phase.Deploying]: position.y === HOME[player].y,
+        [Phase.Activating]:
+          distanceBetween(position, activation?.start ?? position) <= 1,
+      }[dropzoneType]
+    : false;
 
-  const dropzoneVerb = {
-    [Subphase.Idle]: '',
-    [Subphase.Upgrading]: 'Upgrade',
-    [Subphase.Deploying]: 'Deploy on',
-    [Subphase.Activating]: 'Move to',
-  }[subphase];
+  const handleClick = dropzoneType
+    ? {
+        [Phase.Upgrading]: () => commitUpgrade(position),
+        [Phase.Deploying]: () => commitDeployment(position),
+        [Phase.Activating]: () => commitActivation(position),
+      }[dropzoneType]
+    : noop;
 
-  const DropzoneIcon = {
-    [Subphase.Idle]: Replace,
-    [Subphase.Upgrading]: Replace,
-    [Subphase.Deploying]: Replace,
-    [Subphase.Activating]: Move,
-  }[subphase];
+  const dropzoneVerb = dropzoneType
+    ? {
+        [Phase.Upgrading]: 'Upgrade',
+        [Phase.Deploying]: 'Deploy on',
+        [Phase.Activating]: 'Move to',
+      }[dropzoneType]
+    : '';
+
+  const DropzoneIcon = dropzoneType
+    ? {
+        [Phase.Upgrading]: Replace,
+        [Phase.Deploying]: Replace,
+        [Phase.Activating]: Move,
+      }[dropzoneType]
+    : null;
 
   return (
     <div
@@ -93,7 +94,7 @@ export function PondLeafDropzone({
       tabIndex={isDropzone ? 0 : undefined}
     >
       {children}
-      {isDropzone && (
+      {DropzoneIcon && isDropzone && (
         <div role="presentation" id={dropzoneId} className="overlay-container">
           <DropzoneIcon>
             <title>{dropzoneVerb}</title>

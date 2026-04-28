@@ -1,5 +1,5 @@
 import { data } from '../state';
-import { Subphase } from '../types/gameflow';
+import { Phase } from '../types/gameflow';
 import { type Position } from '../types/position';
 
 export const commitUpgrade = (target: Position) =>
@@ -7,7 +7,7 @@ export const commitUpgrade = (target: Position) =>
     const { upgrade } = get;
     const didMeetPreconditions =
       !!upgrade &&
-      get.subphase === Subphase.Upgrading &&
+      get.phase === Phase.Upgrading &&
       get.leaf.at(target).controller === get.player &&
       !get.leaf.at(target).isUpgraded;
     if (!didMeetPreconditions) return get.out;

@@ -5,7 +5,7 @@ import {
 } from '../state-types/card';
 import { INITIAL_POND } from '../state-types/pond';
 import type { Card } from '../types/card';
-import { Phase, Player, Subphase } from '../types/gameflow';
+import { Phase, Player } from '../types/gameflow';
 
 export { data } from './get-out';
 
@@ -13,7 +13,6 @@ export const DEFAULT_GAME_STATE: GameState = {
   flow: {
     phase: Phase.Main,
     player: Player.South,
-    subphase: Subphase.Idle,
   },
   pond: INITIAL_POND,
   northHand: DETERMINISTIC_NORTH_HAND,

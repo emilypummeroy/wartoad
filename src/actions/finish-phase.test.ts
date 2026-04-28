@@ -13,19 +13,18 @@ import {
 import {
   createStateWith,
   gameflowOf,
-  subphaseStateOf,
+  phaseStateOf,
   winningPondOf,
 } from '../state/test-utils';
 import { CardClass, CardKey } from '../types/card';
-import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { counter } from '../types/test-utils';
 import { finishPhase } from './finish-phase';
 
-const { Upgrading, Deploying, Activating } = Subphase;
 const { North, South } = Player;
 const { Froglet, LilyPad } = CardKey;
-const { Start, Main, End, GameOver } = Phase;
+const { Upgrading, Deploying, Activating, Start, Main, End, GameOver } = Phase;
 
 const {
   SOUTH_UPGRADED_UNIT,
@@ -40,7 +39,7 @@ type Inputs = [Player, Phase];
 describe(finishPhase, () => {
   // Preconditions
   it.for<Preconditions>([
-    // < Not a subphase
+    // < Not in an active phase
     [North, Upgrading],
     [North, Deploying],
     [North, Activating],
@@ -57,7 +56,7 @@ describe(finishPhase, () => {
     ([player, phase, winner]) => {
       const before = createStateWith({
         ...gameflowOf(player, phase),
-        ...subphaseStateOf(player, phase),
+        ...phaseStateOf(player, phase),
         ...winningPondOf(winner),
       });
       const after = finishPhase(draw(CardClass.Froglet))(before);

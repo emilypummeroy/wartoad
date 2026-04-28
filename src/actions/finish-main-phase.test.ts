@@ -8,16 +8,15 @@ import {
 import {
   createStateWith,
   gameflowOf,
-  subphaseStateOf,
+  phaseStateOf,
   winningPondOf,
 } from '../state/test-utils';
-import { Phase, Player, Subphase } from '../types/gameflow';
+import { Phase, Player } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { finishMainPhase } from './finish-main-phase';
 
-const { Upgrading, Deploying, Activating } = Subphase;
 const { North, South } = Player;
-const { Start, Main, End, GameOver } = Phase;
+const { Upgrading, Deploying, Activating, Start, Main, End, GameOver } = Phase;
 
 const { INITIAL_POND, ANOTHER_POND } = TestPondKey;
 const {
@@ -64,7 +63,7 @@ describe(finishMainPhase, () => {
       it('should not change state', () => {
         const before = createStateWith({
           ...gameflowOf(player, phase),
-          ...subphaseStateOf(player, phase),
+          ...phaseStateOf(player, phase),
           ...winningPondOf(winner),
         });
         expect(finishMainPhase()(before)).toStrictEqual(before);

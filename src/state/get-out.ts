@@ -14,7 +14,7 @@ import {
   type PondState,
 } from '../state-types/pond';
 import type { Card, LeafCard, UnitCard } from '../types/card';
-import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import type { Position } from '../types/position';
 
 export type StateAction = (s: GameState) => GameState;
@@ -41,27 +41,13 @@ export type GameData = {
 };
 
 // oxlint-disable-next-line max-statements
-const gameInvariants: GameInvariants = (s, get, { always, when, iff }) => {
+const gameInvariants: GameInvariants = (s, get, { always, iff }) => {
   always(get.leaf.at(HOME[Player.North]).isUpgraded);
   always(get.leaf.at(HOME[Player.South]).isUpgraded);
 
-  iff(get.subphase === Subphase.Activating).must(
-    get.phase === Subphase.Activating,
-  );
-  iff(get.subphase === Subphase.Deploying).must(
-    get.subphase === Subphase.Deploying,
-  );
-  iff(get.subphase === Subphase.Upgrading).must(
-    get.subphase === Subphase.Upgrading,
-  );
-
-  iff(get.subphase === Subphase.Activating).must(!!s.activation);
-  iff(get.subphase === Subphase.Deploying).must(!!s.deployment);
-  iff(get.subphase === Subphase.Upgrading).must(!!s.upgrade);
-
-  when(get.phase === Phase.Start).must(get.subphase === Subphase.Idle);
-  when(get.phase === Phase.End).must(get.subphase === Subphase.Idle);
-  when(get.phase === Phase.GameOver).must(get.subphase === Subphase.Idle);
+  iff(get.phase === Phase.Activating).must(!!s.activation);
+  iff(get.phase === Phase.Deploying).must(!!s.deployment);
+  iff(get.phase === Phase.Upgrading).must(!!s.upgrade);
 
   iff(get.phase === Phase.GameOver).must(!!s.winner);
   iff(s.winner === Player.North).must(
@@ -84,7 +70,6 @@ type GameOut = GameAccess & { readonly out: GameState };
 export type GameAccess = {
   readonly player: Player;
   readonly phase: Phase;
-  readonly subphase: Subphase;
   readonly pond: PondState;
   readonly leaf: {
     readonly at: (xy: Position) => LeafState;
@@ -136,9 +121,6 @@ const access: (s: GameState) => GameAccess = s => ({
   get phase() {
     return s.flow.phase;
   },
-  get subphase() {
-    return s.flow.subphase;
-  },
 
   get pond() {
     return s.pond;
@@ -153,13 +135,13 @@ const access: (s: GameState) => GameAccess = s => ({
   },
 
   get upgrade() {
-    return s.flow.subphase === Subphase.Upgrading ? s.upgrade : undefined;
+    return s.flow.phase === Phase.Upgrading ? s.upgrade : undefined;
   },
   get deployment() {
-    return s.flow.subphase === Subphase.Deploying ? s.deployment : undefined;
+    return s.flow.phase === Phase.Deploying ? s.deployment : undefined;
   },
   get activation() {
-    return s.flow.subphase === Subphase.Activating ? s.activation : undefined;
+    return s.flow.phase === Phase.Activating ? s.activation : undefined;
   },
 });
 
@@ -224,7 +206,7 @@ const make = (s: GameState): GameMake => ({
   idle: () =>
     gameData({
       ...s,
-      flow: { ...s.flow, phase: Phase.Main, subphase: Subphase.Idle },
+      flow: { ...s.flow, phase: Phase.Main },
       upgrade: undefined,
       deployment: undefined,
       activation: undefined,
@@ -235,8 +217,7 @@ const make = (s: GameState): GameMake => ({
       ...s,
       flow: {
         ...s.flow,
-        phase: Subphase.Upgrading,
-        subphase: Subphase.Upgrading,
+        phase: Phase.Upgrading,
       },
       upgrade: { leaf },
     }),
@@ -246,8 +227,7 @@ const make = (s: GameState): GameMake => ({
       ...s,
       flow: {
         ...s.flow,
-        phase: Subphase.Deploying,
-        subphase: Subphase.Deploying,
+        phase: Phase.Deploying,
       },
       deployment: { unit },
     }),
@@ -257,8 +237,7 @@ const make = (s: GameState): GameMake => ({
       ...s,
       flow: {
         ...s.flow,
-        phase: Subphase.Activating,
-        subphase: Subphase.Activating,
+        phase: Phase.Activating,
       },
       activation,
     }),
@@ -289,9 +268,10 @@ type GameInvariants = (
 
 type InvariantChecks = {
   readonly always: (p: boolean) => void;
-  readonly when: (p: boolean) => {
-    must: (p: boolean) => void;
-  };
+  // oxlint-disable-next-line capitalized-comments
+  // readonly when: (p: boolean) => {
+  //   must: (p: boolean) => void;
+  // };
   // readonly unless: (p: boolean) => {
   //   readonly must: (q: boolean) => void;
   // };
@@ -302,9 +282,10 @@ type InvariantChecks = {
 
 const invariantChecks: InvariantChecks = {
   always: p => assert(p),
-  when: p => ({
-    must: q => assert(!p || q),
-  }),
+  // oxlint-disable-next-line capitalized-comments
+  // when: p => ({
+  //   must: q => assert(!p || q),
+  // }),
   // unless: p => ({
   //   must: q => assert(p || q),
   // }),

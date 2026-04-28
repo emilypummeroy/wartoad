@@ -2,18 +2,17 @@ import { createLeaf } from '../state-types/card';
 import {
   createStateWith,
   gameflowOf,
-  subphaseStateOf,
+  phaseStateOf,
   winningPondOf,
 } from '../state/test-utils';
 import { CardClass, CardKey, type LeafKey } from '../types/card';
-import { Phase, Player, Subphase } from '../types/gameflow';
+import { Phase, Player } from '../types/gameflow';
 import { counter } from '../types/test-utils';
 import { upgrade } from './upgrade';
 
 const { LilyPad } = CardKey;
 const { North, South } = Player;
-const { Start, End, GameOver } = Phase;
-const { Upgrading, Deploying, Activating } = Subphase;
+const { Upgrading, Deploying, Activating, Start, End, GameOver } = Phase;
 
 describe(upgrade, () => {
   // Preconditions:
@@ -46,7 +45,7 @@ describe(upgrade, () => {
       const before = createStateWith({
         ...gameflowOf(player, phase),
         ...winningPondOf(winner),
-        ...subphaseStateOf(player, phase),
+        ...phaseStateOf(player, phase),
       });
 
       it('should not change state', () => {
@@ -69,20 +68,15 @@ describe(upgrade, () => {
       ...gameflowOf(player),
     });
 
-    // > Subphase := Upgrading
-    it('should set the subphase to upgrading', () => {
-      const after = upgrade(leaf)(before);
-      expect(after.flow.subphase).toBe(Upgrading);
-    });
-
+    // > Phase := Upgrading
     it('should set the phase to upgrading', () => {
       const after = upgrade(leaf)(before);
       expect(after.flow.phase).toBe(Upgrading);
     });
 
     it('should not change the rest of the gameflow state', () => {
-      const { subphase: _, phase: ____, ...got } = upgrade(leaf)(before).flow;
-      const { subphase: __, phase: ___, ...want } = before.flow;
+      const { phase: __, ...got } = upgrade(leaf)(before).flow;
+      const { phase: _, ...want } = before.flow;
       expect(got).toStrictEqual(want);
     });
 

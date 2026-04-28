@@ -11,15 +11,14 @@ import {
 } from '../state-types/pond';
 import { TestPondKey, TEST_PONDS_BY_KEY } from '../state-types/pond.test-utils';
 import { activationOf, gameflowOf, winningPondOf } from '../state/test-utils';
-import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { asPosition } from '../types/position.test-utils';
 import { _ } from '../types/test-utils';
 import { Pond } from './Pond';
 
 const { North, South } = Player;
-const { Start, Main, End, GameOver } = Phase;
-const { Upgrading, Deploying, Activating } = Subphase;
+const { Upgrading, Deploying, Activating, Start, Main, End, GameOver } = Phase;
 const { INITIAL_POND, FULL_POND, ANOTHER_POND, UNITS_POND } = TestPondKey;
 
 type Input = [turn: Player, Phase, TestPondKey, winner?: Player];

@@ -5,14 +5,13 @@ import { HOME, setPondStateAt } from '../state-types/pond';
 import { TEST_PONDS_BY_KEY, ANOTHER_POND_POSITIONS, TestPondKey } from '../state-types/pond.test-utils';
 import { activationOf, gameflowOf, winningPondOf } from '../state/test-utils';
 import type { UnitCard } from '../types/card';
-import { Player, Phase, Subphase } from '../types/gameflow';
+import { Player, Phase } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { _ } from '../types/test-utils';
 import { PondLeafDropzone } from './PondLeafDropzone';
 
 const { North, South } = Player;
-const { Start, Main, End, GameOver } = Phase;
-const { Upgrading, Deploying, Activating } = Subphase;
+const { Upgrading, Deploying, Activating, Start, Main, End, GameOver } = Phase;
 
 const { INITIAL_POND, ANOTHER_POND, FULL_POND, UNITS_POND } = TestPondKey;
 const NORTH_POSITION = ANOTHER_POND_POSITIONS.North;
@@ -49,7 +48,7 @@ describe(PondLeafDropzone, () => {
   const commitDeployment = vi.fn<(p: Position) => void>();
   const commitActivation = vi.fn<(p: Position) => void>();
   const activate = vi.fn<(c: UnitCard, p: Position) => void>();
-  const beforeEach_render_with_subphase = ([controller, player, position, phase, pondKey, start, winner]: Inputs) => {
+  const beforeEach_render_with_phase = ([controller, player, position, phase, pondKey, start, winner]: Inputs) => {
     beforeEach(() => {
       const pond = setPondStateAt(TEST_PONDS_BY_KEY[pondKey ?? INITIAL_POND], position, { controller });
       renderWithGameContext([
@@ -130,7 +129,7 @@ describe(PondLeafDropzone, () => {
     [South, South, { x: 0, y: 5 }, Activating, UNITS_POND, { x: 2, y: 5 }],
     [North, South, { x: 2, y: 5 }, Activating, UNITS_POND, { x: 0, y: 5 }],
   ])('Idle | controlled by %s on %s turn at %s while %s | pond?: %s | start?: %s', inputs => {
-    beforeEach_render_with_subphase(inputs);
+    beforeEach_render_with_phase(inputs);
     it_should_render_its_children();
 
     it('should have no dropzones', () => {
@@ -165,7 +164,7 @@ describe(PondLeafDropzone, () => {
     [South, South, SOUTH_POSITION.LeafEdge, Upgrading, ANOTHER_POND],
   ])('controlled by %s on %s turn at %s while %s | pond: %s', inputs => {
     const [_, __, position] = inputs;
-    beforeEach_render_with_subphase(inputs);
+    beforeEach_render_with_phase(inputs);
     it_should_render_its_children();
 
     it('should have an Upgrade dropzone', () => {
@@ -208,7 +207,7 @@ describe(PondLeafDropzone, () => {
     [North, South, { x: 0, y: 5 }, Deploying],
   ])('controlled by %s on %s turn at %s while %s', inputs => {
     const [_, __, position] = inputs;
-    beforeEach_render_with_subphase(inputs);
+    beforeEach_render_with_phase(inputs);
     it_should_render_its_children();
 
     it('should have a Deploy dropzone', () => {
@@ -254,7 +253,7 @@ describe(PondLeafDropzone, () => {
     [North, South, { x: 2, y: 5 }, Activating, UNITS_POND, { x: 2, y: 5 }],
   ])('controlled by %s on %s turn at %s while %s | pond: %s | phase: %s | start: %s', inputs => {
     const [_, __, position] = inputs;
-    beforeEach_render_with_subphase(inputs);
+    beforeEach_render_with_phase(inputs);
     it_should_render_its_children();
 
     it('should have a Move dropzone', () => {

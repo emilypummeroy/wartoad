@@ -1,6 +1,6 @@
 import { HOME, setPondStateAt } from '../state-types/pond';
 import { TEST_PONDS_BY_KEY, TestPondKey } from '../state-types/pond.test-utils';
-import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import { _ } from '../types/test-utils';
 import { gameData } from './get-out';
 import {
@@ -34,32 +34,8 @@ describe(gameData, () => {
         },
       );
 
-      it.for<[Player, Subphase, Phase]>([
-        [Player.North, Subphase.Upgrading, Phase.Start],
-        [Player.North, Subphase.Upgrading, Phase.End],
-        [Player.South, Subphase.Upgrading, Phase.GameOver],
-        [Player.North, Subphase.Deploying, Phase.Start],
-        [Player.North, Subphase.Deploying, Phase.End],
-        [Player.South, Subphase.Deploying, Phase.GameOver],
-        [Player.North, Subphase.Activating, Phase.Start],
-        [Player.North, Subphase.Activating, Phase.End],
-        [Player.South, Subphase.Activating, Phase.GameOver],
-      ])(
-        'player %s | should throw when subphase is %s but phase is %s',
-        ([player, subphase, phase]) => {
-          const state = createStateWith({
-            pond,
-            flow: { player, phase, subphase },
-            ...(subphase === Subphase.Upgrading && upgradeOf(player)),
-            ...(subphase === Subphase.Deploying && deploymentOf(player)),
-            ...(subphase === Subphase.Activating && activationOf(player)),
-          });
-          expect(() => gameData(state)).toThrow();
-        },
-      );
-
-      it.for([Subphase.Upgrading, Subphase.Deploying, Subphase.Activating])(
-        'should throw when subphase is %s but subphase state is missing',
+      it.for([Phase.Upgrading, Phase.Deploying, Phase.Activating])(
+        'should throw when phase is %s but phase state is missing',
         phase => {
           const state = createStateWith({
             pond,
@@ -74,8 +50,8 @@ describe(gameData, () => {
         Phase.End,
         Phase.GameOver,
         Phase.Main,
-        Subphase.Deploying,
-        Subphase.Activating,
+        Phase.Deploying,
+        Phase.Activating,
       ])(
         'should throw when phase is %s but upgrade state is present',
         phase => {
@@ -93,8 +69,8 @@ describe(gameData, () => {
         Phase.End,
         Phase.GameOver,
         Phase.Main,
-        Subphase.Activating,
-        Subphase.Upgrading,
+        Phase.Activating,
+        Phase.Upgrading,
       ])(
         'should throw when phase is %s but deployment state is present',
         phase => {
@@ -112,8 +88,8 @@ describe(gameData, () => {
         Phase.End,
         Phase.GameOver,
         Phase.Main,
-        Subphase.Deploying,
-        Subphase.Upgrading,
+        Phase.Deploying,
+        Phase.Upgrading,
       ])(
         'should throw when phase is %s but activation state is present',
         phase => {

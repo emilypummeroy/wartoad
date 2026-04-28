@@ -15,14 +15,13 @@ import {
   upgradeOf,
 } from '../state/test-utils';
 import { CardClass, type UnitCard } from '../types/card';
-import { Phase, Player, Subphase } from '../types/gameflow';
+import { Phase, Player } from '../types/gameflow';
 import type { Position } from '../types/position';
-import { _, counter, type SubphasePlayer } from '../types/test-utils';
+import { _, counter, type PhasePlayer } from '../types/test-utils';
 import { commitActivation } from './commit-activation';
 
 const { North, South } = Player;
-const { Idle, Upgrading, Deploying, Activating } = Subphase;
-const { Start, Main, End } = Phase;
+const { Upgrading, Deploying, Activating, Start, Main, End } = Phase;
 
 type Input = [
   target: Position,
@@ -36,7 +35,7 @@ type Preconditions = [
   Position,
   Player,
   Phase,
-  ...SubphasePlayer,
+  ...PhasePlayer,
   start?: Position,
 ];
 
@@ -96,7 +95,7 @@ describe(commitActivation, () => {
     [{ x: 0, y: 0 }, South, 5],
     [{ x: 0, y: 3 }, South, 2],
   ])(
-    `when moving in place in the ${Activating} subphase | target = activation.start = %s | %s turn player and card owner`,
+    `when moving in place in the ${Activating} phase | target = activation.start = %s | %s turn player and card owner`,
     input => {
       const [target] = input;
       const [before] = state_for(input);
@@ -126,7 +125,7 @@ describe(commitActivation, () => {
     [{ x: 2, y: 1 }, South, 4, 1, { x: 2, y: 0 }],
     [{ x: 0, y: 0 }, South, 4, 5, { x: 1, y: 0 }],
   ])(
-    `when in the ${Activating} subphase | target %s | activation.start %s | %s turn player and card owner`,
+    `when in the ${Activating} phase | target %s | activation.start %s | %s turn player and card owner`,
     input => {
       const [target, , targetCount, startCount = targetCount, start = target] =
         input;
@@ -211,10 +210,6 @@ describe(commitActivation, () => {
       expect(result.activation).toBeUndefined();
     });
 
-    it('should set subphase to Idle', () => {
-      const result = commitActivation(target)(old);
-      expect(result.flow.subphase).toStrictEqual(Idle);
-    });
     it('should set phase to Main', () => {
       const result = commitActivation(target)(old);
       expect(result.flow.phase).toStrictEqual(Main);
@@ -230,11 +225,11 @@ describe(commitActivation, () => {
       let got = {};
       let want = {};
       {
-        const { subphase: _, phase: __, ...rest } = after.flow;
+        const { phase: _, ...rest } = after.flow;
         got = rest;
       }
       {
-        const { subphase: _, phase: __, ...rest } = before.flow;
+        const { phase: _, ...rest } = before.flow;
         want = rest;
       }
       expect(got).toStrictEqual(want);

@@ -1,19 +1,14 @@
 import type { GameState } from '../state-types';
 import { createUnit } from '../state-types/card';
-import {
-  createStateWith,
-  gameflowOf,
-  subphaseStateOf,
-} from '../state/test-utils';
+import { createStateWith, gameflowOf, phaseStateOf } from '../state/test-utils';
 import { UnitClass } from '../types/card';
-import { Phase, Player, Subphase } from '../types/gameflow';
+import { Phase, Player } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { ALL_POSITIONS } from '../types/position.test-utils';
 import { activate } from './activate';
 
 const { North, South } = Player;
-const { Upgrading, Deploying, Activating } = Subphase;
-const { Start, Main, End } = Phase;
+const { Upgrading, Deploying, Activating, Start, Main, End } = Phase;
 let key = 0;
 describe(activate, () => {
   describe.for<Position>(ALL_POSITIONS)('with start position %s', xy => {
@@ -43,7 +38,7 @@ describe(activate, () => {
         });
         const oldState = createStateWith({
           ...gameflowOf(player, phase),
-          ...subphaseStateOf(player, phase),
+          ...phaseStateOf(player, phase),
         });
 
         it('should not change the state', () => {
@@ -89,12 +84,6 @@ describe(activate, () => {
         it('should set phase to Activating', () => {
           const newState = activate(unit, xy)(oldState);
           const got = newState.flow.phase;
-          expect(got).toStrictEqual(Activating);
-        });
-
-        it('should set subphase to Activating', () => {
-          const newState = activate(unit, xy)(oldState);
-          const got = newState.flow.subphase;
           expect(got).toStrictEqual(Activating);
         });
 

@@ -2,18 +2,17 @@ import { createUnit } from '../state-types/card';
 import {
   createStateWith,
   gameflowOf,
-  subphaseStateOf,
+  phaseStateOf,
   winningPondOf,
 } from '../state/test-utils';
 import { CardClass, CardKey, type UnitKey } from '../types/card';
-import { Phase, Player, Subphase } from '../types/gameflow';
+import { Phase, Player } from '../types/gameflow';
 import { counter } from '../types/test-utils';
 import { deploy } from './deploy';
 
 const { Froglet } = CardKey;
 const { North, South } = Player;
-const { Start, End, GameOver } = Phase;
-const { Upgrading, Deploying, Activating } = Subphase;
+const { Upgrading, Deploying, Activating, Start, End, GameOver } = Phase;
 
 describe(deploy, () => {
   // Preconditions:
@@ -45,7 +44,7 @@ describe(deploy, () => {
       });
       const before = createStateWith({
         ...gameflowOf(player, phase),
-        ...subphaseStateOf(player, phase),
+        ...phaseStateOf(player, phase),
         ...winningPondOf(winner),
       });
 
@@ -69,20 +68,15 @@ describe(deploy, () => {
       ...gameflowOf(player),
     });
 
-    // > Subphase := Deploying
-    it('should set the subphase to Deploying', () => {
-      const after = deploy(unit)(before);
-      expect(after.flow.subphase).toBe(Deploying);
-    });
-
+    // > Phase := Deploying
     it('should set the phase to Deploying', () => {
       const after = deploy(unit)(before);
       expect(after.flow.phase).toBe(Deploying);
     });
 
     it('should not change the rest of the gameflow state', () => {
-      const { subphase: _, phase: ____, ...got } = deploy(unit)(before).flow;
-      const { subphase: __, phase: ___, ...want } = before.flow;
+      const { phase: __, ...got } = deploy(unit)(before).flow;
+      const { phase: _, ...want } = before.flow;
       expect(got).toStrictEqual(want);
     });
 

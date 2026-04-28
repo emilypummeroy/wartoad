@@ -1,7 +1,7 @@
 import { chain, never, pick } from '../state/get-out';
 import { identity } from '../types';
 import type { Card } from '../types/card';
-import { Phase, Subphase, type Player } from '../types/gameflow';
+import { Phase, type Player } from '../types/gameflow';
 import { captureIfYouCan } from './capture-if-you-can';
 import { finishEndPhase } from './finish-end-phase';
 import { finishMainPhase } from './finish-main-phase';
@@ -19,9 +19,9 @@ export const finishPhase = (draw: (owner: Player) => Card) =>
         return finishEndPhase();
       case Phase.GameOver:
       // TODO 14: These should cancel current action
-      case Subphase.Upgrading:
-      case Subphase.Deploying:
-      case Subphase.Activating:
+      case Phase.Upgrading:
+      case Phase.Deploying:
+      case Phase.Activating:
         return identity;
     }
     /* v8 ignore next line -- @preserve */

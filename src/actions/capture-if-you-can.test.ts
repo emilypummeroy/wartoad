@@ -13,16 +13,15 @@ import {
 import {
   createStateWith,
   gameflowOf,
-  subphaseStateOf,
+  phaseStateOf,
   winningPondOf,
 } from '../state/test-utils';
-import { Phase, Player, Subphase } from '../types/gameflow';
+import { Phase, Player } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { captureIfYouCan } from './capture-if-you-can';
 
-const { Activating, Deploying, Upgrading } = Subphase;
 const { North, South } = Player;
-const { Start, Main, End, GameOver } = Phase;
+const { Activating, Deploying, Upgrading, Start, Main, End, GameOver } = Phase;
 
 const { INITIAL_POND, ANOTHER_POND } = TestPondKey;
 const {
@@ -66,7 +65,7 @@ describe(captureIfYouCan, () => {
     it('should not change state', () => {
       const old = createStateWith({
         ...gameflowOf(player, phase),
-        ...subphaseStateOf(player, phase),
+        ...phaseStateOf(player, phase),
         ...winningPondOf(winner, setPondStateAt(pond, position, leaf)),
       });
       expect(captureIfYouCan()(old)).toStrictEqual(old);

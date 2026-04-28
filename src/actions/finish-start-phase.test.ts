@@ -2,17 +2,16 @@ import { draw } from '../state-types/card.test-utils';
 import {
   createStateWith,
   gameflowOf,
-  subphaseStateOf,
+  phaseStateOf,
   winningPondOf,
 } from '../state/test-utils';
 import { CardClass, CardKey } from '../types/card';
-import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import { finishStartPhase } from './finish-start-phase';
 
-const { Upgrading, Deploying, Activating } = Subphase;
 const { North, South } = Player;
 const { Froglet, LilyPad } = CardKey;
-const { Start, Main, End, GameOver } = Phase;
+const { Upgrading, Deploying, Activating, Start, Main, End, GameOver } = Phase;
 
 type Preconditions = [Player, Phase, winner?: Player];
 type Inputs = [Player, draw: CardKey];
@@ -41,7 +40,7 @@ describe(finishStartPhase, () => {
       it('should not change state', () => {
         const before = createStateWith({
           ...gameflowOf(player, phase),
-          ...subphaseStateOf(player, phase),
+          ...phaseStateOf(player, phase),
           ...winningPondOf(winner),
         });
         expect(finishStartPhase(draw())(before)).toStrictEqual(before);

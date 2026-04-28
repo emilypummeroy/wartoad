@@ -5,17 +5,12 @@ import {
   TestLeafKey,
   TestPondKey,
 } from '../state-types/pond.test-utils';
-import {
-  createStateWith,
-  gameflowOf,
-  subphaseStateOf,
-} from '../state/test-utils';
-import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import { createStateWith, gameflowOf, phaseStateOf } from '../state/test-utils';
+import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import { winIfYouCan } from './win-if-you-can';
 
 const { North, South } = Player;
-const { Upgrading, Deploying, Activating } = Subphase;
-const { Start, Main, End, GameOver } = Phase;
+const { Upgrading, Deploying, Activating, Start, Main, End, GameOver } = Phase;
 
 const { INITIAL_POND, ANOTHER_POND, UNITS_POND } = TestPondKey;
 const {
@@ -56,7 +51,7 @@ describe(winIfYouCan, () => {
       const pond = TEST_PONDS_BY_KEY[pondKey];
       const before = createStateWith({
         ...gameflowOf(player, phase),
-        ...subphaseStateOf(player, phase),
+        ...phaseStateOf(player, phase),
         pond: winner
           ? setPondStateAt(pond, HOME[PLAYER_AFTER[winner]], {
               controller: winner,

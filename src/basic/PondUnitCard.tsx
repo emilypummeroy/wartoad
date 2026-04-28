@@ -2,12 +2,7 @@ import { useCallback, useContext, useId } from 'react';
 
 import { GameContext } from '../context/GameContext';
 import type { UnitCard } from '../types/card';
-import {
-  Phase,
-  PLAYER_CLASSNAME,
-  Subphase,
-  type Gameflow,
-} from '../types/gameflow';
+import { Phase, PLAYER_CLASSNAME, type Gameflow } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { Froglet } from '../view/Card';
 
@@ -25,7 +20,7 @@ type PondUnitCardProps = Readonly<{
 export const PondUnitCard = ({ card, position }: PondUnitCardProps) => {
   const [
     {
-      flow: { player, phase, subphase },
+      flow: { player, phase },
     },
     { activate },
   ]: PondUnitCardContext = useContext(GameContext);
@@ -36,8 +31,7 @@ export const PondUnitCard = ({ card, position }: PondUnitCardProps) => {
     () => activate(card, position),
     [card, position, activate],
   );
-  const canActivate =
-    player === card.owner && phase === Phase.Main && subphase === Subphase.Idle;
+  const canActivate = player === card.owner && phase === Phase.Main;
   return canActivate ? (
     <div className="stacking peeking">
       <div

@@ -1,15 +1,15 @@
 import { draw } from '../state-types/card.test-utils';
 import { createStateWith, gameflowOf } from '../state/test-utils';
 import { CardClass, CardKey } from '../types/card';
-import { Player, Subphase } from '../types/gameflow';
+import { Player, Phase } from '../types/gameflow';
 import { pickCard } from './pick-card';
 
 const { North, South } = Player;
 const { LilyPad, Froglet } = CardKey;
-const { Upgrading, Deploying } = Subphase;
+const { Upgrading, Deploying } = Phase;
 
 describe(pickCard, () => {
-  describe.for<[Player, CardKey, Subphase]>([
+  describe.for<[Player, CardKey, Phase]>([
     [North, Froglet, Deploying],
     [South, Froglet, Deploying],
     [North, LilyPad, Upgrading],
@@ -20,20 +20,15 @@ describe(pickCard, () => {
       ...gameflowOf(player),
     });
 
-    // > Subphase set to appropriate subphase
-    it(`should set the subphase to ${want}`, () => {
-      const after = pickCard(card)(before);
-      expect(after.flow.subphase).toBe(want);
-    });
-
+    // > Phase set to appropriate value
     it(`should set the phase to ${want}`, () => {
       const after = pickCard(card)(before);
       expect(after.flow.phase).toBe(want);
     });
 
     it('should not change the rest of the gameflow state', () => {
-      const { subphase: _, phase: ____, ...got } = pickCard(card)(before).flow;
-      const { subphase: __, phase: ___, ...want } = before.flow;
+      const { phase: __, ...got } = pickCard(card)(before).flow;
+      const { phase: _, ...want } = before.flow;
       expect(got).toStrictEqual(want);
     });
 

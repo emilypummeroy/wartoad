@@ -16,7 +16,7 @@ import {
   type LeafKey,
   type LeafCard,
 } from '../types/card';
-import { type Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { counter } from '../types/test-utils';
 
@@ -27,24 +27,18 @@ export const gameflowOf = (
   flow: {
     player,
     phase,
-    subphase:
-      phase === Subphase.Upgrading ||
-      phase === Subphase.Deploying ||
-      phase === Subphase.Activating
-        ? phase
-        : Subphase.Idle,
   },
 });
 
-export const subphaseStateOf = (
+export const phaseStateOf = (
   player: Player,
-  subphase?: Phase,
+  phase?: Phase,
 ): Partial<GameState> =>
-  subphase === Subphase.Upgrading
+  phase === Phase.Upgrading
     ? upgradeOf(player)
-    : subphase === Subphase.Deploying
+    : phase === Phase.Deploying
       ? deploymentOf(player)
-      : subphase === Subphase.Activating
+      : phase === Phase.Activating
         ? activationOf(player)
         : {};
 

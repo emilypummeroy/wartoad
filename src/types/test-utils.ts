@@ -6,7 +6,7 @@ export const counter = () => (count += 1);
 counter.reset = () => (count = 0);
 let count = 0;
 
-export type SubphasePlayer = [
+export type PhasePlayer = [
   upgrader?: Player,
   deployer?: Player,
   activator?: Player,

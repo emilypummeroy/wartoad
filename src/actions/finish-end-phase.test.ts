@@ -1,15 +1,14 @@
 import {
   createStateWith,
   gameflowOf,
-  subphaseStateOf,
+  phaseStateOf,
   winningPondOf,
 } from '../state/test-utils';
-import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import { finishEndPhase } from './finish-end-phase';
 
 const { North, South } = Player;
-const { Start, Main, End, GameOver } = Phase;
-const { Upgrading, Deploying, Activating } = Subphase;
+const { Upgrading, Deploying, Activating, Start, Main, End, GameOver } = Phase;
 
 type Preconditions = [Player, Phase, winner?: Player];
 type Inputs = [Player];
@@ -38,7 +37,7 @@ describe(finishEndPhase, () => {
       it('should not change state', () => {
         const before = createStateWith({
           ...gameflowOf(player, phase),
-          ...subphaseStateOf(player, phase),
+          ...phaseStateOf(player, phase),
           ...winningPondOf(winner),
         });
         expect(finishEndPhase()(before)).toStrictEqual(before);

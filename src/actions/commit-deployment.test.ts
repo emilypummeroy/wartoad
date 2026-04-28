@@ -11,17 +11,16 @@ import {
   createStateWith,
   deploymentOf,
   gameflowOf,
-  subphaseStateOf,
+  phaseStateOf,
 } from '../state/test-utils';
 import { CardClass } from '../types/card';
-import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { counter } from '../types/test-utils';
 import { commitDeployment } from './commit-deployment';
 
 const { North, South } = Player;
-const { Idle, Upgrading, Deploying, Activating } = Subphase;
-const { Start, Main, End } = Phase;
+const { Upgrading, Deploying, Activating, Start, Main, End } = Phase;
 
 type Input = [target: Position, Player, targetUnits: number];
 type Preconditions = [Position, Player, Phase];
@@ -57,7 +56,7 @@ describe(commitDeployment, () => {
     it('should return the input unchanged', () => {
       const old = createStateWith({
         ...gameflowOf(player, phase),
-        ...subphaseStateOf(player, phase),
+        ...phaseStateOf(player, phase),
       });
       const got = commitDeployment(target)(old);
       expect(got).toStrictEqual(old);
@@ -134,11 +133,6 @@ describe(commitDeployment, () => {
         expect(got).toStrictEqual(want);
       });
 
-      it('should set subphase to Idle', () => {
-        const result = commitDeployment(target)(before);
-        expect(result.flow.subphase).toBe(Idle);
-      });
-
       it('should set phase to Main', () => {
         const result = commitDeployment(target)(before);
         expect(result.flow.phase).toBe(Main);
@@ -158,11 +152,11 @@ describe(commitDeployment, () => {
       let got = {};
       let want = {};
       {
-        const { subphase: _, phase: __, ...rest } = after.flow;
+        const { phase: __, ...rest } = after.flow;
         got = rest;
       }
       {
-        const { subphase: _, phase: __, ...rest } = before.flow;
+        const { phase: __, ...rest } = before.flow;
         want = rest;
       }
       expect(got).toStrictEqual(want);

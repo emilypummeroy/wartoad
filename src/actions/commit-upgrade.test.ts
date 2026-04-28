@@ -14,19 +14,18 @@ import {
 import {
   createStateWith,
   gameflowOf,
-  subphaseStateOf,
+  phaseStateOf,
   upgradeOf,
 } from '../state/test-utils';
 import { CardClass, CardKey, type LeafKey } from '../types/card';
-import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
+import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { counter } from '../types/test-utils';
 import { commitUpgrade } from './commit-upgrade';
 
 const { LilyPad } = CardKey;
 const { North, South } = Player;
-const { Idle, Upgrading, Deploying, Activating } = Subphase;
-const { Start, Main, End } = Phase;
+const { Upgrading, Deploying, Activating, Start, Main, End } = Phase;
 
 const { NORTH_LEAF, SOUTH_LEAF, NORTH_UPGRADED, SOUTH_UPGRADED } = TestLeafKey;
 
@@ -77,7 +76,7 @@ describe(commitUpgrade, () => {
     it('should return the input unchanged', () => {
       const old = createStateWith({
         ...gameflowOf(player, phase),
-        ...subphaseStateOf(player, phase),
+        ...phaseStateOf(player, phase),
         pond: setPondStateAt(INITIAL_POND, target, TEST_LEAVES_BY_KEY[leafKey]),
       });
       const got = commitUpgrade(target)(old);
@@ -156,11 +155,6 @@ describe(commitUpgrade, () => {
         expect(got).toStrictEqual(want);
       });
 
-      it('should set subphase to Idle', () => {
-        const result = commitUpgrade(target)(before);
-        expect(result.flow.subphase).toBe(Idle);
-      });
-
       it('should set phase to Main', () => {
         const result = commitUpgrade(target)(before);
         expect(result.flow.phase).toBe(Main);
@@ -179,11 +173,11 @@ describe(commitUpgrade, () => {
       let got = {};
       let want = {};
       {
-        const { subphase: _, phase: __, ...rest } = after.flow;
+        const { phase: __, ...rest } = after.flow;
         got = rest;
       }
       {
-        const { subphase: _, phase: __, ...rest } = before.flow;
+        const { phase: __, ...rest } = before.flow;
         want = rest;
       }
       expect(got).toStrictEqual(want);
