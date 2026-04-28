@@ -1,8 +1,14 @@
-import { StepForward } from 'lucide-react';
+import { StepForward, X } from 'lucide-react';
 import { useContext } from 'react';
 
 import { GameContext } from '../context/GameContext';
 import { Phase, Player, type Gameflow } from '../types/gameflow';
+
+const NOUN = {
+  [Phase.Upgrading]: 'Upgrade',
+  [Phase.Deploying]: 'Deployment',
+  [Phase.Activating]: 'Activation',
+};
 
 type PhaseTrackerSlice = [
   {
@@ -11,28 +17,25 @@ type PhaseTrackerSlice = [
   },
   {
     finishPhase: () => void;
+    cancelActivePhase: () => void;
   },
 ];
+
 export function PhaseTracker() {
   const [
     {
       flow: { phase, player },
       winner,
     },
-    { finishPhase },
+    { finishPhase, cancelActivePhase },
   ]: PhaseTrackerSlice = useContext(GameContext);
-  const isBusy =
+  const isActivePhase =
     phase === Phase.Upgrading ||
     phase === Phase.Deploying ||
-    phase === Phase.Activating ||
-    phase === Phase.GameOver;
-  const phaseName =
-    phase === Phase.Main ||
-    phase === Phase.Upgrading ||
-    phase === Phase.Deploying ||
-    phase === Phase.Activating
-      ? Phase.Main
-      : phase;
+    phase === Phase.Activating;
+
+  const phaseName = isActivePhase ? Phase.Main : phase;
+
   return phase === Phase.GameOver && !!winner ? (
     <section aria-labelledby="current-phase" className="phases">
       <h3 id="current-phase">
@@ -50,14 +53,17 @@ export function PhaseTracker() {
         </span>
         : <span className="accent">{phaseName}</span> phase
       </h3>
-      <button
-        className="icon-text accent"
-        disabled={isBusy}
-        onClick={finishPhase}
-      >
-        <StepForward />
-        Next phase
-      </button>
+      {isActivePhase ? (
+        <button className="icon-text accent" onClick={cancelActivePhase}>
+          <X />
+          Cancel {NOUN[phase]}
+        </button>
+      ) : (
+        <button className="icon-text accent" onClick={finishPhase}>
+          <StepForward />
+          Next phase
+        </button>
+      )}
     </section>
   );
 }

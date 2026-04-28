@@ -15,19 +15,13 @@ describe('The context', () => {
 
       for (const x of Object.values(dispatch)) expect(x).not.toThrow();
 
-      const {
-        finishPhase,
-        pickCard,
-        activate,
-        commitUpgrade,
-        commitDeployment: commitDeploy,
-        commitActivation: commitActivate,
-      } = dispatch;
+      const { finishPhase, pickCard, activate, commitUpgrade, commitDeployment, commitActivation, cancelActivePhase } =
+        dispatch;
       expect(() => finishPhase()).not.toThrow();
       expect(() => pickCard(draw(CardClass.LilyPad)(Player.North))).not.toThrow();
       expect(() => commitUpgrade({ x: 0, y: 0 })).not.toThrow();
-      expect(() => commitDeploy({ x: 0, y: 0 })).not.toThrow();
-      expect(() => commitActivate({ x: 0, y: 0 })).not.toThrow();
+      expect(() => commitDeployment({ x: 0, y: 0 })).not.toThrow();
+      expect(() => commitActivation({ x: 0, y: 0 })).not.toThrow();
       expect(() =>
         activate(
           createUnit({
@@ -38,13 +32,15 @@ describe('The context', () => {
           { x: 0, y: 0 },
         ),
       ).not.toThrow();
+      expect(() => cancelActivePhase()).not.toThrow();
       ({
         finishPhase,
         pickCard,
         activate,
         commitUpgrade,
-        commitDeployment: commitDeploy,
-        commitActivation: commitActivate,
+        commitDeployment,
+        commitActivation,
+        cancelActivePhase,
       }) satisfies GameActions;
 
       return '';

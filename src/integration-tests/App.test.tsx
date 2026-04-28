@@ -43,14 +43,18 @@ describe(App, () => {
       });
 
       it.for([North, South])(
-        'should not advance to the %s End phase when the button is clicked while placing a card',
+        'should revert to the %s Main phase if the button is pressed while they are placing a card',
         player => {
           advanceToPhase(player, Main);
           fireEvent.click(getAll.handCards(player)[Math.floor(INITIAL_HAND_CARD_COUNT * Math.random())]);
-          fireEvent.click(screen.getByText('Next phase'));
+
+          expect(getFirst.basicDropzoneControlledBy(player)).toBeVisible();
+
+          fireEvent.click(screen.getByText(/Cancel/));
 
           expect(getThe.phaseTracker(player, Main)).toBeVisible();
           expect(queryA.phaseIndicator(player, End)).not.toBeInTheDocument();
+          expect(queryA.basicDropzoneControlledBy(player)).not.toBeInTheDocument();
         },
       );
 

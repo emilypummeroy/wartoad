@@ -10,6 +10,7 @@ import {
   finishPhase,
   DEFAULT_GAME_ACTIONS,
 } from '../actions';
+import { cancelActivePhase } from '../actions/cancel-active-phase';
 import { createState, DEFAULT_GAME_STATE } from '../state';
 import type { GameState } from '../state-types';
 import { type Card } from '../types/card';
@@ -38,6 +39,8 @@ export const useGameContextData = (
         commitUpgrade,
         commitDeployment,
         commitActivation,
+
+        cancelActivePhase,
       }),
     [getDrawnCard],
   );
@@ -57,14 +60,16 @@ const dropAll: DropAll<GameActions, GameState> =
     activate,
     commitUpgrade,
     commitDeployment,
-    commitActivation: commitActivate,
+    commitActivation,
+    cancelActivePhase,
   }) => ({
     finishPhase: drop(set)(finishPhase),
     pickCard: drop(set)(pickCard),
     activate: drop(set)(activate),
     commitUpgrade: drop(set)(commitUpgrade),
     commitDeployment: drop(set)(commitDeployment),
-    commitActivation: drop(set)(commitActivate),
+    commitActivation: drop(set)(commitActivation),
+    cancelActivePhase: drop(set)(cancelActivePhase),
   });
 
 const drop: Drop<GameState> =

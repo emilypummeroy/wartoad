@@ -10,6 +10,7 @@ const { Start, Main, End, GameOver, Upgrading, Deploying, Activating } = Phase;
 
 describe(PhaseTracker, () => {
   const finishPhase = vi.fn<() => void>();
+  const cancelActivePhase = vi.fn<() => void>();
   describe.for<[Player, Phase, Phase]>([
     [North, Start, Start],
     [North, Main, Main],
@@ -39,28 +40,29 @@ describe(PhaseTracker, () => {
     [South, Start],
     [South, Main],
     [South, End],
-  ])('should allow clicking to progress phase when Idle in the %s %s phase', ([player, phase]) => {
-    renderWithGameContext([gameflowOf(player, phase), { finishPhase }])(<PhaseTracker />);
+  ])('should allow clicking to progress phase when in the %s %s phase', ([player, phase]) => {
+    renderWithGameContext([gameflowOf(player, phase), { finishPhase, cancelActivePhase }])(<PhaseTracker />);
     fireEvent.click(screen.getByRole('button', { name: 'Next phase' }));
     expect(finishPhase).toHaveBeenCalledOnce();
+    expect(cancelActivePhase).not.toHaveBeenCalled();
   });
 
-  it.for<[Phase, Player, winner?: Player]>([
-    [Deploying, North],
-    [Upgrading, North],
-    [Activating, North],
-    [Deploying, South],
-    [Upgrading, South],
-    [Activating, South],
-  ])('should not allow clicking to progress phase when %s in the %s Main phase', ([phase, player, winner]) => {
+  it.for<[Phase, Player, noun: string]>([
+    [Deploying, North, 'Deployment'],
+    [Upgrading, North, 'Upgrade'],
+    [Activating, North, 'Activation'],
+    [Deploying, South, 'Deployment'],
+    [Upgrading, South, 'Upgrade'],
+    [Activating, South, 'Activation'],
+  ])('should allow clicking to cancel the action when in the %s %s phase', ([phase, player, noun]) => {
     renderWithGameContext([
       {
         ...gameflowOf(player, phase),
-        ...winningPondOf(winner),
       },
-      { finishPhase },
+      { finishPhase, cancelActivePhase },
     ])(<PhaseTracker />);
-    fireEvent.click(screen.getByRole('button', { name: 'Next phase' }));
+    fireEvent.click(screen.getByRole('button', { name: `Cancel ${noun}` }));
+    expect(cancelActivePhase).toHaveBeenCalledOnce();
     expect(finishPhase).not.toHaveBeenCalled();
   });
 

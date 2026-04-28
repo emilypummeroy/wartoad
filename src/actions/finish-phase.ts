@@ -18,7 +18,6 @@ export const finishPhase = (draw: (owner: Player) => Card) =>
       case Phase.End:
         return finishEndPhase();
       case Phase.GameOver:
-      // TODO 14: These should cancel current action
       case Phase.Upgrading:
       case Phase.Deploying:
       case Phase.Activating:

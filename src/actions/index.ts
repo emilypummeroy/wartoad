@@ -1,3 +1,4 @@
+import { noop } from '../types';
 import { type Card, type UnitCard } from '../types/card';
 import type { Position } from '../types/position';
 
@@ -18,13 +19,15 @@ export type GameActions = {
   commitUpgrade: (_: Position) => void;
   commitDeployment: (_: Position) => void;
   commitActivation: (_: Position) => void;
+  cancelActivePhase: () => void;
 };
 
 export const DEFAULT_GAME_ACTIONS: GameActions = {
-  finishPhase: () => {},
-  pickCard: () => {},
-  activate: () => {},
-  commitUpgrade: () => {},
-  commitDeployment: () => {},
-  commitActivation: () => {},
+  finishPhase: noop,
+  pickCard: noop,
+  activate: noop,
+  commitUpgrade: noop,
+  commitDeployment: noop,
+  commitActivation: noop,
+  cancelActivePhase: noop,
 };
