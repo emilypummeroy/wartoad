@@ -4,16 +4,17 @@ import { Hand } from './basic/Hand';
 import { PhaseTracker } from './basic/PhaseTracker';
 import { Pond } from './composite/Pond';
 import { GameContext } from './context/GameContext';
-import { Phase, Player, PLAYER_CLASSNAME, Subphase } from './types/gameflow';
+import { Phase, Player, PLAYER_CLASSNAME } from './types/gameflow';
 import { Froglet, LilyPad } from './view/Card';
 
 export function Game() {
   const [
     {
-      flow: { phase, player, subphase },
+      flow: { phase, player },
       flow,
       northHand,
       southHand,
+      upgrade,
       deployment,
       activation,
     },
@@ -36,11 +37,10 @@ export function Game() {
             player={Player.North}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.North}
-            isPlacing={subphase !== Subphase.Idle}
             handCards={northHand}
             onPick={pickCard}
           />
-          {subphase !== Subphase.Idle && (
+          {(upgrade ?? deployment ?? activation) && (
             // TODO 18: Make cards zoomable/inspectable/something outside of deploys and upgrades
             <PickedCard owner={player}>
               {deployment || activation ? <Froglet /> : <LilyPad />}
@@ -50,7 +50,6 @@ export function Game() {
             player={Player.South}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.South}
-            isPlacing={subphase !== Subphase.Idle}
             handCards={southHand}
             onPick={pickCard}
           />

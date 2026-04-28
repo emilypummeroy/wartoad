@@ -60,7 +60,6 @@ type HandProps = Readonly<{
   player: Player;
   isMainPhase: boolean;
   isPlayerTurn: boolean;
-  isPlacing: boolean;
   handCards: readonly Card[];
   onPick: (cardClass: Card) => void;
 }>;
@@ -76,12 +75,11 @@ export function Hand({
   player,
   isMainPhase,
   isPlayerTurn,
-  isPlacing,
   handCards,
   onPick,
 }: HandProps) {
   const id = useId();
-  const isJiggling = isMainPhase && !isPlacing && isPlayerTurn;
+  const isJiggling = isMainPhase && isPlayerTurn;
 
   return (
     <section className="hand" aria-labelledby={id}>
@@ -101,7 +99,7 @@ export function Hand({
               <HandCard
                 card={card}
                 player={player}
-                isEnabled={isMainPhase && !isPlacing}
+                isEnabled={isMainPhase}
                 onPick={onPick}
               />
             </div>

@@ -54,20 +54,20 @@ describe(Hand, () => {
 
     const pickCard = vi.fn<(_: Card) => void>();
 
-    describe.for<[Phase, isPlacing: boolean]>([
-      [Phase.Start, true],
-      [Phase.Main, true],
-      [Phase.End, false],
-      [Phase.Start, true],
-      [Phase.Main, false],
-      [Phase.End, false],
-    ])(`during the ${player} %s phase | placing:%s`, ([phase, isPlacing]) => {
+    describe.for<Phase>([
+      Phase.Start,
+      Phase.Main,
+      Phase.Upgrading,
+      Phase.Deploying,
+      Phase.Activating,
+      Phase.End,
+      Phase.GameOver,
+    ])(`during the ${player} %s phase`, phase => {
       it(`should show ${handSize} cards for ${player}`, () => {
         render(
           <Hand
             player={player}
             handCards={cards(handSize, cardClass)}
-            isPlacing={isPlacing}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn
             onPick={pickCard}
@@ -84,7 +84,7 @@ describe(Hand, () => {
 
     it(`should allow ${cardClass.name}s to be picked during the ${player} Main phase `, () => {
       const hand = cards(handSize, cardClass);
-      render(<Hand player={player} handCards={hand} isPlacing={false} isMainPhase isPlayerTurn onPick={pickCard} />);
+      render(<Hand player={player} handCards={hand} isMainPhase isPlayerTurn onPick={pickCard} />);
       const clickableCards = withinHand().getAllByRole('button', {
         name: `Pick ${cardClass.name}`,
       });
@@ -97,14 +97,7 @@ describe(Hand, () => {
 
     it(`should allow all cards to be picked during the ${player} Main phase`, () => {
       render(
-        <Hand
-          player={player}
-          handCards={cards(handSize, cardClass)}
-          isPlacing={false}
-          isMainPhase
-          isPlayerTurn
-          onPick={pickCard}
-        />,
+        <Hand player={player} handCards={cards(handSize, cardClass)} isMainPhase isPlayerTurn onPick={pickCard} />,
       );
       const clickableCards = withinHand().getAllByRole('button');
       for (const card of clickableCards) {
@@ -119,7 +112,6 @@ describe(Hand, () => {
         <Hand
           player={player}
           handCards={cards(handSize, cardClass)}
-          isPlacing={false}
           isMainPhase={false}
           isPlayerTurn
           onPick={pickCard}
@@ -132,38 +124,20 @@ describe(Hand, () => {
       expect(pickCard).not.toHaveBeenCalled();
     });
 
-    it(`should not allow cards to be picked during the ${player} Main phase while placing a card`, () => {
-      render(
-        <Hand
-          player={player}
-          handCards={cards(handSize, cardClass)}
-          isPlacing
-          isMainPhase
-          isPlayerTurn
-          onPick={pickCard}
-        />,
-      );
-      const clickableCards = withinHand().queryAllByRole('button');
-      for (const card of clickableCards) {
-        fireEvent.click(card);
-      }
-      expect(pickCard).not.toHaveBeenCalled();
-    });
-
-    describe.for<[Phase, isPlacing: boolean]>([
-      [Phase.Start, true],
-      [Phase.Main, false],
-      [Phase.End, false],
-      [Phase.Start, true],
-      [Phase.Main, true],
-      [Phase.End, false],
-    ])(`during the opponent's %s phase (placing:%s)`, ([phase, isPlacing]) => {
+    describe.for<Phase>([
+      Phase.Start,
+      Phase.Main,
+      Phase.Upgrading,
+      Phase.Deploying,
+      Phase.Activating,
+      Phase.End,
+      Phase.GameOver,
+    ])(`during the opponent's %s phase`, phase => {
       it(`should show ${handSize} card backs`, () => {
         render(
           <Hand
             player={player}
             handCards={cards(handSize, cardClass)}
-            isPlacing={isPlacing}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={false}
             onPick={pickCard}
@@ -178,7 +152,6 @@ describe(Hand, () => {
           <Hand
             player={player}
             handCards={cards(handSize, cardClass)}
-            isPlacing={isPlacing}
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={false}
             onPick={pickCard}
