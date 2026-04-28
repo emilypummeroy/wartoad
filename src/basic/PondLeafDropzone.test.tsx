@@ -1,31 +1,27 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { renderWithGameContext } from '../context/GameContext.test-utils';
-import { HOME, setPondStateAt } from '../state-types/pond';
-import { TEST_PONDS_BY_KEY, ANOTHER_POND_POSITIONS, TestPondKey } from '../state-types/pond.test-utils';
-import { activationOf, gameflowOf, winningPondOf } from '../state/test-utils';
-import type { UnitCard } from '../types/card';
+import { createUnit } from '../state-types/card';
+import { TestLeafKey, TEST_LEAVES_BY_KEY } from '../state-types/pond.test-utils';
+import { CardClass } from '../types/card';
 import { Player, Phase } from '../types/gameflow';
 import type { Position } from '../types/position';
-import { _ } from '../types/test-utils';
+import { _, counter, gameflowFrom } from '../types/test-utils';
 import { PondLeafDropzone } from './PondLeafDropzone';
 
 const { North, South } = Player;
 const { Upgrading, Deploying, Activating, Start, Main, End, GameOver } = Phase;
 
-const { INITIAL_POND, ANOTHER_POND, FULL_POND, UNITS_POND } = TestPondKey;
-const NORTH_POSITION = ANOTHER_POND_POSITIONS.North;
-const SOUTH_POSITION = ANOTHER_POND_POSITIONS.South;
+const { SOUTH_LEAF, NORTH_LEAF, SOUTH_UPGRADED, NORTH_UPGRADED } = TestLeafKey;
 
-type Inputs = [
-  controller: Player,
-  turnOf: Player,
-  Position,
-  Phase,
-  pond?: TestPondKey,
-  start?: Position,
-  winner?: Player,
-];
+type Inputs = [Player, Phase, Position, TestLeafKey, start?: Position];
+
+const TEST_TARGET_ID = 'test-label-id';
+const TEST_LABEL = 'the Target';
+const CHILD_TEXT = 'Hello';
+const A_POSITION: Position = { x: 2, y: 4 };
+const B_POSITION: Position = { x: 1, y: 5 };
+const C_POSITION: Position = { x: 0, y: 2 };
+const D_POSITION: Position = { x: 1, y: 0 };
 
 // ###
 // # Outputs:
@@ -34,32 +30,34 @@ type Inputs = [
 // > Deploy dropzone
 // > Move dropzone
 describe(PondLeafDropzone, () => {
-  const TEST_TARGET_ID = 'test-label-id';
-  const TEST_LABEL = 'the Target';
-  const CHILD_TEXT = 'Hello';
-
   const it_should_render_its_children = () => {
     it('should render its children', () => {
       expect(screen.getByText(CHILD_TEXT)).toBeVisible();
     });
   };
 
-  const commitUpgrade = vi.fn<(p: Position) => void>();
-  const commitDeployment = vi.fn<(p: Position) => void>();
-  const commitActivation = vi.fn<(p: Position) => void>();
-  const activate = vi.fn<(c: UnitCard, p: Position) => void>();
-  const beforeEach_render_with_phase = ([controller, player, position, phase, pondKey, start, winner]: Inputs) => {
+  const onClickUpgrade = vi.fn<() => void>();
+  const onClickDeploy = vi.fn<() => void>();
+  const onClickMove = vi.fn<() => void>();
+
+  const beforeEach_render_with_phase = ([player, phase, position, leafKey, start]: Inputs) => {
+    const flow = gameflowFrom(player, phase);
+    const leaf = TEST_LEAVES_BY_KEY[leafKey];
+    const activation = start
+      ? { start, unit: createUnit({ cardClass: CardClass.Froglet, owner: player, key: counter() }) }
+      : undefined;
     beforeEach(() => {
-      const pond = setPondStateAt(TEST_PONDS_BY_KEY[pondKey ?? INITIAL_POND], position, { controller });
-      renderWithGameContext([
-        {
-          ...winningPondOf(winner, pond),
-          ...gameflowOf(player, phase),
-          ...(phase === Activating && activationOf(player, _, start)),
-        },
-        { activate, commitUpgrade, commitDeployment, commitActivation },
-      ])(
-        <PondLeafDropzone targetLabelId={TEST_TARGET_ID} position={position}>
+      render(
+        <PondLeafDropzone
+          position={position}
+          flow={flow}
+          leaf={leaf}
+          activation={activation}
+          onClickUpgrade={onClickUpgrade}
+          onClickDeploy={onClickDeploy}
+          onClickMove={onClickMove}
+          targetLabelId={TEST_TARGET_ID}
+        >
           <div id={TEST_TARGET_ID} aria-label={TEST_LABEL}>
             Hello
           </div>
@@ -68,67 +66,50 @@ describe(PondLeafDropzone, () => {
     });
   };
 
-  describe('without context', () => {
-    beforeEach(() => {
-      render(
-        <PondLeafDropzone targetLabelId={TEST_TARGET_ID} position={{ x: 2, y: 2 }}>
-          <div id={TEST_TARGET_ID} aria-label={TEST_LABEL}>
-            Hello
-          </div>
-        </PondLeafDropzone>,
-      );
-    });
-    it_should_render_its_children();
-  });
-
   // ###
   // # Inputs for > No dropzones
   describe.for<Inputs>([
     // < Start phase
-    [North, North, { x: 0, y: 0 }, Start, INITIAL_POND],
-    [South, North, { x: 2, y: 0 }, Start, ANOTHER_POND],
-    [North, South, { x: 0, y: 5 }, Start, UNITS_POND],
-    [South, South, { x: 2, y: 5 }, Start, FULL_POND],
+    [North, Start, A_POSITION, NORTH_LEAF],
+    [South, Start, B_POSITION, NORTH_UPGRADED],
+    [North, Start, C_POSITION, SOUTH_LEAF],
+    [South, Start, D_POSITION, SOUTH_UPGRADED],
     // < End phase
-    [North, North, { x: 1, y: 0 }, End, FULL_POND],
-    [South, North, { x: 1, y: 1 }, End, INITIAL_POND],
-    [North, South, { x: 1, y: 5 }, End, ANOTHER_POND],
-    [South, South, { x: 1, y: 4 }, End, UNITS_POND],
+    [North, End, D_POSITION, NORTH_LEAF],
+    [South, End, A_POSITION, NORTH_UPGRADED],
+    [North, End, B_POSITION, SOUTH_LEAF],
+    [South, End, C_POSITION, SOUTH_UPGRADED],
     // < GameOver
-    [North, North, { x: 2, y: 1 }, GameOver, FULL_POND, _, North],
-    [South, North, { x: 2, y: 2 }, GameOver, INITIAL_POND, _, North],
-    [North, South, { x: 2, y: 3 }, GameOver, ANOTHER_POND, _, North],
-    [South, South, { x: 2, y: 1 }, GameOver, UNITS_POND, _, North],
-    [North, North, { x: 2, y: 1 }, GameOver, FULL_POND, _, South],
-    [South, North, { x: 2, y: 2 }, GameOver, INITIAL_POND, _, South],
-    [North, South, { x: 2, y: 3 }, GameOver, ANOTHER_POND, _, South],
-    [South, South, { x: 2, y: 1 }, GameOver, UNITS_POND, _, South],
+    [North, GameOver, C_POSITION, NORTH_LEAF],
+    [South, GameOver, D_POSITION, NORTH_UPGRADED],
+    [North, GameOver, A_POSITION, SOUTH_LEAF],
+    [South, GameOver, B_POSITION, SOUTH_UPGRADED],
     // < Main/Idle
-    [North, North, { x: 0, y: 0 }, Main, INITIAL_POND],
-    [South, North, { x: 2, y: 0 }, Main, ANOTHER_POND],
-    [North, South, { x: 0, y: 5 }, Main, UNITS_POND],
-    [South, South, { x: 2, y: 5 }, Main, FULL_POND],
+    [North, Main, B_POSITION, NORTH_LEAF],
+    [South, Main, C_POSITION, NORTH_UPGRADED],
+    [North, Main, D_POSITION, SOUTH_LEAF],
+    [South, Main, A_POSITION, SOUTH_UPGRADED],
     // < Upgrading & not controller
-    [South, North, SOUTH_POSITION.LeafMiddle, Upgrading, ANOTHER_POND],
-    [South, North, SOUTH_POSITION.LeafEdge, Upgrading, ANOTHER_POND],
-    [North, South, NORTH_POSITION.LeafMiddle, Upgrading, ANOTHER_POND],
-    [North, South, NORTH_POSITION.LeafEdge, Upgrading, ANOTHER_POND],
+    [North, Upgrading, D_POSITION, SOUTH_LEAF],
+    [South, Upgrading, C_POSITION, NORTH_LEAF],
+    [North, Upgrading, B_POSITION, SOUTH_LEAF],
+    [South, Upgrading, A_POSITION, NORTH_LEAF],
     // < Upgrading & upgraded
-    [North, North, HOME[North], Upgrading, INITIAL_POND],
-    [North, North, { x: 2, y: 1 }, Upgrading, FULL_POND],
-    [South, South, HOME[South], Upgrading, INITIAL_POND],
-    [South, South, { x: 0, y: 4 }, Upgrading, FULL_POND],
+    [North, Upgrading, C_POSITION, NORTH_UPGRADED],
+    [North, Upgrading, B_POSITION, NORTH_UPGRADED],
+    [South, Upgrading, A_POSITION, SOUTH_UPGRADED],
+    [South, Upgrading, D_POSITION, SOUTH_UPGRADED],
     // < Deploying & not home row
-    [North, North, { x: 1, y: 1 }, Deploying],
-    [South, North, { x: 0, y: 5 }, Deploying],
-    [South, South, { x: 2, y: 4 }, Deploying],
-    [North, South, { x: 1, y: 0 }, Deploying],
+    [North, Deploying, { x: 0, y: 1 }, NORTH_LEAF],
+    [South, Deploying, { x: 1, y: 4 }, NORTH_UPGRADED],
+    [South, Deploying, { x: 2, y: 0 }, SOUTH_LEAF],
+    [North, Deploying, { x: 1, y: 5 }, SOUTH_UPGRADED],
     // < Activating & out of range of start
-    [North, North, { x: 0, y: 0 }, Activating, UNITS_POND, { x: 2, y: 0 }],
-    [South, North, { x: 2, y: 0 }, Activating, UNITS_POND, { x: 0, y: 0 }],
-    [South, South, { x: 0, y: 5 }, Activating, UNITS_POND, { x: 2, y: 5 }],
-    [North, South, { x: 2, y: 5 }, Activating, UNITS_POND, { x: 0, y: 5 }],
-  ])('Idle | controlled by %s on %s turn at %s while %s | pond?: %s | start?: %s', inputs => {
+    [North, Activating, { x: 0, y: 0 }, NORTH_LEAF, { x: 2, y: 0 }],
+    [South, Activating, { x: 2, y: 0 }, NORTH_UPGRADED, { x: 0, y: 0 }],
+    [South, Activating, { x: 1, y: 3 }, SOUTH_LEAF, { x: 1, y: 1 }],
+    [North, Activating, { x: 1, y: 3 }, SOUTH_UPGRADED, { x: 1, y: 5 }],
+  ])('No dropzones | %s %s phase | at %s | %s | start?: %s', inputs => {
     beforeEach_render_with_phase(inputs);
     it_should_render_its_children();
 
@@ -136,19 +117,19 @@ describe(PondLeafDropzone, () => {
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
 
-    it('should not call commitUpgrade when children clicked', () => {
+    it('should not call onClickUpgrade when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitUpgrade).not.toHaveBeenCalled();
+      expect(onClickUpgrade).not.toHaveBeenCalled();
     });
 
-    it('should not call commitDeploy when children clicked', () => {
+    it('should not call onClickDeploy when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitDeployment).not.toHaveBeenCalled();
+      expect(onClickDeploy).not.toHaveBeenCalled();
     });
 
-    it('should not call commitActivate when children clicked', () => {
+    it('should not call onClickMove when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitActivation).not.toHaveBeenCalled();
+      expect(onClickMove).not.toHaveBeenCalled();
     });
   });
 
@@ -156,12 +137,10 @@ describe(PondLeafDropzone, () => {
   // # Inputs for > Upgrade dropzone
   describe.for<Inputs>([
     // < Upgrading & controlled & not upgraded
-    [North, North, { x: 1, y: 2 }, Upgrading, INITIAL_POND],
-    [South, South, { x: 2, y: 5 }, Upgrading, INITIAL_POND],
-    [North, North, NORTH_POSITION.LeafEdge, Upgrading, ANOTHER_POND],
-    [North, North, NORTH_POSITION.LeafHomeRow, Upgrading, ANOTHER_POND],
-    [South, South, SOUTH_POSITION.LeafEdge, Upgrading, ANOTHER_POND],
-    [South, South, SOUTH_POSITION.LeafEdge, Upgrading, ANOTHER_POND],
+    [North, Upgrading, A_POSITION, NORTH_LEAF],
+    [North, Upgrading, B_POSITION, NORTH_LEAF],
+    [South, Upgrading, C_POSITION, SOUTH_LEAF],
+    [South, Upgrading, D_POSITION, SOUTH_LEAF],
   ])('controlled by %s on %s turn at %s while %s | pond: %s', inputs => {
     const [_, __, position] = inputs;
     beforeEach_render_with_phase(inputs);
@@ -171,27 +150,27 @@ describe(PondLeafDropzone, () => {
       expect(screen.getByRole('button', { name: `Upgrade ${TEST_LABEL}` })).toBeVisible();
     });
 
-    it('should call commitUpgrade when children clicked', () => {
+    it('should call onClickUpgrade when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitUpgrade).toHaveBeenCalledExactlyOnceWith(position);
+      expect(onClickUpgrade).toHaveBeenCalledExactlyOnceWith(position);
     });
 
     it('should have no Deploy dropzone', () => {
       expect(screen.queryByRole('button', { name: /Deploy/ })).not.toBeInTheDocument();
     });
 
-    it('should not call commitDeploy when children clicked', () => {
+    it('should not call onClickDeploy when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitDeployment).not.toHaveBeenCalled();
+      expect(onClickDeploy).not.toHaveBeenCalled();
     });
 
     it('should have no Move dropzone', () => {
       expect(screen.queryByRole('button', { name: /Move/ })).not.toBeInTheDocument();
     });
 
-    it('should not call commitActivate when children clicked', () => {
+    it('should not call onClickMove when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitActivation).not.toHaveBeenCalled();
+      expect(onClickMove).not.toHaveBeenCalled();
     });
   });
 
@@ -199,12 +178,12 @@ describe(PondLeafDropzone, () => {
   // # Inputs for > Deploy dropzone
   describe.for<Inputs>([
     // < Deploying & home row
-    [South, North, { x: 0, y: 0 }, Deploying],
-    [North, North, { x: 1, y: 0 }, Deploying],
-    [South, North, { x: 2, y: 0 }, Deploying],
-    [North, South, { x: 1, y: 5 }, Deploying],
-    [South, South, { x: 2, y: 5 }, Deploying],
-    [North, South, { x: 0, y: 5 }, Deploying],
+    [North, Deploying, { x: 0, y: 0 }, NORTH_LEAF],
+    [North, Deploying, { x: 1, y: 0 }, NORTH_UPGRADED],
+    [North, Deploying, { x: 2, y: 0 }, SOUTH_LEAF],
+    [South, Deploying, { x: 1, y: 5 }, SOUTH_UPGRADED],
+    [South, Deploying, { x: 2, y: 5 }, SOUTH_LEAF],
+    [South, Deploying, { x: 0, y: 5 }, NORTH_LEAF],
   ])('controlled by %s on %s turn at %s while %s', inputs => {
     const [_, __, position] = inputs;
     beforeEach_render_with_phase(inputs);
@@ -214,27 +193,27 @@ describe(PondLeafDropzone, () => {
       expect(screen.getByRole('button', { name: `Deploy on ${TEST_LABEL}` })).toBeVisible();
     });
 
-    it('should call commitDeploy when children clicked', () => {
+    it('should call onClickDeploy when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitDeployment).toHaveBeenCalledExactlyOnceWith(position);
+      expect(onClickDeploy).toHaveBeenCalledExactlyOnceWith(position);
     });
 
     it('should have no Upgrade dropzone', () => {
       expect(screen.queryByRole('button', { name: /Upgrade / })).not.toBeInTheDocument();
     });
 
-    it('should not call commitUpgrade when children clicked', () => {
+    it('should not call onClickUpgrade when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitUpgrade).not.toHaveBeenCalled();
+      expect(onClickUpgrade).not.toHaveBeenCalled();
     });
 
     it('should have no Move dropzone', () => {
       expect(screen.queryByRole('button', { name: /Move/ })).not.toBeInTheDocument();
     });
 
-    it('should not call commitActivate when children clicked', () => {
+    it('should not call onClickMove when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitActivation).not.toHaveBeenCalled();
+      expect(onClickMove).not.toHaveBeenCalled();
     });
   });
 
@@ -242,15 +221,15 @@ describe(PondLeafDropzone, () => {
   // # Inputs for > Move dropzone
   describe.for<Inputs>([
     // < Activating & in range & not same position
-    [South, North, { x: 2, y: 3 }, Activating, UNITS_POND, { x: 2, y: 2 }],
-    [North, South, { x: 0, y: 2 }, Activating, FULL_POND, { x: 0, y: 3 }],
-    [South, South, { x: 1, y: 1 }, Activating, INITIAL_POND, { x: 2, y: 1 }],
-    [North, North, { x: 1, y: 4 }, Activating, ANOTHER_POND, { x: 0, y: 4 }],
+    [North, Activating, { x: 0, y: 2 }, NORTH_LEAF, { x: 0, y: 3 }],
+    [South, Activating, { x: 2, y: 3 }, NORTH_UPGRADED, { x: 2, y: 2 }],
+    [North, Activating, { x: 1, y: 4 }, SOUTH_UPGRADED, { x: 0, y: 4 }],
+    [South, Activating, { x: 1, y: 1 }, SOUTH_LEAF, { x: 2, y: 1 }],
     // < Activating & same position as start
-    [North, North, { x: 0, y: 0 }, Activating, UNITS_POND, { x: 0, y: 0 }],
-    [South, North, { x: 2, y: 0 }, Activating, UNITS_POND, { x: 2, y: 0 }],
-    [South, South, { x: 0, y: 5 }, Activating, UNITS_POND, { x: 0, y: 5 }],
-    [North, South, { x: 2, y: 5 }, Activating, UNITS_POND, { x: 2, y: 5 }],
+    [North, Activating, { x: 0, y: 0 }, NORTH_UPGRADED, { x: 0, y: 0 }],
+    [South, Activating, { x: 2, y: 0 }, NORTH_LEAF, { x: 2, y: 0 }],
+    [North, Activating, { x: 2, y: 5 }, SOUTH_LEAF, { x: 2, y: 5 }],
+    [South, Activating, { x: 0, y: 5 }, SOUTH_UPGRADED, { x: 0, y: 5 }],
   ])('controlled by %s on %s turn at %s while %s | pond: %s | phase: %s | start: %s', inputs => {
     const [_, __, position] = inputs;
     beforeEach_render_with_phase(inputs);
@@ -260,27 +239,27 @@ describe(PondLeafDropzone, () => {
       expect(screen.getByRole('button', { name: `Move to ${TEST_LABEL}` })).toBeVisible();
     });
 
-    it('should call commitActivate when children clicked', () => {
+    it('should call onClickMove when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitActivation).toHaveBeenCalledExactlyOnceWith(position);
+      expect(onClickMove).toHaveBeenCalledExactlyOnceWith(position);
     });
 
     it('should have no Upgrade dropzone', () => {
       expect(screen.queryByRole('button', { name: /Upgrade / })).not.toBeInTheDocument();
     });
 
-    it('should not call commitUpgrade when children clicked', () => {
+    it('should not call onClickUpgrade when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitUpgrade).not.toHaveBeenCalled();
+      expect(onClickUpgrade).not.toHaveBeenCalled();
     });
 
     it('should have no Deploy dropzone', () => {
       expect(screen.queryByRole('button', { name: /Deploy/ })).not.toBeInTheDocument();
     });
 
-    it('should not call commitDeploy when children clicked', () => {
+    it('should not call onClickDeploy when children clicked', () => {
       fireEvent.click(screen.getByLabelText(TEST_LABEL));
-      expect(commitDeployment).not.toHaveBeenCalled();
+      expect(onClickDeploy).not.toHaveBeenCalled();
     });
   });
 });

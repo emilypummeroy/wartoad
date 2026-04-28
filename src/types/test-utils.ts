@@ -1,4 +1,4 @@
-import type { Player } from './gameflow';
+import type { Gameflow, Phase, Player } from './gameflow';
 
 export const _ = undefined;
 
@@ -13,3 +13,8 @@ export type PhasePlayer = [
 ];
 
 export const partial: <T>(x: T) => Partial<T> = x => x;
+
+export const gameflowFrom = (player: Player, phase: Phase): Gameflow => ({
+  player,
+  phase,
+});

@@ -13,7 +13,7 @@ import {
 
 export type TestPondKey = keyof typeof TEST_PONDS_BY_KEY;
 
-export type TestLeafKey = keyof typeof TEST_LEAVES_BY_KEY;
+export type TestLeafKey = (typeof TestLeafKey)[keyof typeof TEST_LEAVES_BY_KEY];
 
 const SOUTH_UNIT: UnitCard[] = [
   createUnit({
@@ -209,4 +209,5 @@ export const TestLeafKey = {
   SOUTH_UPGRADED_UNIT: 'SOUTH_UPGRADED_UNIT',
   SOUTH_UPGRADED_OTHER_UNIT: 'SOUTH_UPGRADED_OTHER_UNIT',
   SOUTH_UPGRADED_UNITS: 'SOUTH_UPGRADED_UNITS',
-} as Record<TestLeafKey, TestLeafKey>;
+} as const;
+TestLeafKey satisfies Record<TestLeafKey, keyof typeof TEST_LEAVES_BY_KEY>;

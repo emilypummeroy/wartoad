@@ -65,7 +65,7 @@ describe(Froglet, () => {
 describe(LilyPad, () => {
   describe.for<Player>([Player.North, Player.South])('when belonging to %s', player => {
     it.for([true, false, undefined])(
-      // TODO 14: do something about isHome && !isLeaf
+      // TODO 16: do something about isHome && !isLeaf
       'should have LilyPad cost if not a leaf | home: %s',
       isHome => {
         render(<LilyPad player={player} isHome={isHome} />);
