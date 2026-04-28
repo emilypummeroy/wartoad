@@ -30,9 +30,13 @@ export const gameflowOf = (
   },
 });
 
+type PhaseStateParams = Partial<{
+  pond: PondState;
+}>;
 export const phaseStateOf = (
   player: Player,
   phase?: Phase,
+  { pond }: PhaseStateParams = {},
 ): Partial<GameState> =>
   phase === Phase.Upgrading
     ? upgradeOf(player)
@@ -40,7 +44,9 @@ export const phaseStateOf = (
       ? deploymentOf(player)
       : phase === Phase.Activating
         ? activationOf(player)
-        : {};
+        : phase === Phase.GameOver
+          ? winningPondOf(player, pond)
+          : {};
 
 export const upgradeOf = (
   owner?: Player,

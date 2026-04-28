@@ -11,3 +11,5 @@ export type PhasePlayer = [
   deployer?: Player,
   activator?: Player,
 ];
+
+export const partial: <T>(x: T) => Partial<T> = x => x;
