@@ -2,33 +2,36 @@ import { StepForward } from 'lucide-react';
 import { useContext } from 'react';
 
 import { GameContext } from '../context/GameContext';
-import { Phase, Player, Subphase, type Gameflow } from '../types/gameflow';
+import { Phase, Player, type Gameflow } from '../types/gameflow';
 
 // TODO 12: Turn all props into context slice
 type PhaseTrackerSlice = [
   {
+    flow: Gameflow;
     winner?: Player;
   },
-  {},
+  {
+    finishPhase: () => void;
+  },
 ];
-export function PhaseTracker({
-  flow: { player, phase },
-  onNextPhaseClicked,
-}: {
-  readonly flow: Gameflow;
-  readonly onNextPhaseClicked: () => void;
-}) {
-  const [{ winner }]: PhaseTrackerSlice = useContext(GameContext);
+export function PhaseTracker() {
+  const [
+    {
+      flow: { phase, player },
+      winner,
+    },
+    { finishPhase },
+  ]: PhaseTrackerSlice = useContext(GameContext);
   const isBusy =
-    phase === Subphase.Upgrading ||
-    phase === Subphase.Deploying ||
-    phase === Subphase.Activating ||
+    phase === Phase.Upgrading ||
+    phase === Phase.Deploying ||
+    phase === Phase.Activating ||
     phase === Phase.GameOver;
   const phaseName =
     phase === Phase.Main ||
-    phase === Subphase.Upgrading ||
-    phase === Subphase.Deploying ||
-    phase === Subphase.Activating
+    phase === Phase.Upgrading ||
+    phase === Phase.Deploying ||
+    phase === Phase.Activating
       ? Phase.Main
       : phase;
   return phase === Phase.GameOver && !!winner ? (
@@ -51,7 +54,7 @@ export function PhaseTracker({
       <button
         className="icon-text accent"
         disabled={isBusy}
-        onClick={onNextPhaseClicked}
+        onClick={finishPhase}
       >
         <StepForward />
         Next phase

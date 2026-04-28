@@ -11,14 +11,13 @@ export function Game() {
   const [
     {
       flow: { phase, player },
-      flow,
       northHand,
       southHand,
       upgrade,
       deployment,
       activation,
     },
-    { finishPhase, pickCard },
+    { pickCard },
   ] = useContext(GameContext);
 
   return (
@@ -29,7 +28,7 @@ export function Game() {
             War<span className="accent">toad</span>
           </h1>
         </div>
-        <PhaseTracker flow={flow} onNextPhaseClicked={finishPhase} />
+        <PhaseTracker />
       </header>
       <main>
         <section className="handarea">

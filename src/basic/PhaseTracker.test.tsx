@@ -1,33 +1,35 @@
 import { screen, fireEvent } from '@testing-library/react';
 
 import { renderWithGameContext } from '../context/GameContext.test-utils';
-import { winningPondOf } from '../state/test-utils';
-import { Phase, Player, Subphase } from '../types/gameflow';
+import { gameflowOf, winningPondOf } from '../state/test-utils';
+import { Phase, Player } from '../types/gameflow';
 import { PhaseTracker } from './PhaseTracker';
 
-const NOOP = () => {};
-
 const { North, South } = Player;
-const { Start, Main, End, GameOver } = Phase;
-const { Idle, Upgrading, Deploying, Activating } = Subphase;
+const { Start, Main, End, GameOver, Upgrading, Deploying, Activating } = Phase;
 
 describe(PhaseTracker, () => {
-  it.for<[Player, Phase, Subphase]>([
-    [North, Start, Idle],
-    [North, Main, Idle],
+  const finishPhase = vi.fn<() => void>();
+  describe.for<[Player, Phase, Phase]>([
+    [North, Start, Start],
+    [North, Main, Main],
     [North, Main, Deploying],
     [North, Main, Upgrading],
     [North, Main, Activating],
-    [North, End, Idle],
-    [South, Start, Idle],
-    [South, Main, Idle],
+    [North, End, End],
+    [South, Start, Start],
+    [South, Main, Main],
+    [South, Main, Upgrading],
     [South, Main, Deploying],
     [South, Main, Upgrading],
-    [South, End, Idle],
-  ])('should show the %s %s phase during %s subphase', ([player, phase, subphase]) => {
-    const flow = { player, phase, subphase };
-    renderWithGameContext()(<PhaseTracker flow={flow} onNextPhaseClicked={NOOP} />);
-    expect(screen.getByRole('region', { name: `${player}: ${phase} phase` })).toBeVisible();
+    [South, End, End],
+  ])('During %s %s phase | name of phase: %s', ([player, namedPhase, phase]) => {
+    beforeEach(() => {
+      renderWithGameContext([gameflowOf(player, phase)])(<PhaseTracker />);
+    });
+    it(`should render the ${player} ${namedPhase} phase tracker`, () => {
+      expect(screen.getByRole('region', { name: `${player}: ${namedPhase} phase` })).toBeVisible();
+    });
   });
 
   it.for<[Player, Phase]>([
@@ -38,28 +40,28 @@ describe(PhaseTracker, () => {
     [South, Main],
     [South, End],
   ])('should allow clicking to progress phase when Idle in the %s %s phase', ([player, phase]) => {
-    const onNextPhaseClicked = vi.fn<() => void>();
-    renderWithGameContext()(
-      <PhaseTracker flow={{ player, phase, subphase: Idle }} onNextPhaseClicked={onNextPhaseClicked} />,
-    );
+    renderWithGameContext([gameflowOf(player, phase), { finishPhase }])(<PhaseTracker />);
     fireEvent.click(screen.getByRole('button', { name: 'Next phase' }));
-    expect(onNextPhaseClicked).toHaveBeenCalledOnce();
+    expect(finishPhase).toHaveBeenCalledOnce();
   });
 
-  it.for<[Phase & Subphase, Player]>([
+  it.for<[Phase, Player, winner?: Player]>([
     [Deploying, North],
     [Upgrading, North],
     [Activating, North],
     [Deploying, South],
     [Upgrading, South],
     [Activating, South],
-  ])('should not allow clicking to progress phase when %s in the %s Main phase', ([phase, player]) => {
-    const onNextPhaseClicked = vi.fn<() => void>();
-    renderWithGameContext()(
-      <PhaseTracker flow={{ player, phase, subphase: phase }} onNextPhaseClicked={onNextPhaseClicked} />,
-    );
+  ])('should not allow clicking to progress phase when %s in the %s Main phase', ([phase, player, winner]) => {
+    renderWithGameContext([
+      {
+        ...gameflowOf(player, phase),
+        ...winningPondOf(winner),
+      },
+      { finishPhase },
+    ])(<PhaseTracker />);
     fireEvent.click(screen.getByRole('button', { name: 'Next phase' }));
-    expect(onNextPhaseClicked).not.toHaveBeenCalled();
+    expect(finishPhase).not.toHaveBeenCalled();
   });
 
   it.for<[winner: Player, turn: Player]>([
@@ -70,9 +72,10 @@ describe(PhaseTracker, () => {
   ])('should show the %s player winner message when they win during %s turn', ([winner, player]) => {
     renderWithGameContext([
       {
+        ...gameflowOf(player, GameOver),
         ...winningPondOf(winner),
       },
-    ])(<PhaseTracker flow={{ player, phase: GameOver, subphase: Idle }} onNextPhaseClicked={NOOP} />);
+    ])(<PhaseTracker />);
     expect(screen.getByRole('region', { name: `A WINRAR is ${winner}` })).toBeVisible();
   });
 
@@ -82,12 +85,12 @@ describe(PhaseTracker, () => {
     [South, North],
     [South, South],
   ])('should not have a button to progress phase after %s wins on %s turn', ([winner, player]) => {
-    const onNextPhaseClicked = vi.fn<() => void>();
     renderWithGameContext([
       {
+        ...gameflowOf(player, GameOver),
         ...winningPondOf(winner),
       },
-    ])(<PhaseTracker flow={{ player, phase: GameOver, subphase: Idle }} onNextPhaseClicked={onNextPhaseClicked} />);
+    ])(<PhaseTracker />);
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });
