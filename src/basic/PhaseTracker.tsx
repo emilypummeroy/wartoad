@@ -4,7 +4,6 @@ import { useContext } from 'react';
 import { GameContext } from '../context/GameContext';
 import { Phase, Player, type Gameflow } from '../types/gameflow';
 
-// TODO 12: Turn all props into context slice
 type PhaseTrackerSlice = [
   {
     flow: Gameflow;

@@ -14,13 +14,7 @@ import {
   type PondState,
 } from '../state-types/pond';
 import type { Card, LeafCard, UnitCard } from '../types/card';
-import {
-  Phase,
-  Player,
-  PLAYER_AFTER,
-  Subphase,
-  type Gameflow,
-} from '../types/gameflow';
+import { Phase, Player, PLAYER_AFTER, Subphase } from '../types/gameflow';
 import type { Position } from '../types/position';
 
 export type StateAction = (s: GameState) => GameState;
@@ -88,7 +82,6 @@ type GameOut = GameAccess & { readonly out: GameState };
 
 // Accessors for convenience
 export type GameAccess = {
-  readonly flow: Gameflow;
   readonly player: Player;
   readonly phase: Phase;
   readonly subphase: Subphase;
@@ -137,10 +130,6 @@ type GameMake = {
 };
 
 const access: (s: GameState) => GameAccess = s => ({
-  // TODO 12: Make PhaseTracker use this
-  get flow() {
-    return s.flow;
-  },
   get player() {
     return s.flow.player;
   },

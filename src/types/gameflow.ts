@@ -4,7 +4,7 @@ export type Gameflow = {
   readonly subphase: Subphase;
 };
 
-// TODO 25 ActivationStep
+// TODO 25 ActivationStep of an Activation e.g. moving vs attacking
 export type Phase = (typeof Phase)[keyof typeof Phase];
 export type Player = (typeof Player)[keyof typeof Player];
 export type Subphase = (typeof Subphase)[keyof typeof Subphase];
