@@ -10,42 +10,63 @@ import { activate } from './activate';
 const { North, South } = Player;
 const { Upgrading, Deploying, Activating, Start, Main, End } = Phase;
 let key = 0;
+type Preconditions = [Player, Phase, owner?: Player, isExhausted?: boolean];
+
+const it_should_not_change_state_with_failed_precondition =
+  (xy: Position) =>
+  ([player, phase, owner = player, isExhausted = false]: Preconditions) => {
+    let unit = createUnit({
+      cardClass: UnitClass.Froglet,
+      key: key++,
+      owner,
+    });
+    unit = {
+      ...unit,
+      values: { ...unit.values, isExhausted },
+    };
+    const oldState = createStateWith({
+      ...gameflowOf(player, phase),
+      ...phaseStateOf(player, phase),
+    });
+
+    it('should not change the state', () => {
+      expect(activate(unit, xy)(oldState)).toStrictEqual(oldState);
+    });
+  };
+
 describe(activate, () => {
   describe.for<Position>(ALL_POSITIONS)('with start position %s', xy => {
     // Preconditions:
-    describe.for<[string, Player, Phase, owner: Player]>([
-      ['Need Idle', North, Upgrading, North],
-      ['Need Idle', North, Deploying, North],
-      ['Need Idle', North, Activating, North],
-      ['Need Idle', South, Upgrading, South],
-      ['Need Idle', South, Deploying, South],
-      ['Need Idle', South, Activating, South],
-
-      ['Need Main phase', North, Start, North],
-      ['Need Main phase', North, End, North],
-      ['Need Main phase', South, Start, South],
-      ['Need Main phase', South, End, South],
-
-      ['player must own unit', North, Main, South],
-      ['player must own unit', South, Main, North],
-      // TODO 14: Unit must not be exhausted
+    describe.for<Preconditions>([
+      [North, Upgrading],
+      [North, Deploying],
+      [North, Activating],
+      [South, Upgrading],
+      [South, Deploying],
+      [South, Activating],
+      [North, Start],
+      [North, End],
+      [South, Start],
+      [South, End],
     ])(
-      'Precondition failed: %s | %s %s | %s owner',
-      ([_, player, phase, owner]) => {
-        const unit = createUnit({
-          cardClass: UnitClass.Froglet,
-          key: key++,
-          owner,
-        });
-        const oldState = createStateWith({
-          ...gameflowOf(player, phase),
-          ...phaseStateOf(player, phase),
-        });
+      'Precondition (Main phase) failed: | %s %s | %s owner',
+      it_should_not_change_state_with_failed_precondition(xy),
+    );
 
-        it('should not change the state', () => {
-          expect(activate(unit, xy)(oldState)).toStrictEqual(oldState);
-        });
-      },
+    describe.for<Preconditions>([
+      [North, Main, South],
+      [South, Main, North],
+    ])(
+      'Precondition (turn player owns unit) failed: | %s %s | %s owner',
+      it_should_not_change_state_with_failed_precondition(xy),
+    );
+
+    describe.for<Preconditions>([
+      [North, Main, North, true],
+      [South, Main, South, true],
+    ])(
+      'Precondition (unit not exhausted) failed: | %s %s | %s owner',
+      it_should_not_change_state_with_failed_precondition(xy),
     );
 
     // Preconditions met:
