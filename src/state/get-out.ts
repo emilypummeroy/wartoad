@@ -8,6 +8,7 @@ import type {
 import {
   doesAnyPondLeafSatisfy,
   HOME,
+  setAllUnits,
   setPondStateAt,
   setPondStateWhere,
   type LeafState,
@@ -94,6 +95,12 @@ export type GameUpdate = {
     };
   };
 
+  readonly units: {
+    readonly everywhere: {
+      readonly update: (x: (old: UnitCard) => Partial<UnitCard>) => GameData;
+    };
+  };
+
   readonly hand: {
     readonly of: (x: Player) => {
       readonly update: (x: (old: readonly Card[]) => Card[]) => GameData;
@@ -154,6 +161,12 @@ const update: (s: GameState) => GameUpdate = s => ({
       to: v => gameData({ ...s, pond: setPondStateAt(s.pond, xy, v) }),
       update: u => gameData({ ...s, pond: setPondStateAt(s.pond, xy, u) }),
     }),
+  },
+
+  units: {
+    everywhere: {
+      update: u => gameData({ ...s, pond: setAllUnits(s.pond, u) }),
+    },
   },
 
   hand: {

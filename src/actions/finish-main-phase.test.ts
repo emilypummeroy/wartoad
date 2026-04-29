@@ -1,8 +1,8 @@
 import {
   getPondStateAt,
-  setPondStateAt,
+  setAllUnits,
   setPondStateAtEach,
-  setPondStateWhere,
+  setUnitsAt,
   type LeafState,
 } from '../state-types/pond';
 import {
@@ -136,44 +136,36 @@ describe(finishMainPhase, () => {
 
       // > units unexhausted
       it('should make every unit unexhausted', () => {
-        // TODO 14: Create setPondUnitsAt, setPondUnitsWhere
-        // Just one unit
+        // Check for the test pond
         for (const xy of ALL_POSITIONS) {
           const after = finishMainPhase()(before);
           for (const unit of getPondStateAt(after.pond, xy).units)
             expect(unit.values.isExhausted).toBe(false);
         }
-        // Just all units on one position
+
+        // Check for the test pond with one position's units exhausted
         for (const xy of ALL_POSITIONS) {
           const exhausted = {
             ...before,
-            pond: setPondStateAt(basePond, xy, ({ units }) => ({
-              units: units.map(u => ({
-                ...u,
-                values: { ...u.values, isExhausted: true },
-              })),
+            pond: setUnitsAt(pond, xy, u => ({
+              ...u,
+              values: { ...u.values, isExhausted: true },
             })),
           };
           const after = finishMainPhase()(exhausted);
           for (const unit of getPondStateAt(after.pond, xy).units)
             expect(unit.values.isExhausted).toBe(false);
         }
-        // Just all units
+
+        // Check for the test pond with all units exhausted
         for (const xy of ALL_POSITIONS) {
           const exhausted = {
             ...before,
-            pond: setPondStateWhere(
-              basePond,
-              () => true,
-              ({ units }) => ({
-                units: units.map(u => ({
-                  ...u,
-                  values: { ...u.values, isExhausted: true },
-                })),
-              }),
-            ),
+            pond: setAllUnits(pond, u => ({
+              ...u,
+              values: { ...u.values, isExhausted: true },
+            })),
           };
-
           const after = finishMainPhase()(exhausted);
           for (const unit of getPondStateAt(after.pond, xy).units)
             expect(unit.values.isExhausted).toBe(false);

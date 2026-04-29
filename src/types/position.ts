@@ -18,7 +18,7 @@ export const isPosition = (xy: UnsafePosition): xy is Position => {
 };
 
 export const arePositionsEqual = (
-  { x: x1, y: y1 }: Position,
+  { x: x1, y: y1 }: UnsafePosition,
   { x: x2, y: y2 }: Position,
 ) => x1 === x2 && y1 === y2;
 

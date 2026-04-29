@@ -68,9 +68,51 @@ export const setPondStateWhere = (
   const array: LeafState[][] = init.map((row, y) =>
     row.map((leaf, x) => {
       const xy = { x, y };
-      if (!isPosition(xy) || !predicate(leaf, xy)) return leaf;
+      /* v8 ignore if */
+      if (!isPosition(xy))
+        throw new Error('Unsound typing in setPondStateWhere');
+      if (!predicate(leaf, xy)) return leaf;
       return { ...leaf, ...updater(leaf, xy) };
     }),
+  );
+  // v8 ignore if
+  if (!isPondState(array)) {
+    throw new Error(`Expected a PondState but got: ${JSON.stringify(array)}`);
+  }
+  return array;
+};
+
+export const setUnitsAt = (
+  init: PondState,
+  position: Position,
+  updater: (u: UnitCard, v: LeafState) => Partial<UnitCard>,
+): PondState => {
+  const array: LeafState[][] = init.map((row, y) =>
+    row.map((leaf, x) =>
+      arePositionsEqual({ x, y }, position)
+        ? {
+            ...leaf,
+            units: leaf.units.map(u => ({ ...u, ...updater(u, leaf) })),
+          }
+        : leaf,
+    ),
+  );
+  // v8 ignore if
+  if (!isPondState(array)) {
+    throw new Error(`Expected a PondState but got: ${JSON.stringify(array)}`);
+  }
+  return array;
+};
+
+export const setAllUnits = (
+  init: PondState,
+  updater: (u: UnitCard, v: LeafState) => Partial<UnitCard>,
+): PondState => {
+  const array: LeafState[][] = init.map(row =>
+    row.map(leaf => ({
+      ...leaf,
+      units: leaf.units.map(u => ({ ...u, ...updater(u, leaf) })),
+    })),
   );
   // v8 ignore if
   if (!isPondState(array)) {
