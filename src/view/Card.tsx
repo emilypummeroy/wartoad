@@ -78,9 +78,9 @@ export function LilyPad({
   );
 }
 
-// TODO 14: Unit should be dulled out if exhausted
 type UnitCardProps = {
   readonly isOnLeaf?: boolean;
+  readonly isExhausted?: boolean;
   readonly player?: Player;
   readonly nameId?: string;
   readonly symbolId?: string;
@@ -88,6 +88,7 @@ type UnitCardProps = {
 export function Froglet({
   player,
   isOnLeaf = false,
+  isExhausted = false,
   nameId,
   symbolId,
 }: UnitCardProps) {
@@ -108,7 +109,7 @@ export function Froglet({
   return (
     <section
       aria-labelledby={`${isOnLeaf ? symbolId : ''} ${nameId}`}
-      className={`card ${isOnLeaf && player ? PLAYER_CLASSNAME[player] : ''}`}
+      className={`card ${isExhausted ? 'exhausted' : ''} ${isOnLeaf && player ? PLAYER_CLASSNAME[player] : ''}`}
     >
       <div className="card-title" id={nameId}>
         Froglet
@@ -118,7 +119,10 @@ export function Froglet({
         <div className="card-section-fill">
           {isOnLeaf ? (
             <Torus role="img">
-              <title id={symbolId}>{player} unit</title>
+              <title id={symbolId}>
+                {isExhausted ? 'exhausted ' : ''}
+                {player} unit
+              </title>
             </Torus>
           ) : (
             <div role="group" aria-labelledby={costId} className="card-item">

@@ -56,7 +56,7 @@ export const getThe = {
   },
   nthRowUnitControlledBy(player: Player, n: number) {
     return withinThe.nthRowFor(player, n).getByRole('img', {
-      name: `${player} unit`,
+      name: new RegExp(`${player} unit`),
     });
   },
   nthRowDropzoneFor(player: Player, n: number) {
@@ -137,7 +137,7 @@ export const getAll = {
   nthRowUnitsControlledBy(player: Player, n: number) {
     return withinThe
       .nthRowFor(player, n)
-      .getAllByRole('img', { name: `${player} unit` });
+      .getAllByRole('img', { name: new RegExp(`${player} unit`) });
   },
 };
 

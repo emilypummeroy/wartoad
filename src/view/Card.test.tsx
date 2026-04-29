@@ -42,6 +42,15 @@ describe(Froglet, () => {
       expect(card).toBeVisible();
       expect(within(card).getByRole('img', { name: `${player} unit` })).toBeVisible();
     });
+
+    it(`should be shown as an exhausted ${player} unit if it is exhausted on a leaf`, () => {
+      render(<Froglet player={player} isOnLeaf isExhausted />);
+      const card = screen.getByRole('region', {
+        name: `exhausted ${player} unit Froglet`,
+      });
+      expect(card).toBeVisible();
+      expect(within(card).getByRole('img', { name: `exhausted ${player} unit` })).toBeVisible();
+    });
   });
 
   describe.for<[Player, isOnLeaf?: boolean, string?]>([

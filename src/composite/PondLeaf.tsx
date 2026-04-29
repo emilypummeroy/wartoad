@@ -6,6 +6,7 @@ import { PondUnitCard } from '../basic/PondUnitCard';
 import { GameContext } from '../context/GameContext';
 import type { ActivationState } from '../state-types';
 import { type PondState } from '../state-types/pond';
+import type { UnitCard } from '../types/card';
 import type { Gameflow } from '../types/gameflow';
 import { type Position } from '../types/position';
 
@@ -16,6 +17,7 @@ type PondLeafContext = readonly [
     activation?: ActivationState;
   },
   {
+    activate: (unit: UnitCard, start: Position) => void;
     commitUpgrade: (target: Position) => void;
     commitDeployment: (on: Position) => void;
     commitActivation: (end: Position) => void;
@@ -37,7 +39,7 @@ export function PondLeaf({ position }: PondLeafProps) {
         },
       },
     },
-    { commitUpgrade, commitDeployment, commitActivation },
+    { activate, commitUpgrade, commitDeployment, commitActivation },
   ]: PondLeafContext = useContext(GameContext);
 
   const leafSymbolId = useId();
@@ -73,7 +75,13 @@ export function PondLeaf({ position }: PondLeafProps) {
           }}
         >
           {units.map(card => (
-            <PondUnitCard key={card.key} card={card} position={position} />
+            <PondUnitCard
+              key={card.key}
+              unit={card}
+              position={position}
+              flow={flow}
+              onClick={activate}
+            />
           ))}
         </div>
       </PondLeafDropzone>

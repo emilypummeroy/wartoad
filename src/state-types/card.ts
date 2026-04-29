@@ -19,15 +19,20 @@ export const isUnit = (card: Card): card is UnitCard =>
 
 export const createUnit = ({
   cardClass,
+  values,
   ...baseData
 }: {
   readonly key: number;
   readonly cardClass: UnitClass;
   readonly owner: Player;
+  readonly values?: Partial<UnitValues>;
 }): UnitCard => ({
   type: CardType.Unit,
   cardClass,
-  values: INITIAL_VALUES[CardType.Unit],
+  values: {
+    ...INITIAL_VALUES[CardType.Unit],
+    ...values,
+  },
   ...baseData,
 });
 

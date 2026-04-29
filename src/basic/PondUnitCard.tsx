@@ -1,39 +1,33 @@
-import { useCallback, useContext, useId } from 'react';
+import { useCallback, useId } from 'react';
 
-import { GameContext } from '../context/GameContext';
 import type { UnitCard } from '../types/card';
 import { Phase, PLAYER_CLASSNAME, type Gameflow } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { Froglet } from '../view/Card';
 
-type PondUnitCardContext = [
-  { flow: Gameflow },
-  {
-    activate: (unit: UnitCard, position: Position) => void;
-  },
-];
 type PondUnitCardProps = Readonly<{
-  card: UnitCard;
+  unit: UnitCard;
   position: Position;
+  flow: Gameflow;
+  onClick: (unit: UnitCard, start: Position) => void;
 }>;
 
-// TODO 14: Unit should be dulled out and not have pickable styles if exhausted.
-// TODO 14: Unit should not be clickable if exhausted.
-export const PondUnitCard = ({ card, position }: PondUnitCardProps) => {
-  const [
-    {
-      flow: { player, phase },
-    },
-    { activate },
-  ]: PondUnitCardContext = useContext(GameContext);
+export const PondUnitCard = ({
+  unit,
+  flow: { player, phase },
+  position,
+  onClick,
+}: PondUnitCardProps) => {
   const buttonId = useId();
   const symbolId = useId();
   const nameId = useId();
   const handleClick = useCallback(
-    () => activate(card, position),
-    [card, position, activate],
+    () => onClick(unit, position),
+    [unit, position, onClick],
   );
-  const canActivate = player === card.owner && phase === Phase.Main;
+  const { isExhausted } = unit.values;
+  const canActivate =
+    player === unit.owner && phase === Phase.Main && !isExhausted;
   return canActivate ? (
     <div className="stacking peeking">
       <div
@@ -43,13 +37,14 @@ export const PondUnitCard = ({ card, position }: PondUnitCardProps) => {
         aria-label="Activate"
         tabIndex={0}
         onClick={handleClick}
-        className={`highlighting-card pickable-card ${PLAYER_CLASSNAME[card.owner]}`}
+        className={`highlighting-card pickable-card ${PLAYER_CLASSNAME[unit.owner]}`}
       >
         <Froglet
           nameId={nameId}
           symbolId={symbolId}
-          player={card.owner}
+          player={unit.owner}
           isOnLeaf
+          isExhausted={unit.values.isExhausted}
         />
       </div>
     </div>
@@ -57,13 +52,14 @@ export const PondUnitCard = ({ card, position }: PondUnitCardProps) => {
     <div className="stacking peeking">
       <div
         role="listitem"
-        className={`highlighting-card ${PLAYER_CLASSNAME[card.owner]}`}
+        className={`highlighting-card ${PLAYER_CLASSNAME[unit.owner]}`}
       >
         <Froglet
           nameId={nameId}
           symbolId={symbolId}
-          player={card.owner}
+          player={unit.owner}
           isOnLeaf
+          isExhausted={unit.values.isExhausted}
         />
       </div>
     </div>

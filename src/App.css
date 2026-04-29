@@ -754,6 +754,9 @@ span.south {
   &:hover {
     filter: brightness(110%);
   }
+  &.exhausted {
+    filter: brightness(50%) saturate(75%);
+  }
 
   > svg,
   .card-section-row svg,
