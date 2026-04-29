@@ -29,7 +29,7 @@ export const PondUnitCard = ({
   const canActivate =
     player === unit.owner && phase === Phase.Main && !isExhausted;
   return canActivate ? (
-    <div className="stacking peeking">
+    <div className="showing">
       <div
         role="button"
         aria-labelledby={`${buttonId} ${symbolId} ${nameId}`}
@@ -49,7 +49,7 @@ export const PondUnitCard = ({
       </div>
     </div>
   ) : (
-    <div className="stacking peeking">
+    <div className="peeking">
       <div
         role="listitem"
         className={`highlighting-card ${PLAYER_CLASSNAME[unit.owner]}`}

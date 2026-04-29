@@ -26,8 +26,7 @@ export function PondLeafCard({
   const { controller, isUpgraded } = getPondStateAt(pond, position);
   const isHome = arePositionsEqual(HOME[controller], position);
   return isUpgraded ? (
-    // TODO 14: Implement a non-splay-row hack to display cards on leaves
-    <div className="stacking peeking">
+    <div className="leaf showing">
       <div
         role="listitem"
         className={`highlighting-card ${PLAYER_CLASSNAME[controller]}`}
@@ -42,7 +41,7 @@ export function PondLeafCard({
       </div>
     </div>
   ) : (
-    <div className="stacking">
+    <div className="leaf peeking">
       <CardBack
         iconId={leafSymbolId}
         key="facedown-card"

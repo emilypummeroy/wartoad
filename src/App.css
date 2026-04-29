@@ -81,7 +81,12 @@
   --animation-fast-linear: 150ms linear;
 
   --z-index-hand: 10;
+  --z-index-pond-card: 0;
+  --z-index-peeking-card: 15;
   --z-index-playarea-overlay: 20;
+
+  --card-height: 11svh;
+  --card-width: 8svh;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -451,29 +456,17 @@ span.south {
     .stacking {
       margin-left: -2svh;
     }
-    .peeking:hover,
-    .peeking:focus-within {
-      margin-right: 2svh;
-    }
   }
   &.compact:hover {
     margin-left: 1svh;
     .stacking {
       margin-left: -2svh;
     }
-    .peeking:hover,
-    .peeking:focus-within {
-      margin-right: 2svh;
-    }
   }
   &.super-compact:hover {
     margin-left: 3.5svh;
     .stacking {
       margin-left: -4.5svh;
-    }
-    .peeking:hover,
-    .peeking:focus-within {
-      margin-right: 4.5svh;
     }
   }
 }
@@ -720,13 +713,118 @@ span.south {
   }
 }
 
+.peek-row {
+  display: flex;
+  flex-direction: row;
+
+  transition:
+    margin var(--animation-smooth),
+    width var(--animation-smooth);
+  .peeking,
+  .showing {
+    transition: margin var(--animation-smooth);
+    z-index: var(--z-index-pond-card);
+  }
+  &:hover {
+    .peeking,
+    .showing {
+      z-index: var(--z-index-peeking-card);
+    }
+  }
+
+  margin-left: 0;
+  .peeking {
+    margin-right: calc(var(--card-width) * -0.7);
+    &.leaf {
+      margin-right: calc(var(--card-width) * -0.5);
+    }
+  }
+  .showing {
+    margin-right: calc(var(--card-width) * -0.4);
+    &.leaf {
+      margin-right: calc(var(--card-width) * -0.2);
+    }
+  }
+  &.compact {
+    .peeking {
+      margin-right: calc(var(--card-width) * -0.85);
+      &.leaf {
+        margin-right: calc(var(--card-width) * -0.75);
+      }
+    }
+    .showing {
+      margin-right: calc(var(--card-width) * -0.7);
+      &.leaf {
+        margin-right: calc(var(--card-width) * -0.6);
+      }
+    }
+  }
+  &.super-compact {
+    .peeking {
+      margin-right: calc(var(--card-width) * -0.9);
+      &.leaf {
+        margin-right: calc(var(--card-width) * -0.75);
+      }
+    }
+    .showing {
+      margin-right: calc(var(--card-width) * -0.82);
+      &.leaf {
+        margin-right: calc(var(--card-width) * -0.6);
+      }
+    }
+  }
+
+  &:hover {
+    .peeking {
+      margin-right: calc(var(--card-width) * -0.3);
+      &.leaf {
+        margin-right: calc(var(--card-width) * -0.2);
+      }
+    }
+    .showing {
+      margin-right: calc(var(--card-width) * -0);
+      &.leaf {
+        margin-right: 0;
+      }
+    }
+  }
+  &.compact:hover {
+    margin-left: calc(
+      0svh - (var(--row-size) - 2) * (1svh + var(--card-width))
+    );
+    .peeking {
+      margin-right: calc(var(--card-width) * -0.5);
+    }
+    .showing {
+      margin-right: calc(var(--card-width) * -0);
+      &.leaf {
+        margin-right: 0;
+      }
+    }
+  }
+  &.super-compact:hover {
+    margin-left: calc(
+      0svh - (var(--row-size) - 2) * (1svh + var(--card-width))
+    );
+    .peeking {
+      margin-right: calc(var(--card-width) * -0.5);
+    }
+    .showing {
+      margin-right: calc(var(--card-width) * -0.1);
+      &.leaf {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
 .card {
   text-align: center;
 
   flex-shrink: 0;
   box-sizing: border-box;
-  height: 11svh;
-  width: 8svh;
+  height: var(--card-height);
+  width: var(--card-width);
   /* Real world cards are 63mmx88mm */
   /* aspect-ratio: 64 / 88;  */
   border-radius: 0.2svh;
