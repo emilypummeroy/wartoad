@@ -62,7 +62,7 @@ export function PondLeafDropzone({
     [None]: noop,
   }[dropzoneType];
   const handleClick = useCallback(
-    () => isDropzoneVisible && onClickDropzone(position),
+    () => (isDropzoneVisible ? onClickDropzone(position) : noop()),
     [onClickDropzone, isDropzoneVisible, position],
   );
 
