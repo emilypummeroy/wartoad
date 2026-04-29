@@ -1,4 +1,10 @@
-import { setPondStateAtEach, type LeafState } from '../state-types/pond';
+import {
+  getPondStateAt,
+  setPondStateAt,
+  setPondStateAtEach,
+  setPondStateWhere,
+  type LeafState,
+} from '../state-types/pond';
 import {
   TestPondKey,
   TestLeafKey,
@@ -13,12 +19,14 @@ import {
 } from '../state/test-utils';
 import { Phase, Player } from '../types/gameflow';
 import type { Position } from '../types/position';
+import { ALL_POSITIONS } from '../types/position.test-utils';
+import { partial } from '../types/test-utils';
 import { finishMainPhase } from './finish-main-phase';
 
 const { North, South } = Player;
 const { Upgrading, Deploying, Activating, Start, Main, End, GameOver } = Phase;
 
-const { INITIAL_POND, ANOTHER_POND } = TestPondKey;
+const { INITIAL_POND, ANOTHER_POND, UNITS_POND } = TestPondKey;
 const {
   NORTH_LEAF,
   NORTH_LEAF_OTHER_UNIT,
@@ -75,40 +83,41 @@ describe(finishMainPhase, () => {
   describe.for<Inputs>([
     // TODO 22: Should require controlled neighbour to capture
     [North, INITIAL_POND, [{ x: 1, y: 3 }], SOUTH_LEAF],
-    [North, INITIAL_POND, [{ x: 0, y: 3 }], SOUTH_LEAF_WITH_UNIT],
+    [North, UNITS_POND, [{ x: 0, y: 3 }], SOUTH_LEAF_WITH_UNIT],
     [North, INITIAL_POND, [{ x: 2, y: 4 }], SOUTH_LEAF_WITH_UNITS],
-    [North, INITIAL_POND, [{ x: 1, y: 5 }], SOUTH_UPGRADED_UNITS],
+    [North, UNITS_POND, [{ x: 1, y: 5 }], SOUTH_UPGRADED_UNITS],
     [South, INITIAL_POND, [{ x: 1, y: 2 }], NORTH_LEAF],
-    [South, INITIAL_POND, [{ x: 0, y: 2 }], NORTH_LEAF_WITH_UNIT],
+    [South, UNITS_POND, [{ x: 0, y: 2 }], NORTH_LEAF_WITH_UNIT],
     [South, INITIAL_POND, [{ x: 1, y: 0 }], NORTH_UPGRADED_UNITS],
-    [South, INITIAL_POND, [{ x: 1, y: 2 }], NORTH_LEAF_WITH_UNITS],
+    [South, UNITS_POND, [{ x: 1, y: 2 }], NORTH_LEAF_WITH_UNITS],
     [North, ANOTHER_POND, [{ x: 2, y: 3 }], SOUTH_LEAF],
-    [North, ANOTHER_POND, [{ x: 1, y: 1 }], SOUTH_LEAF_WITH_UNIT],
+    [North, UNITS_POND, [{ x: 1, y: 1 }], SOUTH_LEAF_WITH_UNIT],
     [North, ANOTHER_POND, [{ x: 1, y: 5 }], SOUTH_UPGRADED_UNIT],
-    [North, ANOTHER_POND, [{ x: 0, y: 4 }], SOUTH_LEAF_WITH_UNITS],
+    [North, UNITS_POND, [{ x: 0, y: 4 }], SOUTH_LEAF_WITH_UNITS],
     [North, ANOTHER_POND, [{ x: 0, y: 3 }], SOUTH_LEAF_WITH_UNITS],
-    [South, ANOTHER_POND, [{ x: 2, y: 2 }], NORTH_LEAF],
+    [South, UNITS_POND, [{ x: 2, y: 2 }], NORTH_LEAF],
     [South, ANOTHER_POND, [{ x: 1, y: 0 }], NORTH_UPGRADED_UNIT],
-    [South, ANOTHER_POND, [{ x: 0, y: 1 }], NORTH_LEAF_WITH_UNITS],
+    [South, UNITS_POND, [{ x: 0, y: 1 }], NORTH_LEAF_WITH_UNITS],
     [South, ANOTHER_POND, [{ x: 1, y: 2 }], NORTH_UPGRADED_UNITS],
-    [North, INITIAL_POND, [{ x: 0, y: 2 }], SOUTH_LEAF_OTHER_UNIT],
+    [North, UNITS_POND, [{ x: 0, y: 2 }], SOUTH_LEAF_OTHER_UNIT],
     [North, ANOTHER_POND, [{ x: 1, y: 2 }], SOUTH_UPGRADED_OTHER_UNIT],
-    [North, ANOTHER_POND, [{ x: 2, y: 3 }], SOUTH_UPGRADED_OTHER_UNIT],
+    [North, UNITS_POND, [{ x: 2, y: 3 }], SOUTH_UPGRADED_OTHER_UNIT],
     [North, INITIAL_POND, [{ x: 0, y: 2 }], SOUTH_LEAF_OTHER_UNIT],
-    [South, INITIAL_POND, [{ x: 1, y: 3 }], NORTH_LEAF_OTHER_UNIT],
+    [South, UNITS_POND, [{ x: 1, y: 3 }], NORTH_LEAF_OTHER_UNIT],
     [South, INITIAL_POND, [{ x: 0, y: 3 }], NORTH_LEAF_OTHER_UNIT],
-    [South, ANOTHER_POND, [{ x: 1, y: 2 }], NORTH_UPGRADED_OTHER_UNIT],
+    [South, UNITS_POND, [{ x: 1, y: 2 }], NORTH_UPGRADED_OTHER_UNIT],
     [South, ANOTHER_POND, [{ x: 2, y: 3 }], NORTH_LEAF_OTHER_UNIT],
   ])(
     'Postconditions | %s %s | %s %s',
     ([player, pondKey, positions, leafKey]) => {
-      const pond = TEST_PONDS_BY_KEY[pondKey];
+      const basePond = TEST_PONDS_BY_KEY[pondKey];
       const leaf = TEST_LEAVES_BY_KEY[leafKey];
       const updates: [Position, LeafState][] = positions.map(xy => [xy, leaf]);
+      const pond = setPondStateAtEach(basePond, ...updates);
 
       const before = createStateWith({
         ...gameflowOf(player, Main),
-        pond: setPondStateAtEach(pond, ...updates),
+        pond,
       });
 
       // > phase = End
@@ -118,15 +127,108 @@ describe(finishMainPhase, () => {
       });
 
       it('should not change the rest of gameflow state', () => {
-        const { phase: _, ...got } = finishMainPhase()(before).flow;
-        const { phase: __, ...want } = before.flow;
+        const { ...got } = partial(finishMainPhase()(before).flow);
+        const { ...want } = partial(before.flow);
+        delete got.phase;
+        delete want.phase;
         expect(got).toStrictEqual(want);
       });
 
-      // > Non-flow state unchanged
-      it('should not change the rest of the state besides gameflow', () => {
-        const { flow: _, ...got } = finishMainPhase()(before);
-        const { flow: __, ...want } = before;
+      // > units unexhausted
+      it('should make every unit unexhausted', () => {
+        // TODO 14: Create setPondUnitsAt, setPondUnitsWhere
+        // Just one unit
+        for (const xy of ALL_POSITIONS) {
+          const after = finishMainPhase()(before);
+          for (const unit of getPondStateAt(after.pond, xy).units)
+            expect(unit.values.isExhausted).toBe(false);
+        }
+        // Just all units on one position
+        for (const xy of ALL_POSITIONS) {
+          const exhausted = {
+            ...before,
+            pond: setPondStateAt(basePond, xy, ({ units }) => ({
+              units: units.map(u => ({
+                ...u,
+                values: { ...u.values, isExhausted: true },
+              })),
+            })),
+          };
+          const after = finishMainPhase()(exhausted);
+          for (const unit of getPondStateAt(after.pond, xy).units)
+            expect(unit.values.isExhausted).toBe(false);
+        }
+        // Just all units
+        for (const xy of ALL_POSITIONS) {
+          const exhausted = {
+            ...before,
+            pond: setPondStateWhere(
+              basePond,
+              () => true,
+              ({ units }) => ({
+                units: units.map(u => ({
+                  ...u,
+                  values: { ...u.values, isExhausted: true },
+                })),
+              }),
+            ),
+          };
+
+          const after = finishMainPhase()(exhausted);
+          for (const unit of getPondStateAt(after.pond, xy).units)
+            expect(unit.values.isExhausted).toBe(false);
+        }
+      });
+
+      it('should not change the rest of each leaf', () => {
+        const after = finishMainPhase()(before);
+        for (const xy of ALL_POSITIONS) {
+          const { ...got } = partial(getPondStateAt(after.pond, xy));
+          const { ...want } = partial(getPondStateAt(before.pond, xy));
+          delete got.units;
+          delete want.units;
+          expect(got).toStrictEqual(want);
+        }
+      });
+
+      it('should not change the rest of each unit', () => {
+        const after = finishMainPhase()(before);
+        for (const xy of ALL_POSITIONS) {
+          const gots = getPondStateAt(after.pond, xy).units;
+          const wants = getPondStateAt(before.pond, xy).units;
+          expect(gots).toHaveLength(wants.length);
+          for (let i = 0; i < gots.length; i += 1) {
+            const { ...got } = partial(gots[i]);
+            const { ...want } = partial(wants[i]);
+            delete got.values;
+            delete want.values;
+            expect(got).toStrictEqual(want);
+          }
+        }
+      });
+
+      it('should not change the rest of each unit values', () => {
+        const after = finishMainPhase()(before);
+        for (const xy of ALL_POSITIONS) {
+          const gots = getPondStateAt(after.pond, xy).units;
+          const wants = getPondStateAt(before.pond, xy).units;
+          expect(gots).toHaveLength(wants.length);
+          for (let i = 0; i < gots.length; i += 1) {
+            const { ...got } = partial(gots[i].values);
+            const { ...want } = partial(wants[i].values);
+            delete got.isExhausted;
+            delete want.isExhausted;
+            expect(got).toStrictEqual(want);
+          }
+        }
+      });
+
+      // > Rest of state unchanged
+      it('should not change the rest of the state', () => {
+        const { ...got } = partial(finishMainPhase()(before));
+        const { ...want } = partial(before);
+        delete got.flow;
+        delete want.flow;
         expect(got).toStrictEqual(want);
       });
     },

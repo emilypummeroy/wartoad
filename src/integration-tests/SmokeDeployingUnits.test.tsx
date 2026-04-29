@@ -41,7 +41,7 @@ describe('Smoke test: Deploying Units and Activating them', () => {
       fireEvent.click(getAll.unitsControlledByOfClass(player, Froglet)[2]);
       fireEvent.click(getAll.homeRowDropzones(player)[1]);
       fireEvent.click(getAll.unitsControlledByOfClass(player, Froglet)[0]);
-      fireEvent.click(getAll.homeRowDropzones(player)[0]);
+      fireEvent.click(getAll.homeRowDropzones(player)[1]);
       fireEvent.click(getAll.unitsControlledByOfClass(player, Froglet)[0]);
       fireEvent.click(getAll.homeRowDropzones(player)[1]);
       expect(getAll.nthRowUnitsControlledBy(player, 0)).toHaveLength(3);

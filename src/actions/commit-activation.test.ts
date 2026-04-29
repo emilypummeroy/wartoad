@@ -48,8 +48,8 @@ describe(commitActivation, () => {
     [{ x: 0, y: 4 }, South, End, _],
     [{ x: 2, y: 5 }, North, Start, _],
   ])(
-    'Precondition failed: Need Activating | target: %s | flow: %s %s | start: %s | pickedCard: %s',
-    input => it_should_return_state_unchanged(input),
+    'Precondition (Activating) failed | target: %s | flow: %s %s | start: %s | pickedCard: %s',
+    it_should_return_state_unchanged,
   );
 
   describe.for<Preconditions>([
@@ -59,30 +59,9 @@ describe(commitActivation, () => {
     [{ x: 1, y: 1 }, North, Activating, _, _, North, { x: 1, y: 3 }],
     [{ x: 0, y: 4 }, South, Activating, _, _, South, { x: 2, y: 4 }],
   ])(
-    'Precondition failed: Too far to move | target: %s | flow: %s %s | start: %s',
-    input => it_should_return_state_unchanged(input),
+    'Precondition (target in range) failed | target: %s | flow: %s %s | start: %s',
+    it_should_return_state_unchanged,
   );
-
-  const it_should_return_state_unchanged = ([
-    target,
-    player,
-    phase,
-    upgrader,
-    deployer,
-    activator,
-    start,
-  ]: Preconditions) => {
-    it('should return the input unchanged', () => {
-      const old = createStateWith({
-        ...gameflowOf(player, phase),
-        ...upgradeOf(upgrader),
-        ...deploymentOf(deployer),
-        ...activationOf(activator, _, start),
-      });
-      const got = commitActivation(target)(old);
-      expect(got).toStrictEqual(old);
-    });
-  };
 
   describe.for<Input>([
     [{ x: 0, y: 0 }, North, 1],
@@ -98,17 +77,11 @@ describe(commitActivation, () => {
     `when moving in place in the ${Activating} phase | target = activation.start = %s | %s turn player and card owner`,
     input => {
       const [target] = input;
-      const [before] = state_for(input);
+      const [before, unit] = state_for(input);
 
-      // TODO 14: It should make the unit exhausted.
-      it('should not affect the target position', () => {
-        const result = commitActivation(target)(before);
-        const got = getPondStateAt(result.pond, target);
-        const want = getPondStateAt(before.pond, target);
-        expect(got).toStrictEqual(want);
-      });
-
-      it_should_end_activation_and_return_to_idle_state(target, before);
+      it_should_exhaust_the_unit_on_the_leaf(target, unit, before);
+      it_should_end_activation_and_return_to_main_phase(target, before);
+      it_should_not_affect_the_rest_of_the_units(target, unit, before);
       it_should_not_affect_the_rest_of_the_leaf(target, before);
       it_should_not_affect_the_rest_of_the_pond(target, target, before);
       it_should_not_affect_the_rest_of_gameflow(target, before);
@@ -132,24 +105,18 @@ describe(commitActivation, () => {
         input;
       const [before, unit] = state_for(input);
 
-      it('should move the unit to the target position', () => {
-        const result = commitActivation(target)(before);
-        const { units } = getPondStateAt(result.pond, target);
-        expect(units).toHaveLength(targetCount + 1);
-        expect(units[targetCount]).toStrictEqual(unit);
-      });
-
-      // TODO 14: It should make the unit exhausted.
-
-      it('should move the unit from the start position', () => {
+      it('should remove the unit from the start position', () => {
         const result = commitActivation(target)(before);
         const { units } = getPondStateAt(result.pond, start);
         expect(units).toHaveLength(startCount - 1);
         expect(units.find(({ key }) => key === unit.key)).toBe(undefined);
       });
-
-      it_should_end_activation_and_return_to_idle_state(target, before);
+      it_should_not_affect_the_rest_of_the_units(start, unit, before);
       it_should_not_affect_the_rest_of_the_leaf(start, before);
+
+      it_should_exhaust_the_unit_on_the_leaf(target, unit, before);
+      it_should_end_activation_and_return_to_main_phase(target, before);
+      it_should_not_affect_the_rest_of_the_units(target, unit, before);
       it_should_not_affect_the_rest_of_the_leaf(target, before);
       it_should_not_affect_the_rest_of_the_pond(target, start, before);
       it_should_not_affect_the_rest_of_gameflow(target, before);
@@ -204,7 +171,7 @@ describe(commitActivation, () => {
     return [before, unit];
   };
 
-  const it_should_end_activation_and_return_to_idle_state = (
+  const it_should_end_activation_and_return_to_main_phase = (
     target: Position,
     old: GameState,
   ) => {
@@ -263,6 +230,20 @@ describe(commitActivation, () => {
       }
     });
 
+  const it_should_not_affect_the_rest_of_the_units = (
+    xy: Position,
+    unit: UnitCard,
+    before: GameState,
+  ) =>
+    it(`should not affect the rest of the units at ${JSON.stringify(xy)} besides { key=${unit.key} }`, () => {
+      const result = commitActivation(xy)(before);
+      let got = getPondStateAt(result.pond, xy).units;
+      let want = getPondStateAt(before.pond, xy).units;
+      got = got.filter(u => u.key !== unit.key);
+      want = want.filter(u => u.key !== unit.key);
+      expect(got).toStrictEqual(want);
+    });
+
   const it_should_not_affect_the_rest_of_the_leaf = (
     xy: Position,
     before: GameState,
@@ -293,3 +274,42 @@ describe(commitActivation, () => {
       expect(got).toStrictEqual(want);
     });
 });
+
+const it_should_return_state_unchanged = ([
+  target,
+  player,
+  phase,
+  upgrader,
+  deployer,
+  activator,
+  start,
+]: Preconditions) =>
+  it('should return the input unchanged', () => {
+    const old = createStateWith({
+      ...gameflowOf(player, phase),
+      ...upgradeOf(upgrader),
+      ...deploymentOf(deployer),
+      ...activationOf(activator, _, start),
+    });
+    const got = commitActivation(target)(old);
+    expect(got).toStrictEqual(old);
+  });
+
+const it_should_exhaust_the_unit_on_the_leaf = (
+  xy: Position,
+  unit: UnitCard,
+  before: GameState,
+) =>
+  it(`should exhaust the unit at ${JSON.stringify(xy)}`, () => {
+    const result = commitActivation(xy)(before);
+    const got = getPondStateAt(result.pond, xy).units.filter(
+      u => u.key === unit.key,
+    );
+    const want = {
+      ...unit,
+      values: { ...unit.values, isExhausted: true },
+    };
+    expect(got).toHaveLength(1);
+    expect(got[0].values.isExhausted).toBe(true);
+    expect(got[0]).toStrictEqual(want);
+  });
