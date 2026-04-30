@@ -55,25 +55,27 @@ export function LeafCard({ leaf, location, nameId, symbolId }: LeafCardProps) {
       <div className="card-title" id={nameId}>
         {leaf.cardClass.name}
       </div>
-      <div className="card-section-row">
-        {location === CardLocation.Hand && (
-          <div role="group" aria-labelledby={costId} className="card-item">
-            <small id={costId}>Cost</small>
-            {leaf.cardClass.cost}
-          </div>
-        )}
+      <div className="card-section-cost">
+        <div role="group" aria-labelledby={costId} className="card-item">
+          <small id={costId}>Cost</small>
+          {leaf.cardClass.cost}
+        </div>
+      </div>
+      <div className="card-section-fill">
         {location === CardLocation.Home && (
           <Clover role="img">
             <title id={symbolId}>{leaf.owner} Home</title>
           </Clover>
         )}
-        {location === CardLocation.Pond && (
+        {(location === CardLocation.Pond || location === CardLocation.Hand) && (
           <Leaf role="img">
             <title id={symbolId}>{leaf.owner} controlled</title>
           </Leaf>
         )}
       </div>
-      <LeafStatsDisplay stats={leaf.cardClass.stats} />
+      <div className="card-section-row">
+        <LeafStatsDisplay stats={leaf.cardClass.stats} />
+      </div>
     </section>
   );
 }
@@ -114,21 +116,20 @@ export function Froglet({
       <div className="card-title" id={nameId}>
         Froglet
       </div>
+      <div className="card-section-cost">
+        <div role="group" aria-labelledby={costId} className="card-item">
+          <small id={costId}>Cost</small>0
+        </div>
+      </div>
       <div className="card-section-split">
         <UnitStatsDisplay stats={CardClass.Froglet.stats} />
         <div className="card-section-fill">
-          {isOnLeaf ? (
-            <Torus role="img">
-              <title id={symbolId}>
-                {isExhausted ? 'exhausted ' : ''}
-                {player} unit
-              </title>
-            </Torus>
-          ) : (
-            <div role="group" aria-labelledby={costId} className="card-item">
-              <small id={costId}>Cost</small>0
-            </div>
-          )}
+          <Torus className="flip" role="img">
+            <title id={symbolId}>
+              {isExhausted ? 'exhausted ' : ''}
+              {player} unit
+            </title>
+          </Torus>
         </div>
       </div>
     </section>
@@ -193,12 +194,21 @@ function UnitStatsDisplay({
   );
 }
 
-function LeafStatsDisplay({ stats: { gives } }: { readonly stats: LeafStats }) {
-  const givesId = useId();
+function LeafStatsDisplay({
+  stats: { gives, givesHome },
+}: {
+  readonly stats: LeafStats;
+}) {
   return (
-    <div role="group" aria-labelledby={givesId} className="card-section-row">
-      <div className="card-item">
-        <small id={givesId}>Gives</small>+{gives}
+    <div className="card-item">
+      <small>Gives</small>
+      <div className="card-item-line">
+        <small>Home:</small>
+        <span>+{givesHome}</span>
+      </div>
+      <div className="card-item-line">
+        <small>Other:</small>
+        <span>+{gives}</span>
       </div>
     </div>
   );

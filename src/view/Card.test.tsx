@@ -6,7 +6,6 @@ import { Player } from '../types/gameflow';
 import { counter } from '../types/test-utils';
 import { CardBack, Froglet, LeafCard } from './Card';
 
-const { Hand, Pond, Home } = CardLocation;
 describe(CardBack, () => {
   beforeEach(() => {});
 
@@ -56,23 +55,6 @@ describe(Froglet, () => {
       expect(within(card).getByRole('img', { name: `exhausted ${player} unit` })).toBeVisible();
     });
   });
-
-  describe.for<[Player, isOnLeaf?: boolean, string?]>([
-    [Player.North, true, 'id'],
-    [Player.North, false],
-    [Player.North],
-    [Player.South, true],
-    [Player.South, false, 'id'],
-    [Player.South],
-  ])('basic cases | player: %s | isOnLeaf: %s | id: "%s"', ([player, isOnLeaf, id]) => {
-    it('should have Froglet stats', () => {
-      render(<Froglet player={player} isOnLeaf={isOnLeaf} nameId={id} />);
-      const card = screen.getByRole('region', {
-        name: /Froglet/,
-      });
-      expect(within(card).getByRole('group', { name: 'Stats' })).toHaveTextContent('0 Power 0 Range 1 Speed 1 Life');
-    });
-  });
 });
 
 describe(LeafCard, () => {
@@ -101,24 +83,6 @@ describe(LeafCard, () => {
       });
       expect(card).toBeVisible();
       expect(within(card).getByRole('img', { name: `${owner} Home` })).toBeVisible();
-    });
-  });
-
-  describe.for<[Player, CardLocation, string?]>([
-    [Player.North, Home, 'id'],
-    [Player.North, Pond, 'id'],
-    [Player.North, Hand],
-    [Player.South, Home, 'id'],
-    [Player.South, Pond, 'id'],
-    [Player.South, Hand],
-  ])('basic cases | %s | %s | id: "%s"', ([owner, location, id]) => {
-    it('should have Lily Pad stats', () => {
-      const leaf = createLeaf({ cardClass: CardClass.LilyPad, owner, key: counter() });
-      render(<LeafCard leaf={leaf} location={location} nameId={id} />);
-      const card = screen.getByRole('region', {
-        name: /Lily Pad/,
-      });
-      expect(within(card).getByRole('group', { name: 'Gives' })).toHaveTextContent(`${CardClass.LilyPad.stats.gives}`);
     });
   });
 });

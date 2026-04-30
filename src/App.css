@@ -37,12 +37,16 @@
   --card-south: oklch(70% 0.16 260);
   --card-north: oklch(85% 0.22 30);
   --card-front: oklch(32% 0.015 140);
-  --card-front-leaf: oklch(23% 0.03 140);
+  --card-front-leaf: oklch(27% 0.025 140);
+  --card-front-dark: oklch(23% 0.03 140);
+  --card-front-light: oklch(68% 0.01 140);
   --card-text: oklch(95% 0.02 30);
+  --card-text-dark: oklch(5% 0.02 30);
   --card-back: oklch(15% 0.05 200);
   --card-outline: oklch(40% 0.02 160);
   --card-border: oklch(10% 0.03 160);
   --card-back-symbol: oklch(55% 0.05 140);
+  --card-front-symbol: oklch(70% 0.06 140);
 
   color-scheme: light dark;
 
@@ -849,6 +853,10 @@ span.south {
   .card-section-fill svg {
     height: 3svh;
     width: 3svh;
+    color: var(--card-front-symbol);
+    &.flip {
+      transform: scaleY(-1);
+    }
   }
 
   &.south {
@@ -857,6 +865,9 @@ span.south {
     .card-section-fill svg {
       color: var(--card-south);
       transform: scaleY(-1);
+      &.flip {
+        transform: scaleY(1);
+      }
     }
   }
   &.north {
@@ -888,6 +899,18 @@ span.south {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    margin-right: 2svh;
+  }
+  .card-section-cost {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 2svh;
+
+    .card-item {
+      background: var(--card-front-light);
+      color: var(--card-text-dark);
+    }
   }
 
   .card-section-split {
@@ -917,18 +940,46 @@ span.south {
 
     .card-item {
       padding: 0.5svh;
+      background: var(--card-front-dark);
     }
   }
 
   .card-section-row {
     display: flex;
     flex-direction: row;
-    height: 4svh;
+    height: 5svh;
+    .card-item {
+      flex-grow: 1;
+      height: 4.7svh;
+    }
+  }
 
+  .card-section-row,
+  .card-section-cost {
     .card-item {
       flex-direction: column;
-      flex-grow: 1;
-      height: 3.7svh;
+      padding: 0;
+
+      small {
+        font-size: 0.6svh;
+        line-height: 0.7svh;
+        display: block;
+      }
+
+      .card-item-line {
+        font-size: 1.1svh;
+        line-height: 1.4svh;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        width: 100%;
+
+        small {
+          font-size: 0.8svh;
+          line-height: 1.4svh;
+          display: block;
+        }
+      }
     }
   }
 
@@ -945,6 +996,8 @@ span.south {
       flex-grow: 1;
       width: 3svh;
       height: 2svh;
+      background: var(--card-front-light);
+      color: var(--card-text-dark);
 
       svg {
         height: 1.2svh;
