@@ -46,6 +46,7 @@ export type UnitStats = {
 };
 export type LeafStats = {
   readonly gives: number;
+  readonly givesHome: number;
 };
 export type CardStatsOf<T extends CardType> = T extends Unit
   ? UnitStats
@@ -112,12 +113,19 @@ UnitClass satisfies Record<UnitKey, UnitClass>;
 
 // All the classes of leaf cards
 export const LeafClass = {
+  OldLeaf: {
+    key: 'OldLeaf',
+    name: 'Old Leaf',
+    cost: 0,
+    type: CardType.Leaf,
+    stats: { gives: 0, givesHome: 3 },
+  },
   LilyPad: {
     key: 'LilyPad',
     name: 'Lily Pad',
-    cost: 0,
+    cost: 1,
     type: CardType.Leaf,
-    stats: { gives: 0 },
+    stats: { gives: 1, givesHome: 2 },
   },
 } as const;
 LeafClass satisfies Record<LeafKey, LeafClass>;
@@ -129,6 +137,7 @@ export const CardClass = { ...UnitClass, ...LeafClass } as const;
 export const CardKey = {
   Froglet: CardClass.Froglet.key,
   LilyPad: LeafClass.LilyPad.key,
+  OldLeaf: LeafClass.OldLeaf.key,
 } as const;
 CardKey satisfies Record<CardKey, CardKey>;
 CardKey satisfies Record<UnitKey, UnitKey>;

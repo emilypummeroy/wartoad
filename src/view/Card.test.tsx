@@ -82,7 +82,7 @@ describe(LeafCard, () => {
       render(<LeafCard leaf={leaf} location={CardLocation.Hand} />);
       const card = screen.getByRole('region', { name: 'Lily Pad' });
       expect(card).toBeVisible();
-      expect(within(card).getByRole('group', { name: /Cost/ })).toHaveTextContent(/0/);
+      expect(within(card).getByRole('group', { name: /Cost/ })).toHaveTextContent(`${CardClass.LilyPad.stats.gives}`);
     });
 
     it(`should be shown as ${owner} controlled if it is a leaf but not home`, () => {
@@ -118,7 +118,7 @@ describe(LeafCard, () => {
       const card = screen.getByRole('region', {
         name: /Lily Pad/,
       });
-      expect(within(card).getByRole('group', { name: 'Gives' })).toHaveTextContent(/0/);
+      expect(within(card).getByRole('group', { name: 'Gives' })).toHaveTextContent(`${CardClass.LilyPad.stats.gives}`);
     });
   });
 });

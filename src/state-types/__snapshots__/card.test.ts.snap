@@ -25,11 +25,30 @@ exports[`for cards owned by North with key 0 > createCard > should produce a sta
 exports[`for cards owned by North with key 0 > createCard > should produce a stable value for LilyPad 1`] = `
 {
   "cardClass": {
-    "cost": 0,
+    "cost": 1,
     "key": "LilyPad",
     "name": "Lily Pad",
     "stats": {
+      "gives": 1,
+      "givesHome": 2,
+    },
+    "type": "Leaf",
+  },
+  "key": 0,
+  "owner": "North",
+  "type": "Leaf",
+}
+`;
+
+exports[`for cards owned by North with key 0 > createCard > should produce a stable value for OldLeaf 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "OldLeaf",
+    "name": "Old Leaf",
+    "stats": {
       "gives": 0,
+      "givesHome": 3,
     },
     "type": "Leaf",
   },
@@ -42,11 +61,30 @@ exports[`for cards owned by North with key 0 > createCard > should produce a sta
 exports[`for cards owned by North with key 0 > createLeaf > for the card LilyPad > should produce a stable value for %s 1`] = `
 {
   "cardClass": {
-    "cost": 0,
+    "cost": 1,
     "key": "LilyPad",
     "name": "Lily Pad",
     "stats": {
+      "gives": 1,
+      "givesHome": 2,
+    },
+    "type": "Leaf",
+  },
+  "key": 0,
+  "owner": "North",
+  "type": "Leaf",
+}
+`;
+
+exports[`for cards owned by North with key 0 > createLeaf > for the card OldLeaf > should produce a stable value for %s 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "OldLeaf",
+    "name": "Old Leaf",
+    "stats": {
       "gives": 0,
+      "givesHome": 3,
     },
     "type": "Leaf",
   },
@@ -103,11 +141,30 @@ exports[`for cards owned by North with key 3 > createCard > should produce a sta
 exports[`for cards owned by North with key 3 > createCard > should produce a stable value for LilyPad 1`] = `
 {
   "cardClass": {
-    "cost": 0,
+    "cost": 1,
     "key": "LilyPad",
     "name": "Lily Pad",
     "stats": {
+      "gives": 1,
+      "givesHome": 2,
+    },
+    "type": "Leaf",
+  },
+  "key": 3,
+  "owner": "North",
+  "type": "Leaf",
+}
+`;
+
+exports[`for cards owned by North with key 3 > createCard > should produce a stable value for OldLeaf 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "OldLeaf",
+    "name": "Old Leaf",
+    "stats": {
       "gives": 0,
+      "givesHome": 3,
     },
     "type": "Leaf",
   },
@@ -120,11 +177,30 @@ exports[`for cards owned by North with key 3 > createCard > should produce a sta
 exports[`for cards owned by North with key 3 > createLeaf > for the card LilyPad > should produce a stable value for %s 1`] = `
 {
   "cardClass": {
-    "cost": 0,
+    "cost": 1,
     "key": "LilyPad",
     "name": "Lily Pad",
     "stats": {
+      "gives": 1,
+      "givesHome": 2,
+    },
+    "type": "Leaf",
+  },
+  "key": 3,
+  "owner": "North",
+  "type": "Leaf",
+}
+`;
+
+exports[`for cards owned by North with key 3 > createLeaf > for the card OldLeaf > should produce a stable value for %s 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "OldLeaf",
+    "name": "Old Leaf",
+    "stats": {
       "gives": 0,
+      "givesHome": 3,
     },
     "type": "Leaf",
   },
@@ -181,11 +257,30 @@ exports[`for cards owned by South with key 1 > createCard > should produce a sta
 exports[`for cards owned by South with key 1 > createCard > should produce a stable value for LilyPad 1`] = `
 {
   "cardClass": {
-    "cost": 0,
+    "cost": 1,
     "key": "LilyPad",
     "name": "Lily Pad",
     "stats": {
+      "gives": 1,
+      "givesHome": 2,
+    },
+    "type": "Leaf",
+  },
+  "key": 1,
+  "owner": "South",
+  "type": "Leaf",
+}
+`;
+
+exports[`for cards owned by South with key 1 > createCard > should produce a stable value for OldLeaf 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "OldLeaf",
+    "name": "Old Leaf",
+    "stats": {
       "gives": 0,
+      "givesHome": 3,
     },
     "type": "Leaf",
   },
@@ -198,11 +293,30 @@ exports[`for cards owned by South with key 1 > createCard > should produce a sta
 exports[`for cards owned by South with key 1 > createLeaf > for the card LilyPad > should produce a stable value for %s 1`] = `
 {
   "cardClass": {
-    "cost": 0,
+    "cost": 1,
     "key": "LilyPad",
     "name": "Lily Pad",
     "stats": {
+      "gives": 1,
+      "givesHome": 2,
+    },
+    "type": "Leaf",
+  },
+  "key": 1,
+  "owner": "South",
+  "type": "Leaf",
+}
+`;
+
+exports[`for cards owned by South with key 1 > createLeaf > for the card OldLeaf > should produce a stable value for %s 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "OldLeaf",
+    "name": "Old Leaf",
+    "stats": {
       "gives": 0,
+      "givesHome": 3,
     },
     "type": "Leaf",
   },
@@ -259,11 +373,30 @@ exports[`for cards owned by South with key 2 > createCard > should produce a sta
 exports[`for cards owned by South with key 2 > createCard > should produce a stable value for LilyPad 1`] = `
 {
   "cardClass": {
-    "cost": 0,
+    "cost": 1,
     "key": "LilyPad",
     "name": "Lily Pad",
     "stats": {
+      "gives": 1,
+      "givesHome": 2,
+    },
+    "type": "Leaf",
+  },
+  "key": 2,
+  "owner": "South",
+  "type": "Leaf",
+}
+`;
+
+exports[`for cards owned by South with key 2 > createCard > should produce a stable value for OldLeaf 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "OldLeaf",
+    "name": "Old Leaf",
+    "stats": {
       "gives": 0,
+      "givesHome": 3,
     },
     "type": "Leaf",
   },
@@ -276,11 +409,30 @@ exports[`for cards owned by South with key 2 > createCard > should produce a sta
 exports[`for cards owned by South with key 2 > createLeaf > for the card LilyPad > should produce a stable value for %s 1`] = `
 {
   "cardClass": {
-    "cost": 0,
+    "cost": 1,
     "key": "LilyPad",
     "name": "Lily Pad",
     "stats": {
+      "gives": 1,
+      "givesHome": 2,
+    },
+    "type": "Leaf",
+  },
+  "key": 2,
+  "owner": "South",
+  "type": "Leaf",
+}
+`;
+
+exports[`for cards owned by South with key 2 > createLeaf > for the card OldLeaf > should produce a stable value for %s 1`] = `
+{
+  "cardClass": {
+    "cost": 0,
+    "key": "OldLeaf",
+    "name": "Old Leaf",
+    "stats": {
       "gives": 0,
+      "givesHome": 3,
     },
     "type": "Leaf",
   },
