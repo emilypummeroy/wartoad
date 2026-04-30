@@ -37,7 +37,7 @@
   --card-south: oklch(70% 0.16 260);
   --card-north: oklch(85% 0.22 30);
   --card-front: oklch(32% 0.015 140);
-  --card-front-leaf: oklch(23% 0.02 140);
+  --card-front-leaf: oklch(23% 0.03 140);
   --card-text: oklch(95% 0.02 30);
   --card-back: oklch(15% 0.05 200);
   --card-outline: oklch(40% 0.02 160);

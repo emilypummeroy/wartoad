@@ -23,25 +23,21 @@ import { useId } from 'react';
 
 import {
   CardClass,
+  CardLocation,
   type LeafState,
   type LeafStats,
   type UnitStats,
 } from '../types/card';
 import { type Player, PLAYER_CLASSNAME } from '../types/gameflow';
 
-export function LeafCard({
-  leaf,
-  isHome = false,
-  isLeaf = false,
-  nameId,
-  symbolId,
-}: Readonly<{
+export type LeafCardProps = Readonly<{
   leaf: LeafState;
+  location: CardLocation;
   nameId?: string;
   symbolId?: string;
-  isHome?: boolean;
-  isLeaf?: boolean;
-}>) {
+}>;
+
+export function LeafCard({ leaf, location, nameId, symbolId }: LeafCardProps) {
   {
     const _symbolId = useId();
     symbolId ??= _symbolId;
@@ -49,25 +45,29 @@ export function LeafCard({
     nameId ??= _nameId;
   }
   const costId = useId();
+  const isInPond =
+    location === CardLocation.Pond || location === CardLocation.Home;
   return (
     <section
-      aria-labelledby={`${isLeaf ? symbolId : ''} ${nameId}`}
-      className={`card leaf ${isLeaf ? PLAYER_CLASSNAME[leaf.owner] : ''}`}
+      aria-labelledby={`${isInPond ? symbolId : ''} ${nameId}`}
+      className={`card leaf ${isInPond ? PLAYER_CLASSNAME[leaf.owner] : ''}`}
     >
       <div className="card-title" id={nameId}>
         {leaf.cardClass.name}
       </div>
       <div className="card-section-row">
-        {!isLeaf ? (
+        {location === CardLocation.Hand && (
           <div role="group" aria-labelledby={costId} className="card-item">
             <small id={costId}>Cost</small>
             {leaf.cardClass.cost}
           </div>
-        ) : isHome ? (
+        )}
+        {location === CardLocation.Home && (
           <Clover role="img">
             <title id={symbolId}>{leaf.owner} Home</title>
           </Clover>
-        ) : (
+        )}
+        {location === CardLocation.Pond && (
           <Leaf role="img">
             <title id={symbolId}>{leaf.owner} controlled</title>
           </Leaf>

@@ -1,11 +1,12 @@
 import { screen, within, render } from '@testing-library/react';
 
 import { createLeaf } from '../state-types/card';
-import { CardClass } from '../types/card';
+import { CardClass, CardLocation } from '../types/card';
 import { Player } from '../types/gameflow';
 import { counter } from '../types/test-utils';
 import { CardBack, Froglet, LeafCard } from './Card';
 
+const { Hand, Pond, Home } = CardLocation;
 describe(CardBack, () => {
   beforeEach(() => {});
 
@@ -77,19 +78,15 @@ describe(Froglet, () => {
 describe(LeafCard, () => {
   describe.for<Player>([Player.North, Player.South])('when belonging to %s', owner => {
     const leaf = createLeaf({ cardClass: CardClass.LilyPad, owner, key: counter() });
-    it.for([true, false, undefined])(
-      // TODO 16: do something about isHome && !isLeaf
-      'should have LilyPad cost if not a leaf | home: %s',
-      isHome => {
-        render(<LeafCard leaf={leaf} isHome={isHome} />);
-        const card = screen.getByRole('region', { name: 'Lily Pad' });
-        expect(card).toBeVisible();
-        expect(within(card).getByRole('group', { name: /Cost/ })).toHaveTextContent(/0/);
-      },
-    );
+    it('should have LilyPad cost in Hand | home: %s', () => {
+      render(<LeafCard leaf={leaf} location={CardLocation.Hand} />);
+      const card = screen.getByRole('region', { name: 'Lily Pad' });
+      expect(card).toBeVisible();
+      expect(within(card).getByRole('group', { name: /Cost/ })).toHaveTextContent(/0/);
+    });
 
     it(`should be shown as ${owner} controlled if it is a leaf but not home`, () => {
-      render(<LeafCard leaf={leaf} isLeaf />);
+      render(<LeafCard leaf={leaf} location={CardLocation.Pond} />);
       const card = screen.getByRole('region', {
         name: `${owner} controlled Lily Pad`,
       });
@@ -98,7 +95,7 @@ describe(LeafCard, () => {
     });
 
     it(`should be shown as ${owner} Home if it is a home leaf`, () => {
-      render(<LeafCard leaf={leaf} isLeaf isHome />);
+      render(<LeafCard leaf={leaf} location={CardLocation.Home} />);
       const card = screen.getByRole('region', {
         name: `${owner} Home Lily Pad`,
       });
@@ -107,23 +104,17 @@ describe(LeafCard, () => {
     });
   });
 
-  describe.for<[Player, isLeaf?: boolean, isHome?: boolean, string?]>([
-    [Player.North, true, true, 'id'],
-    [Player.North, true, false],
-    [Player.North, true],
-    [Player.North, false, false, 'id'],
-    [Player.North, false],
-    [Player.North],
-    [Player.South, true, true],
-    [Player.South, true, false, 'id'],
-    [Player.South, true],
-    [Player.South, false, false, 'id'],
-    [Player.South, false],
-    [Player.South],
-  ])('basic cases | player: %s | isLeaf: %s | id: "%s"', ([owner, isLeaf, isHome, id]) => {
+  describe.for<[Player, CardLocation, string?]>([
+    [Player.North, Home, 'id'],
+    [Player.North, Pond, 'id'],
+    [Player.North, Hand],
+    [Player.South, Home, 'id'],
+    [Player.South, Pond, 'id'],
+    [Player.South, Hand],
+  ])('basic cases | %s | %s | id: "%s"', ([owner, location, id]) => {
     it('should have Lily Pad stats', () => {
       const leaf = createLeaf({ cardClass: CardClass.LilyPad, owner, key: counter() });
-      render(<LeafCard leaf={leaf} isLeaf={isLeaf} isHome={isHome} nameId={id} />);
+      render(<LeafCard leaf={leaf} location={location} nameId={id} />);
       const card = screen.getByRole('region', {
         name: /Lily Pad/,
       });

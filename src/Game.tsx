@@ -4,6 +4,7 @@ import { Hand } from './basic/Hand';
 import { PhaseTracker } from './basic/PhaseTracker';
 import { Pond } from './composite/Pond';
 import { GameContext } from './context/GameContext';
+import { CardLocation } from './types/card';
 import { Phase, Player, PLAYER_CLASSNAME } from './types/gameflow';
 import { Froglet, LeafCard } from './view/Card';
 
@@ -44,13 +45,23 @@ export function Game() {
             handCards={northHand}
             onPick={pickCard}
           />
-          {(upgrade ?? deployment ?? activation) && (
+          {upgrade && (
             // TODO 18: Make cards zoomable/inspectable/something outside of deploys and upgrades
             <PickedCard owner={player}>
-              {(deployment ?? activation) && <Froglet />}
-              {upgrade && <LeafCard leaf={upgrade.leaf} />}
+              <LeafCard location={CardLocation.Hand} leaf={upgrade.leaf} />
             </PickedCard>
           )}
+          {deployment && (
+            <PickedCard owner={player}>
+              <Froglet />
+            </PickedCard>
+          )}
+          {activation && (
+            <PickedCard owner={player}>
+              <Froglet />
+            </PickedCard>
+          )}
+
           <Hand
             player={Player.South}
             isMainPhase={phase === Phase.Main}

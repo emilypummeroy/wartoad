@@ -1,5 +1,12 @@
 import type { Player } from './gameflow';
 
+export const CardLocation = {
+  Hand: 'Hand', // All cards in either hand
+  Pond: 'Pond', // Cards on the pond, except for the leaf cards for Home positions
+  Home: 'Home', // Leaf cards for Home positions
+};
+export type CardLocation = (typeof CardLocation)[keyof typeof CardLocation];
+
 // Cards are the objects which you draw, have in your hand
 // play to the Pond, etc.
 // Cards have a key to uniquely identify them among instances

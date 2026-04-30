@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import { GameContext } from '../context/GameContext';
 import { createLeaf } from '../state-types/card';
 import { type PondState, getPondStateAt, HOME } from '../state-types/pond';
-import { CardClass } from '../types/card';
+import { CardClass, CardLocation } from '../types/card';
 import { PLAYER_CLASSNAME } from '../types/gameflow';
 import { type Position, arePositionsEqual } from '../types/position';
 import { counter } from '../types/test-utils';
@@ -43,8 +43,7 @@ export function PondLeafCard({
           })}
           symbolId={leafSymbolId}
           nameId={leafNameId}
-          isHome={isHome}
-          isLeaf
+          location={isHome ? CardLocation.Home : CardLocation.Pond}
         />
       </div>
     </div>

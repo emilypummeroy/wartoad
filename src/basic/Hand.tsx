@@ -1,6 +1,6 @@
 import { useCallback, useId } from 'react';
 
-import { CardType, type CardState } from '../types/card';
+import { CardLocation, CardType, type CardState } from '../types/card';
 import { type Player, PLAYER_CLASSNAME } from '../types/gameflow';
 import { CardBack, Froglet, LeafCard } from '../view/Card';
 
@@ -29,7 +29,9 @@ function HandCard({ isEnabled = false, card, player, onPick }: HandCardProps) {
       onClick={handleClick}
     >
       {card.type === CardType.Unit && <Froglet nameId={titleId} />}
-      {card.type === CardType.Leaf && <LeafCard leaf={card} nameId={titleId} />}
+      {card.type === CardType.Leaf && (
+        <LeafCard leaf={card} location={CardLocation.Hand} nameId={titleId} />
+      )}
     </div>
   ) : (
     <div
@@ -39,7 +41,9 @@ function HandCard({ isEnabled = false, card, player, onPick }: HandCardProps) {
       className={`highlighting-card ${PLAYER_CLASSNAME[player]}`}
     >
       {card.type === CardType.Unit && <Froglet nameId={titleId} />}
-      {card.type === CardType.Leaf && <LeafCard leaf={card} nameId={titleId} />}
+      {card.type === CardType.Leaf && (
+        <LeafCard leaf={card} location={CardLocation.Hand} nameId={titleId} />
+      )}
     </div>
   );
 }
