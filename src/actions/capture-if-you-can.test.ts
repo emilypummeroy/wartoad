@@ -18,6 +18,7 @@ import {
 } from '../state/test-utils';
 import { Phase, Player } from '../types/gameflow';
 import type { Position } from '../types/position';
+import { partial } from '../types/test-utils';
 import { captureIfYouCan } from './capture-if-you-can';
 
 const { North, South } = Player;
@@ -239,13 +240,33 @@ describe(captureIfYouCan, () => {
         expect(got).toStrictEqual(want);
       });
 
-      // > p <- position . can capture -> capture(p, player)
+      // > p <- position . can capture p -> capture(p, player)
       it.for(positions)('should capture position %s', xy => {
         const after = captureIfYouCan(capturer)(before);
-        const want = { ...leaf, controller: capturer };
         const got = getPondStateAt(after.pond, xy);
-        expect(got).toStrictEqual(want);
+        expect(got.controller).toBe(capturer);
       });
+
+      it.for(positions)('should unupgrade position %s', xy => {
+        const after = captureIfYouCan(capturer)(before);
+        const got = getPondStateAt(after.pond, xy);
+        expect(got.isUpgraded).toBe(false);
+      });
+
+      // > p <- position . can capture p -> p.isUpgraded = false
+      it.for(positions)(
+        'should not change the rest of the leaf at position %s',
+        xy => {
+          const after = captureIfYouCan(capturer)(before);
+          const { ...want } = partial(getPondStateAt(after.pond, xy));
+          const { ...got } = partial(getPondStateAt(after.pond, xy));
+          delete want.isUpgraded;
+          delete want.controller;
+          delete got.isUpgraded;
+          delete got.controller;
+          expect(got).toStrictEqual(want);
+        },
+      );
     },
   );
 });
