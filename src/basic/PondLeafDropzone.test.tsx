@@ -11,7 +11,7 @@ import { PondLeafDropzone } from './PondLeafDropzone';
 const { North, South } = Player;
 const { Upgrading, Deploying, Activating, Start, Main, End, GameOver } = Phase;
 
-const { SOUTH_LEAF, NORTH_LEAF, SOUTH_UPGRADED, NORTH_UPGRADED } = TestLeafKey;
+const { SOUTH_LEAF, NORTH_LEAF, SOUTH_LILYPAD, NORTH_LILYPAD } = TestLeafKey;
 
 type Inputs = [Player, Phase, Position, TestLeafKey, start?: Position];
 
@@ -51,7 +51,7 @@ describe(PondLeafDropzone, () => {
         <PondLeafDropzone
           position={position}
           flow={flow}
-          leaf={leaf}
+          pondLeaf={leaf}
           activation={activation}
           onClickUpgrade={onClickUpgrade}
           onClickDeploy={onClickDeploy}
@@ -71,44 +71,44 @@ describe(PondLeafDropzone, () => {
   describe.for<Inputs>([
     // < Start phase
     [North, Start, A_POSITION, NORTH_LEAF],
-    [South, Start, B_POSITION, NORTH_UPGRADED],
+    [South, Start, B_POSITION, NORTH_LILYPAD],
     [North, Start, C_POSITION, SOUTH_LEAF],
-    [South, Start, D_POSITION, SOUTH_UPGRADED],
+    [South, Start, D_POSITION, SOUTH_LILYPAD],
     // < End phase
     [North, End, D_POSITION, NORTH_LEAF],
-    [South, End, A_POSITION, NORTH_UPGRADED],
+    [South, End, A_POSITION, NORTH_LILYPAD],
     [North, End, B_POSITION, SOUTH_LEAF],
-    [South, End, C_POSITION, SOUTH_UPGRADED],
+    [South, End, C_POSITION, SOUTH_LILYPAD],
     // < GameOver
     [North, GameOver, C_POSITION, NORTH_LEAF],
-    [South, GameOver, D_POSITION, NORTH_UPGRADED],
+    [South, GameOver, D_POSITION, NORTH_LILYPAD],
     [North, GameOver, A_POSITION, SOUTH_LEAF],
-    [South, GameOver, B_POSITION, SOUTH_UPGRADED],
+    [South, GameOver, B_POSITION, SOUTH_LILYPAD],
     // < Main/Idle
     [North, Main, B_POSITION, NORTH_LEAF],
-    [South, Main, C_POSITION, NORTH_UPGRADED],
+    [South, Main, C_POSITION, NORTH_LILYPAD],
     [North, Main, D_POSITION, SOUTH_LEAF],
-    [South, Main, A_POSITION, SOUTH_UPGRADED],
+    [South, Main, A_POSITION, SOUTH_LILYPAD],
     // < Upgrading & not controller
     [North, Upgrading, D_POSITION, SOUTH_LEAF],
     [South, Upgrading, C_POSITION, NORTH_LEAF],
     [North, Upgrading, B_POSITION, SOUTH_LEAF],
     [South, Upgrading, A_POSITION, NORTH_LEAF],
     // < Upgrading & upgraded
-    [North, Upgrading, C_POSITION, NORTH_UPGRADED],
-    [North, Upgrading, B_POSITION, NORTH_UPGRADED],
-    [South, Upgrading, A_POSITION, SOUTH_UPGRADED],
-    [South, Upgrading, D_POSITION, SOUTH_UPGRADED],
+    [North, Upgrading, C_POSITION, NORTH_LILYPAD],
+    [North, Upgrading, B_POSITION, NORTH_LILYPAD],
+    [South, Upgrading, A_POSITION, SOUTH_LILYPAD],
+    [South, Upgrading, D_POSITION, SOUTH_LILYPAD],
     // < Deploying & not home row
     [North, Deploying, { x: 0, y: 1 }, NORTH_LEAF],
-    [South, Deploying, { x: 1, y: 4 }, NORTH_UPGRADED],
+    [South, Deploying, { x: 1, y: 4 }, NORTH_LILYPAD],
     [South, Deploying, { x: 2, y: 0 }, SOUTH_LEAF],
-    [North, Deploying, { x: 1, y: 5 }, SOUTH_UPGRADED],
+    [North, Deploying, { x: 1, y: 5 }, SOUTH_LILYPAD],
     // < Activating & out of range of start
     [North, Activating, { x: 0, y: 0 }, NORTH_LEAF, { x: 2, y: 0 }],
-    [South, Activating, { x: 2, y: 0 }, NORTH_UPGRADED, { x: 0, y: 0 }],
+    [South, Activating, { x: 2, y: 0 }, NORTH_LILYPAD, { x: 0, y: 0 }],
     [South, Activating, { x: 1, y: 3 }, SOUTH_LEAF, { x: 1, y: 1 }],
-    [North, Activating, { x: 1, y: 3 }, SOUTH_UPGRADED, { x: 1, y: 5 }],
+    [North, Activating, { x: 1, y: 3 }, SOUTH_LILYPAD, { x: 1, y: 5 }],
   ])('No dropzones | %s %s phase | at %s | %s | start?: %s', inputs => {
     beforeEach_render_with_phase(inputs);
     it_should_render_its_children();
@@ -179,9 +179,9 @@ describe(PondLeafDropzone, () => {
   describe.for<Inputs>([
     // < Deploying & home row
     [North, Deploying, { x: 0, y: 0 }, NORTH_LEAF],
-    [North, Deploying, { x: 1, y: 0 }, NORTH_UPGRADED],
+    [North, Deploying, { x: 1, y: 0 }, NORTH_LILYPAD],
     [North, Deploying, { x: 2, y: 0 }, SOUTH_LEAF],
-    [South, Deploying, { x: 1, y: 5 }, SOUTH_UPGRADED],
+    [South, Deploying, { x: 1, y: 5 }, SOUTH_LILYPAD],
     [South, Deploying, { x: 2, y: 5 }, SOUTH_LEAF],
     [South, Deploying, { x: 0, y: 5 }, NORTH_LEAF],
   ])('controlled by %s on %s turn at %s while %s', inputs => {
@@ -222,14 +222,14 @@ describe(PondLeafDropzone, () => {
   describe.for<Inputs>([
     // < Activating & in range & not same position
     [North, Activating, { x: 0, y: 2 }, NORTH_LEAF, { x: 0, y: 3 }],
-    [South, Activating, { x: 2, y: 3 }, NORTH_UPGRADED, { x: 2, y: 2 }],
-    [North, Activating, { x: 1, y: 4 }, SOUTH_UPGRADED, { x: 0, y: 4 }],
+    [South, Activating, { x: 2, y: 3 }, NORTH_LILYPAD, { x: 2, y: 2 }],
+    [North, Activating, { x: 1, y: 4 }, SOUTH_LILYPAD, { x: 0, y: 4 }],
     [South, Activating, { x: 1, y: 1 }, SOUTH_LEAF, { x: 2, y: 1 }],
     // < Activating & same position as start
-    [North, Activating, { x: 0, y: 0 }, NORTH_UPGRADED, { x: 0, y: 0 }],
+    [North, Activating, { x: 0, y: 0 }, NORTH_LILYPAD, { x: 0, y: 0 }],
     [South, Activating, { x: 2, y: 0 }, NORTH_LEAF, { x: 2, y: 0 }],
     [North, Activating, { x: 2, y: 5 }, SOUTH_LEAF, { x: 2, y: 5 }],
-    [South, Activating, { x: 0, y: 5 }, SOUTH_UPGRADED, { x: 0, y: 5 }],
+    [South, Activating, { x: 0, y: 5 }, SOUTH_LILYPAD, { x: 0, y: 5 }],
   ])('controlled by %s on %s turn at %s while %s | pond: %s | phase: %s | start: %s', inputs => {
     const [_, __, position] = inputs;
     beforeEach_render_with_phase(inputs);

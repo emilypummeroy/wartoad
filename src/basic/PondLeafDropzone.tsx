@@ -12,7 +12,7 @@ type PondLeafDropzoneProps = Readonly<{
 
   position: Position;
   flow: Gameflow;
-  leaf: PondLeafState;
+  pondLeaf: PondLeafState;
   activation?: ActivationState;
 
   targetLabelId: string;
@@ -29,7 +29,7 @@ export function PondLeafDropzone({
 
   position,
   flow: { player, phase },
-  leaf: { isUpgraded, controller },
+  pondLeaf: { leaf, controller },
   activation,
 
   targetLabelId,
@@ -48,7 +48,7 @@ export function PondLeafDropzone({
       : None;
 
   const isDropzoneVisible = {
-    [Phase.Upgrading]: player === controller && !isUpgraded,
+    [Phase.Upgrading]: player === controller && !leaf,
     [Phase.Deploying]: position.y === HOME[player].y,
     [Phase.Activating]:
       distanceBetween(position, activation?.start ?? position) <= 1,

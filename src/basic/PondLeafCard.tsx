@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import { GameContext } from '../context/GameContext';
 import { createLeaf } from '../state-types/card';
 import { type PondState, getPondStateAt, HOME } from '../state-types/pond';
-import { CardClass, CardLocation } from '../types/card';
+import { CardLocation } from '../types/card';
 import { PLAYER_CLASSNAME } from '../types/gameflow';
 import { type Position, arePositionsEqual } from '../types/position';
 import { counter } from '../types/test-utils';
@@ -26,9 +26,9 @@ export function PondLeafCard({
   position,
 }: PondLeafCardProps) {
   const [{ pond }]: PondLeafCardSlice = useContext(GameContext);
-  const { controller, isUpgraded } = getPondStateAt(pond, position);
+  const { controller, leaf } = getPondStateAt(pond, position);
   const isHome = arePositionsEqual(HOME[controller], position);
-  return isUpgraded ? (
+  return leaf ? (
     <div className="leaf showing">
       <div
         role="listitem"
@@ -37,7 +37,7 @@ export function PondLeafCard({
         <LeafCard
           // TODO 16: Use a real leaf card from state
           leaf={createLeaf({
-            cardClass: CardClass.LilyPad,
+            cardClass: leaf,
             owner: controller,
             key: counter(),
           })}

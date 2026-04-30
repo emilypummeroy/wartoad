@@ -70,7 +70,7 @@ const it_should_have_the_right_controlling_player_and_leaves_in_each_row = (pond
         const zones = within(rows[y]).getAllByRole('gridcell', { name: new RegExp(controller) });
         expect(zones).toHaveLength(LEAF_COUNT_PER_ROW);
         for (let x = 0; x < zones.length; x += 1) {
-          const name = pond[y][x].isUpgraded ? /Lily Pad/ : /leaf/;
+          const name = pond[y][x].leaf ? /Lily Pad/ : /leaf/;
           expect(within(zones[x]).getByRole('region', { name })).toBeVisible();
         }
       }
@@ -136,8 +136,8 @@ describe(Pond, () => {
         const zones = within(rows[y]).getAllByRole('gridcell');
         expect(zones).toHaveLength(LEAF_COUNT_PER_ROW);
         for (let x = 0; x < zones.length; x += 1) {
-          const { isUpgraded, controller } = pond[y][x];
-          const name = isUpgraded ? /Lily Pad/ : /leaf/;
+          const { leaf, controller } = pond[y][x];
+          const name = leaf ? /Lily Pad/ : /leaf/;
           expect(within(zones[x]).getByRole('region', { name })).toBeVisible();
           expect(within(zones[x]).getByRole('region', { name: new RegExp(controller) })).toBeVisible();
         }
@@ -168,7 +168,7 @@ describe(Pond, () => {
         expect(zones).toHaveLength(LEAF_COUNT_PER_ROW);
         for (let x = 0; x < zones.length; x += 1) {
           const { controller } = getPondStateAt(pond, asPosition({ x, y }));
-          const leafName = pond[y][x].isUpgraded ? 'Lily Pad' : 'leaf';
+          const leafName = pond[y][x].leaf ? 'Lily Pad' : 'leaf';
           expect(
             within(zones[x]).getByRole('region', { name: new RegExp(`${controller} (controlled|Home) ${leafName}`) }),
           ).toBeVisible();

@@ -20,14 +20,14 @@ import {
 import { CardClass, CardKey, type LeafKey } from '../types/card';
 import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import type { Position } from '../types/position';
-import { counter } from '../types/test-utils';
+import { counter, partial } from '../types/test-utils';
 import { commitUpgrade } from './commit-upgrade';
 
 const { LilyPad } = CardKey;
 const { North, South } = Player;
 const { Upgrading, Deploying, Activating, Start, Main, End } = Phase;
 
-const { NORTH_LEAF, SOUTH_LEAF, NORTH_UPGRADED, SOUTH_UPGRADED } = TestLeafKey;
+const { NORTH_LEAF, SOUTH_LEAF, NORTH_LILYPAD, SOUTH_LILYPAD } = TestLeafKey;
 
 type Input = [Position, Player, LeafKey];
 type Preconditions = [Position, TestLeafKey, turn: Player, Phase];
@@ -58,10 +58,10 @@ describe(commitUpgrade, () => {
 
   describe.for<Preconditions>([
     // < Target is not upgraded
-    [{ x: 2, y: 5 }, NORTH_UPGRADED, North, Upgrading],
-    [{ x: 0, y: 4 }, NORTH_UPGRADED, North, Upgrading],
-    [{ x: 2, y: 1 }, SOUTH_UPGRADED, South, Upgrading],
-    [{ x: 0, y: 2 }, SOUTH_UPGRADED, South, Upgrading],
+    [{ x: 2, y: 5 }, NORTH_LILYPAD, North, Upgrading],
+    [{ x: 0, y: 4 }, NORTH_LILYPAD, North, Upgrading],
+    [{ x: 2, y: 1 }, SOUTH_LILYPAD, South, Upgrading],
+    [{ x: 0, y: 2 }, SOUTH_LILYPAD, South, Upgrading],
   ])(
     'Precondition failed: Target not already upgraded | target: %s %s | flow: %s %s %s',
     input => it_should_return_state_unchanged(input),
@@ -125,14 +125,14 @@ describe(commitUpgrade, () => {
           : { southHand: playerHand }),
         pond: setPondStateAt(INITIAL_POND, target, {
           controller: player,
-          isUpgraded: false,
+          leaf: undefined,
         }),
       });
 
       it('should upgrade the target position', () => {
         const after = commitUpgrade(target)(before);
         const got = getPondStateAt(after.pond, target);
-        expect(got.isUpgraded).toBe(true);
+        expect(got.leaf).toBe(CardClass.LilyPad);
       });
 
       it('should unset the upgrade state', () => {
@@ -203,8 +203,10 @@ describe(commitUpgrade, () => {
 
     it(`should not affect the rest of the leaf at the target`, () => {
       const after = commitUpgrade(target)(before);
-      const { isUpgraded: _, ...got } = getPondStateAt(after.pond, target);
-      const { isUpgraded: __, ...want } = getPondStateAt(before.pond, target);
+      const { ...got } = partial(getPondStateAt(after.pond, target));
+      const { ...want } = partial(getPondStateAt(before.pond, target));
+      delete got.leaf;
+      delete want.leaf;
       expect(got).toStrictEqual(want);
     });
 

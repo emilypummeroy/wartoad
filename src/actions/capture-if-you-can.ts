@@ -20,5 +20,5 @@ export const captureIfYouCan = (you: Player) =>
           units.length > 0 &&
           units.every(u => u.owner === you),
       )
-      .update(() => ({ controller: you, isUpgraded: false })).get.out;
+      .update(() => ({ controller: you, leaf: undefined })).get.out;
   });

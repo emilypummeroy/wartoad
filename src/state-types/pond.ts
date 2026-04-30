@@ -1,4 +1,4 @@
-import type { UnitState } from '../types/card';
+import { CardClass, type LeafClass, type UnitState } from '../types/card';
 import { Player } from '../types/gameflow';
 import {
   arePositionsEqual,
@@ -17,7 +17,7 @@ export type PondState = readonly [
 
 export type PondLeafState = {
   readonly units: readonly UnitState[];
-  readonly isUpgraded: boolean;
+  readonly leaf: LeafClass | undefined;
   readonly controller: Player;
 };
 
@@ -144,33 +144,34 @@ export const ROW_COUNT_PER_PLAYER = 3 as const;
 export const LEAF_COUNT_PER_ROW = 3 as const;
 export const LAST_IN_ROW = 2 as const;
 
-export const NORTH_UPGRADED = {
+export const NORTH_LILYPAD: PondLeafState = {
   units: [],
-  isUpgraded: true,
+  leaf: CardClass.LilyPad,
   controller: Player.North,
 } as const;
-export const NORTH_LEAF = {
+export const NORTH_LEAF: PondLeafState = {
   units: [],
-  isUpgraded: false,
   controller: Player.North,
+  leaf: undefined,
 } as const;
-export const SOUTH_UPGRADED = {
+// I want to find a good way to draw this card instead of hardcoding it.
+export const SOUTH_LILYPAD: PondLeafState = {
   units: [],
-  isUpgraded: true,
+  leaf: CardClass.LilyPad,
   controller: Player.South,
 } as const;
-export const SOUTH_LEAF = {
+export const SOUTH_LEAF: PondLeafState = {
   units: [],
-  isUpgraded: false,
   controller: Player.South,
+  leaf: undefined,
 } as const;
 export const INITIAL_POND: PondState = [
-  [NORTH_LEAF, NORTH_UPGRADED, NORTH_LEAF],
+  [NORTH_LEAF, NORTH_LILYPAD, NORTH_LEAF],
   [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],
   [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],
   [SOUTH_LEAF, SOUTH_LEAF, SOUTH_LEAF],
   [SOUTH_LEAF, SOUTH_LEAF, SOUTH_LEAF],
-  [SOUTH_LEAF, SOUTH_UPGRADED, SOUTH_LEAF],
+  [SOUTH_LEAF, SOUTH_LILYPAD, SOUTH_LEAF],
 ];
 
 export const HOME = {

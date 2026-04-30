@@ -6,7 +6,7 @@ import { PondUnitCard } from '../basic/PondUnitCard';
 import { GameContext } from '../context/GameContext';
 import type { ActivationState } from '../state-types';
 import { type PondState } from '../state-types/pond';
-import type { UnitState } from '../types/card';
+import type { LeafClass, UnitState } from '../types/card';
 import { type Gameflow } from '../types/gameflow';
 import { type Position } from '../types/position';
 
@@ -38,13 +38,13 @@ const LEAF_ZONE_SIZE = 2.2;
 const rowSize = ({
   units,
   position,
-  isUpgraded,
+  leaf,
 }: Readonly<{
   units: readonly UnitState[];
   position: Position;
-  isUpgraded: boolean;
+  leaf?: LeafClass;
 }>) => {
-  const leafSize = isUpgraded ? SHOW_LEAF_SIZE : PEEK_LEAF_SIZE;
+  const leafSize = leaf ? SHOW_LEAF_SIZE : PEEK_LEAF_SIZE;
   const showingUnitCount = units.filter(u => !u.isExhausted).length;
   const peekingUnitCount = units.filter(u => u.isExhausted).length;
 
@@ -71,8 +71,8 @@ export function PondLeaf({ position }: PondLeafProps) {
       activation,
       pond: {
         [position.y]: {
-          [position.x]: leaf,
-          [position.x]: { isUpgraded, units },
+          [position.x]: pondLeaf,
+          [position.x]: { leaf, units },
         },
       },
     },
@@ -86,7 +86,7 @@ export function PondLeaf({ position }: PondLeafProps) {
   const [rowClassName, clampedSize] = rowSize({
     units,
     position,
-    isUpgraded,
+    leaf,
   });
 
   return (
@@ -98,7 +98,7 @@ export function PondLeaf({ position }: PondLeafProps) {
       <PondLeafDropzone
         position={position}
         flow={flow}
-        leaf={leaf}
+        pondLeaf={pondLeaf}
         activation={activation}
         onClickUpgrade={commitUpgrade}
         onClickDeploy={commitDeployment}

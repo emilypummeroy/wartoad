@@ -28,12 +28,12 @@ const { Froglet, LilyPad } = CardKey;
 const { Upgrading, Deploying, Activating, Start, Main, End, GameOver } = Phase;
 
 const {
-  SOUTH_UPGRADED,
-  SOUTH_UPGRADED_UNIT,
-  SOUTH_UPGRADED_OTHER_UNIT,
-  NORTH_UPGRADED,
-  NORTH_UPGRADED_UNIT,
-  NORTH_UPGRADED_OTHER_UNIT,
+  SOUTH_LILYPAD,
+  SOUTH_LILYPAD_UNIT,
+  SOUTH_LILYPAD_OTHER_UNIT,
+  NORTH_LILYPAD,
+  NORTH_LILYPAD_UNIT,
+  NORTH_LILYPAD_OTHER_UNIT,
 } = TestLeafKey;
 
 type Preconditions = [Player, Phase, Player?];
@@ -105,16 +105,16 @@ describe(finishPhase, () => {
   // Postconditions
   describe.for<[...Inputs, opponentLeaf: TestLeafKey, wantController: Player]>([
     // < Main & Idle & cannot capture > End
-    [North, Main, SOUTH_UPGRADED_UNIT, South],
-    [South, Main, NORTH_UPGRADED_UNIT, North],
+    [North, Main, SOUTH_LILYPAD_UNIT, South],
+    [South, Main, NORTH_LILYPAD_UNIT, North],
 
     // < Main & Idle & can capture other leaf > End & capture
-    [North, Main, SOUTH_UPGRADED_OTHER_UNIT, North],
-    [South, Main, NORTH_UPGRADED_OTHER_UNIT, South],
+    [North, Main, SOUTH_LILYPAD_OTHER_UNIT, North],
+    [South, Main, NORTH_LILYPAD_OTHER_UNIT, South],
 
     // < Main & Idle & opponent can capture leaf > End & capture
-    [North, Main, NORTH_UPGRADED_OTHER_UNIT, South],
-    [South, Main, SOUTH_UPGRADED_OTHER_UNIT, North],
+    [North, Main, NORTH_LILYPAD_OTHER_UNIT, South],
+    [South, Main, SOUTH_LILYPAD_OTHER_UNIT, North],
   ])(
     'Preconditions met | during %s %s | when a centre leaf is %s',
     ([player, phase, opponentLeaf, wantController]) => {
@@ -151,16 +151,16 @@ describe(finishPhase, () => {
     ]
   >([
     // < Main & can capture opponent Home > GameOver
-    [North, Main, SOUTH_UPGRADED_OTHER_UNIT, North],
-    [South, Main, NORTH_UPGRADED_OTHER_UNIT, South],
+    [North, Main, SOUTH_LILYPAD_OTHER_UNIT, North],
+    [South, Main, NORTH_LILYPAD_OTHER_UNIT, South],
 
     // < Main & opponent can capture Home > GameOver
-    [North, Main, SOUTH_UPGRADED, South, NORTH_UPGRADED_OTHER_UNIT],
-    [South, Main, NORTH_UPGRADED, North, SOUTH_UPGRADED_OTHER_UNIT],
+    [North, Main, SOUTH_LILYPAD, South, NORTH_LILYPAD_OTHER_UNIT],
+    [South, Main, NORTH_LILYPAD, North, SOUTH_LILYPAD_OTHER_UNIT],
 
     // < Main & opponent can capture Home > GameOver
-    [North, Main, SOUTH_UPGRADED_OTHER_UNIT, South, NORTH_UPGRADED_OTHER_UNIT],
-    [South, Main, NORTH_UPGRADED_OTHER_UNIT, North, SOUTH_UPGRADED_OTHER_UNIT],
+    [North, Main, SOUTH_LILYPAD_OTHER_UNIT, South, NORTH_LILYPAD_OTHER_UNIT],
+    [South, Main, NORTH_LILYPAD_OTHER_UNIT, North, SOUTH_LILYPAD_OTHER_UNIT],
   ])(
     'Preconditions met | during %s %s | opponent Home is %s | want winner: %s | own home: %s',
     ([player, phase, opponentLeaf, wantWinner, ownLeaf]) => {

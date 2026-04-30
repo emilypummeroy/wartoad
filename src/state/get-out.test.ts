@@ -26,9 +26,7 @@ describe(gameData, () => {
         'should throw when %s home is unupgraded',
         player => {
           const state = createStateWith({
-            pond: setPondStateAt(pond, HOME[player], {
-              isUpgraded: false,
-            }),
+            pond: setPondStateAt(pond, HOME[player], { leaf: undefined }),
           });
           expect(() => gameData(state)).toThrow();
         },

@@ -1,3 +1,4 @@
+import { CardClass } from '../types/card';
 import { Player } from '../types/gameflow';
 import { getPondStateAt, HOME } from './pond';
 import {
@@ -5,6 +6,8 @@ import {
   ANOTHER_POND_POSITIONS,
   TestPondKey,
 } from './pond.test-utils';
+
+const { LilyPad } = CardClass;
 
 describe.for([Player.North, Player.South])(
   `Test positions for %s in ${TestPondKey.ANOTHER_POND}`,
@@ -23,12 +26,12 @@ describe.for([Player.North, Player.South])(
 
     it(`should have all ${player}.LeafHomeRow unupgraded`, () => {
       const position = ANOTHER_POND_POSITIONS[player].LeafHomeRow;
-      expect(getPondStateAt(anotherPond, position).isUpgraded).toBe(false);
+      expect(getPondStateAt(anotherPond, position).leaf).toBeUndefined();
     });
 
     it(`should have ${player}.LeafHomeRow unupgraded`, () => {
       const position = ANOTHER_POND_POSITIONS[player].LeafHomeRow;
-      expect(getPondStateAt(anotherPond, position).isUpgraded).toBe(false);
+      expect(getPondStateAt(anotherPond, position).leaf).not.toBeDefined();
     });
 
     it(`should have ${player}.LeafHomeRow be on the home row and not Home`, () => {
@@ -39,7 +42,7 @@ describe.for([Player.North, Player.South])(
 
     it(`should have ${player}.LeafEdge be unupgraded`, () => {
       const position = ANOTHER_POND_POSITIONS[player].LeafEdge;
-      expect(getPondStateAt(anotherPond, position).isUpgraded).toBe(false);
+      expect(getPondStateAt(anotherPond, position).leaf).not.toBeDefined();
     });
 
     it(`should have ${player}.LeafEdge be on the edge and not the home row`, () => {
@@ -50,7 +53,7 @@ describe.for([Player.North, Player.South])(
 
     it(`should have ${player}.UpgradedEdge be unupgraded`, () => {
       const position = ANOTHER_POND_POSITIONS[player].UpgradedEdge;
-      expect(getPondStateAt(anotherPond, position).isUpgraded).toBe(true);
+      expect(getPondStateAt(anotherPond, position).leaf).toBe(LilyPad);
     });
 
     it(`should have ${player}.UpgradedEdge be on the edge and not the home row`, () => {
@@ -61,7 +64,7 @@ describe.for([Player.North, Player.South])(
 
     it(`should have ${player}.LeafMiddle be unupgraded`, () => {
       const position = ANOTHER_POND_POSITIONS[player].LeafMiddle;
-      expect(getPondStateAt(anotherPond, position).isUpgraded).toBe(false);
+      expect(getPondStateAt(anotherPond, position).leaf).not.toBeDefined();
     });
 
     it(`should have ${player}.LeafMiddle be on the edge and not the home row`, () => {
@@ -72,7 +75,7 @@ describe.for([Player.North, Player.South])(
 
     it(`should have ${player}.UpgradedMiddle be unupgraded`, () => {
       const position = ANOTHER_POND_POSITIONS[player].UpgradedMiddle;
-      expect(getPondStateAt(anotherPond, position).isUpgraded).toBe(true);
+      expect(getPondStateAt(anotherPond, position).leaf).toBe(LilyPad);
     });
 
     it(`should have ${player}.UpgradedMiddle be on the edge and not the home row`, () => {

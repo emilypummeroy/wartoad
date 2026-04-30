@@ -43,8 +43,8 @@ export type GameData = {
 
 // oxlint-disable-next-line max-statements
 const gameInvariants: GameInvariants = (s, get, { always, iff }) => {
-  always(get.leaf.at(HOME[Player.North]).isUpgraded);
-  always(get.leaf.at(HOME[Player.South]).isUpgraded);
+  always(!!get.leaf.at(HOME[Player.North]).leaf);
+  always(!!get.leaf.at(HOME[Player.South]).leaf);
 
   iff(get.phase === Phase.Activating).must(!!s.activation);
   iff(get.phase === Phase.Deploying).must(!!s.deployment);

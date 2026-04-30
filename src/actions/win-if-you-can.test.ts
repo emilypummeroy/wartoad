@@ -14,14 +14,14 @@ const { Upgrading, Deploying, Activating, Start, Main, End, GameOver } = Phase;
 
 const { INITIAL_POND, ANOTHER_POND, UNITS_POND } = TestPondKey;
 const {
-  SOUTH_UPGRADED,
-  SOUTH_UPGRADED_UNIT,
-  SOUTH_UPGRADED_UNITS,
-  SOUTH_UPGRADED_OTHER_UNIT,
-  NORTH_UPGRADED,
-  NORTH_UPGRADED_UNIT,
-  NORTH_UPGRADED_UNITS,
-  NORTH_UPGRADED_OTHER_UNIT,
+  SOUTH_LILYPAD,
+  SOUTH_LILYPAD_UNIT,
+  SOUTH_LILYPAD_UNITS,
+  SOUTH_LILYPAD_OTHER_UNIT,
+  NORTH_LILYPAD,
+  NORTH_LILYPAD_UNIT,
+  NORTH_LILYPAD_UNITS,
+  NORTH_LILYPAD_OTHER_UNIT,
 } = TestLeafKey;
 
 type Input = [
@@ -73,12 +73,12 @@ describe(winIfYouCan, () => {
 
   describe.for<[...Preconditions, opponentHome: TestLeafKey]>([
     // < Can capture opponent Home
-    [North, North, End, INITIAL_POND, SOUTH_UPGRADED_UNIT],
-    [North, South, End, UNITS_POND, SOUTH_UPGRADED],
-    [North, North, End, ANOTHER_POND, SOUTH_UPGRADED_UNITS],
-    [South, South, End, INITIAL_POND, NORTH_UPGRADED_UNIT],
-    [South, North, End, UNITS_POND, NORTH_UPGRADED],
-    [South, South, End, ANOTHER_POND, NORTH_UPGRADED_UNITS],
+    [North, North, End, INITIAL_POND, SOUTH_LILYPAD_UNIT],
+    [North, South, End, UNITS_POND, SOUTH_LILYPAD],
+    [North, North, End, ANOTHER_POND, SOUTH_LILYPAD_UNITS],
+    [South, South, End, INITIAL_POND, NORTH_LILYPAD_UNIT],
+    [South, North, End, UNITS_POND, NORTH_LILYPAD],
+    [South, South, End, ANOTHER_POND, NORTH_LILYPAD_UNITS],
   ])(
     'Precondition failed: can capture opponent Home | %s during %s %s phase | opponent home: %s',
     ([you, player, phase, pondKey, opponentHome]) => {
@@ -100,14 +100,14 @@ describe(winIfYouCan, () => {
 
   // Postconditions:
   describe.for<Input>([
-    [North, North, INITIAL_POND, SOUTH_UPGRADED_OTHER_UNIT],
-    [North, South, ANOTHER_POND, SOUTH_UPGRADED_OTHER_UNIT],
-    [South, North, INITIAL_POND, NORTH_UPGRADED_OTHER_UNIT],
-    [South, South, ANOTHER_POND, NORTH_UPGRADED_OTHER_UNIT],
-    [North, South, INITIAL_POND, SOUTH_UPGRADED_OTHER_UNIT],
-    [North, North, ANOTHER_POND, SOUTH_UPGRADED_OTHER_UNIT],
-    [South, South, INITIAL_POND, NORTH_UPGRADED_OTHER_UNIT],
-    [South, North, ANOTHER_POND, NORTH_UPGRADED_OTHER_UNIT],
+    [North, North, INITIAL_POND, SOUTH_LILYPAD_OTHER_UNIT],
+    [North, South, ANOTHER_POND, SOUTH_LILYPAD_OTHER_UNIT],
+    [South, North, INITIAL_POND, NORTH_LILYPAD_OTHER_UNIT],
+    [South, South, ANOTHER_POND, NORTH_LILYPAD_OTHER_UNIT],
+    [North, South, INITIAL_POND, SOUTH_LILYPAD_OTHER_UNIT],
+    [North, North, ANOTHER_POND, SOUTH_LILYPAD_OTHER_UNIT],
+    [South, South, INITIAL_POND, NORTH_LILYPAD_OTHER_UNIT],
+    [South, North, ANOTHER_POND, NORTH_LILYPAD_OTHER_UNIT],
   ])(
     'Preconditions met | %s during %s turn | in %s with %s at opponent Home',
     ([you, player, pondKey, leafKey]) => {
