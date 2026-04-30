@@ -2,7 +2,7 @@ import { useCallback, useId } from 'react';
 
 import { CardType, type CardState } from '../types/card';
 import { type Player, PLAYER_CLASSNAME } from '../types/gameflow';
-import { CardBack, Froglet, LilyPad } from '../view/Card';
+import { CardBack, Froglet, LeafCard } from '../view/Card';
 
 export const INITIAL_HAND_SIZE = 7;
 export const SMALL_HAND_SIZE = 8;
@@ -28,11 +28,8 @@ function HandCard({ isEnabled = false, card, player, onPick }: HandCardProps) {
       className={`highlighting-card pickable-card ${PLAYER_CLASSNAME[player]}`}
       onClick={handleClick}
     >
-      {card.cardClass === CardClass.Froglet ? (
-        <Froglet nameId={titleId} />
-      ) : (
-        <LilyPad nameId={titleId} />
-      )}
+      {card.type === CardType.Unit && <Froglet nameId={titleId} />}
+      {card.type === CardType.Leaf && <LeafCard leaf={card} nameId={titleId} />}
     </div>
   ) : (
     <div
@@ -41,11 +38,8 @@ function HandCard({ isEnabled = false, card, player, onPick }: HandCardProps) {
       tabIndex={0}
       className={`highlighting-card ${PLAYER_CLASSNAME[player]}`}
     >
-      {card.cardClass === CardClass.Froglet ? (
-        <Froglet nameId={titleId} />
-      ) : (
-        <LilyPad nameId={titleId} />
-      )}
+      {card.type === CardType.Unit && <Froglet nameId={titleId} />}
+      {card.type === CardType.Leaf && <LeafCard leaf={card} nameId={titleId} />}
     </div>
   );
 }

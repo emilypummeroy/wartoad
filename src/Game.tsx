@@ -5,7 +5,7 @@ import { PhaseTracker } from './basic/PhaseTracker';
 import { Pond } from './composite/Pond';
 import { GameContext } from './context/GameContext';
 import { Phase, Player, PLAYER_CLASSNAME } from './types/gameflow';
-import { Froglet, LilyPad } from './view/Card';
+import { Froglet, LeafCard } from './view/Card';
 
 export function Game() {
   const [
@@ -47,7 +47,8 @@ export function Game() {
           {(upgrade ?? deployment ?? activation) && (
             // TODO 18: Make cards zoomable/inspectable/something outside of deploys and upgrades
             <PickedCard owner={player}>
-              {deployment || activation ? <Froglet /> : <LilyPad />}
+              {(deployment ?? activation) && <Froglet />}
+              {upgrade && <LeafCard leaf={upgrade.leaf} />}
             </PickedCard>
           )}
           <Hand

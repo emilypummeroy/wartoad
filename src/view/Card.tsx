@@ -29,25 +29,19 @@ import {
 } from '../types/card';
 import { type Player, PLAYER_CLASSNAME } from '../types/gameflow';
 
-export function LilyPad({
-  player,
+export function LeafCard({
+  leaf,
   isHome = false,
   isLeaf = false,
   nameId,
   symbolId,
 }: Readonly<{
-  player?: Player;
+  leaf: LeafCardState;
   nameId?: string;
   symbolId?: string;
   isHome?: boolean;
   isLeaf?: boolean;
 }>) {
-  // TODO 16: Wire in card.class:
-  // .stats
-  // .name
-  // .cost
-  // card:
-  // .owner
   {
     const _symbolId = useId();
     symbolId ??= _symbolId;
@@ -58,27 +52,28 @@ export function LilyPad({
   return (
     <section
       aria-labelledby={`${isLeaf ? symbolId : ''} ${nameId}`}
-      className={`card leaf ${isLeaf && player ? PLAYER_CLASSNAME[player] : ''}`}
+      className={`card leaf ${isLeaf ? PLAYER_CLASSNAME[leaf.owner] : ''}`}
     >
       <div className="card-title" id={nameId}>
-        Lily Pad
+        {leaf.cardClass.name}
       </div>
       <div className="card-section-row">
         {!isLeaf ? (
           <div role="group" aria-labelledby={costId} className="card-item">
-            <small id={costId}>Cost</small>0
+            <small id={costId}>Cost</small>
+            {leaf.cardClass.cost}
           </div>
         ) : isHome ? (
           <Clover role="img">
-            <title id={symbolId}>{player} Home</title>
+            <title id={symbolId}>{leaf.owner} Home</title>
           </Clover>
         ) : (
           <Leaf role="img">
-            <title id={symbolId}>{player} controlled</title>
+            <title id={symbolId}>{leaf.owner} controlled</title>
           </Leaf>
         )}
       </div>
-      <LeafStatsDisplay stats={CardClass.LilyPad.stats} />
+      <LeafStatsDisplay stats={leaf.cardClass.stats} />
     </section>
   );
 }

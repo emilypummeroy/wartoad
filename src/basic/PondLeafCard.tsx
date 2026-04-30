@@ -1,10 +1,13 @@
 import { useContext } from 'react';
 
 import { GameContext } from '../context/GameContext';
+import { createLeaf } from '../state-types/card';
 import { type PondState, getPondStateAt, HOME } from '../state-types/pond';
+import { CardClass } from '../types/card';
 import { PLAYER_CLASSNAME } from '../types/gameflow';
 import { type Position, arePositionsEqual } from '../types/position';
-import { CardBack, LilyPad } from '../view/Card';
+import { counter } from '../types/test-utils';
+import { CardBack, LeafCard } from '../view/Card';
 
 type PondLeafCardSlice = [
   {
@@ -31,11 +34,16 @@ export function PondLeafCard({
         role="listitem"
         className={`highlighting-card ${PLAYER_CLASSNAME[controller]}`}
       >
-        <LilyPad
+        <LeafCard
+          // TODO 16: Use a real leaf card from state
+          leaf={createLeaf({
+            cardClass: CardClass.LilyPad,
+            owner: controller,
+            key: counter(),
+          })}
           symbolId={leafSymbolId}
           nameId={leafNameId}
           isHome={isHome}
-          player={controller}
           isLeaf
         />
       </div>
