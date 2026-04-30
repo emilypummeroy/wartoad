@@ -7,22 +7,22 @@ import {
 } from '../types/position';
 
 export type PondState = readonly [
-  readonly [LeafState, LeafState, LeafState],
-  readonly [LeafState, LeafState, LeafState],
-  readonly [LeafState, LeafState, LeafState],
-  readonly [LeafState, LeafState, LeafState],
-  readonly [LeafState, LeafState, LeafState],
-  readonly [LeafState, LeafState, LeafState],
+  readonly [PondLeafState, PondLeafState, PondLeafState],
+  readonly [PondLeafState, PondLeafState, PondLeafState],
+  readonly [PondLeafState, PondLeafState, PondLeafState],
+  readonly [PondLeafState, PondLeafState, PondLeafState],
+  readonly [PondLeafState, PondLeafState, PondLeafState],
+  readonly [PondLeafState, PondLeafState, PondLeafState],
 ];
 
-export type LeafState = {
+export type PondLeafState = {
   readonly units: readonly UnitCardState[];
   readonly isUpgraded: boolean;
   readonly controller: Player;
 };
 
 export const isPondState = (
-  array: ReadonlyArray<ReadonlyArray<LeafState>>,
+  array: ReadonlyArray<ReadonlyArray<PondLeafState>>,
 ): array is PondState =>
   array.length === ROW_COUNT &&
   array.every(row => row.length === LEAF_COUNT_PER_ROW);
@@ -30,14 +30,14 @@ export const isPondState = (
 export const getPondStateAt = (
   pond: PondState,
   { x, y }: Position,
-): LeafState => pond[y][x];
+): PondLeafState => pond[y][x];
 
 export const setPondStateAt = (
   old: PondState,
   target: Position,
   newValue:
-    | Partial<LeafState>
-    | ((old: LeafState, xy: Position) => Partial<LeafState>),
+    | Partial<PondLeafState>
+    | ((old: PondLeafState, xy: Position) => Partial<PondLeafState>),
 ): PondState =>
   setPondStateWhere(
     old,
@@ -52,7 +52,10 @@ export const setPondStateAtEach = (
   init: PondState,
   ...updates: readonly (readonly [
     Position,
-    Partial<LeafState> | ((old: LeafState, xy: Position) => Partial<LeafState>),
+    (
+      | Partial<PondLeafState>
+      | ((old: PondLeafState, xy: Position) => Partial<PondLeafState>)
+    ),
   ])[]
 ): PondState =>
   updates.reduce(
@@ -62,10 +65,10 @@ export const setPondStateAtEach = (
 
 export const setPondStateWhere = (
   init: PondState,
-  predicate: (v: LeafState, xy: Position) => boolean,
-  updater: (v: LeafState, xy: Position) => Partial<LeafState>,
+  predicate: (v: PondLeafState, xy: Position) => boolean,
+  updater: (v: PondLeafState, xy: Position) => Partial<PondLeafState>,
 ): PondState => {
-  const array: LeafState[][] = init.map((row, y) =>
+  const array: PondLeafState[][] = init.map((row, y) =>
     row.map((leaf, x) => {
       const xy = { x, y };
       /* v8 ignore if */
@@ -85,9 +88,9 @@ export const setPondStateWhere = (
 export const setUnitsAt = (
   init: PondState,
   position: Position,
-  updater: (u: UnitCardState, v: LeafState) => Partial<UnitCardState>,
+  updater: (u: UnitCardState, v: PondLeafState) => Partial<UnitCardState>,
 ): PondState => {
-  const array: LeafState[][] = init.map((row, y) =>
+  const array: PondLeafState[][] = init.map((row, y) =>
     row.map((leaf, x) =>
       arePositionsEqual({ x, y }, position)
         ? {
@@ -106,9 +109,9 @@ export const setUnitsAt = (
 
 export const setAllUnits = (
   init: PondState,
-  updater: (u: UnitCardState, v: LeafState) => Partial<UnitCardState>,
+  updater: (u: UnitCardState, v: PondLeafState) => Partial<UnitCardState>,
 ): PondState => {
-  const array: LeafState[][] = init.map(row =>
+  const array: PondLeafState[][] = init.map(row =>
     row.map(leaf => ({
       ...leaf,
       units: leaf.units.map(u => ({ ...u, ...updater(u, leaf) })),
@@ -126,7 +129,7 @@ export const setAllUnits = (
 
 export const doesAnyPondLeafSatisfy = (
   pond: PondState,
-  predicate: (v: LeafState, xy: Position) => boolean,
+  predicate: (v: PondLeafState, xy: Position) => boolean,
 ): boolean =>
   pond.some((row, y) =>
     row.some((leaf, x) => {

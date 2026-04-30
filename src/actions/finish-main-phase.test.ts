@@ -3,7 +3,7 @@ import {
   setAllUnits,
   setPondStateAtEach,
   setUnitsAt,
-  type LeafState,
+  type PondLeafState,
 } from '../state-types/pond';
 import {
   TestPondKey,
@@ -112,7 +112,10 @@ describe(finishMainPhase, () => {
     ([player, pondKey, positions, leafKey]) => {
       const basePond = TEST_PONDS_BY_KEY[pondKey];
       const leaf = TEST_LEAVES_BY_KEY[leafKey];
-      const updates: [Position, LeafState][] = positions.map(xy => [xy, leaf]);
+      const updates: [Position, PondLeafState][] = positions.map(xy => [
+        xy,
+        leaf,
+      ]);
       const pond = setPondStateAtEach(basePond, ...updates);
 
       const before = createStateWith({

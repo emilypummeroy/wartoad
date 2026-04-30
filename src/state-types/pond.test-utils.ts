@@ -6,7 +6,7 @@ import {
   NORTH_LEAF,
   NORTH_UPGRADED,
   type PondState,
-  type LeafState,
+  type PondLeafState,
   SOUTH_LEAF,
   SOUTH_UPGRADED,
 } from './pond';
@@ -66,52 +66,52 @@ const OTHER_UNITS: UnitCardState[] = [
   }),
 ];
 
-export const NORTH_LEAF_WITH_UNIT: LeafState = {
+export const NORTH_LEAF_WITH_UNIT: PondLeafState = {
   ...NORTH_LEAF,
   units: NORTH_UNIT,
 };
-export const NORTH_LEAF_OTHER_UNIT: LeafState = {
+export const NORTH_LEAF_OTHER_UNIT: PondLeafState = {
   ...NORTH_LEAF,
   units: SOUTH_UNIT,
 };
-export const NORTH_LEAF_WITH_UNITS: LeafState = {
+export const NORTH_LEAF_WITH_UNITS: PondLeafState = {
   ...NORTH_LEAF,
   units: SOME_UNITS,
 };
-export const NORTH_UPGRADED_UNIT: LeafState = {
+export const NORTH_UPGRADED_UNIT: PondLeafState = {
   ...NORTH_UPGRADED,
   units: NORTH_UNIT,
 };
-export const NORTH_UPGRADED_OTHER_UNIT: LeafState = {
+export const NORTH_UPGRADED_OTHER_UNIT: PondLeafState = {
   ...NORTH_UPGRADED,
   units: SOUTH_UNIT,
 };
-export const NORTH_UPGRADED_UNITS: LeafState = {
+export const NORTH_UPGRADED_UNITS: PondLeafState = {
   ...NORTH_UPGRADED,
   units: SOME_UNITS,
 };
 
-export const SOUTH_LEAF_WITH_UNIT: LeafState = {
+export const SOUTH_LEAF_WITH_UNIT: PondLeafState = {
   ...SOUTH_LEAF,
   units: SOUTH_UNIT,
 };
-export const SOUTH_LEAF_OTHER_UNIT: LeafState = {
+export const SOUTH_LEAF_OTHER_UNIT: PondLeafState = {
   ...SOUTH_LEAF,
   units: NORTH_UNIT,
 };
-export const SOUTH_LEAF_WITH_UNITS: LeafState = {
+export const SOUTH_LEAF_WITH_UNITS: PondLeafState = {
   ...SOUTH_LEAF,
   units: OTHER_UNITS,
 };
-export const SOUTH_UPGRADED_UNIT: LeafState = {
+export const SOUTH_UPGRADED_UNIT: PondLeafState = {
   ...SOUTH_UPGRADED,
   units: SOUTH_UNIT,
 };
-export const SOUTH_UPGRADED_OTHER_UNIT: LeafState = {
+export const SOUTH_UPGRADED_OTHER_UNIT: PondLeafState = {
   ...SOUTH_UPGRADED,
   units: NORTH_UNIT,
 };
-export const SOUTH_UPGRADED_UNITS: LeafState = {
+export const SOUTH_UPGRADED_UNITS: PondLeafState = {
   ...SOUTH_UPGRADED,
   units: OTHER_UNITS,
 };

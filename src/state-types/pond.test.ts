@@ -9,7 +9,7 @@ import {
   ROW_COUNT,
   setPondStateAt,
   type PondState,
-  type LeafState,
+  type PondLeafState,
   getPondStateAt,
   setPondStateAtEach,
 } from './pond';
@@ -44,15 +44,15 @@ const NORTH_UNIT = createUnit({
   key: 77,
   owner: Player.North,
 });
-const addSouthUnit = (old: LeafState) => ({
+const addSouthUnit = (old: PondLeafState) => ({
   units: [...old.units, SOUTH_UNIT],
 });
-const addNorthUnit = (old: LeafState) => ({
+const addNorthUnit = (old: PondLeafState) => ({
   units: [...old.units, NORTH_UNIT],
 });
-const upgrade = (old: LeafState) => ({ ...old, isUpgraded: true });
-const unupgrade = (old: LeafState) => ({ ...old, isUpgraded: false });
-const upgradeAndSetUnits = (_: LeafState) => ({
+const upgrade = (old: PondLeafState) => ({ ...old, isUpgraded: true });
+const unupgrade = (old: PondLeafState) => ({ ...old, isUpgraded: false });
+const upgradeAndSetUnits = (_: PondLeafState) => ({
   isUpgraded: true,
   units: [NORTH_UNIT, SOUTH_UNIT],
 });
@@ -86,7 +86,9 @@ const describeForAllPositions = (block: (_: Position) => void) =>
 
 const itShouldNotChangeOtherZones = (
   pond: PondState,
-  valueToSet: Partial<LeafState> | ((old: LeafState) => Partial<LeafState>),
+  valueToSet:
+    | Partial<PondLeafState>
+    | ((old: PondLeafState) => Partial<PondLeafState>),
   { x, y }: Position,
 ) =>
   it('should not change other zones', () => {
@@ -107,7 +109,7 @@ const itShouldNotChangeOtherZones = (
   });
 
 describe('the PondState type functions', () => {
-  type Updater = (old: LeafState) => Partial<LeafState>;
+  type Updater = (old: PondLeafState) => Partial<PondLeafState>;
   describe(setPondStateAtEach, () => {
     describe.for<[TestPondKey, string, string, Updater, Updater]>([
       [
@@ -247,16 +249,16 @@ describe('the PondState type functions', () => {
   });
 
   describe(`${setPondStateAt.name} and ${getPondStateAt.name}`, () => {
-    describe.for<[TestPondKey, string, (old: LeafState) => Partial<LeafState>]>(
-      [
-        [INITIAL_POND, 'addNorthUnit', addNorthUnit],
-        [ANOTHER_POND, 'addSouthUnit', addSouthUnit],
-        [FULL_POND, 'unupgrade', unupgrade],
-        [INITIAL_POND, 'upgradeAndAddUnit', upgradeAndSetUnits],
-        [INITIAL_POND, 'upgrade', upgrade],
-        [UNITS_POND, 'removeUnits', removeUnits],
-      ],
-    )(
+    describe.for<
+      [TestPondKey, string, (old: PondLeafState) => Partial<PondLeafState>]
+    >([
+      [INITIAL_POND, 'addNorthUnit', addNorthUnit],
+      [ANOTHER_POND, 'addSouthUnit', addSouthUnit],
+      [FULL_POND, 'unupgrade', unupgrade],
+      [INITIAL_POND, 'upgradeAndAddUnit', upgradeAndSetUnits],
+      [INITIAL_POND, 'upgrade', upgrade],
+      [UNITS_POND, 'removeUnits', removeUnits],
+    ])(
       'with known PondState: %s | updater function: %s',
       ([pondKey, updaterName, updater]) => {
         const pond = TEST_PONDS_BY_KEY[pondKey];
@@ -320,7 +322,7 @@ describe('the PondState type functions', () => {
 
           describe.for(
             // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-            Object.keys(valueToSet) as (keyof LeafState)[],
+            Object.keys(valueToSet) as (keyof PondLeafState)[],
           )('when called with partial state: %s', key => {
             it(`should set zone.${key} at x=${x}, y=${y} to ${newValueName}.${key} `, () => {
               const newPond = setPondStateAt(
@@ -356,7 +358,7 @@ describe('the PondState type functions', () => {
       FULL_POND,
       UNITS_POND,
     ])('with known GridState: %s', pondKey => {
-      const array: ReadonlyArray<ReadonlyArray<LeafState>> =
+      const array: ReadonlyArray<ReadonlyArray<PondLeafState>> =
         TEST_PONDS_BY_KEY[pondKey];
       it(`should verify the pond`, () => {
         expect(isPondState(array)).toBe(true);

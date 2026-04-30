@@ -2,7 +2,7 @@ import {
   getPondStateAt,
   setPondStateAt,
   setPondStateAtEach,
-  type LeafState,
+  type PondLeafState,
 } from '../state-types/pond';
 import {
   TestPondKey,
@@ -222,7 +222,10 @@ describe(captureIfYouCan, () => {
       const pond = TEST_PONDS_BY_KEY[pondKey];
       const leaf = TEST_LEAVES_BY_KEY[leafKey];
       const positions = xy2 ? [xy1, xy2] : [xy1];
-      const updates: [Position, LeafState][] = positions.map(xy => [xy, leaf]);
+      const updates: [Position, PondLeafState][] = positions.map(xy => [
+        xy,
+        leaf,
+      ]);
 
       const before = createStateWith({
         ...gameflowOf(player, End),

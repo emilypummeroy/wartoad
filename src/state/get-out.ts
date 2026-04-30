@@ -11,7 +11,7 @@ import {
   setAllUnits,
   setPondStateAt,
   setPondStateWhere,
-  type LeafState,
+  type PondLeafState,
   type PondState,
 } from '../state-types/pond';
 import type { CardState, LeafCardState, UnitCardState } from '../types/card';
@@ -73,8 +73,10 @@ export type GameAccess = {
   readonly phase: Phase;
   readonly pond: PondState;
   readonly leaf: {
-    readonly at: (xy: Position) => LeafState;
-    readonly exists: (p: (v: LeafState, xy: Position) => boolean) => boolean;
+    readonly at: (xy: Position) => PondLeafState;
+    readonly exists: (
+      p: (v: PondLeafState, xy: Position) => boolean,
+    ) => boolean;
   };
   readonly upgrade: UpgradeState | undefined;
   readonly deployment: DeploymentState | undefined;
@@ -85,12 +87,14 @@ export type GameAccess = {
 export type GameUpdate = {
   readonly leaf: {
     readonly at: (x: Position) => {
-      readonly to: (x: Partial<LeafState>) => GameData;
-      readonly update: (x: (old: LeafState) => Partial<LeafState>) => GameData;
-    };
-    readonly where: (p: (v: LeafState, xy: Position) => boolean) => {
+      readonly to: (x: Partial<PondLeafState>) => GameData;
       readonly update: (
-        u: (v: LeafState, xy: Position) => Partial<LeafState>,
+        x: (old: PondLeafState) => Partial<PondLeafState>,
+      ) => GameData;
+    };
+    readonly where: (p: (v: PondLeafState, xy: Position) => boolean) => {
+      readonly update: (
+        u: (v: PondLeafState, xy: Position) => Partial<PondLeafState>,
       ) => GameData;
     };
   };
