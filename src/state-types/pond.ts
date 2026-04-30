@@ -1,4 +1,4 @@
-import type { UnitCardState } from '../types/card';
+import type { UnitState } from '../types/card';
 import { Player } from '../types/gameflow';
 import {
   arePositionsEqual,
@@ -16,7 +16,7 @@ export type PondState = readonly [
 ];
 
 export type PondLeafState = {
-  readonly units: readonly UnitCardState[];
+  readonly units: readonly UnitState[];
   readonly isUpgraded: boolean;
   readonly controller: Player;
 };
@@ -88,7 +88,7 @@ export const setPondStateWhere = (
 export const setUnitsAt = (
   init: PondState,
   position: Position,
-  updater: (u: UnitCardState, v: PondLeafState) => Partial<UnitCardState>,
+  updater: (u: UnitState, v: PondLeafState) => Partial<UnitState>,
 ): PondState => {
   const array: PondLeafState[][] = init.map((row, y) =>
     row.map((leaf, x) =>
@@ -109,7 +109,7 @@ export const setUnitsAt = (
 
 export const setAllUnits = (
   init: PondState,
-  updater: (u: UnitCardState, v: PondLeafState) => Partial<UnitCardState>,
+  updater: (u: UnitState, v: PondLeafState) => Partial<UnitState>,
 ): PondState => {
   const array: PondLeafState[][] = init.map(row =>
     row.map(leaf => ({

@@ -1,4 +1,4 @@
-import type { CardState, LeafCardState, UnitCardState } from '../types/card';
+import type { CardState, LeafState, UnitState } from '../types/card';
 import type { Gameflow, Player } from '../types/gameflow';
 import type { Position } from '../types/position';
 import type { PondState } from './pond';
@@ -16,13 +16,13 @@ export type GameState = {
 
 export type ActivationState = {
   readonly start: Position;
-  readonly unit: UnitCardState;
+  readonly unit: UnitState;
 };
 
 export type DeploymentState = {
-  readonly unit: UnitCardState;
+  readonly unit: UnitState;
 };
 
 export type UpgradeState = {
-  readonly leaf: LeafCardState;
+  readonly leaf: LeafState;
 };

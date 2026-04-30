@@ -1,4 +1,4 @@
-import { CardClass, type UnitCardState } from '../types/card';
+import { CardClass, type UnitState } from '../types/card';
 import { Player } from '../types/gameflow';
 import { createUnit } from './card';
 import {
@@ -15,14 +15,14 @@ export type TestPondKey = keyof typeof TEST_PONDS_BY_KEY;
 
 export type TestLeafKey = (typeof TestLeafKey)[keyof typeof TEST_LEAVES_BY_KEY];
 
-const SOUTH_UNIT: UnitCardState[] = [
+const SOUTH_UNIT: UnitState[] = [
   createUnit({
     cardClass: CardClass.Froglet,
     owner: Player.South,
     key: 15,
   }),
 ];
-const NORTH_UNIT: UnitCardState[] = [
+const NORTH_UNIT: UnitState[] = [
   createUnit({
     cardClass: CardClass.Froglet,
     owner: Player.North,
@@ -30,7 +30,7 @@ const NORTH_UNIT: UnitCardState[] = [
   }),
 ];
 
-const SOME_UNITS: UnitCardState[] = [
+const SOME_UNITS: UnitState[] = [
   createUnit({
     cardClass: CardClass.Froglet,
     owner: Player.North,
@@ -48,7 +48,7 @@ const SOME_UNITS: UnitCardState[] = [
   }),
 ];
 
-const OTHER_UNITS: UnitCardState[] = [
+const OTHER_UNITS: UnitState[] = [
   createUnit({
     cardClass: CardClass.Froglet,
     owner: Player.South,

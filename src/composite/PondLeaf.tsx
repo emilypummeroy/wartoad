@@ -6,7 +6,7 @@ import { PondUnitCard } from '../basic/PondUnitCard';
 import { GameContext } from '../context/GameContext';
 import type { ActivationState } from '../state-types';
 import { type PondState } from '../state-types/pond';
-import type { UnitCardState } from '../types/card';
+import type { UnitState } from '../types/card';
 import { type Gameflow } from '../types/gameflow';
 import { type Position } from '../types/position';
 
@@ -17,7 +17,7 @@ type PondLeafContext = readonly [
     activation?: ActivationState;
   },
   {
-    activate: (unit: UnitCardState, start: Position) => void;
+    activate: (unit: UnitState, start: Position) => void;
     commitUpgrade: (target: Position) => void;
     commitDeployment: (on: Position) => void;
     commitActivation: (end: Position) => void;
@@ -40,7 +40,7 @@ const rowSize = ({
   position,
   isUpgraded,
 }: Readonly<{
-  units: readonly UnitCardState[];
+  units: readonly UnitState[];
   position: Position;
   isUpgraded: boolean;
 }>) => {

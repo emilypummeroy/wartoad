@@ -1,5 +1,5 @@
 import { noop } from '../types';
-import { type CardState, type UnitCardState } from '../types/card';
+import { type CardState, type UnitState } from '../types/card';
 import type { Position } from '../types/position';
 
 export { activate } from './activate';
@@ -15,7 +15,7 @@ export type GameActions = {
   // The difference between activation and upgrading is not the concern of
   // Hand or Card.
   pickCard: (_: CardState) => void;
-  activate: (unit: UnitCardState, position: Position) => void;
+  activate: (unit: UnitState, position: Position) => void;
   commitUpgrade: (_: Position) => void;
   commitDeployment: (_: Position) => void;
   commitActivation: (_: Position) => void;

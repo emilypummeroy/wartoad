@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import { createUnit } from '../state-types/card';
-import { UnitClass, type UnitCardState } from '../types/card';
+import { UnitClass, type UnitState } from '../types/card';
 import { Phase, Player } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { counter, gameflowFrom } from '../types/test-utils';
@@ -10,7 +10,7 @@ import { PondUnitCard } from './PondUnitCard';
 const { North, South } = Player;
 const { Start, Main, Upgrading, Deploying, Activating, End, GameOver } = Phase;
 describe(PondUnitCard, () => {
-  const onClick = vi.fn<(unit: UnitCardState, position: Position) => void>();
+  const onClick = vi.fn<(unit: UnitState, position: Position) => void>();
   describe.for<[owner: Player, turn: Player, Phase, Position]>([
     [North, North, Main, { x: 1, y: 2 }],
     [South, South, Main, { x: 0, y: 4 }],

@@ -1,15 +1,15 @@
 import { useCallback, useId } from 'react';
 
-import type { UnitCardState } from '../types/card';
+import type { UnitState } from '../types/card';
 import { Phase, PLAYER_CLASSNAME, type Gameflow } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { Froglet } from '../view/Card';
 
 type PondUnitCardProps = Readonly<{
-  unit: UnitCardState;
+  unit: UnitState;
   position: Position;
   flow: Gameflow;
-  onClick: (unit: UnitCardState, start: Position) => void;
+  onClick: (unit: UnitState, start: Position) => void;
 }>;
 
 export const PondUnitCard = ({

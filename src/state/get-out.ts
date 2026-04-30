@@ -14,7 +14,7 @@ import {
   type PondLeafState,
   type PondState,
 } from '../state-types/pond';
-import type { CardState, LeafCardState, UnitCardState } from '../types/card';
+import type { CardState, LeafState, UnitState } from '../types/card';
 import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import type { Position } from '../types/position';
 
@@ -101,9 +101,7 @@ export type GameUpdate = {
 
   readonly units: {
     readonly everywhere: {
-      readonly update: (
-        x: (old: UnitCardState) => Partial<UnitCardState>,
-      ) => GameData;
+      readonly update: (x: (old: UnitState) => Partial<UnitState>) => GameData;
     };
   };
 
@@ -125,8 +123,8 @@ type GameMake = {
 
   readonly idle: () => GameData;
   readonly activating: (x: ActivationState) => GameData;
-  readonly upgrading: (x: LeafCardState) => GameData;
-  readonly deploying: (x: UnitCardState) => GameData;
+  readonly upgrading: (x: LeafState) => GameData;
+  readonly deploying: (x: UnitState) => GameData;
 };
 
 const access: (s: GameState) => GameAccess = s => ({

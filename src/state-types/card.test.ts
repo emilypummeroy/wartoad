@@ -1,7 +1,7 @@
 import {
   type CardState,
-  type LeafCardState,
-  type UnitCardState,
+  type LeafState,
+  type UnitState,
   CardClass,
   CardType,
   LeafClass,
@@ -31,7 +31,7 @@ describe.for<[Player, number]>([
           isExhausted,
         };
         expect(isUnit(card)).toBe(true);
-        if (isUnit(card)) card satisfies UnitCardState;
+        if (isUnit(card)) card satisfies UnitState;
       },
     );
 
@@ -45,7 +45,7 @@ describe.for<[Player, number]>([
           owner,
         };
         expect(isUnit(card)).toBe(false);
-        if (!isUnit(card)) card satisfies LeafCardState;
+        if (!isUnit(card)) card satisfies LeafState;
       },
     );
   });
@@ -61,7 +61,7 @@ describe.for<[Player, number]>([
           owner,
         };
         expect(isLeaf(card)).toBe(true);
-        if (isLeaf(card)) card satisfies LeafCardState;
+        if (isLeaf(card)) card satisfies LeafState;
       },
     );
     it.for<[string, number, boolean, UnitClass]>(
@@ -78,7 +78,7 @@ describe.for<[Player, number]>([
           isExhausted,
         };
         expect(isLeaf(card)).toBe(false);
-        if (!isLeaf(card)) card satisfies UnitCardState;
+        if (!isLeaf(card)) card satisfies UnitState;
       },
     );
   });
@@ -97,7 +97,7 @@ describe.for<[Player, number]>([
           const card = createCard({ key, cardClass: cardClass, owner });
           expect(card.type).toBe(CardType.Unit);
           if (card.type !== CardType.Unit) expect.fail();
-          card satisfies UnitCardState;
+          card satisfies UnitState;
         });
       },
     );
@@ -132,7 +132,7 @@ describe.for<[Player, number]>([
         const card = createCard({ key, cardClass: cardClass, owner });
         expect(card.type).toBe(CardType.Unit);
         if (card.type !== CardType.Unit) expect.fail();
-        card satisfies UnitCardState;
+        card satisfies UnitState;
       },
     );
   });

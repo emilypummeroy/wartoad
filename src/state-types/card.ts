@@ -2,8 +2,8 @@ import {
   CardClass,
   CardType,
   type CardState,
-  type LeafCardState,
-  type UnitCardState,
+  type LeafState,
+  type UnitState,
   type LeafClass,
   type UnitClass,
   type Leaf,
@@ -13,8 +13,8 @@ import {
 } from '../types/card';
 import { Player } from '../types/gameflow';
 
-export const isUnit = (card: CardState): card is UnitCardState =>
-  card.type === CardType.Unit && Boolean(card satisfies UnitCardState);
+export const isUnit = (card: CardState): card is UnitState =>
+  card.type === CardType.Unit && Boolean(card satisfies UnitState);
 
 export const createUnit = ({
   cardClass,
@@ -25,7 +25,7 @@ export const createUnit = ({
   readonly cardClass: UnitClass;
   readonly owner: Player;
   readonly values?: Partial<UnitValues>;
-}): UnitCardState => ({
+}): UnitState => ({
   type: CardType.Unit,
   cardClass,
   ...INITIAL_VALUES[CardType.Unit],
@@ -33,8 +33,8 @@ export const createUnit = ({
   ...baseData,
 });
 
-export const isLeaf = (card: CardState): card is LeafCardState =>
-  card.type === CardType.Leaf && Boolean(card satisfies LeafCardState);
+export const isLeaf = (card: CardState): card is LeafState =>
+  card.type === CardType.Leaf && Boolean(card satisfies LeafState);
 
 export const createLeaf = ({
   cardClass,
@@ -43,7 +43,7 @@ export const createLeaf = ({
   readonly key: number;
   readonly cardClass: LeafClass;
   readonly owner: Player;
-}): LeafCardState => ({
+}): LeafState => ({
   type: CardType.Leaf,
   cardClass,
   ...INITIAL_VALUES[CardType.Leaf],

@@ -23,7 +23,7 @@ import { useId } from 'react';
 
 import {
   CardClass,
-  type LeafCardState,
+  type LeafState,
   type LeafStats,
   type UnitStats,
 } from '../types/card';
@@ -36,7 +36,7 @@ export function LeafCard({
   nameId,
   symbolId,
 }: Readonly<{
-  leaf: LeafCardState;
+  leaf: LeafState;
   nameId?: string;
   symbolId?: string;
   isHome?: boolean;
