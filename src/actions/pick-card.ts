@@ -1,9 +1,9 @@
 import { never, pick } from '../state/get-out';
-import { type Card, CardType } from '../types/card';
+import { type CardState, CardType } from '../types/card';
 import { deploy } from './deploy';
 import { upgrade } from './upgrade';
 
-export const pickCard = (card: Card) =>
+export const pickCard = (card: CardState) =>
   pick(() => {
     switch (card.type) {
       case CardType.Leaf:

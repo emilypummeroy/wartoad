@@ -13,14 +13,14 @@ import {
 import { cancelActivePhase } from '../actions/cancel-active-phase';
 import { createState, DEFAULT_GAME_STATE } from '../state';
 import type { GameState } from '../state-types';
-import { type Card } from '../types/card';
+import { type CardState } from '../types/card';
 import type { Player } from '../types/gameflow';
 
 export type GameContext = [GameState, GameActions];
 
 export const useGameContextData = (
-  getStartingHand: (owner: Player, getNextCardKey: () => number) => Card[],
-  getDrawnCard: (owner: Player, getNextCardKey: () => number) => Card,
+  getStartingHand: (owner: Player, getNextCardKey: () => number) => CardState[],
+  getDrawnCard: (owner: Player, getNextCardKey: () => number) => CardState,
 ): GameContext => {
   const cardKey = useRef(0);
   const getNextCardKey = () => (cardKey.current += 1);

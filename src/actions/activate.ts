@@ -1,9 +1,9 @@
 import { data } from '../state';
-import type { UnitCard } from '../types/card';
+import type { UnitCardState } from '../types/card';
 import { Phase } from '../types/gameflow';
 import type { Position } from '../types/position';
 
-export const activate = (unit: UnitCard, start: Position) =>
+export const activate = (unit: UnitCardState, start: Position) =>
   data(({ get, make }) => {
     const didMeetPreconditions =
       get.phase === Phase.Main &&

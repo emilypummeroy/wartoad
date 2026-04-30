@@ -7,10 +7,10 @@ import type { Player } from './gameflow';
 //
 // They are owned by a particular player.
 // Some cards track additional values like how much damage they've taken.
-export type Card = UnitCard | LeafCard;
-export type UnitCard = CardOf<Unit>;
-export type LeafCard = CardOf<Leaf>;
-export type CardOf<T extends CardType> = CardValuesOf<T> & {
+export type CardState = UnitCardState | LeafCardState;
+export type UnitCardState = CardStateOf<Unit>;
+export type LeafCardState = CardStateOf<Leaf>;
+export type CardStateOf<T extends CardType> = CardValuesOf<T> & {
   readonly type: T;
   readonly key: number;
   readonly owner: Player;

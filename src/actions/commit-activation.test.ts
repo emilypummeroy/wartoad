@@ -14,7 +14,7 @@ import {
   gameflowOf,
   upgradeOf,
 } from '../state/test-utils';
-import { CardClass, type UnitCard } from '../types/card';
+import { CardClass, type UnitCardState } from '../types/card';
 import { Phase, Player } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { _, counter, type PhasePlayer } from '../types/test-utils';
@@ -130,7 +130,7 @@ describe(commitActivation, () => {
     targetCount,
     startCount,
     start = target,
-  ]: Input): [GameState, UnitCard] => {
+  ]: Input): [GameState, UnitCardState] => {
     const unit = createUnit({
       cardClass: CardClass.Froglet,
       owner: player,
@@ -232,7 +232,7 @@ describe(commitActivation, () => {
 
   const it_should_not_affect_the_rest_of_the_units = (
     xy: Position,
-    unit: UnitCard,
+    unit: UnitCardState,
     before: GameState,
   ) =>
     it(`should not affect the rest of the units at ${JSON.stringify(xy)} besides { key=${unit.key} }`, () => {
@@ -297,7 +297,7 @@ const it_should_return_state_unchanged = ([
 
 const it_should_exhaust_the_unit_on_the_leaf = (
   xy: Position,
-  unit: UnitCard,
+  unit: UnitCardState,
   before: GameState,
 ) =>
   it(`should exhaust the unit at ${JSON.stringify(xy)}`, () => {

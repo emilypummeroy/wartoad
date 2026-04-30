@@ -8,13 +8,13 @@ import {
   type PondState,
 } from '../state-types/pond';
 import {
-  type UnitCard,
+  type UnitCardState,
   type UnitKey,
   UnitClass,
   CardClass,
   LeafClass,
   type LeafKey,
-  type LeafCard,
+  type LeafCardState,
 } from '../types/card';
 import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import type { Position } from '../types/position';
@@ -50,7 +50,7 @@ export const phaseStateOf = (
 
 export const upgradeOf = (
   owner?: Player,
-  leaf: LeafCard | LeafKey = CardClass.LilyPad.key,
+  leaf: LeafCardState | LeafKey = CardClass.LilyPad.key,
 ): Partial<GameState> =>
   owner
     ? {
@@ -69,7 +69,7 @@ export const upgradeOf = (
 
 export const deploymentOf = (
   owner?: Player,
-  unit: UnitCard | UnitKey = UnitClass.Froglet.key,
+  unit: UnitCardState | UnitKey = UnitClass.Froglet.key,
 ): Partial<GameState> =>
   owner
     ? {
@@ -88,7 +88,7 @@ export const deploymentOf = (
 
 export const activationOf = (
   owner?: Player,
-  unit: UnitCard | UnitKey = UnitClass.Froglet.key,
+  unit: UnitCardState | UnitKey = UnitClass.Froglet.key,
   start: Position = owner === Player.North ? { x: 1, y: 1 } : { x: 1, y: 4 },
 ): Partial<GameState> =>
   owner

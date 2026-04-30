@@ -1,6 +1,6 @@
 import { useCallback, useId } from 'react';
 
-import { CardClass, type Card } from '../types/card';
+import { CardType, type CardState } from '../types/card';
 import { type Player, PLAYER_CLASSNAME } from '../types/gameflow';
 import { CardBack, Froglet, LilyPad } from '../view/Card';
 
@@ -10,9 +10,9 @@ export const BIG_HAND_HAND_SIZE = 12;
 
 type HandCardProps = Readonly<{
   isEnabled?: boolean;
-  card: Card;
+  card: CardState;
   player: Player;
-  onPick: (cardKey: Card) => void;
+  onPick: (cardKey: CardState) => void;
 }>;
 function HandCard({ isEnabled = false, card, player, onPick }: HandCardProps) {
   const handleClick = useCallback(() => onPick(card), [card, onPick]);
@@ -61,8 +61,8 @@ type HandProps = Readonly<{
   isMainPhase: boolean;
   isActivePhase?: boolean;
   isPlayerTurn: boolean;
-  handCards: readonly Card[];
-  onPick: (cardClass: Card) => void;
+  handCards: readonly CardState[];
+  onPick: (cardClass: CardState) => void;
 }>;
 declare module 'react' {
   // oxlint-disable-next-line typescript/consistent-type-definitions

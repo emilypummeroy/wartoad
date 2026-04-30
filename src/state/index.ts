@@ -4,7 +4,7 @@ import {
   DETERMINISTIC_SOUTH_HAND,
 } from '../state-types/card';
 import { INITIAL_POND } from '../state-types/pond';
-import type { Card } from '../types/card';
+import type { CardState } from '../types/card';
 import { Phase, Player } from '../types/gameflow';
 
 export { data } from './get-out';
@@ -24,7 +24,9 @@ export const DEFAULT_GAME_STATE: GameState = {
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 
-export const createState = (getStartingHand: (owner: Player) => Card[]) => ({
+export const createState = (
+  getStartingHand: (owner: Player) => CardState[],
+) => ({
   ...DEFAULT_GAME_STATE,
   northHand: getStartingHand(Player.North),
   southHand: getStartingHand(Player.South),

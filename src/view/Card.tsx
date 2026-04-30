@@ -21,7 +21,12 @@ import {
 } from 'lucide-react';
 import { useId } from 'react';
 
-import { CardClass, type LeafStats, type UnitStats } from '../types/card';
+import {
+  CardClass,
+  type LeafCardState,
+  type LeafStats,
+  type UnitStats,
+} from '../types/card';
 import { type Player, PLAYER_CLASSNAME } from '../types/gameflow';
 
 export function LilyPad({

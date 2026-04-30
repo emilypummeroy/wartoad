@@ -1,9 +1,9 @@
 import {
   CardClass,
   CardType,
-  type Card,
-  type LeafCard,
-  type UnitCard,
+  type CardState,
+  type LeafCardState,
+  type UnitCardState,
   type LeafClass,
   type UnitClass,
   type Leaf,
@@ -13,8 +13,8 @@ import {
 } from '../types/card';
 import { Player } from '../types/gameflow';
 
-export const isUnit = (card: Card): card is UnitCard =>
-  card.type === CardType.Unit && Boolean(card satisfies UnitCard);
+export const isUnit = (card: CardState): card is UnitCardState =>
+  card.type === CardType.Unit && Boolean(card satisfies UnitCardState);
 
 export const createUnit = ({
   cardClass,
@@ -25,7 +25,7 @@ export const createUnit = ({
   readonly cardClass: UnitClass;
   readonly owner: Player;
   readonly values?: Partial<UnitValues>;
-}): UnitCard => ({
+}): UnitCardState => ({
   type: CardType.Unit,
   cardClass,
   ...INITIAL_VALUES[CardType.Unit],
@@ -33,8 +33,8 @@ export const createUnit = ({
   ...baseData,
 });
 
-export const isLeaf = (card: Card): card is LeafCard =>
-  card.type === CardType.Leaf && Boolean(card satisfies LeafCard);
+export const isLeaf = (card: CardState): card is LeafCardState =>
+  card.type === CardType.Leaf && Boolean(card satisfies LeafCardState);
 
 export const createLeaf = ({
   cardClass,
@@ -43,7 +43,7 @@ export const createLeaf = ({
   readonly key: number;
   readonly cardClass: LeafClass;
   readonly owner: Player;
-}): LeafCard => ({
+}): LeafCardState => ({
   type: CardType.Leaf,
   cardClass,
   ...INITIAL_VALUES[CardType.Leaf],
@@ -56,7 +56,7 @@ type BaseData = {
   readonly owner: Player;
 };
 
-export const createCard = ({ cardClass, ...baseData }: BaseData): Card => {
+export const createCard = ({ cardClass, ...baseData }: BaseData): CardState => {
   switch (cardClass.type) {
     case CardType.Unit:
       return createUnit({ ...baseData, cardClass });

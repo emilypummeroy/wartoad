@@ -1,7 +1,7 @@
 import {
-  type Card,
-  type LeafCard,
-  type UnitCard,
+  type CardState,
+  type LeafCardState,
+  type UnitCardState,
   CardClass,
   CardType,
   LeafClass,
@@ -22,7 +22,7 @@ describe.for<[Player, number]>([
     )(
       'should allow %s with %s damage',
       ([_, damage, isExhausted, cardClass]) => {
-        const card: Card = {
+        const card: CardState = {
           key,
           cardClass: cardClass,
           type: CardType.Unit,
@@ -31,21 +31,21 @@ describe.for<[Player, number]>([
           isExhausted,
         };
         expect(isUnit(card)).toBe(true);
-        if (isUnit(card)) card satisfies UnitCard;
+        if (isUnit(card)) card satisfies UnitCardState;
       },
     );
 
     it.for<[string, LeafClass]>(Object.entries(LeafClass))(
       'should filter %s',
       ([_, cardClass]) => {
-        const card: Card = {
+        const card: CardState = {
           key,
           cardClass: cardClass,
           type: CardType.Leaf,
           owner,
         };
         expect(isUnit(card)).toBe(false);
-        if (!isUnit(card)) card satisfies LeafCard;
+        if (!isUnit(card)) card satisfies LeafCardState;
       },
     );
   });
@@ -54,14 +54,14 @@ describe.for<[Player, number]>([
     it.for<[string, LeafClass]>(Object.entries(LeafClass))(
       'should allow %s',
       ([_, cardClass]) => {
-        const card: Card = {
+        const card: CardState = {
           key,
           cardClass: cardClass,
           type: CardType.Leaf,
           owner,
         };
         expect(isLeaf(card)).toBe(true);
-        if (isLeaf(card)) card satisfies LeafCard;
+        if (isLeaf(card)) card satisfies LeafCardState;
       },
     );
     it.for<[string, number, boolean, UnitClass]>(
@@ -69,7 +69,7 @@ describe.for<[Player, number]>([
     )(
       'should filter %s with %s damage',
       ([_, damage, isExhausted, cardClass]) => {
-        const card: Card = {
+        const card: CardState = {
           key,
           cardClass: cardClass,
           type: CardType.Unit,
@@ -78,7 +78,7 @@ describe.for<[Player, number]>([
           isExhausted,
         };
         expect(isLeaf(card)).toBe(false);
-        if (!isLeaf(card)) card satisfies UnitCard;
+        if (!isLeaf(card)) card satisfies UnitCardState;
       },
     );
   });
@@ -97,7 +97,7 @@ describe.for<[Player, number]>([
           const card = createCard({ key, cardClass: cardClass, owner });
           expect(card.type).toBe(CardType.Unit);
           if (card.type !== CardType.Unit) expect.fail();
-          card satisfies UnitCard;
+          card satisfies UnitCardState;
         });
       },
     );
@@ -132,7 +132,7 @@ describe.for<[Player, number]>([
         const card = createCard({ key, cardClass: cardClass, owner });
         expect(card.type).toBe(CardType.Unit);
         if (card.type !== CardType.Unit) expect.fail();
-        card satisfies UnitCard;
+        card satisfies UnitCardState;
       },
     );
   });

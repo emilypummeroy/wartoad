@@ -4,7 +4,7 @@ import { renderWithGameContext } from '../context/GameContext.test-utils';
 import { createUnit } from '../state-types/card';
 import { HOME, INITIAL_POND, setPondStateAt } from '../state-types/pond';
 import { activationOf, gameflowOf } from '../state/test-utils';
-import { UnitClass, type UnitCard } from '../types/card';
+import { UnitClass, type UnitCardState } from '../types/card';
 import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import type { Position } from '../types/position';
 import { _ } from '../types/test-utils';
@@ -88,7 +88,7 @@ const itShouldNotHaveOpponentUpgradeOrActivateButtons = ([, player]: Inputs) => 
 describe(PondLeaf, () => {
   const renderForInputs = (
     [controller, player, phase, position, isUpgraded, unitOwners, activationStart]: Inputs,
-    units: UnitCard[] = frogletsOwnedBy(unitOwners),
+    units: UnitCardState[] = frogletsOwnedBy(unitOwners),
   ) => {
     renderWithGameContext([
       {
