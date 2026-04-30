@@ -24,30 +24,35 @@ const {
   NORTH_UPGRADED_OTHER_UNIT,
 } = TestLeafKey;
 
-type Input = [Player, TestPondKey, opponentHome: TestLeafKey];
-type Preconditions = [Player, Phase, TestPondKey];
+type Input = [
+  you: Player,
+  turn: Player,
+  TestPondKey,
+  opponentHome: TestLeafKey,
+];
+type Preconditions = [you: Player, turn: Player, Phase, TestPondKey];
 
 describe(winIfYouCan, () => {
   // Preconditions:
   describe.for<[...Preconditions, winner?: Player]>([
     // < Is End phase
-    [North, Main, INITIAL_POND],
-    [North, Start, ANOTHER_POND],
-    [North, Upgrading, INITIAL_POND],
-    [North, Deploying, ANOTHER_POND],
-    [North, Activating, INITIAL_POND],
-    [North, GameOver, INITIAL_POND, North],
-    [North, GameOver, ANOTHER_POND, South],
-    [South, Main, INITIAL_POND],
-    [South, Start, ANOTHER_POND],
-    [South, Upgrading, INITIAL_POND],
-    [South, Deploying, ANOTHER_POND],
-    [South, Activating, ANOTHER_POND],
-    [South, GameOver, INITIAL_POND, North],
-    [South, GameOver, ANOTHER_POND, South],
+    [North, North, Main, INITIAL_POND],
+    [North, South, Start, ANOTHER_POND],
+    [North, North, Upgrading, INITIAL_POND],
+    [North, South, Deploying, ANOTHER_POND],
+    [North, North, Activating, INITIAL_POND],
+    [North, South, GameOver, INITIAL_POND, North],
+    [North, North, GameOver, ANOTHER_POND, South],
+    [South, South, Main, INITIAL_POND],
+    [South, North, Start, ANOTHER_POND],
+    [South, South, Upgrading, INITIAL_POND],
+    [South, North, Deploying, ANOTHER_POND],
+    [South, South, Activating, ANOTHER_POND],
+    [South, North, GameOver, INITIAL_POND, North],
+    [South, South, GameOver, ANOTHER_POND, South],
   ])(
-    'Precondition failed: need End phase | %s %s phase | %s | winner: %s',
-    ([player, phase, pondKey, winner]) => {
+    'Precondition failed: need End phase | %s during %s %s phase | %s | winner: %s',
+    ([you, player, phase, pondKey, winner]) => {
       const pond = TEST_PONDS_BY_KEY[pondKey];
       const before = createStateWith({
         ...gameflowOf(player, phase),
@@ -60,7 +65,7 @@ describe(winIfYouCan, () => {
         winner,
       });
       it('should not change state at all', () => {
-        const after = winIfYouCan()(before);
+        const after = winIfYouCan(you)(before);
         expect(after).toStrictEqual(before);
       });
     },
@@ -68,26 +73,26 @@ describe(winIfYouCan, () => {
 
   describe.for<[...Preconditions, opponentHome: TestLeafKey]>([
     // < Can capture opponent Home
-    [North, End, INITIAL_POND, SOUTH_UPGRADED_UNIT],
-    [North, End, UNITS_POND, SOUTH_UPGRADED],
-    [North, End, ANOTHER_POND, SOUTH_UPGRADED_UNITS],
-    [South, End, INITIAL_POND, NORTH_UPGRADED_UNIT],
-    [South, End, UNITS_POND, NORTH_UPGRADED],
-    [South, End, ANOTHER_POND, NORTH_UPGRADED_UNITS],
+    [North, North, End, INITIAL_POND, SOUTH_UPGRADED_UNIT],
+    [North, South, End, UNITS_POND, SOUTH_UPGRADED],
+    [North, North, End, ANOTHER_POND, SOUTH_UPGRADED_UNITS],
+    [South, South, End, INITIAL_POND, NORTH_UPGRADED_UNIT],
+    [South, North, End, UNITS_POND, NORTH_UPGRADED],
+    [South, South, End, ANOTHER_POND, NORTH_UPGRADED_UNITS],
   ])(
-    'Precondition failed: can capture opponent Home | %s %s phase | opponent home: %s',
-    ([player, phase, pondKey, opponentHome]) => {
+    'Precondition failed: can capture opponent Home | %s during %s %s phase | opponent home: %s',
+    ([you, player, phase, pondKey, opponentHome]) => {
       const pond = TEST_PONDS_BY_KEY[pondKey];
       const before = createStateWith({
         ...gameflowOf(player, phase),
         pond: setPondStateAt(
           pond,
-          HOME[PLAYER_AFTER[player]],
+          HOME[PLAYER_AFTER[you]],
           TEST_LEAVES_BY_KEY[opponentHome],
         ),
       });
       it('should not change state at all', () => {
-        const after = winIfYouCan()(before);
+        const after = winIfYouCan(you)(before);
         expect(after).toStrictEqual(before);
       });
     },
@@ -95,49 +100,53 @@ describe(winIfYouCan, () => {
 
   // Postconditions:
   describe.for<Input>([
-    [North, INITIAL_POND, SOUTH_UPGRADED_OTHER_UNIT],
-    [North, ANOTHER_POND, SOUTH_UPGRADED_OTHER_UNIT],
-    [South, INITIAL_POND, NORTH_UPGRADED_OTHER_UNIT],
-    [South, ANOTHER_POND, NORTH_UPGRADED_OTHER_UNIT],
+    [North, North, INITIAL_POND, SOUTH_UPGRADED_OTHER_UNIT],
+    [North, South, ANOTHER_POND, SOUTH_UPGRADED_OTHER_UNIT],
+    [South, North, INITIAL_POND, NORTH_UPGRADED_OTHER_UNIT],
+    [South, South, ANOTHER_POND, NORTH_UPGRADED_OTHER_UNIT],
+    [North, South, INITIAL_POND, SOUTH_UPGRADED_OTHER_UNIT],
+    [North, North, ANOTHER_POND, SOUTH_UPGRADED_OTHER_UNIT],
+    [South, South, INITIAL_POND, NORTH_UPGRADED_OTHER_UNIT],
+    [South, North, ANOTHER_POND, NORTH_UPGRADED_OTHER_UNIT],
   ])(
-    'Preconditions met | %s turn | in %s with %s at opponent Home',
-    ([player, pondKey, leafKey]) => {
+    'Preconditions met | %s during %s turn | in %s with %s at opponent Home',
+    ([you, player, pondKey, leafKey]) => {
       const pond = TEST_PONDS_BY_KEY[pondKey];
-      const position = HOME[PLAYER_AFTER[player]];
+      const position = HOME[PLAYER_AFTER[you]];
       const leaf = TEST_LEAVES_BY_KEY[leafKey];
       const before = createStateWith({
         ...gameflowOf(player, End),
         pond: setPondStateAt(pond, position, leaf),
       });
-      const opponent = player === North ? South : North;
+      const opponent = you === North ? South : North;
 
       // > GameOver phase
       it('should set Phase to GameOver', () => {
-        const after = winIfYouCan()(before);
+        const after = winIfYouCan(you)(before);
         expect(after.flow.phase).toBe(GameOver);
       });
 
       it('should not change other gameflow details', () => {
-        const { phase: _, ...got } = winIfYouCan()(before).flow;
+        const { phase: _, ...got } = winIfYouCan(you)(before).flow;
         const { phase: __, ...want } = before.flow;
         expect(got).toStrictEqual(want);
       });
 
       // > winner = player
       it(`should set the winner to ${player}`, () => {
-        const after = winIfYouCan()(before);
-        expect(after.winner).toBe(player);
+        const after = winIfYouCan(you)(before);
+        expect(after.winner).toBe(you);
       });
 
       // > opponent Home is captured
       it(`should capture the ${opponent} Home`, () => {
-        const after = winIfYouCan()(before);
+        const after = winIfYouCan(you)(before);
         const { controller } = getPondStateAt(after.pond, HOME[opponent]);
-        expect(controller).toBe(player);
+        expect(controller).toBe(you);
       });
 
       it(`should not change the rest of the pond`, () => {
-        const after = winIfYouCan()(before);
+        const after = winIfYouCan(you)(before);
         const want = setPondStateAt(before.pond, HOME[opponent], {
           controller: getPondStateAt(after.pond, HOME[opponent]).controller,
         });
@@ -147,7 +156,7 @@ describe(winIfYouCan, () => {
       it('should not change other state details', () => {
         let got = {};
         let want = {};
-        const after = winIfYouCan()(before);
+        const after = winIfYouCan(you)(before);
         {
           const { pond: _, flow: __, winner: ___, ...got_ } = after;
           got = got_;

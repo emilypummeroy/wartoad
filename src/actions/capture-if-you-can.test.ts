@@ -42,17 +42,26 @@ const {
 } = TestLeafKey;
 
 type Preconditions = [
-  Player,
+  capturer: Player,
+  turn: Player,
   Phase,
   TestPondKey,
   Position,
   TestLeafKey,
   winner?: Player,
 ];
-type Inputs = [Player, TestPondKey, Position, TestLeafKey, Position?];
+type Inputs = [
+  capturer: Player,
+  turn: Player,
+  TestPondKey,
+  Position,
+  TestLeafKey,
+  Position?,
+];
 
 describe(captureIfYouCan, () => {
   const it_should_not_change_state = ([
+    capturer,
     player,
     phase,
     pondKey,
@@ -68,16 +77,17 @@ describe(captureIfYouCan, () => {
         ...phaseStateOf(player, phase),
         ...winningPondOf(winner, setPondStateAt(pond, position, leaf)),
       });
-      expect(captureIfYouCan()(old)).toStrictEqual(old);
+      expect(captureIfYouCan(capturer)(old)).toStrictEqual(old);
     });
   };
 
   // Preconditions:
   // < need phase = End
   describe.for<Preconditions>([
-    [North, Start, INITIAL_POND, { x: 2, y: 5 }, SOUTH_LEAF_OTHER_UNIT],
-    [South, Main, INITIAL_POND, { x: 1, y: 2 }, NORTH_LEAF_OTHER_UNIT],
+    [North, North, Start, INITIAL_POND, { x: 2, y: 5 }, SOUTH_LEAF_OTHER_UNIT],
+    [South, North, Main, INITIAL_POND, { x: 1, y: 2 }, NORTH_LEAF_OTHER_UNIT],
     [
+      North,
       North,
       GameOver,
       INITIAL_POND,
@@ -85,61 +95,130 @@ describe(captureIfYouCan, () => {
       SOUTH_LEAF_OTHER_UNIT,
       North,
     ],
-    [South, Upgrading, INITIAL_POND, { x: 2, y: 1 }, NORTH_LEAF_OTHER_UNIT],
-    [North, Deploying, INITIAL_POND, { x: 1, y: 3 }, SOUTH_LEAF_OTHER_UNIT],
-    [South, Activating, INITIAL_POND, { x: 0, y: 0 }, NORTH_LEAF_OTHER_UNIT],
+    [
+      South,
+      North,
+      Upgrading,
+      INITIAL_POND,
+      { x: 2, y: 1 },
+      NORTH_LEAF_OTHER_UNIT,
+    ],
+    [
+      North,
+      North,
+      Deploying,
+      INITIAL_POND,
+      { x: 1, y: 3 },
+      SOUTH_LEAF_OTHER_UNIT,
+    ],
+    [
+      South,
+      North,
+      Activating,
+      INITIAL_POND,
+      { x: 0, y: 0 },
+      NORTH_LEAF_OTHER_UNIT,
+    ],
+    [North, South, Start, INITIAL_POND, { x: 2, y: 5 }, SOUTH_LEAF_OTHER_UNIT],
+    [South, South, Main, INITIAL_POND, { x: 1, y: 2 }, NORTH_LEAF_OTHER_UNIT],
+    [
+      North,
+      South,
+      GameOver,
+      INITIAL_POND,
+      { x: 0, y: 4 },
+      SOUTH_LEAF_OTHER_UNIT,
+      South,
+    ],
+    [
+      South,
+      South,
+      Upgrading,
+      INITIAL_POND,
+      { x: 2, y: 1 },
+      NORTH_LEAF_OTHER_UNIT,
+    ],
+    [
+      North,
+      South,
+      Deploying,
+      INITIAL_POND,
+      { x: 1, y: 3 },
+      SOUTH_LEAF_OTHER_UNIT,
+    ],
+    [
+      South,
+      South,
+      Activating,
+      INITIAL_POND,
+      { x: 0, y: 0 },
+      NORTH_LEAF_OTHER_UNIT,
+    ],
   ])(
-    'Precondition failed: need End phase | %s %s | %s with %s set to %s',
+    'Precondition failed: need End phase |  %s capturing in%s %s | %s with %s set to %s',
     inputs => it_should_not_change_state(inputs),
   );
 
   // Preconditions:
   // < need Can capture
   describe.for<Preconditions>([
-    [North, End, INITIAL_POND, { x: 1, y: 3 }, SOUTH_LEAF],
-    [North, End, INITIAL_POND, { x: 0, y: 3 }, SOUTH_LEAF_WITH_UNIT],
-    [North, End, INITIAL_POND, { x: 2, y: 4 }, SOUTH_LEAF_WITH_UNITS],
-    [North, End, INITIAL_POND, { x: 2, y: 2 }, NORTH_LEAF_OTHER_UNIT],
-    [North, End, INITIAL_POND, { x: 1, y: 5 }, SOUTH_UPGRADED_UNITS],
-    [North, End, INITIAL_POND, { x: 2, y: 2 }, NORTH_LEAF_OTHER_UNIT],
-    [South, End, INITIAL_POND, { x: 1, y: 2 }, NORTH_LEAF],
-    [South, End, INITIAL_POND, { x: 0, y: 2 }, NORTH_LEAF_WITH_UNIT],
-    [South, End, INITIAL_POND, { x: 1, y: 0 }, NORTH_UPGRADED_UNITS],
-    [South, End, INITIAL_POND, { x: 1, y: 2 }, NORTH_LEAF_WITH_UNITS],
-    [South, End, INITIAL_POND, { x: 2, y: 3 }, SOUTH_LEAF_OTHER_UNIT],
-    [North, End, ANOTHER_POND, { x: 2, y: 3 }, SOUTH_LEAF],
-    [North, End, ANOTHER_POND, { x: 1, y: 1 }, SOUTH_LEAF_WITH_UNIT],
-    [North, End, ANOTHER_POND, { x: 1, y: 5 }, SOUTH_UPGRADED_UNIT],
-    [North, End, ANOTHER_POND, { x: 0, y: 4 }, SOUTH_LEAF_WITH_UNITS],
-    [North, End, ANOTHER_POND, { x: 0, y: 3 }, SOUTH_LEAF_WITH_UNITS],
-    [North, End, ANOTHER_POND, { x: 0, y: 2 }, NORTH_UPGRADED_OTHER_UNIT],
-    [South, End, ANOTHER_POND, { x: 2, y: 2 }, NORTH_LEAF],
-    [South, End, ANOTHER_POND, { x: 1, y: 0 }, NORTH_UPGRADED_UNIT],
-    [South, End, ANOTHER_POND, { x: 0, y: 1 }, NORTH_LEAF_WITH_UNITS],
-    [South, End, ANOTHER_POND, { x: 1, y: 2 }, NORTH_UPGRADED_UNITS],
-    [South, End, ANOTHER_POND, { x: 0, y: 3 }, SOUTH_UPGRADED_OTHER_UNIT],
+    [North, South, End, INITIAL_POND, { x: 1, y: 3 }, SOUTH_LEAF],
+    [North, South, End, INITIAL_POND, { x: 0, y: 3 }, SOUTH_LEAF_WITH_UNIT],
+    [North, South, End, INITIAL_POND, { x: 2, y: 4 }, SOUTH_LEAF_WITH_UNITS],
+    [North, North, End, INITIAL_POND, { x: 2, y: 2 }, NORTH_LEAF_OTHER_UNIT],
+    [North, North, End, INITIAL_POND, { x: 1, y: 5 }, SOUTH_UPGRADED_UNITS],
+    [North, North, End, INITIAL_POND, { x: 2, y: 2 }, NORTH_LEAF_OTHER_UNIT],
+    [South, South, End, INITIAL_POND, { x: 1, y: 2 }, NORTH_LEAF],
+    [South, South, End, INITIAL_POND, { x: 0, y: 2 }, NORTH_LEAF_WITH_UNIT],
+    [South, South, End, INITIAL_POND, { x: 1, y: 0 }, NORTH_UPGRADED_UNITS],
+    [South, North, End, INITIAL_POND, { x: 1, y: 2 }, NORTH_LEAF_WITH_UNITS],
+    [South, North, End, INITIAL_POND, { x: 2, y: 3 }, SOUTH_LEAF_OTHER_UNIT],
+    [North, South, End, ANOTHER_POND, { x: 2, y: 3 }, SOUTH_LEAF],
+    [North, South, End, ANOTHER_POND, { x: 1, y: 1 }, SOUTH_LEAF_WITH_UNIT],
+    [North, South, End, ANOTHER_POND, { x: 1, y: 5 }, SOUTH_UPGRADED_UNIT],
+    [North, North, End, ANOTHER_POND, { x: 0, y: 4 }, SOUTH_LEAF_WITH_UNITS],
+    [North, North, End, ANOTHER_POND, { x: 0, y: 3 }, SOUTH_LEAF_WITH_UNITS],
+    [
+      North,
+      North,
+      End,
+      ANOTHER_POND,
+      { x: 0, y: 2 },
+      NORTH_UPGRADED_OTHER_UNIT,
+    ],
+    [South, South, End, ANOTHER_POND, { x: 2, y: 2 }, NORTH_LEAF],
+    [South, South, End, ANOTHER_POND, { x: 1, y: 0 }, NORTH_UPGRADED_UNIT],
+    [South, South, End, ANOTHER_POND, { x: 0, y: 1 }, NORTH_LEAF_WITH_UNITS],
+    [South, North, End, ANOTHER_POND, { x: 1, y: 2 }, NORTH_UPGRADED_UNITS],
+    [
+      South,
+      North,
+      End,
+      ANOTHER_POND,
+      { x: 0, y: 3 },
+      SOUTH_UPGRADED_OTHER_UNIT,
+    ],
   ])(
-    'Precondition failed: cannot capture | %s %s | %s with %s set to %s',
+    'Precondition failed: cannot capture | %s capturing in %s %s | %s with %s set to %s',
     inputs => it_should_not_change_state(inputs),
   );
 
   // Postconditions: Can capture
   // > p <- position . can capture -> capture(p, player)
-  // TODO 15: Opponent should capture first.
   // Capturing requires exclusive occupation of a leaf controlled by the opponent of the turn player.
   // Exclusive occupation means that only units of the turn player may be on the leaf.
   describe.for<Inputs>([
-    [North, INITIAL_POND, { x: 0, y: 2 }, SOUTH_LEAF_OTHER_UNIT],
-    [North, ANOTHER_POND, { x: 1, y: 2 }, SOUTH_UPGRADED_OTHER_UNIT],
-    [North, ANOTHER_POND, { x: 2, y: 3 }, SOUTH_UPGRADED_OTHER_UNIT],
-    [North, INITIAL_POND, { x: 0, y: 2 }, SOUTH_LEAF_OTHER_UNIT],
-    [South, INITIAL_POND, { x: 1, y: 3 }, NORTH_LEAF_OTHER_UNIT],
-    [South, INITIAL_POND, { x: 0, y: 3 }, NORTH_LEAF_OTHER_UNIT],
-    [South, ANOTHER_POND, { x: 1, y: 2 }, NORTH_UPGRADED_OTHER_UNIT],
-    [South, ANOTHER_POND, { x: 2, y: 3 }, NORTH_LEAF_OTHER_UNIT],
+    [North, North, INITIAL_POND, { x: 0, y: 2 }, SOUTH_LEAF_OTHER_UNIT],
+    [North, South, ANOTHER_POND, { x: 1, y: 2 }, SOUTH_UPGRADED_OTHER_UNIT],
+    [North, North, ANOTHER_POND, { x: 2, y: 3 }, SOUTH_UPGRADED_OTHER_UNIT],
+    [North, South, INITIAL_POND, { x: 0, y: 2 }, SOUTH_LEAF_OTHER_UNIT],
+    [South, North, INITIAL_POND, { x: 1, y: 3 }, NORTH_LEAF_OTHER_UNIT],
+    [South, South, INITIAL_POND, { x: 0, y: 3 }, NORTH_LEAF_OTHER_UNIT],
+    [South, North, ANOTHER_POND, { x: 1, y: 2 }, NORTH_UPGRADED_OTHER_UNIT],
+    [South, South, ANOTHER_POND, { x: 2, y: 3 }, NORTH_LEAF_OTHER_UNIT],
   ])(
-    'Postconditions | %s turn | %s with %s set to %s',
-    ([player, pondKey, xy1, leafKey, xy2]) => {
+    'Postconditions | %s capturing on %s turn | %s with %s set to %s',
+    ([capturer, player, pondKey, xy1, leafKey, xy2]) => {
       const pond = TEST_PONDS_BY_KEY[pondKey];
       const leaf = TEST_LEAVES_BY_KEY[leafKey];
       const positions = xy2 ? [xy1, xy2] : [xy1];
@@ -152,15 +231,15 @@ describe(captureIfYouCan, () => {
 
       // > Non-pond state unchanged
       it('should not change the rest of the state besides the pond', () => {
-        const { pond: _, ...got } = captureIfYouCan()(before);
+        const { pond: _, ...got } = captureIfYouCan(capturer)(before);
         const { pond: __, ...want } = before;
         expect(got).toStrictEqual(want);
       });
 
       // > p <- position . can capture -> capture(p, player)
       it.for(positions)('should capture position %s', xy => {
-        const after = captureIfYouCan()(before);
-        const want = { ...leaf, controller: player };
+        const after = captureIfYouCan(capturer)(before);
+        const want = { ...leaf, controller: capturer };
         const got = getPondStateAt(after.pond, xy);
         expect(got).toStrictEqual(want);
       });

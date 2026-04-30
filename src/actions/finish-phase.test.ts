@@ -5,6 +5,7 @@ import {
   HOME,
   INITIAL_POND,
   setPondStateAt,
+  setPondStateAtEach,
 } from '../state-types/pond';
 import {
   TEST_LEAVES_BY_KEY,
@@ -27,8 +28,10 @@ const { Froglet, LilyPad } = CardKey;
 const { Upgrading, Deploying, Activating, Start, Main, End, GameOver } = Phase;
 
 const {
+  SOUTH_UPGRADED,
   SOUTH_UPGRADED_UNIT,
   SOUTH_UPGRADED_OTHER_UNIT,
+  NORTH_UPGRADED,
   NORTH_UPGRADED_UNIT,
   NORTH_UPGRADED_OTHER_UNIT,
 } = TestLeafKey;
@@ -108,6 +111,10 @@ describe(finishPhase, () => {
     // < Main & Idle & can capture other leaf > End & capture
     [North, Main, SOUTH_UPGRADED_OTHER_UNIT, North],
     [South, Main, NORTH_UPGRADED_OTHER_UNIT, South],
+
+    // < Main & Idle & opponent can capture leaf > End & capture
+    [North, Main, NORTH_UPGRADED_OTHER_UNIT, South],
+    [South, Main, SOUTH_UPGRADED_OTHER_UNIT, North],
   ])(
     'Preconditions met | during %s %s | when a centre leaf is %s',
     ([player, phase, opponentLeaf, wantController]) => {
@@ -135,25 +142,47 @@ describe(finishPhase, () => {
   );
 
   // Postconditions
-  describe.for<[...Inputs, opponentHome: TestLeafKey]>([
-    // < Main & Idle & can capture opponent Home > GameOver
-    [North, Main, SOUTH_UPGRADED_OTHER_UNIT],
-    [South, Main, NORTH_UPGRADED_OTHER_UNIT],
+  describe.for<
+    [
+      ...Inputs,
+      opponentHome: TestLeafKey,
+      wantWinner: Player,
+      playerHome?: TestLeafKey,
+    ]
+  >([
+    // < Main & can capture opponent Home > GameOver
+    [North, Main, SOUTH_UPGRADED_OTHER_UNIT, North],
+    [South, Main, NORTH_UPGRADED_OTHER_UNIT, South],
+
+    // < Main & opponent can capture Home > GameOver
+    [North, Main, SOUTH_UPGRADED, South, NORTH_UPGRADED_OTHER_UNIT],
+    [South, Main, NORTH_UPGRADED, North, SOUTH_UPGRADED_OTHER_UNIT],
+
+    // < Main & opponent can capture Home > GameOver
+    [North, Main, SOUTH_UPGRADED_OTHER_UNIT, South, NORTH_UPGRADED_OTHER_UNIT],
+    [South, Main, NORTH_UPGRADED_OTHER_UNIT, North, SOUTH_UPGRADED_OTHER_UNIT],
   ])(
-    'Preconditions met | during %s %s | when opponent Home is %s',
-    ([player, phase, opponentLeaf]) => {
+    'Preconditions met | during %s %s | opponent Home is %s | want winner: %s | own home: %s',
+    ([player, phase, opponentLeaf, wantWinner, ownLeaf]) => {
       const before = createStateWith({
         ...gameflowOf(player, phase),
-        pond: setPondStateAt(
-          INITIAL_POND,
-          HOME[PLAYER_AFTER[player]],
-          TEST_LEAVES_BY_KEY[opponentLeaf],
-        ),
+        pond: ownLeaf
+          ? setPondStateAtEach(
+              INITIAL_POND,
+              [HOME[PLAYER_AFTER[player]], TEST_LEAVES_BY_KEY[opponentLeaf]],
+              [HOME[player], TEST_LEAVES_BY_KEY[ownLeaf]],
+            )
+          : setPondStateAt(
+              INITIAL_POND,
+              HOME[PLAYER_AFTER[player]],
+              TEST_LEAVES_BY_KEY[opponentLeaf],
+            ),
       });
 
-      it('should set phase to GameOver', () => {
+      it(`should make ${wantWinner} win`, () => {
         const after = finishPhase(draw())(before);
         expect(after.flow.phase).toBe(GameOver);
+        expect(after.winner).toBe(wantWinner);
       });
     },
   );

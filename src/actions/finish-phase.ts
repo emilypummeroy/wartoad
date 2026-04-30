@@ -1,7 +1,7 @@
 import { chain, never, pick } from '../state/get-out';
 import { identity } from '../types';
 import type { Card } from '../types/card';
-import { Phase, type Player } from '../types/gameflow';
+import { Phase, PLAYER_AFTER, type Player } from '../types/gameflow';
 import { captureIfYouCan } from './capture-if-you-can';
 import { finishEndPhase } from './finish-end-phase';
 import { finishMainPhase } from './finish-main-phase';
@@ -14,7 +14,13 @@ export const finishPhase = (draw: (owner: Player) => Card) =>
       case Phase.Start:
         return finishStartPhase(draw);
       case Phase.Main:
-        return chain(finishMainPhase(), winIfYouCan(), captureIfYouCan());
+        return chain(
+          finishMainPhase(),
+          winIfYouCan(PLAYER_AFTER[get.player]),
+          captureIfYouCan(PLAYER_AFTER[get.player]),
+          winIfYouCan(get.player),
+          captureIfYouCan(get.player),
+        );
       case Phase.End:
         return finishEndPhase();
       case Phase.GameOver:
