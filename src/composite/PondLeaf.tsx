@@ -7,7 +7,7 @@ import { GameContext } from '../context/GameContext';
 import type { ActivationState } from '../state-types';
 import { type PondState } from '../state-types/pond';
 import type { UnitCard } from '../types/card';
-import { Phase, type Gameflow, type Player } from '../types/gameflow';
+import { type Gameflow } from '../types/gameflow';
 import { type Position } from '../types/position';
 
 type PondLeafContext = readonly [
@@ -29,34 +29,24 @@ type PondLeafProps = {
 const clamp = (min: number, v: number, max: number) =>
   Math.max(min, Math.min(max, v));
 
-const SHOW_SIZE = 1;
-const PEEK_SIZE = 0.5;
+const SHOW_SIZE = 0.9;
+const PEEK_SIZE = 0.45;
 const SHOW_LEAF_SIZE = 0.8;
-const PEEK_LEAF_SIZE = 0.4;
-const LEAF_ZONE_SIZE = 2.5;
+const PEEK_LEAF_SIZE = 0.2;
+const LEAF_ZONE_SIZE = 2.2;
 
 const rowSize = ({
   units,
-  player,
-  phase,
   position,
   isUpgraded,
 }: Readonly<{
   units: readonly UnitCard[];
-  player: Player;
-  phase: Phase;
   position: Position;
   isUpgraded: boolean;
 }>) => {
   const leafSize = isUpgraded ? SHOW_LEAF_SIZE : PEEK_LEAF_SIZE;
-  const showingUnitCount =
-    phase === Phase.Main
-      ? units.filter(u => u.owner === player && !u.values.isExhausted).length
-      : 0;
-  const peekingUnitCount =
-    phase === Phase.Main
-      ? units.filter(u => u.owner !== player || u.values.isExhausted).length
-      : units.length;
+  const showingUnitCount = units.filter(u => !u.values.isExhausted).length;
+  const peekingUnitCount = units.filter(u => u.values.isExhausted).length;
 
   const rowSize =
     showingUnitCount * SHOW_SIZE + peekingUnitCount * PEEK_SIZE + leafSize;
@@ -66,7 +56,7 @@ const rowSize = ({
     (1 + position.x) * LEAF_ZONE_SIZE,
   );
   const rowClassName =
-    rowSize / 2 > LEAF_ZONE_SIZE
+    rowSize >= 2 * LEAF_ZONE_SIZE
       ? 'super-compact'
       : rowSize > LEAF_ZONE_SIZE
         ? 'compact'
@@ -78,7 +68,6 @@ export function PondLeaf({ position }: PondLeafProps) {
   const [
     {
       flow,
-      flow: { player, phase },
       activation,
       pond: {
         [position.y]: {
@@ -96,8 +85,6 @@ export function PondLeaf({ position }: PondLeafProps) {
 
   const [rowClassName, clampedSize] = rowSize({
     units,
-    player,
-    phase,
     position,
     isUpgraded,
   });

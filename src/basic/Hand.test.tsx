@@ -124,6 +124,24 @@ describe(Hand, () => {
       expect(pickCard).not.toHaveBeenCalled();
     });
 
+    it(`should not allow cards to be picked during an active phase`, () => {
+      render(
+        <Hand
+          player={player}
+          handCards={cards(handSize, cardClass)}
+          isMainPhase={false}
+          isActivePhase
+          isPlayerTurn
+          onPick={pickCard}
+        />,
+      );
+      const clickableCards = withinHand().queryAllByRole('button');
+      for (const card of clickableCards) {
+        fireEvent.click(card);
+      }
+      expect(pickCard).not.toHaveBeenCalled();
+    });
+
     describe.for<Phase>([
       Phase.Start,
       Phase.Main,

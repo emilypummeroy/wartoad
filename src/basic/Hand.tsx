@@ -59,6 +59,7 @@ export const classForHand = (cards: readonly unknown[]): string => {
 type HandProps = Readonly<{
   player: Player;
   isMainPhase: boolean;
+  isActivePhase?: boolean;
   isPlayerTurn: boolean;
   handCards: readonly Card[];
   onPick: (cardClass: Card) => void;
@@ -74,12 +75,18 @@ declare module 'react' {
 export function Hand({
   player,
   isMainPhase,
+  isActivePhase = false,
   isPlayerTurn,
   handCards,
   onPick,
 }: HandProps) {
   const id = useId();
-  const isJiggling = isMainPhase && isPlayerTurn;
+  const isJiggling = !isActivePhase && isMainPhase && isPlayerTurn;
+  const listClass = isActivePhase
+    ? 'stack-row'
+    : isJiggling
+      ? 'jiggle-row'
+      : 'splay-row';
 
   return (
     <section className="hand" aria-labelledby={id}>
@@ -88,7 +95,7 @@ export function Hand({
       </h3>
       <div
         role={isJiggling ? 'listbox' : 'list'}
-        className={`${isJiggling ? 'jiggle-row' : 'splay-row'} ${classForHand(handCards)}`}
+        className={`${listClass} ${classForHand(handCards)}`}
         style={{
           '--hand-size': handCards.length,
         }}

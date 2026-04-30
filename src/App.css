@@ -36,7 +36,8 @@
 :root {
   --card-south: oklch(70% 0.16 260);
   --card-north: oklch(85% 0.22 30);
-  --card-front: oklch(30% 0.02 140);
+  --card-front: oklch(32% 0.015 140);
+  --card-front-leaf: oklch(23% 0.02 140);
   --card-text: oklch(95% 0.02 30);
   --card-back: oklch(15% 0.05 200);
   --card-outline: oklch(40% 0.02 160);
@@ -411,6 +412,7 @@ span.south {
   }
 }
 
+.stack-row,
 .splay-row {
   display: flex;
   flex-direction: row;
@@ -457,6 +459,8 @@ span.south {
       }
     }
   }
+}
+.splay-row {
   &:hover {
     margin-left: 2svh;
     .stacking {
@@ -742,18 +746,18 @@ span.south {
   &.super-compact {
     &:hover {
       margin-left: calc(
-        0svh - (var(--row-size) - 2.5) *
+        0svh - (var(--row-size) - 2.2) *
           (var(--card-width) * var(--showing-factor))
       );
     }
   }
   .peeking {
     margin-right: calc(
-      0svh - var(--card-width) * (1 - 0.5 * var(--showing-factor))
+      0svh - var(--card-width) * (1 - 0.45 * var(--showing-factor))
     );
     &:hover {
       margin-right: calc(
-        0svh - var(--card-width) * (1 - 1 * var(--showing-factor))
+        0svh - var(--card-width) * (1 - 0.8 * var(--showing-factor))
       );
     }
     &.leaf {
@@ -768,13 +772,15 @@ span.south {
     }
   }
   .showing {
-    margin-right: calc(0svh - var(--card-width) * (1 - var(--showing-factor)));
+    margin-right: calc(
+      0svh - var(--card-width) * (0.9 - var(--showing-factor))
+    );
     &:hover {
       margin-right: 0;
     }
     &.leaf {
       margin-right: calc(
-        0svh - var(--card-width) * (1 - var(--showing-factor))
+        0svh - var(--card-width) * (0.8 - var(--showing-factor))
       );
       &:hover {
         margin-right: 0;
@@ -813,6 +819,9 @@ span.south {
   justify-content: space-between;
 
   background: var(--card-front);
+  &.leaf {
+    background: var(--card-front-leaf);
+  }
   color: var(--card-text);
   border: 1px solid var(--card-border);
   outline: 1px solid var(--card-outline);

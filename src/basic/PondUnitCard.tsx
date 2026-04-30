@@ -49,7 +49,7 @@ export const PondUnitCard = ({
       </div>
     </div>
   ) : (
-    <div className="peeking">
+    <div className={isExhausted ? 'peeking' : 'showing'}>
       <div
         role="listitem"
         className={`highlighting-card ${PLAYER_CLASSNAME[unit.owner]}`}

@@ -34,6 +34,11 @@ export function Game() {
         <section className="handarea">
           <Hand
             player={Player.North}
+            isActivePhase={
+              phase === Phase.Activating ||
+              phase === Phase.Deploying ||
+              phase === Phase.Upgrading
+            }
             isMainPhase={phase === Phase.Main}
             isPlayerTurn={player === Player.North}
             handCards={northHand}

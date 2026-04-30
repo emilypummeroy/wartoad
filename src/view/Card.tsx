@@ -53,7 +53,7 @@ export function LilyPad({
   return (
     <section
       aria-labelledby={`${isLeaf ? symbolId : ''} ${nameId}`}
-      className={`card ${isLeaf && player ? PLAYER_CLASSNAME[player] : ''}`}
+      className={`card leaf ${isLeaf && player ? PLAYER_CLASSNAME[player] : ''}`}
     >
       <div className="card-title" id={nameId}>
         Lily Pad
