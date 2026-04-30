@@ -29,11 +29,11 @@ type PondLeafProps = {
 const clamp = (min: number, v: number, max: number) =>
   Math.max(min, Math.min(max, v));
 
-const SHOW_SIZE = 0.6;
-const PEEK_SIZE = 0.3;
+const SHOW_SIZE = 1;
+const PEEK_SIZE = 0.5;
 const SHOW_LEAF_SIZE = 0.8;
-const PEEK_LEAF_SIZE = 0.5;
-const LEAF_ZONE_SIZE = 2.15;
+const PEEK_LEAF_SIZE = 0.4;
+const LEAF_ZONE_SIZE = 2.5;
 
 const rowSize = ({
   units,

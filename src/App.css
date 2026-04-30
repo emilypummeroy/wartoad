@@ -49,12 +49,12 @@
     oklch(0% 0 0 / 0.3) 0 6px 16px 0, oklch(0% 0 0 / 0.5) 0 4px 8px 0;
 
   /* South 100-5x, North 100-4x */
-  --south-accent: oklch(65% 0.16 260);
-  --north-accent: oklch(72% 0.16 30);
   --south-text: oklch(40% 0.16 260);
   --north-text: oklch(48% 0.16 30);
-  --south-outline-accent: oklch(50% 0.16 260);
-  --north-outline-accent: oklch(60% 0.16 30);
+  --south-accent: oklch(50% 0.16 260);
+  --north-accent: oklch(60% 0.16 30);
+  --south-outline-accent: oklch(60% 0.16 260);
+  --north-outline-accent: oklch(68% 0.16 30);
   --south-outline: oklch(65% 0.16 260);
   --north-outline: oklch(72% 0.16 30);
   --south-bg: oklch(84% 0.05 260);
@@ -62,12 +62,12 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --south-accent: oklch(48% 0.16 260);
-    --north-accent: oklch(55% 0.16 30);
     --south-text: oklch(66% 0.16 260);
     --north-text: oklch(75% 0.16 30);
-    --south-outline-accent: oklch(60% 0.16 260);
-    --north-outline-accent: oklch(70% 0.16 30);
+    --south-accent: oklch(60% 0.16 260);
+    --north-accent: oklch(70% 0.16 30);
+    --south-outline-accent: oklch(52% 0.16 260);
+    --north-outline-accent: oklch(60% 0.16 30);
     --south-outline: oklch(48% 0.16 260);
     --north-outline: oklch(55% 0.16 30);
     --south-bg: oklch(23% 0.05 260);
@@ -233,14 +233,27 @@ div.highlighting-card {
   border: none;
   border-radius: 0.2svh;
   box-shadow: var(--card-shadow);
-  outline-offset: 2px;
+  outline-offset: 1px;
 
   &:hover {
     outline: 1px solid;
   }
   &:focus {
-    outline: 2px solid;
+    outline: 1px solid;
   }
+  &.pickable-card {
+    &:hover {
+      outline: 2px solid;
+    }
+    &:focus {
+      outline: 2px solid;
+    }
+    cursor: grab;
+    &:hover .card {
+      filter: brightness(120%);
+    }
+  }
+
   &.north {
     outline-color: var(--north-outline);
     &.pickable-card,
@@ -259,13 +272,6 @@ div.highlighting-card {
     }
     &.pickable-card:focus {
       outline-color: var(--south-accent);
-    }
-  }
-
-  &.pickable-card {
-    cursor: grab;
-    &:hover {
-      filter: brightness(120%);
     }
   }
 }
@@ -732,88 +738,61 @@ span.south {
     }
   }
 
-  margin-left: 0;
+  &.compact,
+  &.super-compact {
+    &:hover {
+      margin-left: calc(
+        0svh - (var(--row-size) - 2.5) *
+          (var(--card-width) * var(--showing-factor))
+      );
+    }
+  }
   .peeking {
-    margin-right: calc(var(--card-width) * -0.7);
+    margin-right: calc(
+      0svh - var(--card-width) * (1 - 0.5 * var(--showing-factor))
+    );
+    &:hover {
+      margin-right: calc(
+        0svh - var(--card-width) * (1 - 1 * var(--showing-factor))
+      );
+    }
     &.leaf {
-      margin-right: calc(var(--card-width) * -0.5);
+      margin-right: calc(
+        0svh - var(--card-width) * (1 - 0.4 * var(--showing-factor))
+      );
+      &:hover {
+        margin-right: calc(
+          0svh - var(--card-width) * (1 - 0.6 * var(--showing-factor))
+        );
+      }
     }
   }
   .showing {
-    margin-right: calc(var(--card-width) * -0.4);
+    margin-right: calc(0svh - var(--card-width) * (1 - var(--showing-factor)));
+    &:hover {
+      margin-right: 0;
+    }
     &.leaf {
-      margin-right: calc(var(--card-width) * -0.2);
-    }
-  }
-  &.compact {
-    .peeking {
-      margin-right: calc(var(--card-width) * -0.85);
-      &.leaf {
-        margin-right: calc(var(--card-width) * -0.75);
-      }
-    }
-    .showing {
-      margin-right: calc(var(--card-width) * -0.7);
-      &.leaf {
-        margin-right: calc(var(--card-width) * -0.6);
-      }
-    }
-  }
-  &.super-compact {
-    .peeking {
-      margin-right: calc(var(--card-width) * -0.9);
-      &.leaf {
-        margin-right: calc(var(--card-width) * -0.75);
-      }
-    }
-    .showing {
-      margin-right: calc(var(--card-width) * -0.82);
-      &.leaf {
-        margin-right: calc(var(--card-width) * -0.6);
+      margin-right: calc(
+        0svh - var(--card-width) * (1 - var(--showing-factor))
+      );
+      &:hover {
+        margin-right: 0;
       }
     }
   }
 
-  &:hover {
-    .peeking {
-      margin-right: calc(var(--card-width) * -0.3);
-      &.leaf {
-        margin-right: calc(var(--card-width) * -0.2);
-      }
-    }
-    .showing {
-      margin-right: calc(var(--card-width) * -0);
-      &.leaf {
-        margin-right: 0;
-      }
+  --showing-factor: 0.8;
+  &.compact {
+    --showing-factor: 0.4;
+    &:hover {
+      --showing-factor: 0.6;
     }
   }
-  &.compact:hover {
-    margin-left: calc(
-      0svh - (var(--row-size) - 2) * (1svh + var(--card-width))
-    );
-    .peeking {
-      margin-right: calc(var(--card-width) * -0.5);
-    }
-    .showing {
-      margin-right: calc(var(--card-width) * -0);
-      &.leaf {
-        margin-right: 0;
-      }
-    }
-  }
-  &.super-compact:hover {
-    margin-left: calc(
-      0svh - (var(--row-size) - 2) * (1svh + var(--card-width))
-    );
-    .peeking {
-      margin-right: calc(var(--card-width) * -0.5);
-    }
-    .showing {
-      margin-right: calc(var(--card-width) * -0.1);
-      &.leaf {
-        margin-right: 0;
-      }
+  &.super-compact {
+    --showing-factor: 0.2;
+    &:hover {
+      --showing-factor: 0.5;
     }
   }
 }
