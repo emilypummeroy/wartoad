@@ -8,7 +8,7 @@ export const activate = (unit: UnitCard, start: Position) =>
     const didMeetPreconditions =
       get.phase === Phase.Main &&
       get.player === unit.owner &&
-      !unit.values.isExhausted;
+      !unit.isExhausted;
     if (!didMeetPreconditions) return get.out;
 
     return make.activating({ start, unit }).get.out;

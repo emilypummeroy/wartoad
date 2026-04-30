@@ -22,7 +22,7 @@ const it_should_not_change_state_with_failed_precondition =
     });
     unit = {
       ...unit,
-      values: { ...unit.values, isExhausted },
+      isExhausted,
     };
     const oldState = createStateWith({
       ...gameflowOf(player, phase),

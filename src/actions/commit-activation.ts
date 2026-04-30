@@ -10,7 +10,7 @@ export const commitActivation = (target: Position) =>
     const { start, unit } = get.activation;
     const exhaustedUnit = {
       ...unit,
-      values: { ...unit.values, isExhausted: true },
+      isExhausted: true,
     };
     return set.leaf
       .at(start)

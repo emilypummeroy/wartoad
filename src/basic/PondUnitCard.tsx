@@ -25,7 +25,7 @@ export const PondUnitCard = ({
     () => onClick(unit, position),
     [unit, position, onClick],
   );
-  const { isExhausted } = unit.values;
+  const { isExhausted } = unit;
   const canActivate =
     player === unit.owner && phase === Phase.Main && !isExhausted;
   return canActivate ? (
@@ -44,7 +44,7 @@ export const PondUnitCard = ({
           symbolId={symbolId}
           player={unit.owner}
           isOnLeaf
-          isExhausted={unit.values.isExhausted}
+          isExhausted={isExhausted}
         />
       </div>
     </div>
@@ -59,7 +59,7 @@ export const PondUnitCard = ({
           symbolId={symbolId}
           player={unit.owner}
           isOnLeaf
-          isExhausted={unit.values.isExhausted}
+          isExhausted={isExhausted}
         />
       </div>
     </div>

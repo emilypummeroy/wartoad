@@ -45,8 +45,8 @@ const rowSize = ({
   isUpgraded: boolean;
 }>) => {
   const leafSize = isUpgraded ? SHOW_LEAF_SIZE : PEEK_LEAF_SIZE;
-  const showingUnitCount = units.filter(u => !u.values.isExhausted).length;
-  const peekingUnitCount = units.filter(u => u.values.isExhausted).length;
+  const showingUnitCount = units.filter(u => !u.isExhausted).length;
+  const peekingUnitCount = units.filter(u => u.isExhausted).length;
 
   const rowSize =
     showingUnitCount * SHOW_SIZE + peekingUnitCount * PEEK_SIZE + leafSize;

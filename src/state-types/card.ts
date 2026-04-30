@@ -1,7 +1,6 @@
 import {
   CardClass,
   CardType,
-  NoneValues,
   type Card,
   type LeafCard,
   type UnitCard,
@@ -29,10 +28,8 @@ export const createUnit = ({
 }): UnitCard => ({
   type: CardType.Unit,
   cardClass,
-  values: {
-    ...INITIAL_VALUES[CardType.Unit],
-    ...values,
-  },
+  ...INITIAL_VALUES[CardType.Unit],
+  ...values,
   ...baseData,
 });
 
@@ -49,7 +46,7 @@ export const createLeaf = ({
 }): LeafCard => ({
   type: CardType.Leaf,
   cardClass,
-  values: INITIAL_VALUES[CardType.Leaf],
+  ...INITIAL_VALUES[CardType.Leaf],
   ...baseData,
 });
 
@@ -74,7 +71,7 @@ export const createCard = ({ cardClass, ...baseData }: BaseData): Card => {
 };
 
 const INITIAL_VALUES = {
-  [CardType.Leaf]: NoneValues,
+  [CardType.Leaf]: {},
   [CardType.Unit]: { damage: 0, isExhausted: false },
 } as const satisfies Record<Unit, UnitValues> & Record<Leaf, LeafValues>;
 

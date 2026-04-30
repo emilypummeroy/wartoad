@@ -9,7 +9,7 @@ export const finishMainPhase = () =>
     return set.units.everywhere
       .update(u => ({
         ...u,
-        values: { ...u.values, isExhausted: false },
+        isExhausted: false,
       }))
       .make.endPhase().get.out;
   });

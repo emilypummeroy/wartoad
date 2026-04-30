@@ -140,7 +140,7 @@ describe(finishMainPhase, () => {
         for (const xy of ALL_POSITIONS) {
           const after = finishMainPhase()(before);
           for (const unit of getPondStateAt(after.pond, xy).units)
-            expect(unit.values.isExhausted).toBe(false);
+            expect(unit.isExhausted).toBe(false);
         }
 
         // Check for the test pond with one position's units exhausted
@@ -149,12 +149,12 @@ describe(finishMainPhase, () => {
             ...before,
             pond: setUnitsAt(pond, xy, u => ({
               ...u,
-              values: { ...u.values, isExhausted: true },
+              isExhausted: true,
             })),
           };
           const after = finishMainPhase()(exhausted);
           for (const unit of getPondStateAt(after.pond, xy).units)
-            expect(unit.values.isExhausted).toBe(false);
+            expect(unit.isExhausted).toBe(false);
         }
 
         // Check for the test pond with all units exhausted
@@ -163,12 +163,12 @@ describe(finishMainPhase, () => {
             ...before,
             pond: setAllUnits(pond, u => ({
               ...u,
-              values: { ...u.values, isExhausted: true },
+              isExhausted: true,
             })),
           };
           const after = finishMainPhase()(exhausted);
           for (const unit of getPondStateAt(after.pond, xy).units)
-            expect(unit.values.isExhausted).toBe(false);
+            expect(unit.isExhausted).toBe(false);
         }
       });
 
@@ -192,22 +192,6 @@ describe(finishMainPhase, () => {
           for (let i = 0; i < gots.length; i += 1) {
             const { ...got } = partial(gots[i]);
             const { ...want } = partial(wants[i]);
-            delete got.values;
-            delete want.values;
-            expect(got).toStrictEqual(want);
-          }
-        }
-      });
-
-      it('should not change the rest of each unit values', () => {
-        const after = finishMainPhase()(before);
-        for (const xy of ALL_POSITIONS) {
-          const gots = getPondStateAt(after.pond, xy).units;
-          const wants = getPondStateAt(before.pond, xy).units;
-          expect(gots).toHaveLength(wants.length);
-          for (let i = 0; i < gots.length; i += 1) {
-            const { ...got } = partial(gots[i].values);
-            const { ...want } = partial(wants[i].values);
             delete got.isExhausted;
             delete want.isExhausted;
             expect(got).toStrictEqual(want);

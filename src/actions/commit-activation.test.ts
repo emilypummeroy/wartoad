@@ -307,9 +307,9 @@ const it_should_exhaust_the_unit_on_the_leaf = (
     );
     const want = {
       ...unit,
-      values: { ...unit.values, isExhausted: true },
+      isExhausted: true,
     };
     expect(got).toHaveLength(1);
-    expect(got[0].values.isExhausted).toBe(true);
+    expect(got[0].isExhausted).toBe(true);
     expect(got[0]).toStrictEqual(want);
   });

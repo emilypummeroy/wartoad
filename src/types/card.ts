@@ -10,12 +10,11 @@ import type { Player } from './gameflow';
 export type Card = UnitCard | LeafCard;
 export type UnitCard = CardOf<Unit>;
 export type LeafCard = CardOf<Leaf>;
-export type CardOf<T extends CardType> = {
+export type CardOf<T extends CardType> = CardValuesOf<T> & {
   readonly type: T;
   readonly key: number;
   readonly owner: Player;
   readonly cardClass: CardClassOf<T>;
-  readonly values: CardValuesOf<T>;
 };
 
 // All cards are either Leaves or Units.
@@ -80,7 +79,7 @@ export type UnitValues = {
   readonly damage: number;
   readonly isExhausted: boolean;
 };
-export type LeafValues = typeof NoneValues;
+export type LeafValues = {};
 export type CardValuesOf<T extends CardType> = T extends Unit
   ? UnitValues
   : T extends Leaf

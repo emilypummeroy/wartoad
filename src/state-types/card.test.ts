@@ -5,7 +5,6 @@ import {
   CardClass,
   CardType,
   LeafClass,
-  NoneValues,
   UnitClass,
 } from '../types/card';
 import { Player } from '../types/gameflow';
@@ -28,7 +27,8 @@ describe.for<[Player, number]>([
           cardClass: cardClass,
           type: CardType.Unit,
           owner,
-          values: { damage, isExhausted },
+          damage,
+          isExhausted,
         };
         expect(isUnit(card)).toBe(true);
         if (isUnit(card)) card satisfies UnitCard;
@@ -43,7 +43,6 @@ describe.for<[Player, number]>([
           cardClass: cardClass,
           type: CardType.Leaf,
           owner,
-          values: NoneValues,
         };
         expect(isUnit(card)).toBe(false);
         if (!isUnit(card)) card satisfies LeafCard;
@@ -60,7 +59,6 @@ describe.for<[Player, number]>([
           cardClass: cardClass,
           type: CardType.Leaf,
           owner,
-          values: NoneValues,
         };
         expect(isLeaf(card)).toBe(true);
         if (isLeaf(card)) card satisfies LeafCard;
@@ -76,7 +74,8 @@ describe.for<[Player, number]>([
           cardClass: cardClass,
           type: CardType.Unit,
           owner,
-          values: { damage, isExhausted },
+          damage,
+          isExhausted,
         };
         expect(isLeaf(card)).toBe(false);
         if (!isLeaf(card)) card satisfies UnitCard;

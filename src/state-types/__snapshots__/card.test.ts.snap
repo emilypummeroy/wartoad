@@ -14,13 +14,11 @@ exports[`for cards owned by North with key 0 > createCard > should produce a sta
     },
     "type": "Unit",
   },
+  "damage": 0,
+  "isExhausted": false,
   "key": 0,
   "owner": "North",
   "type": "Unit",
-  "values": {
-    "damage": 0,
-    "isExhausted": false,
-  },
 }
 `;
 
@@ -38,7 +36,6 @@ exports[`for cards owned by North with key 0 > createCard > should produce a sta
   "key": 0,
   "owner": "North",
   "type": "Leaf",
-  "values": "None",
 }
 `;
 
@@ -56,7 +53,6 @@ exports[`for cards owned by North with key 0 > createLeaf > for the card LilyPad
   "key": 0,
   "owner": "North",
   "type": "Leaf",
-  "values": "None",
 }
 `;
 
@@ -74,13 +70,11 @@ exports[`for cards owned by North with key 0 > createUnit > for the card Froglet
     },
     "type": "Unit",
   },
+  "damage": 0,
+  "isExhausted": false,
   "key": 0,
   "owner": "North",
   "type": "Unit",
-  "values": {
-    "damage": 0,
-    "isExhausted": false,
-  },
 }
 `;
 
@@ -98,13 +92,11 @@ exports[`for cards owned by North with key 3 > createCard > should produce a sta
     },
     "type": "Unit",
   },
+  "damage": 0,
+  "isExhausted": false,
   "key": 3,
   "owner": "North",
   "type": "Unit",
-  "values": {
-    "damage": 0,
-    "isExhausted": false,
-  },
 }
 `;
 
@@ -122,7 +114,6 @@ exports[`for cards owned by North with key 3 > createCard > should produce a sta
   "key": 3,
   "owner": "North",
   "type": "Leaf",
-  "values": "None",
 }
 `;
 
@@ -140,7 +131,6 @@ exports[`for cards owned by North with key 3 > createLeaf > for the card LilyPad
   "key": 3,
   "owner": "North",
   "type": "Leaf",
-  "values": "None",
 }
 `;
 
@@ -158,13 +148,11 @@ exports[`for cards owned by North with key 3 > createUnit > for the card Froglet
     },
     "type": "Unit",
   },
+  "damage": 0,
+  "isExhausted": false,
   "key": 3,
   "owner": "North",
   "type": "Unit",
-  "values": {
-    "damage": 0,
-    "isExhausted": false,
-  },
 }
 `;
 
@@ -182,13 +170,11 @@ exports[`for cards owned by South with key 1 > createCard > should produce a sta
     },
     "type": "Unit",
   },
+  "damage": 0,
+  "isExhausted": false,
   "key": 1,
   "owner": "South",
   "type": "Unit",
-  "values": {
-    "damage": 0,
-    "isExhausted": false,
-  },
 }
 `;
 
@@ -206,7 +192,6 @@ exports[`for cards owned by South with key 1 > createCard > should produce a sta
   "key": 1,
   "owner": "South",
   "type": "Leaf",
-  "values": "None",
 }
 `;
 
@@ -224,7 +209,6 @@ exports[`for cards owned by South with key 1 > createLeaf > for the card LilyPad
   "key": 1,
   "owner": "South",
   "type": "Leaf",
-  "values": "None",
 }
 `;
 
@@ -242,13 +226,11 @@ exports[`for cards owned by South with key 1 > createUnit > for the card Froglet
     },
     "type": "Unit",
   },
+  "damage": 0,
+  "isExhausted": false,
   "key": 1,
   "owner": "South",
   "type": "Unit",
-  "values": {
-    "damage": 0,
-    "isExhausted": false,
-  },
 }
 `;
 
@@ -266,13 +248,11 @@ exports[`for cards owned by South with key 2 > createCard > should produce a sta
     },
     "type": "Unit",
   },
+  "damage": 0,
+  "isExhausted": false,
   "key": 2,
   "owner": "South",
   "type": "Unit",
-  "values": {
-    "damage": 0,
-    "isExhausted": false,
-  },
 }
 `;
 
@@ -290,7 +270,6 @@ exports[`for cards owned by South with key 2 > createCard > should produce a sta
   "key": 2,
   "owner": "South",
   "type": "Leaf",
-  "values": "None",
 }
 `;
 
@@ -308,7 +287,6 @@ exports[`for cards owned by South with key 2 > createLeaf > for the card LilyPad
   "key": 2,
   "owner": "South",
   "type": "Leaf",
-  "values": "None",
 }
 `;
 
@@ -326,12 +304,10 @@ exports[`for cards owned by South with key 2 > createUnit > for the card Froglet
     },
     "type": "Unit",
   },
+  "damage": 0,
+  "isExhausted": false,
   "key": 2,
   "owner": "South",
   "type": "Unit",
-  "values": {
-    "damage": 0,
-    "isExhausted": false,
-  },
 }
 `;
