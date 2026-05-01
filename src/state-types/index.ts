@@ -8,6 +8,8 @@ export type GameState = {
   readonly pond: PondState;
   readonly northHand: readonly CardState[];
   readonly southHand: readonly CardState[];
+  readonly northCash: number;
+  readonly southCash: number;
   readonly activation?: ActivationState;
   readonly deployment?: DeploymentState;
   readonly upgrade?: UpgradeState;

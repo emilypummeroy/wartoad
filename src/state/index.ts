@@ -17,6 +17,8 @@ export const DEFAULT_GAME_STATE: GameState = {
   pond: INITIAL_POND,
   northHand: DETERMINISTIC_NORTH_HAND,
   southHand: DETERMINISTIC_SOUTH_HAND,
+  northCash: 0,
+  southCash: 0,
   upgrade: undefined,
   deployment: undefined,
   activation: undefined,
