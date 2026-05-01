@@ -39,7 +39,7 @@
   --card-front: oklch(32% 0.015 140);
   --card-front-leaf: oklch(27% 0.025 140);
   --card-front-dark: oklch(23% 0.03 140);
-  --card-front-light: oklch(68% 0.01 140);
+  --card-front-light: oklch(60% 0.01 140);
   --card-text: oklch(95% 0.02 30);
   --card-text-dark: oklch(5% 0.02 30);
   --card-back: oklch(15% 0.05 200);
