@@ -7,5 +7,6 @@ export const upgrade = (leaf: LeafState) =>
     const didMeetPreconditions = get.phase === Phase.Main;
     if (!didMeetPreconditions) return get.out;
 
+    // TODO 16: Check cost
     return make.upgrading(leaf).get.out;
   });

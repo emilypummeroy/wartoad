@@ -18,6 +18,7 @@ function HandCard({ isEnabled = false, card, player, onPick }: HandCardProps) {
   const handleClick = useCallback(() => onPick(card), [card, onPick]);
   const buttonId = useId();
   const titleId = useId();
+  // TODO 16: Check cost
   return isEnabled ? (
     <div
       role="button"
@@ -86,6 +87,7 @@ export function Hand({
       ? 'jiggle-row'
       : 'splay-row';
 
+  // TODO 16: Display funds
   return (
     <section className="hand" aria-labelledby={id}>
       <h3 id={id} className={PLAYER_CLASSNAME[player]}>
