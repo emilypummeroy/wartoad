@@ -56,6 +56,11 @@ describe(App, () => {
         expect(getAll.handCards(player)).toHaveLength(INITIAL_HAND_CARD_COUNT);
       });
 
+      it(`should show ${player}'s funds`, () => {
+        advanceToPhase(player, Start);
+        expect(getThe.fundsOf(player)).toBeVisible();
+      });
+
       it(`should be visible during the ${player} turn`, () => {
         advanceToPhase(player, Start);
         const cards = getAll.handCards(player);

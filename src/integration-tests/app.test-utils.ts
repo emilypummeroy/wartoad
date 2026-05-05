@@ -31,6 +31,9 @@ export const getThe = {
   hand(player: Player) {
     return screen.getByRole('region', { name: `${player} hand` });
   },
+  fundsOf(player: Player) {
+    return withinThe.hand(player).getByText(/Funds: [\d]+/);
+  },
   get pickedCardDisplay() {
     return screen.getByRole('region', { name: `Picked card` });
   },

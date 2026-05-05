@@ -388,6 +388,12 @@ span.south {
   gap: 0.5svh;
 }
 
+.player-stats {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
 .card-display {
   height: calc(27svh);
   width: 100%;

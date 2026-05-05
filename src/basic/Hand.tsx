@@ -8,6 +8,67 @@ export const INITIAL_HAND_SIZE = 7;
 export const SMALL_HAND_SIZE = 8;
 export const BIG_HAND_HAND_SIZE = 12;
 
+type HandProps = Readonly<{
+  player: Player;
+  isMainPhase: boolean;
+  isActivePhase?: boolean;
+  isPlayerTurn: boolean;
+  handCards: readonly CardState[];
+  onPick: (cardClass: CardState) => void;
+}>;
+export function Hand({
+  player,
+  isMainPhase,
+  isActivePhase = false,
+  isPlayerTurn,
+  handCards,
+  onPick,
+}: HandProps) {
+  const id = useId();
+  const isJiggling = !isActivePhase && isMainPhase && isPlayerTurn;
+  const listClass = isActivePhase
+    ? 'stack-row'
+    : isJiggling
+      ? 'jiggle-row'
+      : 'splay-row';
+
+  // TODO 16: Display funds
+  return (
+    <section className="hand" aria-labelledby={id}>
+      <div className="player-stats">
+        <h3 id={id} className={PLAYER_CLASSNAME[player]}>
+          {player} hand
+        </h3>
+        Funds: {5}
+      </div>
+      <div
+        role={isJiggling ? 'listbox' : 'list'}
+        className={`${listClass} ${classForHand(handCards)}`}
+        style={{
+          '--hand-size': handCards.length,
+        }}
+      >
+        {handCards.map(card =>
+          isPlayerTurn ? (
+            <div key={card.key} className="stacking jiggling">
+              <HandCard
+                card={card}
+                player={player}
+                isEnabled={isMainPhase}
+                onPick={onPick}
+              />
+            </div>
+          ) : (
+            <div key={card.key} className="stacking">
+              <CardBack player={player} />
+            </div>
+          ),
+        )}
+      </div>
+    </section>
+  );
+}
+
 type HandCardProps = Readonly<{
   isEnabled?: boolean;
   card: CardState;
@@ -54,69 +115,3 @@ export const classForHand = (cards: readonly unknown[]): string => {
   if (cards.length <= BIG_HAND_HAND_SIZE) return 'compact';
   return 'super-compact';
 };
-
-type HandProps = Readonly<{
-  player: Player;
-  isMainPhase: boolean;
-  isActivePhase?: boolean;
-  isPlayerTurn: boolean;
-  handCards: readonly CardState[];
-  onPick: (cardClass: CardState) => void;
-}>;
-declare module 'react' {
-  // oxlint-disable-next-line typescript/consistent-type-definitions
-  interface CSSProperties {
-    // Allow any CSS variable starting with '--'
-    // oxlint-disable-next-line typescript/consistent-indexed-object-style
-    [key: `--${string}`]: string | number;
-  }
-}
-export function Hand({
-  player,
-  isMainPhase,
-  isActivePhase = false,
-  isPlayerTurn,
-  handCards,
-  onPick,
-}: HandProps) {
-  const id = useId();
-  const isJiggling = !isActivePhase && isMainPhase && isPlayerTurn;
-  const listClass = isActivePhase
-    ? 'stack-row'
-    : isJiggling
-      ? 'jiggle-row'
-      : 'splay-row';
-
-  // TODO 16: Display funds
-  return (
-    <section className="hand" aria-labelledby={id}>
-      <h3 id={id} className={PLAYER_CLASSNAME[player]}>
-        {player} hand
-      </h3>
-      <div
-        role={isJiggling ? 'listbox' : 'list'}
-        className={`${listClass} ${classForHand(handCards)}`}
-        style={{
-          '--hand-size': handCards.length,
-        }}
-      >
-        {handCards.map(card =>
-          isPlayerTurn ? (
-            <div key={card.key} className="stacking jiggling">
-              <HandCard
-                card={card}
-                player={player}
-                isEnabled={isMainPhase}
-                onPick={onPick}
-              />
-            </div>
-          ) : (
-            <div key={card.key} className="stacking">
-              <CardBack player={player} />
-            </div>
-          ),
-        )}
-      </div>
-    </section>
-  );
-}
