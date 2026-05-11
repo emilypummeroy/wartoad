@@ -105,6 +105,12 @@ export type GameUpdate = {
     };
   };
 
+  readonly funds: {
+    readonly of: (x: Player) => {
+      readonly to: (x: number) => GameData;
+    };
+  };
+
   readonly hand: {
     readonly of: (x: Player) => {
       readonly update: (
@@ -173,6 +179,16 @@ const update: (s: GameState) => GameUpdate = s => ({
     everywhere: {
       update: u => gameData({ ...s, pond: setAllUnits(s.pond, u) }),
     },
+  },
+
+  funds: {
+    of: x => ({
+      to: v =>
+        gameData({
+          ...s,
+          ...(x === Player.North ? { northFunds: v } : { southFunds: v }),
+        }),
+    }),
   },
 
   hand: {

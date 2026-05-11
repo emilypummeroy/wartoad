@@ -7,6 +7,7 @@ import {
 } from '../state/test-utils';
 import { CardClass, CardKey } from '../types/card';
 import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
+import { partial } from '../types/test-utils';
 import { finishStartPhase } from './finish-start-phase';
 
 const { North, South } = Player;
@@ -81,12 +82,59 @@ describe(finishStartPhase, () => {
       expect(afterHand).toStrictEqual([...beforeHand, card]);
     });
 
+    // > player funds increased by 5
+    it(`should increase ${player} funds`, () => {
+      const after = finishStartPhase(draw(cardClass))(before);
+      const beforeFunds =
+        player === North ? before.northFunds : before.southFunds;
+      const afterFunds = player === North ? after.northFunds : after.southFunds;
+      expect(afterFunds).toStrictEqual(beforeFunds + 5);
+    });
+
     // > opponent hand unchanged
     it(`should not change the ${opponent} hand`, () => {
       const after = finishStartPhase(draw(cardClass))(before);
       const beforeHand = player === South ? before.northHand : before.southHand;
       const afterHand = player === South ? after.northHand : after.southHand;
       expect(afterHand).toStrictEqual(beforeHand);
+    });
+
+    // > opponent funds unchanged
+    it(`should not change the ${opponent} funds`, () => {
+      const after = finishStartPhase(draw(cardClass))(before);
+      const beforeFunds =
+        player === South ? before.northFunds : before.southFunds;
+      const afterFunds = player === South ? after.northFunds : after.southFunds;
+      expect(afterFunds).toStrictEqual(beforeFunds);
+    });
+
+    it('should not change the rest of the flow state', () => {
+      const after = finishStartPhase(draw(cardClass))(before);
+      const { ...want } = partial(before);
+      const { ...got } = partial(after);
+      if (player === South) {
+        delete want.southHand;
+        delete got.southHand;
+        delete want.southFunds;
+        delete got.southFunds;
+      } else {
+        delete want.northHand;
+        delete got.northHand;
+        delete want.northFunds;
+        delete got.northFunds;
+      }
+      delete want.flow;
+      delete got.flow;
+      expect(got).toStrictEqual(want);
+    });
+
+    it('should not change the rest of the flow state', () => {
+      const after = finishStartPhase(draw(cardClass))(before);
+      const { ...want } = partial(before.flow);
+      const { ...got } = partial(after.flow);
+      delete want.phase;
+      delete got.phase;
+      expect(got).toStrictEqual(want);
     });
   });
 });
