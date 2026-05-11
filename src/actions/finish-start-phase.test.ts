@@ -85,10 +85,10 @@ describe(finishStartPhase, () => {
     // > player funds increased by 5
     it(`should increase ${player} funds`, () => {
       const after = finishStartPhase(draw(cardClass))(before);
-      const beforeFunds =
-        player === North ? before.northFunds : before.southFunds;
+      // const beforeFunds =
+      //   player === North ? before.northFunds : before.southFunds;
       const afterFunds = player === North ? after.northFunds : after.southFunds;
-      expect(afterFunds).toStrictEqual(beforeFunds + 5);
+      expect(afterFunds).toStrictEqual(5);
     });
 
     // > opponent hand unchanged

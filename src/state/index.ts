@@ -17,9 +17,8 @@ export const DEFAULT_GAME_STATE: GameState = {
   pond: INITIAL_POND,
   northHand: DETERMINISTIC_NORTH_HAND,
   southHand: DETERMINISTIC_SOUTH_HAND,
-  // TODO 16: Change to 5/5
-  northFunds: 0,
-  southFunds: 0,
+  northFunds: 5,
+  southFunds: 5,
   upgrade: undefined,
   deployment: undefined,
   activation: undefined,

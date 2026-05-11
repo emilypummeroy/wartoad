@@ -26,8 +26,8 @@ describe(Bench, () => {
       expect(screen.queryByText('Picked card')).not.toBeInTheDocument();
     });
 
-    it('should show 0 funds', () => {
-      expect(screen.getAllByText('Funds: 0')).toHaveLength(2);
+    it('should show 5 funds', () => {
+      expect(screen.getAllByText('Funds: 5')).toHaveLength(2);
     });
   });
 
