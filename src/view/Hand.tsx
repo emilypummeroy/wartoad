@@ -1,7 +1,7 @@
 import { useCallback, useId } from 'react';
 
 import { CardLocation, CardType, type CardState } from '../types/card';
-import { type Player, PLAYER_CLASSNAME } from '../types/gameflow';
+import { Phase, type Player, PLAYER_CLASSNAME } from '../types/gameflow';
 import { CardBack, Froglet, LeafCard } from '../view/Card';
 
 export const INITIAL_HAND_SIZE = 7;
@@ -10,39 +10,41 @@ export const BIG_HAND_HAND_SIZE = 12;
 
 type HandProps = Readonly<{
   player: Player;
-  isMainPhase: boolean;
-  isActivePhase?: boolean;
+  funds: number;
+  phase: Phase;
   isPlayerTurn: boolean;
   handCards: readonly CardState[];
   onPick: (cardClass: CardState) => void;
 }>;
 export function Hand({
   player,
-  isMainPhase,
-  isActivePhase = false,
+  funds,
+  phase,
   isPlayerTurn,
   handCards,
   onPick,
 }: HandProps) {
   const id = useId();
-  const isJiggling = !isActivePhase && isMainPhase && isPlayerTurn;
+  const isActivePhase =
+    phase === Phase.Upgrading ||
+    phase === Phase.Deploying ||
+    phase === Phase.Activating;
   const listClass = isActivePhase
     ? 'stack-row'
-    : isJiggling
+    : phase === Phase.Main && isPlayerTurn
       ? 'jiggle-row'
       : 'splay-row';
 
-  // TODO 16: Display funds
   return (
     <section className="hand" aria-labelledby={id}>
       <div className="player-stats">
         <h3 id={id} className={PLAYER_CLASSNAME[player]}>
-          {player} hand
+          {player}
         </h3>
-        Funds: {5}
+        Funds: {funds}
       </div>
       <div
-        role={isJiggling ? 'listbox' : 'list'}
+        role="list"
         className={`${listClass} ${classForHand(handCards)}`}
         style={{
           '--hand-size': handCards.length,
@@ -54,7 +56,7 @@ export function Hand({
               <HandCard
                 card={card}
                 player={player}
-                isEnabled={isMainPhase}
+                isEnabled={phase === Phase.Main}
                 onPick={onPick}
               />
             </div>

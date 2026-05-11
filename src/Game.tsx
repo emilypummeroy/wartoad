@@ -1,26 +1,8 @@
-import { useContext, type ReactNode } from 'react';
-
+import { Bench } from './basic/Bench';
 import { PhaseTracker } from './basic/PhaseTracker';
 import { Pond } from './composite/Pond';
-import { GameContext } from './context/GameContext';
-import { CardLocation } from './types/card';
-import { Phase, Player, PLAYER_CLASSNAME } from './types/gameflow';
-import { Froglet, LeafCard } from './view/Card';
-import { Hand } from './view/Hand';
 
 export function Game() {
-  const [
-    {
-      flow: { phase, player },
-      northHand,
-      southHand,
-      upgrade,
-      deployment,
-      activation,
-    },
-    { pickCard },
-  ] = useContext(GameContext);
-
   return (
     <div role="application" aria-label="Wartoad" className="wartoad-app">
       <header>
@@ -32,44 +14,7 @@ export function Game() {
         <PhaseTracker />
       </header>
       <main>
-        <section className="handarea">
-          <Hand
-            player={Player.North}
-            isActivePhase={
-              phase === Phase.Activating ||
-              phase === Phase.Deploying ||
-              phase === Phase.Upgrading
-            }
-            isMainPhase={phase === Phase.Main}
-            isPlayerTurn={player === Player.North}
-            handCards={northHand}
-            onPick={pickCard}
-          />
-          {upgrade && (
-            // TODO 18: Make cards zoomable/inspectable/something outside of deploys and upgrades
-            <PickedCard owner={player}>
-              <LeafCard location={CardLocation.Hand} leaf={upgrade.leaf} />
-            </PickedCard>
-          )}
-          {deployment && (
-            <PickedCard owner={player}>
-              <Froglet />
-            </PickedCard>
-          )}
-          {activation && (
-            <PickedCard owner={player}>
-              <Froglet />
-            </PickedCard>
-          )}
-
-          <Hand
-            player={Player.South}
-            isMainPhase={phase === Phase.Main}
-            isPlayerTurn={player === Player.South}
-            handCards={southHand}
-            onPick={pickCard}
-          />
-        </section>
+        <Bench />
         <div className="scroll-x">
           <section className="playarea">
             <Pond />
@@ -77,27 +22,5 @@ export function Game() {
         </div>
       </main>
     </div>
-  );
-}
-
-function PickedCard({
-  owner,
-  children,
-}: Readonly<{
-  owner: Player;
-  children: ReactNode;
-}>) {
-  return (
-    <section className="card-display" aria-labelledby="picked-card">
-      <h3 id="picked-card">Picked card</h3>
-      <div className="zoom-row">
-        <div
-          className={`zooming highlighting-card ${PLAYER_CLASSNAME[owner]}`}
-          tabIndex={0}
-        >
-          {children}
-        </div>
-      </div>
-    </section>
   );
 }

@@ -8,12 +8,12 @@ export type GameState = {
   readonly pond: PondState;
   readonly northHand: readonly CardState[];
   readonly southHand: readonly CardState[];
-  readonly northCash: number;
-  readonly southCash: number;
-  readonly activation?: ActivationState;
-  readonly deployment?: DeploymentState;
-  readonly upgrade?: UpgradeState;
-  readonly winner?: Player;
+  readonly northFunds: number;
+  readonly southFunds: number;
+  readonly activation: ActivationState | undefined;
+  readonly deployment: DeploymentState | undefined;
+  readonly upgrade: UpgradeState | undefined;
+  readonly winner: Player | undefined;
 };
 
 export type ActivationState = {

@@ -50,29 +50,19 @@ describe(Hand, () => {
   ])('With %i cards for %s player | cardKey: %s', (handSize, player, cardKey) => {
     const cardClass = CardClass[cardKey];
 
-    const withinHand = () => within(screen.getByRole('region', { name: `${player} hand` }));
+    const hand = cards(handSize, cardClass);
+    const withinHand = () => within(screen.getByRole('region', { name: player }));
 
     const pickCard = vi.fn<(_: CardState) => void>();
 
-    describe.for<Phase>([
-      Phase.Start,
-      Phase.Main,
-      Phase.Upgrading,
-      Phase.Deploying,
-      Phase.Activating,
-      Phase.End,
-      Phase.GameOver,
-    ])(`during the ${player} %s phase`, phase => {
-      it(`should show ${handSize} cards for ${player}`, () => {
+    describe.for([0, 1, MANY])(`during the ${player} Main phase with %s funds`, funds => {
+      beforeEach(() => {
         render(
-          <Hand
-            player={player}
-            handCards={cards(handSize, cardClass)}
-            isMainPhase={phase === Phase.Main}
-            isPlayerTurn
-            onPick={pickCard}
-          />,
+          <Hand player={player} funds={funds} handCards={hand} phase={Phase.Main} isPlayerTurn onPick={pickCard} />,
         );
+      });
+
+      it(`should show ${handSize} cards for ${player}`, () => {
         expect(
           withinHand().getAllByRole('region', {
             name: cardClass.name,
@@ -80,101 +70,93 @@ describe(Hand, () => {
         ).toHaveLength(handSize);
         expect(withinHand().queryByRole('region', { name: 'Card back' })).not.toBeInTheDocument();
       });
-    });
 
-    it(`should allow ${cardClass.name}s to be picked during the ${player} Main phase `, () => {
-      const hand = cards(handSize, cardClass);
-      render(<Hand player={player} handCards={hand} isMainPhase isPlayerTurn onPick={pickCard} />);
-      const clickableCards = withinHand().getAllByRole('button', {
-        name: `Pick ${cardClass.name}`,
+      it(`should show ${funds} funds for ${player}`, () => {
+        expect(withinHand().queryByText(`Funds: ${funds}`)).toBeVisible();
       });
-      for (let i = 0; i < clickableCards.length; i += 1) {
-        fireEvent.click(clickableCards[i]);
-        expect(pickCard).toHaveBeenCalledExactlyOnceWith(hand[i]);
-        pickCard.mockClear();
-      }
+
+      it(`should allow ${cardClass.name}s to be picked during the ${player} Main phase `, () => {
+        const clickableCards = withinHand().getAllByRole('button', {
+          name: `Pick ${cardClass.name}`,
+        });
+        for (let i = 0; i < clickableCards.length; i += 1) {
+          fireEvent.click(clickableCards[i]);
+          expect(pickCard).toHaveBeenCalledExactlyOnceWith(hand[i]);
+          pickCard.mockClear();
+        }
+      });
+
+      it(`should allow all cards to be picked during the ${player} Main phase`, () => {
+        const clickableCards = withinHand().getAllByRole('button');
+        for (const card of clickableCards) {
+          fireEvent.click(card);
+          expect(pickCard).toHaveBeenCalledOnce();
+          pickCard.mockClear();
+        }
+      });
     });
 
-    it(`should allow all cards to be picked during the ${player} Main phase`, () => {
-      render(
-        <Hand player={player} handCards={cards(handSize, cardClass)} isMainPhase isPlayerTurn onPick={pickCard} />,
-      );
-      const clickableCards = withinHand().getAllByRole('button');
-      for (const card of clickableCards) {
-        fireEvent.click(card);
-        expect(pickCard).toHaveBeenCalledOnce();
-        pickCard.mockClear();
-      }
+    describe.for<[Phase, number]>([
+      [Phase.Start, 0],
+      [Phase.End, 1],
+      [Phase.GameOver, MANY],
+      [Phase.Upgrading, 2],
+      [Phase.Deploying, 3],
+      [Phase.Activating, MANY],
+    ])(`during the ${player} non-Main phase with %s funds`, ([phase, funds]) => {
+      beforeEach(() => {
+        render(<Hand player={player} funds={funds} handCards={hand} phase={phase} isPlayerTurn onPick={pickCard} />);
+      });
+      it(`should show ${handSize} cards for ${player}`, () => {
+        expect(
+          withinHand().getAllByRole('region', {
+            name: cardClass.name,
+          }),
+        ).toHaveLength(handSize);
+        expect(withinHand().queryByRole('region', { name: 'Card back' })).not.toBeInTheDocument();
+      });
+
+      it(`should show ${funds} funds for ${player}`, () => {
+        expect(withinHand().queryByText(`Funds: ${funds}`)).toBeVisible();
+      });
+
+      it(`should not allow cards to be picked during the ${player} non-Main phase`, () => {
+        const clickableCards = withinHand().queryAllByRole('button');
+        for (const card of clickableCards) {
+          fireEvent.click(card);
+        }
+        expect(pickCard).not.toHaveBeenCalled();
+      });
     });
 
-    it(`should not allow cards to be picked during the ${player} non-Main phase`, () => {
-      render(
-        <Hand
-          player={player}
-          handCards={cards(handSize, cardClass)}
-          isMainPhase={false}
-          isPlayerTurn
-          onPick={pickCard}
-        />,
-      );
-      const clickableCards = withinHand().queryAllByRole('button');
-      for (const card of clickableCards) {
-        fireEvent.click(card);
-      }
-      expect(pickCard).not.toHaveBeenCalled();
-    });
-
-    it(`should not allow cards to be picked during an active phase`, () => {
-      render(
-        <Hand
-          player={player}
-          handCards={cards(handSize, cardClass)}
-          isMainPhase={false}
-          isActivePhase
-          isPlayerTurn
-          onPick={pickCard}
-        />,
-      );
-      const clickableCards = withinHand().queryAllByRole('button');
-      for (const card of clickableCards) {
-        fireEvent.click(card);
-      }
-      expect(pickCard).not.toHaveBeenCalled();
-    });
-
-    describe.for<Phase>([
-      Phase.Start,
-      Phase.Main,
-      Phase.Upgrading,
-      Phase.Deploying,
-      Phase.Activating,
-      Phase.End,
-      Phase.GameOver,
-    ])(`during the opponent's %s phase`, phase => {
-      it(`should show ${handSize} card backs`, () => {
+    describe.for<[Phase, number]>([
+      [Phase.Start, 0],
+      [Phase.Main, 1],
+      [Phase.Upgrading, MANY],
+      [Phase.Deploying, 2],
+      [Phase.Activating, MANY],
+      [Phase.End, 3],
+      [Phase.GameOver, 0],
+    ])(`during the opponent's %s phase`, ([phase, funds]) => {
+      beforeEach(() => {
         render(
           <Hand
             player={player}
             handCards={cards(handSize, cardClass)}
-            isMainPhase={phase === Phase.Main}
+            phase={phase}
+            funds={funds}
             isPlayerTurn={false}
             onPick={pickCard}
           />,
         );
+      });
+
+      it(`should show ${handSize} card backs`, () => {
         expect(withinHand().queryByRole('region', { description: 'Card face' })).not.toBeInTheDocument();
         expect(withinHand().getAllByRole('region', { name: 'Card back' })).toHaveLength(handSize);
       });
 
       it('should not allow cards to be picked', () => {
-        render(
-          <Hand
-            player={player}
-            handCards={cards(handSize, cardClass)}
-            isMainPhase={phase === Phase.Main}
-            isPlayerTurn={false}
-            onPick={pickCard}
-          />,
-        );
         const clickableCards = withinHand().queryAllByRole('button');
         for (const card of clickableCards) {
           fireEvent.click(card);

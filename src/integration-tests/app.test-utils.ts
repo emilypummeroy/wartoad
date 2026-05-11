@@ -29,7 +29,7 @@ export const getThe = {
     return screen.getByRole('main');
   },
   hand(player: Player) {
-    return screen.getByRole('region', { name: `${player} hand` });
+    return screen.getByRole('region', { name: player });
   },
   fundsOf(player: Player) {
     return withinThe.hand(player).getByText(/Funds: [\d]+/);

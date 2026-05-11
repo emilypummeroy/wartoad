@@ -17,11 +17,12 @@ export const DEFAULT_GAME_STATE: GameState = {
   pond: INITIAL_POND,
   northHand: DETERMINISTIC_NORTH_HAND,
   southHand: DETERMINISTIC_SOUTH_HAND,
-  northCash: 0,
-  southCash: 0,
+  northFunds: 0,
+  southFunds: 0,
   upgrade: undefined,
   deployment: undefined,
   activation: undefined,
+  winner: undefined,
 } as const;
 
 export const INITIAL_HAND_CARD_COUNT = 7;
