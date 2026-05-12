@@ -23,7 +23,7 @@ import type { Position } from '../types/position';
 import { counter, partial } from '../types/test-utils';
 import { commitUpgrade } from './commit-upgrade';
 
-const { LilyPad } = CardKey;
+const { LilyPad, OldLeaf } = CardKey;
 const { North, South } = Player;
 const { Upgrading, Deploying, Activating, Start, Main, End } = Phase;
 
@@ -93,15 +93,15 @@ describe(commitUpgrade, () => {
     [{ x: 2, y: 1 }, South, LilyPad],
     [{ x: 0, y: 2 }, North, LilyPad],
     [{ x: 1, y: 2 }, South, LilyPad],
-    [{ x: 2, y: 2 }, North, LilyPad],
-    [{ x: 0, y: 3 }, South, LilyPad],
-    [{ x: 2, y: 3 }, North, LilyPad],
-    [{ x: 2, y: 3 }, South, LilyPad],
-    [{ x: 0, y: 4 }, North, LilyPad],
-    [{ x: 1, y: 4 }, South, LilyPad],
-    [{ x: 2, y: 4 }, North, LilyPad],
-    [{ x: 0, y: 5 }, South, LilyPad],
-    [{ x: 2, y: 5 }, North, LilyPad],
+    [{ x: 2, y: 2 }, North, OldLeaf],
+    [{ x: 0, y: 3 }, South, OldLeaf],
+    [{ x: 2, y: 3 }, North, OldLeaf],
+    [{ x: 2, y: 3 }, South, OldLeaf],
+    [{ x: 0, y: 4 }, North, OldLeaf],
+    [{ x: 1, y: 4 }, South, OldLeaf],
+    [{ x: 2, y: 4 }, North, OldLeaf],
+    [{ x: 0, y: 5 }, South, OldLeaf],
+    [{ x: 2, y: 5 }, North, OldLeaf],
   ])(
     `Postconditions: target = %s | %s turn player and leaf controller | picked: %s`,
     ([target, player, leafKey]) => {
@@ -132,7 +132,7 @@ describe(commitUpgrade, () => {
       it('should upgrade the target position', () => {
         const after = commitUpgrade(target)(before);
         const got = getPondStateAt(after.pond, target);
-        expect(got.leaf).toBe(CardClass.LilyPad);
+        expect(got.leaf).toBe(CardClass[leafKey]);
       });
 
       it('should unset the upgrade state', () => {

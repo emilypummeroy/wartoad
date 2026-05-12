@@ -5,7 +5,7 @@ import { Player, Phase } from '../types/gameflow';
 import { pickCard } from './pick-card';
 
 const { North, South } = Player;
-const { LilyPad, Froglet } = CardKey;
+const { LilyPad, OldLeaf, Froglet } = CardKey;
 const { Upgrading, Deploying } = Phase;
 
 describe(pickCard, () => {
@@ -14,6 +14,8 @@ describe(pickCard, () => {
     [South, Froglet, Deploying],
     [North, LilyPad, Upgrading],
     [South, LilyPad, Upgrading],
+    [North, OldLeaf, Upgrading],
+    [South, OldLeaf, Upgrading],
   ])('Postconditions | %s turn | called with %s', ([player, cardKey, want]) => {
     const card = draw(CardClass[cardKey])(player);
     const before = createStateWith({
