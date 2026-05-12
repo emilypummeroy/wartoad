@@ -81,7 +81,6 @@ function HandCard({ isEnabled = false, card, player, onPick }: HandCardProps) {
   const handleClick = useCallback(() => onPick(card), [card, onPick]);
   const buttonId = useId();
   const titleId = useId();
-  // TODO 16: Check cost
   return isEnabled ? (
     <div
       role="button"
@@ -92,10 +91,16 @@ function HandCard({ isEnabled = false, card, player, onPick }: HandCardProps) {
       className={`highlighting-card pickable-card ${PLAYER_CLASSNAME[player]}`}
       onClick={handleClick}
     >
-      {card.type === CardType.Unit && <Froglet nameId={titleId} />}
-      {card.type === CardType.Leaf && (
-        <LeafCard leaf={card} location={CardLocation.Hand} nameId={titleId} />
-      )}
+      {
+        // TODO 21: Check cost
+        card.type === CardType.Unit && <Froglet nameId={titleId} />
+      }
+      {
+        // TODO 19: Check cost
+        card.type === CardType.Leaf && (
+          <LeafCard leaf={card} location={CardLocation.Hand} nameId={titleId} />
+        )
+      }
     </div>
   ) : (
     <div

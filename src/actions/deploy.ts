@@ -7,6 +7,6 @@ export const deploy = (unit: UnitState) =>
     const didMeetPreconditions = get.phase === Phase.Main;
     if (!didMeetPreconditions) return get.out;
 
-    // TODO 16: Check cost
+    // TODO 21: Check cost
     return make.deploying(unit).get.out;
   });

@@ -101,7 +101,7 @@ export function Froglet({
     symbolId ??= _symbolId;
   }
   const costId = useId();
-  // TODO 17: Wire in card.class:
+  // TODO 26: Wire in card.class:
   // .stats
   // .name
   // .cost

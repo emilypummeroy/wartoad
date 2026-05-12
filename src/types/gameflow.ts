@@ -3,7 +3,7 @@ export type Gameflow = {
   readonly phase: Phase;
 };
 
-// TODO 25 ActivationStep of an Activation e.g. moving vs attacking
+// TODO 28 ActivationStep of an Activation e.g. moving vs attacking
 export type Phase = (typeof Phase)[keyof typeof Phase];
 export type Player = (typeof Player)[keyof typeof Player];
 

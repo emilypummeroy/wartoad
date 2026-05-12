@@ -11,7 +11,7 @@ export const finishStartPhase = (draw: (owner: Player) => CardState) =>
       data.set.hand
         .of(get.player)
         .update(cards => [...cards, draw(get.player)])
-        // TODO 16: Add funds per leaf
+        // TODO 22: Add funds per leaf
         .set.funds.of(get.player)
         .to(5)
         .make.mainPhase().get.out

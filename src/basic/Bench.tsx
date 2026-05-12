@@ -53,7 +53,7 @@ export function Bench() {
         onPick={pickCard}
       />
       {upgrade && (
-        // TODO 18: Make cards zoomable/inspectable/something outside of deploys and upgrades
+        // TODO 25: Make cards zoomable/inspectable/something outside of deploys and upgrades
         <PickedCard owner={player}>
           <LeafCard location={CardLocation.Hand} leaf={upgrade.leaf} />
         </PickedCard>
