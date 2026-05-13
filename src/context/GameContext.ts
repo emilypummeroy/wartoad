@@ -1,4 +1,4 @@
-import { createContext, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useMemo, useRef, useState } from 'react';
 
 import {
   activate,
@@ -13,8 +13,10 @@ import {
 import { cancelActivePhase } from '../actions/cancel-active-phase';
 import { createState, DEFAULT_GAME_STATE } from '../state';
 import type { GameState } from '../state-types';
+import { createLeaf } from '../state-types/card';
 import { type CardState } from '../types/card';
-import type { Player } from '../types/gameflow';
+import type { DeckActions } from '../types/deck';
+import { Player } from '../types/gameflow';
 
 export type GameContext = [GameState, GameActions];
 
@@ -23,15 +25,37 @@ export const useGameContextData = (
   getDrawnCard: (owner: Player, getNextCardKey: () => number) => CardState,
 ): GameContext => {
   const cardKey = useRef(0);
-  const getNextCardKey = () => (cardKey.current += 1);
+  const getNextCardKey = useCallback(() => (cardKey.current += 1), []);
+  const deckActions: Record<Player, DeckActions> = useMemo(
+    () => ({
+      [Player.North]: {
+        draw: () => getDrawnCard(Player.North, getNextCardKey),
+        leafTutor: cardClass =>
+          createLeaf({
+            owner: Player.North,
+            cardClass,
+            key: getNextCardKey(),
+          }),
+      },
+      [Player.South]: {
+        draw: () => getDrawnCard(Player.South, getNextCardKey),
+        leafTutor: cardClass =>
+          createLeaf({
+            owner: Player.South,
+            cardClass,
+            key: getNextCardKey(),
+          }),
+      },
+    }),
+    [getNextCardKey, getDrawnCard],
+  );
   const [state, setState] = useState<GameState>(
-    createState(p => getStartingHand(p, getNextCardKey)),
+    createState(p => getStartingHand(p, getNextCardKey), deckActions),
   );
   const actions = useMemo(
     () =>
       dropAll(setState)({
-        finishPhase: () =>
-          finishPhase(player => getDrawnCard(player, getNextCardKey)),
+        finishPhase: () => finishPhase(player => deckActions[player].draw()),
 
         pickCard,
         activate,
@@ -42,7 +66,7 @@ export const useGameContextData = (
 
         cancelActivePhase,
       }),
-    [getDrawnCard],
+    [deckActions],
   );
   return [state, actions];
 };

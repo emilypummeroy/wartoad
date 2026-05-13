@@ -1,4 +1,5 @@
 import { CardClass, type LeafClass, type UnitState } from '../types/card';
+import type { DeckActions } from '../types/deck';
 import { Player } from '../types/gameflow';
 import {
   arePositionsEqual,
@@ -144,34 +145,68 @@ export const ROW_COUNT_PER_PLAYER = 3 as const;
 export const LEAF_COUNT_PER_ROW = 3 as const;
 export const LAST_IN_ROW = 2 as const;
 
-export const NORTH_LILYPAD: PondLeafState = {
+export const makeNorthLilypad = (
+  actions: Record<Player, DeckActions>,
+): PondLeafState => ({
   units: [],
-  leaf: CardClass.LilyPad,
+  leaf: actions.North.leafTutor(CardClass.LilyPad).cardClass,
   controller: Player.North,
-} as const;
+});
+
+export const makeNorthLeaf = (
+  _: Record<Player, DeckActions>,
+): PondLeafState => ({
+  units: [],
+  leaf: undefined,
+  controller: Player.North,
+});
+
+export const makeSouthLilypad = (
+  actions: Record<Player, DeckActions>,
+): PondLeafState => ({
+  units: [],
+  leaf: actions.South.leafTutor(CardClass.LilyPad).cardClass,
+  controller: Player.South,
+});
+
+export const makeSouthLeaf = (
+  _: Record<Player, DeckActions>,
+): PondLeafState => ({
+  units: [],
+  leaf: undefined,
+  controller: Player.South,
+});
+
+export const makeInitialPond = (
+  actions: Record<Player, DeckActions>,
+): PondState => [
+  [makeNorthLeaf(actions), makeNorthLilypad(actions), makeNorthLeaf(actions)],
+  [makeNorthLeaf(actions), makeNorthLeaf(actions), makeNorthLeaf(actions)],
+  [makeNorthLeaf(actions), makeNorthLeaf(actions), makeNorthLeaf(actions)],
+  [makeSouthLeaf(actions), makeSouthLeaf(actions), makeSouthLeaf(actions)],
+  [makeSouthLeaf(actions), makeSouthLeaf(actions), makeSouthLeaf(actions)],
+  [makeSouthLeaf(actions), makeSouthLilypad(actions), makeSouthLeaf(actions)],
+];
+
 export const NORTH_LEAF: PondLeafState = {
   units: [],
   controller: Player.North,
   leaf: undefined,
 } as const;
-// I want to find a good way to draw this card instead of hardcoding it.
-export const SOUTH_LILYPAD: PondLeafState = {
-  units: [],
-  leaf: CardClass.LilyPad,
-  controller: Player.South,
-} as const;
+
 export const SOUTH_LEAF: PondLeafState = {
   units: [],
   controller: Player.South,
   leaf: undefined,
 } as const;
-export const INITIAL_POND: PondState = [
-  [NORTH_LEAF, NORTH_LILYPAD, NORTH_LEAF],
+
+export const DEFAULT_POND: PondState = [
+  [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],
   [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],
   [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],
   [SOUTH_LEAF, SOUTH_LEAF, SOUTH_LEAF],
   [SOUTH_LEAF, SOUTH_LEAF, SOUTH_LEAF],
-  [SOUTH_LEAF, SOUTH_LILYPAD, SOUTH_LEAF],
+  [SOUTH_LEAF, SOUTH_LEAF, SOUTH_LEAF],
 ];
 
 export const HOME = {

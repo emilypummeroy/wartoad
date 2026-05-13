@@ -8,6 +8,7 @@ import {
   ROW_COUNT_PER_PLAYER,
   type PondState,
   getPondStateAt,
+  DEFAULT_POND,
 } from '../state-types/pond';
 import { TestPondKey, TEST_PONDS_BY_KEY } from '../state-types/pond.test-utils';
 import { activationOf, gameflowOf, winningPondOf } from '../state/test-utils';
@@ -83,7 +84,7 @@ describe(Pond, () => {
   describe('without context', () => {
     beforeEach(() => render(<Pond />));
     it_should_have_a_6x3_grid_with_leaves();
-    it_should_have_the_right_controlling_player_and_leaves_in_each_row(TEST_PONDS_BY_KEY[INITIAL_POND]);
+    it_should_have_the_right_controlling_player_and_leaves_in_each_row(DEFAULT_POND);
   });
 
   // No dropzones:

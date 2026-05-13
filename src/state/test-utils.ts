@@ -1,12 +1,11 @@
-import { DEFAULT_GAME_STATE } from '.';
 import type { GameState } from '../state-types';
-import { leafTutor, unitTutor } from '../state-types/deck.test-utils';
 import {
-  HOME,
-  INITIAL_POND,
-  setPondStateAt,
-  type PondState,
-} from '../state-types/pond';
+  DETERMINISTIC_NORTH_HAND,
+  DETERMINISTIC_SOUTH_HAND,
+} from '../state-types/card';
+import { leafTutor, unitTutor } from '../state-types/deck.test-utils';
+import { HOME, setPondStateAt, type PondState } from '../state-types/pond';
+import { INITIAL_POND } from '../state-types/pond.test-utils';
 import {
   type UnitState,
   type UnitKey,
@@ -18,6 +17,22 @@ import {
 } from '../types/card';
 import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import type { Position } from '../types/position';
+
+export const DEFAULT_GAME_STATE: GameState = {
+  flow: {
+    phase: Phase.Main,
+    player: Player.South,
+  },
+  pond: INITIAL_POND,
+  northHand: DETERMINISTIC_NORTH_HAND,
+  southHand: DETERMINISTIC_SOUTH_HAND,
+  northFunds: 5,
+  southFunds: 5,
+  upgrade: undefined,
+  deployment: undefined,
+  activation: undefined,
+  winner: undefined,
+} as const;
 
 export const gameflowOf = (
   player: Player = DEFAULT_GAME_STATE.flow.player,

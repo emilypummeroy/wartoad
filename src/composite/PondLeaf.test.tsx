@@ -2,7 +2,8 @@ import { screen } from '@testing-library/react';
 
 import { renderWithGameContext } from '../context/GameContext.test-utils';
 import { createUnit } from '../state-types/card';
-import { HOME, INITIAL_POND, setPondStateAt } from '../state-types/pond';
+import { HOME, setPondStateAt } from '../state-types/pond';
+import { INITIAL_POND } from '../state-types/pond.test-utils';
 import { activationOf, gameflowOf } from '../state/test-utils';
 import { CardClass, CardKey, UnitClass, type LeafKey, type UnitState } from '../types/card';
 import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';

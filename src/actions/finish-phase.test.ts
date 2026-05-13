@@ -3,11 +3,11 @@ import { draw } from '../state-types/card.test-utils';
 import {
   getPondStateAt,
   HOME,
-  INITIAL_POND,
   setPondStateAt,
   setPondStateAtEach,
 } from '../state-types/pond';
 import {
+  INITIAL_POND,
   TEST_LEAVES_BY_KEY,
   TestLeafKey,
 } from '../state-types/pond.test-utils';

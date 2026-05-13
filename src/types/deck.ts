@@ -9,6 +9,11 @@ import type {
 } from './card';
 import type { Player } from './gameflow';
 
+export type DeckActions = {
+  readonly draw: ReturnType<Draw>;
+  readonly leafTutor: ReturnType<LeafTutor>;
+};
+
 export type Tutor = (player: Player) => (cardClass: CardClass) => CardState;
 export type LeafTutor = TutorOf<Leaf>;
 export type UnitTutor = TutorOf<Unit>;

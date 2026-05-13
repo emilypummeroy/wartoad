@@ -2,11 +2,11 @@ import type { GameState } from '../state-types';
 import { createUnit } from '../state-types/card';
 import {
   getPondStateAt,
-  INITIAL_POND,
   LEAF_COUNT_PER_ROW,
   ROW_COUNT,
   setPondStateAtEach,
 } from '../state-types/pond';
+import { INITIAL_POND } from '../state-types/pond.test-utils';
 import {
   activationOf,
   createStateWith,

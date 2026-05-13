@@ -2,8 +2,8 @@ import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 import { type GameActions, DEFAULT_GAME_ACTIONS } from '../actions';
-import { DEFAULT_GAME_STATE } from '../state';
 import type { GameState } from '../state-types';
+import { DEFAULT_GAME_STATE } from '../state/test-utils';
 import { GameContext } from './GameContext';
 
 // (Not a component):

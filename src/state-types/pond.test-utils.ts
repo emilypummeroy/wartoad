@@ -1,19 +1,40 @@
 import { CardClass, type UnitState } from '../types/card';
 import { Player } from '../types/gameflow';
 import { createUnit } from './card';
-import {
-  INITIAL_POND,
-  NORTH_LEAF,
-  NORTH_LILYPAD,
-  type PondState,
-  type PondLeafState,
-  SOUTH_LEAF,
-  SOUTH_LILYPAD,
-} from './pond';
+import { type PondState, type PondLeafState } from './pond';
 
 export type TestPondKey = keyof typeof TEST_PONDS_BY_KEY;
 
 export type TestLeafKey = (typeof TestLeafKey)[keyof typeof TEST_LEAVES_BY_KEY];
+
+export const NORTH_LILYPAD: PondLeafState = {
+  units: [],
+  leaf: CardClass.LilyPad,
+  controller: Player.North,
+} as const;
+export const NORTH_LEAF: PondLeafState = {
+  units: [],
+  controller: Player.North,
+  leaf: undefined,
+} as const;
+export const SOUTH_LILYPAD: PondLeafState = {
+  units: [],
+  leaf: CardClass.LilyPad,
+  controller: Player.South,
+} as const;
+export const SOUTH_LEAF: PondLeafState = {
+  units: [],
+  controller: Player.South,
+  leaf: undefined,
+} as const;
+export const INITIAL_POND: PondState = [
+  [NORTH_LEAF, NORTH_LILYPAD, NORTH_LEAF],
+  [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],
+  [NORTH_LEAF, NORTH_LEAF, NORTH_LEAF],
+  [SOUTH_LEAF, SOUTH_LEAF, SOUTH_LEAF],
+  [SOUTH_LEAF, SOUTH_LEAF, SOUTH_LEAF],
+  [SOUTH_LEAF, SOUTH_LILYPAD, SOUTH_LEAF],
+];
 
 const SOUTH_UNIT: UnitState[] = [
   createUnit({
