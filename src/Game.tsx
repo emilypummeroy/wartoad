@@ -1,4 +1,5 @@
 import { Bench } from './basic/Bench';
+import { CallToAction } from './basic/CallToAction';
 import { PhaseTracker } from './basic/PhaseTracker';
 import { Pond } from './composite/Pond';
 
@@ -11,6 +12,7 @@ export function Game() {
             War<span className="accent">toad</span>
           </h1>
         </div>
+        <CallToAction />
         <PhaseTracker />
       </header>
       <main>

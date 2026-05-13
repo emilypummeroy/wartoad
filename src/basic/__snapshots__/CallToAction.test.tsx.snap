@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`CallToAction > in North Activating phase > should have a consistent message 1`] = `"Choose a leaf in range to move to"`;
+
+exports[`CallToAction > in North Deploying phase > should have a consistent message 1`] = `"Choose a leaf in your home row to deploy on"`;
+
+exports[`CallToAction > in North GameOver phase > should have a consistent message 1`] = `"Refresh the page to play again"`;
+
+exports[`CallToAction > in North Upgrading phase > should have a consistent message 1`] = `"Choose an unupgraded leaf to upgrade"`;
+
+exports[`CallToAction > in South Activating phase > should have a consistent message 1`] = `"Choose a leaf in range to move to"`;
+
+exports[`CallToAction > in South Deploying phase > should have a consistent message 1`] = `"Choose a leaf in your home row to deploy on"`;
+
+exports[`CallToAction > in South GameOver phase > should have a consistent message 1`] = `"Refresh the page to play again"`;
+
+exports[`CallToAction > in South Upgrading phase > should have a consistent message 1`] = `"Choose an unupgraded leaf to upgrade"`;
