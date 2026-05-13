@@ -139,6 +139,13 @@ export const CardKey = {
   LilyPad: LeafClass.LilyPad.key,
   OldLeaf: LeafClass.OldLeaf.key,
 } as const;
+
+export const CARD_KEYS = [
+  CardKey.Froglet,
+  CardKey.LilyPad,
+  CardKey.OldLeaf,
+] as const;
+
 CardKey satisfies Record<CardKey, CardKey>;
 CardKey satisfies Record<UnitKey, UnitKey>;
 CardKey satisfies Record<LeafKey, LeafKey>;
