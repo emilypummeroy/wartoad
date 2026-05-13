@@ -1,6 +1,6 @@
 import { DEFAULT_GAME_STATE } from '.';
 import type { GameState } from '../state-types';
-import { createLeaf, createUnit } from '../state-types/card';
+import { leafTutor, unitTutor } from '../state-types/deck.test-utils';
 import {
   HOME,
   INITIAL_POND,
@@ -18,7 +18,6 @@ import {
 } from '../types/card';
 import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import type { Position } from '../types/position';
-import { counter } from '../types/test-utils';
 
 export const gameflowOf = (
   player: Player = DEFAULT_GAME_STATE.flow.player,
@@ -56,13 +55,7 @@ export const upgradeOf = (
     ? {
         upgrade: {
           leaf:
-            typeof leaf === 'string'
-              ? createLeaf({
-                  cardClass: LeafClass[leaf],
-                  key: counter(),
-                  owner,
-                })
-              : leaf,
+            typeof leaf === 'string' ? leafTutor(owner)(LeafClass[leaf]) : leaf,
         },
       }
     : {};
@@ -75,13 +68,7 @@ export const deploymentOf = (
     ? {
         deployment: {
           unit:
-            typeof unit === 'string'
-              ? createUnit({
-                  cardClass: UnitClass[unit],
-                  key: counter(),
-                  owner,
-                })
-              : unit,
+            typeof unit === 'string' ? unitTutor(owner)(UnitClass[unit]) : unit,
         },
       }
     : {};
@@ -97,11 +84,7 @@ export const activationOf = (
           start,
           unit:
             typeof unit === 'string'
-              ? createUnit({
-                  cardClass: UnitClass[unit],
-                  key: counter(),
-                  owner,
-                })
+              ? unitTutor(owner)(UnitClass[unit])
               : { ...unit, owner },
         },
       }

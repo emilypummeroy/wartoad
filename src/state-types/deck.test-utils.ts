@@ -14,21 +14,21 @@ export const makeDraw: () => Draw = () => {
     });
 };
 
-export const makeTutor: () => Tutor = () => owner => cardClass =>
+export const makeTutor: Tutor = owner => cardClass =>
   createCard({
     cardClass,
     owner,
     key: counter(),
   });
 
-export const leafTutor: () => LeafTutor = () => owner => cardClass =>
+export const leafTutor: LeafTutor = owner => cardClass =>
   createLeaf({
     cardClass,
     owner,
     key: counter(),
   });
 
-export const unitTutor: () => UnitTutor = () => owner => cardClass =>
+export const unitTutor: UnitTutor = owner => cardClass =>
   createUnit({
     cardClass,
     owner,

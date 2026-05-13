@@ -11,7 +11,9 @@
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
     "src/**/*.test-utils.ts",
-    "src/**/*.test-utils.tsx"
+    "src/**/*.test-utils.tsx",
+    "src/**/test-utils.ts",
+    "src/**/test-utils.tsx"
   ],
   "exclude": [],
   "references": [{ "path": "./tsconfig.app.json" }]

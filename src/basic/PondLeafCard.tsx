@@ -6,7 +6,6 @@ import { type PondState, getPondStateAt, HOME } from '../state-types/pond';
 import { CardLocation } from '../types/card';
 import { PLAYER_CLASSNAME } from '../types/gameflow';
 import { type Position, arePositionsEqual } from '../types/position';
-import { counter } from '../types/test-utils';
 import { CardBack, LeafCard } from '../view/Card';
 
 type PondLeafCardSlice = [
@@ -39,7 +38,7 @@ export function PondLeafCard({
           leaf={createLeaf({
             cardClass: leaf,
             owner: controller,
-            key: counter(),
+            key: -1,
           })}
           symbolId={leafSymbolId}
           nameId={leafNameId}
