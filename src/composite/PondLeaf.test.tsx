@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react';
 
 import { renderWithGameContext } from '../context/GameContext.test-utils';
 import { createUnit } from '../state-types/card';
+import { leafTutor } from '../state-types/deck.test-utils';
 import { HOME, setPondStateAt } from '../state-types/pond';
 import { INITIAL_POND } from '../state-types/pond.test-utils';
 import { activationOf, gameflowOf } from '../state/test-utils';
@@ -92,7 +93,7 @@ describe(PondLeaf, () => {
     [controller, player, phase, position, leafKey, unitOwners = [], activationStart]: Inputs,
     units: UnitState[] = frogletsOwnedBy(unitOwners),
   ) => {
-    const leaf = leafKey ? CardClass[leafKey] : undefined;
+    const leaf = leafKey ? leafTutor(controller)(CardClass[leafKey]) : undefined;
     renderWithGameContext([
       {
         ...(phase === Activating && activationOf(player, _, activationStart)),

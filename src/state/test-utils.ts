@@ -114,6 +114,7 @@ export const winningPondOf = (
         winner,
         pond: setPondStateAt(pond ?? INITIAL_POND, HOME[PLAYER_AFTER[winner]], {
           controller: winner,
+          leaf: undefined,
         }),
       }
     : pond

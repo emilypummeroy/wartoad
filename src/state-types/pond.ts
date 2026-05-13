@@ -1,4 +1,4 @@
-import { CardClass, type LeafClass, type UnitState } from '../types/card';
+import { CardClass, type LeafState, type UnitState } from '../types/card';
 import type { DeckActions } from '../types/deck';
 import { Player } from '../types/gameflow';
 import {
@@ -18,7 +18,7 @@ export type PondState = readonly [
 
 export type PondLeafState = {
   readonly units: readonly UnitState[];
-  readonly leaf: LeafClass | undefined;
+  readonly leaf: LeafState | undefined;
   readonly controller: Player;
 };
 
@@ -139,6 +139,17 @@ export const doesAnyPondLeafSatisfy = (
     }),
   );
 
+export const doesEveryPondLeafSatisfy = (
+  pond: PondState,
+  predicate: (v: PondLeafState, xy: Position) => boolean,
+): boolean =>
+  pond.every((row, y) =>
+    row.every((leaf, x) => {
+      const xy = { x, y };
+      return isPosition(xy) && predicate(leaf, xy);
+    }),
+  );
+
 export const ROW_COUNT = 6 as const;
 export const LAST_ROW = 5 as const;
 export const ROW_COUNT_PER_PLAYER = 3 as const;
@@ -149,7 +160,7 @@ export const makeNorthLilypad = (
   actions: Record<Player, DeckActions>,
 ): PondLeafState => ({
   units: [],
-  leaf: actions.North.leafTutor(CardClass.LilyPad).cardClass,
+  leaf: actions.North.leafTutor(CardClass.LilyPad),
   controller: Player.North,
 });
 
@@ -165,7 +176,7 @@ export const makeSouthLilypad = (
   actions: Record<Player, DeckActions>,
 ): PondLeafState => ({
   units: [],
-  leaf: actions.South.leafTutor(CardClass.LilyPad).cardClass,
+  leaf: actions.South.leafTutor(CardClass.LilyPad),
   controller: Player.South,
 });
 

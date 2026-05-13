@@ -6,7 +6,7 @@ import { PondUnitCard } from '../basic/PondUnitCard';
 import { GameContext } from '../context/GameContext';
 import type { ActivationState } from '../state-types';
 import { type PondState } from '../state-types/pond';
-import type { LeafClass, UnitState } from '../types/card';
+import type { LeafState, UnitState } from '../types/card';
 import { type Gameflow } from '../types/gameflow';
 import { type Position } from '../types/position';
 
@@ -42,7 +42,7 @@ const rowSize = ({
 }: Readonly<{
   units: readonly UnitState[];
   position: Position;
-  leaf?: LeafClass;
+  leaf?: LeafState;
 }>) => {
   const leafSize = leaf ? SHOW_LEAF_SIZE : PEEK_LEAF_SIZE;
   const showingUnitCount = units.filter(u => !u.isExhausted).length;

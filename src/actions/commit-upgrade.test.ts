@@ -132,7 +132,7 @@ describe(commitUpgrade, () => {
       it('should upgrade the target position', () => {
         const after = commitUpgrade(target)(before);
         const got = getPondStateAt(after.pond, target);
-        expect(got.leaf).toBe(CardClass[leafKey]);
+        expect(got.leaf).toBe(leaf);
       });
 
       it('should unset the upgrade state', () => {

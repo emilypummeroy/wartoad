@@ -5,7 +5,12 @@ import {
   TestLeafKey,
   TestPondKey,
 } from '../state-types/pond.test-utils';
-import { createStateWith, gameflowOf, phaseStateOf } from '../state/test-utils';
+import {
+  createStateWith,
+  gameflowOf,
+  phaseStateOf,
+  winningPondOf,
+} from '../state/test-utils';
 import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import { winIfYouCan } from './win-if-you-can';
 
@@ -57,12 +62,7 @@ describe(winIfYouCan, () => {
       const before = createStateWith({
         ...gameflowOf(player, phase),
         ...phaseStateOf(player, phase),
-        pond: winner
-          ? setPondStateAt(pond, HOME[PLAYER_AFTER[winner]], {
-              controller: winner,
-            })
-          : pond,
-        winner,
+        ...winningPondOf(winner, pond),
       });
       it('should not change state at all', () => {
         const after = winIfYouCan(you)(before);
@@ -141,14 +141,16 @@ describe(winIfYouCan, () => {
       // > opponent Home is captured
       it(`should capture the ${opponent} Home`, () => {
         const after = winIfYouCan(you)(before);
-        const { controller } = getPondStateAt(after.pond, HOME[opponent]);
+        const { controller, leaf } = getPondStateAt(after.pond, HOME[opponent]);
         expect(controller).toBe(you);
+        expect(leaf).not.toBeDefined();
       });
 
       it(`should not change the rest of the pond`, () => {
         const after = winIfYouCan(you)(before);
         const want = setPondStateAt(before.pond, HOME[opponent], {
-          controller: getPondStateAt(after.pond, HOME[opponent]).controller,
+          controller: you,
+          leaf: undefined,
         });
         expect(after.pond).toStrictEqual(want);
       });

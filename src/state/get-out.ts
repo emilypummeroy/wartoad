@@ -7,6 +7,7 @@ import type {
 } from '../state-types';
 import {
   doesAnyPondLeafSatisfy,
+  doesEveryPondLeafSatisfy,
   HOME,
   setAllUnits,
   setPondStateAt,
@@ -43,20 +44,27 @@ export type GameData = {
 
 // oxlint-disable-next-line max-statements
 const gameInvariants: GameInvariants = (s, get, { always, iff }) => {
-  always(!!get.leaf.at(HOME[Player.North]).leaf);
-  always(!!get.leaf.at(HOME[Player.South]).leaf);
+  always(
+    get.leaf.every(
+      ({ leaf, controller }) => !leaf || leaf.owner === controller,
+    ),
+  );
 
   iff(get.phase === Phase.Activating).must(!!s.activation);
   iff(get.phase === Phase.Deploying).must(!!s.deployment);
   iff(get.phase === Phase.Upgrading).must(!!s.upgrade);
 
   iff(get.phase === Phase.GameOver).must(!!s.winner);
+
   iff(s.winner === Player.North).must(
     get.leaf.at(HOME[Player.South]).controller === Player.North,
   );
+  iff(s.winner === Player.North).must(!get.leaf.at(HOME[Player.South]).leaf);
+
   iff(s.winner === Player.South).must(
     get.leaf.at(HOME[Player.North]).controller === Player.South,
   );
+  iff(s.winner === Player.South).must(!get.leaf.at(HOME[Player.North]).leaf);
 };
 
 export const gameData = (s: GameState): GameData => ({
@@ -74,6 +82,7 @@ export type GameAccess = {
   readonly pond: PondState;
   readonly leaf: {
     readonly at: (xy: Position) => PondLeafState;
+    readonly every: (p: (v: PondLeafState, xy: Position) => boolean) => boolean;
     readonly exists: (
       p: (v: PondLeafState, xy: Position) => boolean,
     ) => boolean;
@@ -147,6 +156,9 @@ const access: (s: GameState) => GameAccess = s => ({
   leaf: {
     at({ x, y }) {
       return s.pond[y][x];
+    },
+    every(p) {
+      return doesEveryPondLeafSatisfy(s.pond, p);
     },
     exists(p) {
       return doesAnyPondLeafSatisfy(s.pond, p);
@@ -235,6 +247,7 @@ const make = (s: GameState): GameMake => ({
       winner,
       pond: setPondStateAt(s.pond, HOME[PLAYER_AFTER[winner]], {
         controller: winner,
+        leaf: undefined,
       }),
     }),
 

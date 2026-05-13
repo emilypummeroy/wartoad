@@ -1,6 +1,7 @@
 import { CardClass, type UnitState } from '../types/card';
 import { Player } from '../types/gameflow';
 import { createUnit } from './card';
+import { leafTutor } from './deck.test-utils';
 import { type PondState, type PondLeafState } from './pond';
 
 export type TestPondKey = keyof typeof TEST_PONDS_BY_KEY;
@@ -9,7 +10,7 @@ export type TestLeafKey = (typeof TestLeafKey)[keyof typeof TEST_LEAVES_BY_KEY];
 
 export const NORTH_LILYPAD: PondLeafState = {
   units: [],
-  leaf: CardClass.LilyPad,
+  leaf: leafTutor(Player.North)(CardClass.LilyPad),
   controller: Player.North,
 } as const;
 export const NORTH_LEAF: PondLeafState = {
@@ -19,7 +20,7 @@ export const NORTH_LEAF: PondLeafState = {
 } as const;
 export const SOUTH_LILYPAD: PondLeafState = {
   units: [],
-  leaf: CardClass.LilyPad,
+  leaf: leafTutor(Player.South)(CardClass.LilyPad),
   controller: Player.South,
 } as const;
 export const SOUTH_LEAF: PondLeafState = {

@@ -14,7 +14,7 @@ export const commitUpgrade = (target: Position) =>
 
     return set.leaf
       .at(target)
-      .to({ leaf: upgrade.leaf.cardClass })
+      .to({ leaf: upgrade.leaf })
       .set.hand.of(get.player)
       .update(hand => hand.filter(card => card !== upgrade.leaf))
       .make.idle().get.out;

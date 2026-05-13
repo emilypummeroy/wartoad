@@ -105,7 +105,7 @@ describe(Pond, () => {
     [South, Main, FULL_POND],
     [North, Main, UNITS_POND],
     [South, Main, UNITS_POND],
-  ])('on %s turn %s phase while %s | in pond: %s', ([player, phase, pondKey, winner]) => {
+  ])('on %s turn %s phase | in pond: %s', ([player, phase, pondKey, winner]) => {
     const pond = TEST_PONDS_BY_KEY[pondKey];
     beforeEach(() => {
       renderWithGameContext([{ ...gameflowOf(player, phase), ...winningPondOf(winner, pond) }])(<Pond />);

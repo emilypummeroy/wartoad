@@ -1,7 +1,6 @@
 import { useContext } from 'react';
 
 import { GameContext } from '../context/GameContext';
-import { createLeaf } from '../state-types/card';
 import { type PondState, getPondStateAt, HOME } from '../state-types/pond';
 import { CardLocation } from '../types/card';
 import { PLAYER_CLASSNAME } from '../types/gameflow';
@@ -34,12 +33,7 @@ export function PondLeafCard({
         className={`highlighting-card ${PLAYER_CLASSNAME[controller]}`}
       >
         <LeafCard
-          // TODO 16: Use a real leaf card from state
-          leaf={createLeaf({
-            cardClass: leaf,
-            owner: controller,
-            key: -1,
-          })}
+          leaf={leaf}
           symbolId={leafSymbolId}
           nameId={leafNameId}
           location={isHome ? CardLocation.Home : CardLocation.Pond}
