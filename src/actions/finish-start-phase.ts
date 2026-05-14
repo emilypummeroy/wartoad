@@ -1,17 +1,21 @@
 import { data } from '../state';
-import type { CardState } from '../types/card';
-import { Phase, type Player } from '../types/gameflow';
+import { createDeckActions } from '../types/deck';
+import { Phase } from '../types/gameflow';
 
-export const finishStartPhase = (draw: (owner: Player) => CardState) =>
+export const finishStartPhase = () =>
   data(({ get, ...data }) => {
-    const didMeetPreconditions = get.phase === Phase.Start;
+    const deck = createDeckActions(get.deck.of(get.player));
+    const drawnCard = deck.draw();
+    const didMeetPreconditions = get.phase === Phase.Start && !!drawnCard;
     if (!didMeetPreconditions) return get.out;
 
     return (
       data.set.hand
         .of(get.player)
-        .update(cards => [...cards, draw(get.player)])
-        // TODO 22: Add funds per leaf
+        .update(cards => [...cards, drawnCard])
+        .set.deck.of(get.player)
+        .to(deck.resultingDeck)
+        // TODO 23: Add funds per leaf
         .set.funds.of(get.player)
         .to(5)
         .make.mainPhase().get.out

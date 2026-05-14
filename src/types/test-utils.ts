@@ -12,7 +12,7 @@ export type PhasePlayer = [
   activator?: Player,
 ];
 
-export const partial: <T>(x: T) => Partial<T> = x => x;
+export const partial: <T>(x: T) => Partial<T> = x => ({ ...x });
 
 export const gameflowFrom = (player: Player, phase: Phase): Gameflow => ({
   player,

@@ -16,6 +16,7 @@ import {
   type PondState,
 } from '../state-types/pond';
 import type { CardState, LeafState, UnitState } from '../types/card';
+import type { Deck } from '../types/deck';
 import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import type { Position } from '../types/position';
 
@@ -90,6 +91,7 @@ export type GameAccess = {
   readonly upgrade: UpgradeState | undefined;
   readonly deployment: DeploymentState | undefined;
   readonly activation: ActivationState | undefined;
+  readonly deck: { readonly of: (x: Player) => Deck };
 };
 
 // Updaters which preserve simple invariants
@@ -123,8 +125,14 @@ export type GameUpdate = {
   readonly hand: {
     readonly of: (x: Player) => {
       readonly update: (
-        x: (old: readonly CardState[]) => CardState[],
+        u: (old: readonly CardState[]) => CardState[],
       ) => GameData;
+    };
+  };
+
+  readonly deck: {
+    readonly of: (x: Player) => {
+      readonly to: (v: Deck) => GameData;
     };
   };
 };
@@ -174,6 +182,10 @@ const access: (s: GameState) => GameAccess = s => ({
   get activation() {
     return s.flow.phase === Phase.Activating ? s.activation : undefined;
   },
+
+  deck: {
+    of: x => (x === Player.North ? s.northDeck : s.southDeck),
+  },
 });
 
 const update: (s: GameState) => GameUpdate = s => ({
@@ -211,6 +223,16 @@ const update: (s: GameState) => GameUpdate = s => ({
           ...(x === Player.North
             ? { northHand: u(s.northHand) }
             : { southHand: u(s.southHand) }),
+        }),
+    }),
+  },
+
+  deck: {
+    of: x => ({
+      to: v =>
+        gameData({
+          ...s,
+          ...(x === Player.North ? { northDeck: v } : { southDeck: v }),
         }),
     }),
   },

@@ -1,7 +1,12 @@
 import type { GameState } from '../state-types';
+import {
+  generateDeckDeterministic,
+  INITIAL_DECK_SIZE,
+} from '../state-types/deck';
 import { leafTutor, unitTutor } from '../state-types/deck.test-utils';
 import { HOME, setPondStateAt, type PondState } from '../state-types/pond';
 import { INITIAL_POND } from '../state-types/pond.test-utils';
+import { shuffled } from '../types';
 import {
   type UnitState,
   type UnitKey,
@@ -11,8 +16,10 @@ import {
   type LeafKey,
   type LeafState,
 } from '../types/card';
+import type { Deck } from '../types/deck';
 import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
 import type { Position } from '../types/position';
+import { counter } from '../types/test-utils';
 
 export const DEFAULT_GAME_STATE: GameState = {
   flow: {
@@ -119,6 +126,19 @@ export const winningPondOf = (
       ? { pond }
       : {};
 
+export const deckOf = (
+  player: Player = DEFAULT_GAME_STATE.flow.player,
+  deckOrSize: number | Deck = INITIAL_DECK_SIZE,
+  shuffle: boolean = typeof deckOrSize === 'number',
+): Partial<GameState> => {
+  const deck: Deck =
+    typeof deckOrSize === 'number'
+      ? generateDeckDeterministic(player, counter).slice(0, deckOrSize)
+      : deckOrSize;
+  return player === Player.North
+    ? { northDeck: shuffle ? shuffled(deck) : deck }
+    : { southDeck: shuffle ? shuffled(deck) : deck };
+};
 export const createStateWith = (partial: Partial<GameState>): GameState => ({
   ...DEFAULT_GAME_STATE,
   ...partial,

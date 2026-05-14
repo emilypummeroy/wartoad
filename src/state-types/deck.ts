@@ -5,6 +5,7 @@ import { createCard } from './card';
 const LILYPAD_COUNT = 15;
 const OLD_LEAF_COUNT = 5;
 const FROGLET_COUNT = 40;
+export const INITIAL_DECK_SIZE = LILYPAD_COUNT + OLD_LEAF_COUNT + FROGLET_COUNT;
 
 export const generateDeckDeterministic = (
   owner: Player,

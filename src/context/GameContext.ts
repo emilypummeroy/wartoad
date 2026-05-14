@@ -14,28 +14,15 @@ import { cancelActivePhase } from '../actions/cancel-active-phase';
 import { createState, DEFAULT_GAME_STATE } from '../state';
 import type { GameState } from '../state-types';
 import { type CardState } from '../types/card';
-import type { DeckActions } from '../types/deck';
 import { Player } from '../types/gameflow';
 
 export type GameContext = [GameState, GameActions];
 
 export const useGameContextData = (
   generateDeck: (owner: Player, getNextCardKey: () => number) => CardState[],
-  getDrawnCard: (owner: Player, getNextCardKey: () => number) => CardState,
 ): GameContext => {
   const cardKey = useRef(0);
   const getNextCardKey = useCallback(() => (cardKey.current += 1), []);
-  const deckActions: Record<Player, DeckActions> = useMemo(
-    () => ({
-      [Player.North]: {
-        draw: () => getDrawnCard(Player.North, getNextCardKey),
-      },
-      [Player.South]: {
-        draw: () => getDrawnCard(Player.South, getNextCardKey),
-      },
-    }),
-    [getNextCardKey, getDrawnCard],
-  );
 
   const northDeck = generateDeck(Player.North, getNextCardKey);
   const southDeck = generateDeck(Player.South, getNextCardKey);
@@ -49,7 +36,7 @@ export const useGameContextData = (
   const actions = useMemo(
     () =>
       dropAll(setState)({
-        finishPhase: () => finishPhase(player => deckActions[player].draw()),
+        finishPhase,
 
         pickCard,
         activate,
@@ -60,7 +47,7 @@ export const useGameContextData = (
 
         cancelActivePhase,
       }),
-    [deckActions],
+    [],
   );
   return [state, actions];
 };

@@ -81,7 +81,7 @@ describe(finishMainPhase, () => {
 
   // Postconditions:
   describe.for<Inputs>([
-    // TODO 22: Should require controlled neighbour to capture
+    // TODO 28: Should require controlled neighbour to capture
     [North, INITIAL_POND, [{ x: 1, y: 3 }], SOUTH_LEAF],
     [North, UNITS_POND, [{ x: 0, y: 3 }], SOUTH_LEAF_WITH_UNIT],
     [North, INITIAL_POND, [{ x: 2, y: 4 }], SOUTH_LEAF_WITH_UNITS],
