@@ -9,7 +9,6 @@ import {
   type CardKey,
   type LeafState,
 } from './card';
-import type { Player } from './gameflow';
 
 export type Deck = readonly CardState[];
 
@@ -19,25 +18,21 @@ export type DeckSpec = {
   readonly makeDeck: () => readonly CardState[];
 };
 
-export type DeckActions = {
-  readonly draw: ReturnType<Draw>;
-};
-
-export type Tutor2 = (cardClass: CardClass) => CardState | undefined;
-export type LeafTutor2 = TutorOf2<Leaf>;
-export type UnitTutor2 = TutorOf2<Unit>;
-export type TutorOf2<T extends CardType = CardType> = (
+export type Tutor = (cardClass: CardClass) => CardState | undefined;
+export type LeafTutor = TutorOf<Leaf>;
+export type UnitTutor = TutorOf<Unit>;
+export type TutorOf<T extends CardType = CardType> = (
   cardClass: CardClassOf<T>,
 ) => CardStateOf<T> | undefined;
 
-export type DeckActions2 = {
+export type DeckActions = {
   readonly draw: () => CardState | undefined;
-  readonly tutor: Tutor2;
-  readonly tutorLeaf: LeafTutor2;
+  readonly tutor: Tutor;
+  readonly tutorLeaf: LeafTutor;
   readonly resultingDeck: Deck;
 };
 
-export const createDeckActions = (oldDeck: Deck): DeckActions2 => {
+export const createDeckActions = (oldDeck: Deck): DeckActions => {
   const deck = [...oldDeck];
   return {
     draw: () => deck.shift(),
@@ -68,12 +63,3 @@ export const createDeckActions = (oldDeck: Deck): DeckActions2 => {
     },
   };
 };
-
-export type Tutor = (player: Player) => (cardClass: CardClass) => CardState;
-export type LeafTutor = TutorOf<Leaf>;
-export type UnitTutor = TutorOf<Unit>;
-export type TutorOf<T extends CardType = CardType> = (
-  player: Player,
-) => (cardClass: CardClassOf<T>) => CardStateOf<T>;
-
-export type Draw = (player: Player) => () => CardState;

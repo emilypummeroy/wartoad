@@ -1,7 +1,7 @@
 import type { GameState } from '../state-types';
 import { DEFAULT_POND, makeInitialPond } from '../state-types/pond';
 import type { CardState } from '../types/card';
-import { createDeckActions, type DeckActions2 } from '../types/deck';
+import { createDeckActions, type DeckActions } from '../types/deck';
 import { Phase, Player } from '../types/gameflow';
 
 export { data } from './get-out';
@@ -33,7 +33,7 @@ export const createState = ({
   readonly northDeck: readonly CardState[];
   readonly southDeck: readonly CardState[];
 }) => {
-  const getStartingHand = ({ draw }: DeckActions2): CardState[] =>
+  const getStartingHand = ({ draw }: DeckActions): CardState[] =>
     Array.from({ length: INITIAL_HAND_CARD_COUNT }, draw).filter(x => !!x);
   const northDeckActions = createDeckActions(northDeck);
   const southDeckActions = createDeckActions(southDeck);

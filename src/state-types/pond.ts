@@ -1,5 +1,5 @@
 import { CardClass, type LeafState, type UnitState } from '../types/card';
-import type { DeckActions2 } from '../types/deck';
+import type { DeckActions } from '../types/deck';
 import { Player } from '../types/gameflow';
 import {
   arePositionsEqual,
@@ -157,7 +157,7 @@ export const LEAF_COUNT_PER_ROW = 3 as const;
 export const LAST_IN_ROW = 2 as const;
 
 export const makeNorthLilypad = (
-  actions: Record<Player, DeckActions2>,
+  actions: Record<Player, DeckActions>,
 ): PondLeafState => ({
   units: [],
   leaf: actions.North.tutorLeaf(CardClass.LilyPad),
@@ -165,7 +165,7 @@ export const makeNorthLilypad = (
 });
 
 export const makeNorthLeaf = (
-  _: Record<Player, DeckActions2>,
+  _: Record<Player, DeckActions>,
 ): PondLeafState => ({
   units: [],
   leaf: undefined,
@@ -173,7 +173,7 @@ export const makeNorthLeaf = (
 });
 
 export const makeSouthLilypad = (
-  actions: Record<Player, DeckActions2>,
+  actions: Record<Player, DeckActions>,
 ): PondLeafState => ({
   units: [],
   leaf: actions.South.tutorLeaf(CardClass.LilyPad),
@@ -181,7 +181,7 @@ export const makeSouthLilypad = (
 });
 
 export const makeSouthLeaf = (
-  _: Record<Player, DeckActions2>,
+  _: Record<Player, DeckActions>,
 ): PondLeafState => ({
   units: [],
   leaf: undefined,
@@ -189,7 +189,7 @@ export const makeSouthLeaf = (
 });
 
 export const makeInitialPond = (
-  actions: Record<Player, DeckActions2>,
+  actions: Record<Player, DeckActions>,
 ): PondState => [
   [makeNorthLeaf(actions), makeNorthLilypad(actions), makeNorthLeaf(actions)],
   [makeNorthLeaf(actions), makeNorthLeaf(actions), makeNorthLeaf(actions)],

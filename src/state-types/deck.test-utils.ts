@@ -1,37 +1,41 @@
 import { shuffled } from '../types';
-import { CARD_KEYS, CardClass } from '../types/card';
-import type { Draw, LeafTutor, Tutor, UnitTutor } from '../types/deck';
+import {
+  CARD_KEYS,
+  CardClass,
+  type CardState,
+  type LeafClass,
+  type UnitClass,
+} from '../types/card';
 import type { Player } from '../types/gameflow';
 import { counter } from '../types/test-utils';
 import { createCard, createLeaf, createUnit } from './card';
 import { generateDeck } from './deck';
 
-export const makeDraw: () => Draw = () => {
+export const makeDraw = () => {
   let i = 0;
-  let j = 0;
-  return owner => () =>
+  return (owner: Player) => (): CardState =>
     createCard({
       cardClass: CardClass[CARD_KEYS[i++ % CARD_KEYS.length]],
       owner,
-      key: j++,
+      key: counter(),
     });
 };
 
-export const makeTutor: Tutor = owner => cardClass =>
+export const makeTutor = (owner: Player) => (cardClass: CardClass) =>
   createCard({
     cardClass,
     owner,
     key: counter(),
   });
 
-export const leafTutor: LeafTutor = owner => cardClass =>
+export const leafTutor = (owner: Player) => (cardClass: LeafClass) =>
   createLeaf({
     cardClass,
     owner,
     key: counter(),
   });
 
-export const unitTutor: UnitTutor = owner => cardClass =>
+export const unitTutor = (owner: Player) => (cardClass: UnitClass) =>
   createUnit({
     cardClass,
     owner,

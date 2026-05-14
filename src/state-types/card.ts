@@ -11,7 +11,7 @@ import {
   type Unit,
   type UnitValues,
 } from '../types/card';
-import type { DeckActions2 } from '../types/deck';
+import type { DeckActions } from '../types/deck';
 import type { Player } from '../types/gameflow';
 
 export const isUnit = (card: CardState): card is UnitState =>
@@ -76,7 +76,7 @@ const INITIAL_VALUES = {
   [CardType.Unit]: { damage: 0, isExhausted: false },
 } as const satisfies Record<Unit, UnitValues> & Record<Leaf, LeafValues>;
 
-export const deterministicStartingHand = ({ tutor }: DeckActions2) =>
+export const deterministicStartingHand = ({ tutor }: DeckActions) =>
   [
     CardClass.LilyPad,
     CardClass.Froglet,
