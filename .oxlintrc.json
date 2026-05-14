@@ -32,6 +32,7 @@
     "no-ternary": "allow",
     "no-continue": "allow",
     "no-shadow": "allow",
+    "no-useless-undefined": "allow",
     "ban-types": "allow",
     "prefer-readonly-parameter-types": [
       "error",

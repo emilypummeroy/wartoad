@@ -1,5 +1,6 @@
 import type { GameState } from '../state-types';
-import { createUnit, deterministicStartingHand } from '../state-types/card';
+import { createUnit } from '../state-types/card';
+import { makeHand } from '../state-types/deck.test-utils';
 import {
   getPondStateAt,
   LEAF_COUNT_PER_ROW,
@@ -88,11 +89,7 @@ describe(commitDeployment, () => {
           key: counter(),
         }),
       );
-
-      const restOfHand =
-        player === North
-          ? deterministicStartingHand(Player.North, counter)
-          : deterministicStartingHand(Player.South, counter).toReversed();
+      const restOfHand = makeHand(player, 5);
       const playerHand =
         player === North ? [...restOfHand, unit] : [unit, ...restOfHand];
 

@@ -1,8 +1,4 @@
 import type { GameState } from '../state-types';
-import {
-  DETERMINISTIC_NORTH_HAND,
-  DETERMINISTIC_SOUTH_HAND,
-} from '../state-types/card';
 import { leafTutor, unitTutor } from '../state-types/deck.test-utils';
 import { HOME, setPondStateAt, type PondState } from '../state-types/pond';
 import { INITIAL_POND } from '../state-types/pond.test-utils';
@@ -24,8 +20,8 @@ export const DEFAULT_GAME_STATE: GameState = {
     player: Player.South,
   },
   pond: INITIAL_POND,
-  northHand: DETERMINISTIC_NORTH_HAND,
-  southHand: DETERMINISTIC_SOUTH_HAND,
+  northHand: [],
+  southHand: [],
   northFunds: 5,
   southFunds: 5,
   northDeck: [],

@@ -1,7 +1,7 @@
 import type { GameState } from '../state-types';
 import { DEFAULT_POND, makeInitialPond } from '../state-types/pond';
 import type { CardState } from '../types/card';
-import type { DeckActions } from '../types/deck';
+import { createDeckActions, type DeckActions2 } from '../types/deck';
 import { Phase, Player } from '../types/gameflow';
 
 export { data } from './get-out';
@@ -26,21 +26,27 @@ export const DEFAULT_GAME_STATE: GameState = {
 
 export const INITIAL_HAND_CARD_COUNT = 7;
 
-export const createState = (
-  getStartingHand: (owner: Player) => CardState[],
-  deckActions: Record<Player, DeckActions>,
-  {
-    northDeck,
-    southDeck,
-  }: {
-    readonly northDeck: readonly CardState[];
-    readonly southDeck: readonly CardState[];
-  },
-) => ({
-  ...DEFAULT_GAME_STATE,
-  pond: makeInitialPond(deckActions),
-  northHand: getStartingHand(Player.North),
-  southHand: getStartingHand(Player.South),
+export const createState = ({
   northDeck,
   southDeck,
-});
+}: {
+  readonly northDeck: readonly CardState[];
+  readonly southDeck: readonly CardState[];
+}) => {
+  const getStartingHand = ({ draw }: DeckActions2): CardState[] =>
+    Array.from({ length: INITIAL_HAND_CARD_COUNT }, draw).filter(x => !!x);
+  const northDeckActions = createDeckActions(northDeck);
+  const southDeckActions = createDeckActions(southDeck);
+  const deckActions = {
+    [Player.North]: northDeckActions,
+    [Player.South]: southDeckActions,
+  };
+  return {
+    ...DEFAULT_GAME_STATE,
+    pond: makeInitialPond(deckActions),
+    northHand: getStartingHand(northDeckActions),
+    southHand: getStartingHand(southDeckActions),
+    northDeck: northDeckActions.resultingDeck,
+    southDeck: southDeckActions.resultingDeck,
+  };
+};

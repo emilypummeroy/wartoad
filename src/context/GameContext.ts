@@ -13,7 +13,6 @@ import {
 import { cancelActivePhase } from '../actions/cancel-active-phase';
 import { createState, DEFAULT_GAME_STATE } from '../state';
 import type { GameState } from '../state-types';
-import { createLeaf } from '../state-types/card';
 import { type CardState } from '../types/card';
 import type { DeckActions } from '../types/deck';
 import { Player } from '../types/gameflow';
@@ -22,7 +21,6 @@ export type GameContext = [GameState, GameActions];
 
 export const useGameContextData = (
   generateDeck: (owner: Player, getNextCardKey: () => number) => CardState[],
-  getStartingHand: (owner: Player, getNextCardKey: () => number) => CardState[],
   getDrawnCard: (owner: Player, getNextCardKey: () => number) => CardState,
 ): GameContext => {
   const cardKey = useRef(0);
@@ -31,30 +29,18 @@ export const useGameContextData = (
     () => ({
       [Player.North]: {
         draw: () => getDrawnCard(Player.North, getNextCardKey),
-        leafTutor: cardClass =>
-          createLeaf({
-            owner: Player.North,
-            cardClass,
-            key: getNextCardKey(),
-          }),
       },
       [Player.South]: {
         draw: () => getDrawnCard(Player.South, getNextCardKey),
-        leafTutor: cardClass =>
-          createLeaf({
-            owner: Player.South,
-            cardClass,
-            key: getNextCardKey(),
-          }),
       },
     }),
     [getNextCardKey, getDrawnCard],
   );
 
   const northDeck = generateDeck(Player.North, getNextCardKey);
-  const southDeck = generateDeck(Player.North, getNextCardKey);
+  const southDeck = generateDeck(Player.South, getNextCardKey);
   const [state, setState] = useState<GameState>(
-    createState(p => getStartingHand(p, getNextCardKey), deckActions, {
+    createState({
       northDeck,
       southDeck,
     }),

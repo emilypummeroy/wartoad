@@ -1,7 +1,10 @@
+import { shuffled } from '../types';
 import { CARD_KEYS, CardClass } from '../types/card';
 import type { Draw, LeafTutor, Tutor, UnitTutor } from '../types/deck';
+import type { Player } from '../types/gameflow';
 import { counter } from '../types/test-utils';
 import { createCard, createLeaf, createUnit } from './card';
+import { generateDeck } from './deck';
 
 export const makeDraw: () => Draw = () => {
   let i = 0;
@@ -34,3 +37,6 @@ export const unitTutor: UnitTutor = owner => cardClass =>
     owner,
     key: counter(),
   });
+
+export const makeHand = (player: Player, length: number) =>
+  shuffled(generateDeck(player, counter)).slice(0, length);
