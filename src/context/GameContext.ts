@@ -51,12 +51,13 @@ export const useGameContextData = (
     [getNextCardKey, getDrawnCard],
   );
 
+  const northDeck = generateDeck(Player.North, getNextCardKey);
+  const southDeck = generateDeck(Player.North, getNextCardKey);
   const [state, setState] = useState<GameState>(
-    createState(
-      p => getStartingHand(p, getNextCardKey),
-      deckActions,
-      p => generateDeck(p, getNextCardKey),
-    ),
+    createState(p => getStartingHand(p, getNextCardKey), deckActions, {
+      northDeck,
+      southDeck,
+    }),
   );
 
   const actions = useMemo(

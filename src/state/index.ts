@@ -29,12 +29,18 @@ export const INITIAL_HAND_CARD_COUNT = 7;
 export const createState = (
   getStartingHand: (owner: Player) => CardState[],
   deckActions: Record<Player, DeckActions>,
-  generateDeck: (owner: Player) => CardState[],
+  {
+    northDeck,
+    southDeck,
+  }: {
+    readonly northDeck: readonly CardState[];
+    readonly southDeck: readonly CardState[];
+  },
 ) => ({
   ...DEFAULT_GAME_STATE,
   pond: makeInitialPond(deckActions),
   northHand: getStartingHand(Player.North),
   southHand: getStartingHand(Player.South),
-  northDeck: generateDeck(Player.North),
-  southDeck: generateDeck(Player.South),
+  northDeck,
+  southDeck,
 });
