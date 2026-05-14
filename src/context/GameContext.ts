@@ -21,6 +21,7 @@ import { Player } from '../types/gameflow';
 export type GameContext = [GameState, GameActions];
 
 export const useGameContextData = (
+  generateDeck: (owner: Player, getNextCardKey: () => number) => CardState[],
   getStartingHand: (owner: Player, getNextCardKey: () => number) => CardState[],
   getDrawnCard: (owner: Player, getNextCardKey: () => number) => CardState,
 ): GameContext => {
@@ -49,9 +50,15 @@ export const useGameContextData = (
     }),
     [getNextCardKey, getDrawnCard],
   );
+
   const [state, setState] = useState<GameState>(
-    createState(p => getStartingHand(p, getNextCardKey), deckActions),
+    createState(
+      p => getStartingHand(p, getNextCardKey),
+      deckActions,
+      p => generateDeck(p, getNextCardKey),
+    ),
   );
+
   const actions = useMemo(
     () =>
       dropAll(setState)({

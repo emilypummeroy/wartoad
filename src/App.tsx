@@ -3,11 +3,12 @@ import { GameContext, useGameContextData } from './context/GameContext';
 import { Game } from './Game';
 import { INITIAL_HAND_CARD_COUNT } from './state';
 import { createCard, deterministicStartingHand } from './state-types/card';
-import { CardClass } from './types/card';
+import { CardClass, type CardState } from './types/card';
 import type { Player } from './types/gameflow';
 
 export function DeterministicApp() {
   const context: GameContext = useGameContextData(
+    generateDeck,
     shuffledDeterministicStartingHand,
     deterministicDraw,
   );
@@ -21,6 +22,7 @@ export function DeterministicApp() {
 
 export function App() {
   const context: GameContext = useGameContextData(
+    (x, y) => shuffled(generateDeck(x, y)),
     drawStartingHand,
     drawNextCard,
   );
@@ -31,6 +33,37 @@ export function App() {
     </GameContext>
   );
 }
+
+const LILYPAD_COUNT = 15;
+const OLD_LEAF_COUNT = 5;
+const FROGLET_COUNT = 40;
+
+export const generateDeck = (
+  owner: Player,
+  getNextCardKey: () => number,
+): CardState[] => [
+  ...Array.from({ length: LILYPAD_COUNT }, () =>
+    createCard({
+      cardClass: CardClass.LilyPad,
+      owner,
+      key: getNextCardKey(),
+    }),
+  ),
+  ...Array.from({ length: OLD_LEAF_COUNT }, () =>
+    createCard({
+      cardClass: CardClass.OldLeaf,
+      owner,
+      key: getNextCardKey(),
+    }),
+  ),
+  ...Array.from({ length: FROGLET_COUNT }, () =>
+    createCard({
+      cardClass: CardClass.Froglet,
+      owner,
+      key: getNextCardKey(),
+    }),
+  ),
+];
 
 const drawStartingHand = (owner: Player, getNextCardKey: () => number) =>
   Array.from({ length: INITIAL_HAND_CARD_COUNT }, () =>
