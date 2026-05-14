@@ -16,6 +16,8 @@ export const DEFAULT_GAME_STATE: GameState = {
   southHand: [],
   northFunds: 5,
   southFunds: 5,
+  northDeck: [],
+  southDeck: [],
   upgrade: undefined,
   deployment: undefined,
   activation: undefined,

@@ -10,6 +10,8 @@ export type GameState = {
   readonly southHand: readonly CardState[];
   readonly northFunds: number;
   readonly southFunds: number;
+  readonly northDeck: readonly CardState[];
+  readonly southDeck: readonly CardState[];
   readonly activation: ActivationState | undefined;
   readonly deployment: DeploymentState | undefined;
   readonly upgrade: UpgradeState | undefined;
