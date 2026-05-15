@@ -4,6 +4,10 @@ Wartoad is a card game about seizing control of the pond!
 
 Upgrade leaves floating on the pond, deploy units, and use them to capture your opponent's home leaf to win.
 
+<img alt="A screenshot of Wartoad being played from the perspective of a blue 'South' player.  A sidebar shows hands of cards belonging to the South player and their red 'North' opponent.  The main play area has a grid of red and blue zones, each with cards on them.  Some cards are face down, but face up 'LilyPads' and 'Froglets' are also visible." src="./assets/Screenshot-2026-05-15-Wartoad.png" width="800px" title="A screenshot of Wartoad">
+
+This is a toy project based on [Wartide](https://www.wartidecardgame.com/) for coding practice.
+
 ## Project directory structure
 
 Directories are "ordered" as follows. Files in later directories may only import from earlier ones.
