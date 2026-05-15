@@ -108,6 +108,10 @@
       }
     },
     {
+      "files": ["./vite.config.ts"],
+      "env": { "node": true }
+    },
+    {
       "files": ["src/test-setup.ts", "**/*.test-utils.ts*", "**/*.test.ts*"],
       "plugins": ["vitest"],
       "rules": {
@@ -167,6 +171,5 @@
     "browser": true,
     "builtin": true
   },
-  "globals": {},
   "ignorePatterns": []
 }

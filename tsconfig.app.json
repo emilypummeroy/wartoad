@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     "composite": true,
     "outDir": "./tsdist",
     "tsBuildInfoFile": "./tsdist/tsconfig.app.tsbuildinfo",
