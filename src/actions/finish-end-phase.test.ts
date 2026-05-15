@@ -3,8 +3,9 @@ import {
   gameflowOf,
   phaseStateOf,
   winningPondOf,
-} from '../state/test-utils';
-import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
+} from '@/state/test-utils';
+import { Phase, Player, PLAYER_AFTER } from '@/types/gameflow';
+
 import { finishEndPhase } from './finish-end-phase';
 
 const { North, South } = Player;

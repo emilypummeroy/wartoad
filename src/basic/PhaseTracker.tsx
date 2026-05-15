@@ -1,8 +1,8 @@
 import { StepForward, X } from 'lucide-react';
 import { useContext } from 'react';
 
-import { GameContext } from '../context/GameContext';
-import { Phase, Player, type Gameflow } from '../types/gameflow';
+import { GameContext } from '@/context/GameContext';
+import { Phase, Player, type Gameflow } from '@/types/gameflow';
 
 const NOUN = {
   [Phase.Upgrading]: 'Upgrade',

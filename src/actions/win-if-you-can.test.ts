@@ -1,17 +1,18 @@
-import { getPondStateAt, HOME, setPondStateAt } from '../state-types/pond';
+import { getPondStateAt, HOME, setPondStateAt } from '@/state-types/pond';
 import {
   TEST_LEAVES_BY_KEY,
   TEST_PONDS_BY_KEY,
   TestLeafKey,
   TestPondKey,
-} from '../state-types/pond.test-utils';
+} from '@/state-types/pond.test-utils';
 import {
   createStateWith,
   gameflowOf,
   phaseStateOf,
   winningPondOf,
-} from '../state/test-utils';
-import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
+} from '@/state/test-utils';
+import { Phase, Player, PLAYER_AFTER } from '@/types/gameflow';
+
 import { winIfYouCan } from './win-if-you-can';
 
 const { North, South } = Player;

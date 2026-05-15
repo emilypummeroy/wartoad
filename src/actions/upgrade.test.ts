@@ -1,13 +1,14 @@
-import { createLeaf } from '../state-types/card';
+import { createLeaf } from '@/state-types/card';
 import {
   createStateWith,
   gameflowOf,
   phaseStateOf,
   winningPondOf,
-} from '../state/test-utils';
-import { CardClass, CardKey, type LeafKey } from '../types/card';
-import { Phase, Player } from '../types/gameflow';
-import { counter } from '../types/test-utils';
+} from '@/state/test-utils';
+import { CardClass, CardKey, type LeafKey } from '@/types/card';
+import { Phase, Player } from '@/types/gameflow';
+import { counter } from '@/types/test-utils';
+
 import { upgrade } from './upgrade';
 
 const { LilyPad } = CardKey;

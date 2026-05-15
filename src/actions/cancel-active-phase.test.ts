@@ -1,6 +1,7 @@
-import { createStateWith, gameflowOf, phaseStateOf } from '../state/test-utils';
-import { Phase, Player } from '../types/gameflow';
-import { partial } from '../types/test-utils';
+import { createStateWith, gameflowOf, phaseStateOf } from '@/state/test-utils';
+import { Phase, Player } from '@/types/gameflow';
+import { partial } from '@/types/test-utils';
+
 import { cancelActivePhase } from './cancel-active-phase';
 
 const { North, South } = Player;

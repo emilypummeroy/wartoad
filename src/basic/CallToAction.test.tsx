@@ -1,8 +1,9 @@
 import { screen } from '@testing-library/react';
 
-import { renderWithGameContext } from '../context/GameContext.test-utils';
-import { gameflowOf } from '../state/test-utils';
-import { Phase, Player } from '../types/gameflow';
+import { renderWithGameContext } from '@/context/GameContext.test-utils';
+import { gameflowOf } from '@/state/test-utils';
+import { Phase, Player } from '@/types/gameflow';
+
 import { CallToAction } from './CallToAction';
 
 const { North, South } = Player;

@@ -1,9 +1,9 @@
 import { useCallback, useId } from 'react';
 
-import type { UnitState } from '../types/card';
-import { Phase, PLAYER_CLASSNAME, type Gameflow } from '../types/gameflow';
-import type { Position } from '../types/position';
-import { Froglet } from '../view/Card';
+import type { UnitState } from '@/types/card';
+import { Phase, PLAYER_CLASSNAME, type Gameflow } from '@/types/gameflow';
+import type { Position } from '@/types/position';
+import { Froglet } from '@/view/Card';
 
 type PondUnitCardProps = Readonly<{
   unit: UnitState;

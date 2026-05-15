@@ -1,10 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { createUnit } from '../state-types/card';
-import { UnitClass, type UnitState } from '../types/card';
-import { Phase, Player } from '../types/gameflow';
-import type { Position } from '../types/position';
-import { counter, gameflowFrom } from '../types/test-utils';
+import { createUnit } from '@/state-types/card';
+import { UnitClass, type UnitState } from '@/types/card';
+import { Phase, Player } from '@/types/gameflow';
+import type { Position } from '@/types/position';
+import { counter, gameflowFrom } from '@/types/test-utils';
+
 import { PondUnitCard } from './PondUnitCard';
 
 const { North, South } = Player;

@@ -1,6 +1,6 @@
-import { noop } from '../types';
-import { type CardState, type UnitState } from '../types/card';
-import type { Position } from '../types/position';
+import { noop } from '@/types';
+import { type CardState, type UnitState } from '@/types/card';
+import type { Position } from '@/types/position';
 
 export { activate } from './activate';
 export { commitActivation } from './commit-activation';

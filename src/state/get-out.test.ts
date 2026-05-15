@@ -1,10 +1,11 @@
-import { leafTutor } from '../state-types/deck.test-utils';
-import { HOME, setPondStateAt } from '../state-types/pond';
-import { TEST_PONDS_BY_KEY, TestPondKey } from '../state-types/pond.test-utils';
-import { CardClass, type LeafClass } from '../types/card';
-import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
-import type { Position } from '../types/position';
-import { _ } from '../types/test-utils';
+import { leafTutor } from '@/state-types/deck.test-utils';
+import { HOME, setPondStateAt } from '@/state-types/pond';
+import { TEST_PONDS_BY_KEY, TestPondKey } from '@/state-types/pond.test-utils';
+import { CardClass, type LeafClass } from '@/types/card';
+import { Phase, Player, PLAYER_AFTER } from '@/types/gameflow';
+import type { Position } from '@/types/position';
+import { _ } from '@/types/test-utils';
+
 import { gameData } from './get-out';
 import {
   activationOf,

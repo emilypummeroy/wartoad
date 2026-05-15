@@ -1,5 +1,5 @@
-import { data } from '../state';
-import { distanceBetween, type Position } from '../types/position';
+import { data } from '@/state';
+import { distanceBetween, type Position } from '@/types/position';
 
 export const commitActivation = (target: Position) =>
   data(({ get, set }) => {

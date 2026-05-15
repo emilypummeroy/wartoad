@@ -1,7 +1,8 @@
-import { draw } from '../state-types/card.test-utils';
-import { createStateWith, gameflowOf } from '../state/test-utils';
-import { CardClass, CardKey } from '../types/card';
-import { Player, Phase } from '../types/gameflow';
+import { draw } from '@/state-types/card.test-utils';
+import { createStateWith, gameflowOf } from '@/state/test-utils';
+import { CardClass, CardKey } from '@/types/card';
+import { Player, Phase } from '@/types/gameflow';
+
 import { pickCard } from './pick-card';
 
 const { North, South } = Player;

@@ -1,6 +1,6 @@
-import { data } from '../state';
-import { HOME } from '../state-types/pond';
-import { type Position } from '../types/position';
+import { data } from '@/state';
+import { HOME } from '@/state-types/pond';
+import { type Position } from '@/types/position';
 
 export const commitDeployment = (target: Position) =>
   data(({ get, set }) => {

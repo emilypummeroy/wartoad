@@ -1,5 +1,5 @@
-import { data } from '../state';
-import { Phase, type Player } from '../types/gameflow';
+import { data } from '@/state';
+import { Phase, type Player } from '@/types/gameflow';
 
 export const captureIfYouCan = (you: Player) =>
   data(({ get, set }) => {

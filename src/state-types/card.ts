@@ -10,9 +10,9 @@ import {
   type LeafValues,
   type Unit,
   type UnitValues,
-} from '../types/card';
-import type { DeckActions } from '../types/deck';
-import type { Player } from '../types/gameflow';
+} from '@/types/card';
+import type { DeckActions } from '@/types/deck';
+import type { Player } from '@/types/gameflow';
 
 export const isUnit = (card: CardState): card is UnitState =>
   card.type === CardType.Unit && Boolean(card satisfies UnitState);

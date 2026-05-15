@@ -1,9 +1,10 @@
 import { screen, within, render } from '@testing-library/react';
 
-import { createLeaf } from '../state-types/card';
-import { CardClass, CardLocation } from '../types/card';
-import { Player } from '../types/gameflow';
-import { counter } from '../types/test-utils';
+import { createLeaf } from '@/state-types/card';
+import { CardClass, CardLocation } from '@/types/card';
+import { Player } from '@/types/gameflow';
+import { counter } from '@/types/test-utils';
+
 import { CardBack, Froglet, LeafCard } from './Card';
 
 describe(CardBack, () => {

@@ -1,6 +1,7 @@
-import { chain, never, pick } from '../state/get-out';
-import { identity } from '../types';
-import { Phase, PLAYER_AFTER } from '../types/gameflow';
+import { chain, never, pick } from '@/state/get-out';
+import { identity } from '@/types';
+import { Phase, PLAYER_AFTER } from '@/types/gameflow';
+
 import { captureIfYouCan } from './capture-if-you-can';
 import { finishEndPhase } from './finish-end-phase';
 import { finishMainPhase } from './finish-main-phase';

@@ -1,5 +1,6 @@
-import { CardClass, type CardState } from '../types/card';
-import type { Player } from '../types/gameflow';
+import { CardClass, type CardState } from '@/types/card';
+import type { Player } from '@/types/gameflow';
+
 import { createCard } from './card';
 
 const LILYPAD_COUNT = 15;

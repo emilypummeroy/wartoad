@@ -1,5 +1,6 @@
-import { CardClass, type UnitState } from '../types/card';
-import { Player } from '../types/gameflow';
+import { CardClass, type UnitState } from '@/types/card';
+import { Player } from '@/types/gameflow';
+
 import { createUnit } from './card';
 import { leafTutor } from './deck.test-utils';
 import { type PondState, type PondLeafState } from './pond';

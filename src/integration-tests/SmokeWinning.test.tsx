@@ -1,9 +1,10 @@
 import { fireEvent, render } from '@testing-library/react';
 
-import { DeterministicApp } from '../App';
-import { ROW_COUNT } from '../state-types/pond';
-import { CardClass } from '../types/card';
-import { Phase, Player } from '../types/gameflow';
+import { DeterministicApp } from '@/App';
+import { ROW_COUNT } from '@/state-types/pond';
+import { CardClass } from '@/types/card';
+import { Phase, Player } from '@/types/gameflow';
+
 import { advanceToGameOver, advanceToPhase, getFirst, getThe } from './app.test-utils';
 
 const { Main, End } = Phase;

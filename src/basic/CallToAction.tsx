@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 
-import { GameContext } from '../context/GameContext';
-import type { Gameflow, Phase } from '../types/gameflow';
+import { GameContext } from '@/context/GameContext';
+import type { Gameflow, Phase } from '@/types/gameflow';
 
 type CallToActionSlice = [
   {

@@ -1,6 +1,7 @@
-import type { CardState, LeafState, UnitState } from '../types/card';
-import type { Gameflow, Player } from '../types/gameflow';
-import type { Position } from '../types/position';
+import type { CardState, LeafState, UnitState } from '@/types/card';
+import type { Gameflow, Player } from '@/types/gameflow';
+import type { Position } from '@/types/position';
+
 import type { PondState } from './pond';
 
 export type GameState = {

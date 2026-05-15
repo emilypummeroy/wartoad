@@ -1,8 +1,9 @@
 import { fireEvent, render } from '@testing-library/react';
 
-import { App } from '../App';
-import { INITIAL_HAND_CARD_COUNT } from '../state';
-import { Phase, Player } from '../types/gameflow';
+import { App } from '@/App';
+import { INITIAL_HAND_CARD_COUNT } from '@/state';
+import { Phase, Player } from '@/types/gameflow';
+
 import { advanceToPhase, getAll, getFirst, getThe, queryA, queryAll } from './app.test-utils';
 
 const { Start, Main, End } = Phase;

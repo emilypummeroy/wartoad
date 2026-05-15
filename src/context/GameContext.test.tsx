@@ -1,11 +1,12 @@
 import { render } from '@testing-library/react';
 import { useContext } from 'react';
 
-import type { GameActions } from '../actions';
-import { createUnit } from '../state-types/card';
-import { draw } from '../state-types/card.test-utils';
-import { CardClass, UnitClass } from '../types/card';
-import { Player } from '../types/gameflow';
+import type { GameActions } from '@/actions';
+import { createUnit } from '@/state-types/card';
+import { draw } from '@/state-types/card.test-utils';
+import { CardClass, UnitClass } from '@/types/card';
+import { Player } from '@/types/gameflow';
+
 import { GameContext } from './GameContext';
 
 describe('The context', () => {

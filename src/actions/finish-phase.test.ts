@@ -1,25 +1,26 @@
-import { draw } from '../state-types/card.test-utils';
+import { draw } from '@/state-types/card.test-utils';
 import {
   getPondStateAt,
   HOME,
   setPondStateAt,
   setPondStateAtEach,
-} from '../state-types/pond';
+} from '@/state-types/pond';
 import {
   INITIAL_POND,
   TEST_LEAVES_BY_KEY,
   TestLeafKey,
-} from '../state-types/pond.test-utils';
+} from '@/state-types/pond.test-utils';
 import {
   createStateWith,
   deckOf,
   gameflowOf,
   phaseStateOf,
   winningPondOf,
-} from '../state/test-utils';
-import { CardClass, CardKey } from '../types/card';
-import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
-import type { Position } from '../types/position';
+} from '@/state/test-utils';
+import { CardClass, CardKey } from '@/types/card';
+import { Phase, Player, PLAYER_AFTER } from '@/types/gameflow';
+import type { Position } from '@/types/position';
+
 import { finishPhase } from './finish-phase';
 
 const { North, South } = Player;

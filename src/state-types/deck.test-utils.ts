@@ -1,13 +1,14 @@
-import { shuffled } from '../types';
+import { shuffled } from '@/types';
 import {
   CARD_KEYS,
   CardClass,
   type CardState,
   type LeafClass,
   type UnitClass,
-} from '../types/card';
-import type { Player } from '../types/gameflow';
-import { counter } from '../types/test-utils';
+} from '@/types/card';
+import type { Player } from '@/types/gameflow';
+import { counter } from '@/types/test-utils';
+
 import { createCard, createLeaf, createUnit } from './card';
 import { generateDeck } from './deck';
 

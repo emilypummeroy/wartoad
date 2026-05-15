@@ -1,6 +1,6 @@
-import { data } from '../state';
-import type { LeafState } from '../types/card';
-import { Phase } from '../types/gameflow';
+import { data } from '@/state';
+import type { LeafState } from '@/types/card';
+import { Phase } from '@/types/gameflow';
 
 export const upgrade = (leaf: LeafState) =>
   data(({ get, make }) => {

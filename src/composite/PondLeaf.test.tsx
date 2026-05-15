@@ -1,15 +1,16 @@
 import { screen } from '@testing-library/react';
 
-import { renderWithGameContext } from '../context/GameContext.test-utils';
-import { createUnit } from '../state-types/card';
-import { leafTutor } from '../state-types/deck.test-utils';
-import { HOME, setPondStateAt } from '../state-types/pond';
-import { INITIAL_POND } from '../state-types/pond.test-utils';
-import { activationOf, gameflowOf } from '../state/test-utils';
-import { CardClass, CardKey, UnitClass, type LeafKey, type UnitState } from '../types/card';
-import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
-import type { Position } from '../types/position';
-import { _ } from '../types/test-utils';
+import { renderWithGameContext } from '@/context/GameContext.test-utils';
+import { createUnit } from '@/state-types/card';
+import { leafTutor } from '@/state-types/deck.test-utils';
+import { HOME, setPondStateAt } from '@/state-types/pond';
+import { INITIAL_POND } from '@/state-types/pond.test-utils';
+import { activationOf, gameflowOf } from '@/state/test-utils';
+import { CardClass, CardKey, UnitClass, type LeafKey, type UnitState } from '@/types/card';
+import { Phase, Player, PLAYER_AFTER } from '@/types/gameflow';
+import type { Position } from '@/types/position';
+import { _ } from '@/types/test-utils';
+
 import { PondLeaf } from './PondLeaf';
 
 const { North, South } = Player;

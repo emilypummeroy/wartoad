@@ -1,11 +1,7 @@
-import { CardClass, type LeafState, type UnitState } from '../types/card';
-import type { DeckActions } from '../types/deck';
-import { Player } from '../types/gameflow';
-import {
-  arePositionsEqual,
-  isPosition,
-  type Position,
-} from '../types/position';
+import { CardClass, type LeafState, type UnitState } from '@/types/card';
+import type { DeckActions } from '@/types/deck';
+import { Player } from '@/types/gameflow';
+import { arePositionsEqual, isPosition, type Position } from '@/types/position';
 
 export type PondState = readonly [
   readonly [PondLeafState, PondLeafState, PondLeafState],

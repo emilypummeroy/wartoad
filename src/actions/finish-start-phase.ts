@@ -1,6 +1,6 @@
-import { data } from '../state';
-import { createDeckActions } from '../types/deck';
-import { Phase } from '../types/gameflow';
+import { data } from '@/state';
+import { createDeckActions } from '@/types/deck';
+import { Phase } from '@/types/gameflow';
 
 export const finishStartPhase = () =>
   data(({ get, ...data }) => {

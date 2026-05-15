@@ -4,7 +4,7 @@ import type {
   DeploymentState,
   GameState,
   UpgradeState,
-} from '../state-types';
+} from '@/state-types';
 import {
   doesAnyPondLeafSatisfy,
   doesEveryPondLeafSatisfy,
@@ -14,11 +14,11 @@ import {
   setPondStateWhere,
   type PondLeafState,
   type PondState,
-} from '../state-types/pond';
-import type { CardState, LeafState, UnitState } from '../types/card';
-import type { Deck } from '../types/deck';
-import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
-import type { Position } from '../types/position';
+} from '@/state-types/pond';
+import type { CardState, LeafState, UnitState } from '@/types/card';
+import type { Deck } from '@/types/deck';
+import { Phase, Player, PLAYER_AFTER } from '@/types/gameflow';
+import type { Position } from '@/types/position';
 
 export type StateAction = (s: GameState) => GameState;
 export type DataAction = (d: GameData) => GameState;

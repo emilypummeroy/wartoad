@@ -1,15 +1,15 @@
 import { useContext, type ReactNode } from 'react';
 
-import { GameContext } from '../context/GameContext';
+import { GameContext } from '@/context/GameContext';
 import type {
   ActivationState,
   DeploymentState,
   UpgradeState,
-} from '../state-types';
-import { CardLocation, type CardState } from '../types/card';
-import { Player, PLAYER_CLASSNAME, type Gameflow } from '../types/gameflow';
-import { Froglet, LeafCard } from '../view/Card';
-import { Hand } from '../view/Hand';
+} from '@/state-types';
+import { CardLocation, type CardState } from '@/types/card';
+import { Player, PLAYER_CLASSNAME, type Gameflow } from '@/types/gameflow';
+import { Froglet, LeafCard } from '@/view/Card';
+import { Hand } from '@/view/Hand';
 
 type BenchSlice = readonly [
   {

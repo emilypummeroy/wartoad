@@ -1,23 +1,24 @@
-import type { GameState } from '../state-types';
-import { createUnit } from '../state-types/card';
-import { makeHand } from '../state-types/deck.test-utils';
+import type { GameState } from '@/state-types';
+import { createUnit } from '@/state-types/card';
+import { makeHand } from '@/state-types/deck.test-utils';
 import {
   getPondStateAt,
   LEAF_COUNT_PER_ROW,
   ROW_COUNT,
   setPondStateAt,
-} from '../state-types/pond';
-import { INITIAL_POND } from '../state-types/pond.test-utils';
+} from '@/state-types/pond';
+import { INITIAL_POND } from '@/state-types/pond.test-utils';
 import {
   createStateWith,
   deploymentOf,
   gameflowOf,
   phaseStateOf,
-} from '../state/test-utils';
-import { CardClass } from '../types/card';
-import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
-import type { Position } from '../types/position';
-import { counter } from '../types/test-utils';
+} from '@/state/test-utils';
+import { CardClass } from '@/types/card';
+import { Phase, Player, PLAYER_AFTER } from '@/types/gameflow';
+import type { Position } from '@/types/position';
+import { counter } from '@/types/test-utils';
+
 import { commitDeployment } from './commit-deployment';
 
 const { North, South } = Player;

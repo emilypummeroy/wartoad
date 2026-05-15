@@ -1,13 +1,14 @@
-import { createUnit } from '../state-types/card';
+import { createUnit } from '@/state-types/card';
 import {
   createStateWith,
   gameflowOf,
   phaseStateOf,
   winningPondOf,
-} from '../state/test-utils';
-import { CardClass, CardKey, type UnitKey } from '../types/card';
-import { Phase, Player } from '../types/gameflow';
-import { counter } from '../types/test-utils';
+} from '@/state/test-utils';
+import { CardClass, CardKey, type UnitKey } from '@/types/card';
+import { Phase, Player } from '@/types/gameflow';
+import { counter } from '@/types/test-utils';
+
 import { deploy } from './deploy';
 
 const { Froglet } = CardKey;

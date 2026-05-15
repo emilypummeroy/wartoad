@@ -1,7 +1,7 @@
-import { data } from '../state';
-import type { UnitState } from '../types/card';
-import { Phase } from '../types/gameflow';
-import type { Position } from '../types/position';
+import { data } from '@/state';
+import type { UnitState } from '@/types/card';
+import { Phase } from '@/types/gameflow';
+import type { Position } from '@/types/position';
 
 export const activate = (unit: UnitState, start: Position) =>
   data(({ get, make }) => {

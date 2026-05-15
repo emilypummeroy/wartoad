@@ -1,8 +1,8 @@
-import type { GameState } from '../state-types';
-import { DEFAULT_POND, makeInitialPond } from '../state-types/pond';
-import type { CardState } from '../types/card';
-import { createDeckActions, type DeckActions } from '../types/deck';
-import { Phase, Player } from '../types/gameflow';
+import type { GameState } from '@/state-types';
+import { DEFAULT_POND, makeInitialPond } from '@/state-types/pond';
+import type { CardState } from '@/types/card';
+import { createDeckActions, type DeckActions } from '@/types/deck';
+import { Phase, Player } from '@/types/gameflow';
 
 export { data } from './get-out';
 

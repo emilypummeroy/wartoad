@@ -1,8 +1,9 @@
 import { fireEvent, render } from '@testing-library/react';
 
-import { DeterministicApp } from '../App';
-import { CardClass } from '../types/card';
-import { Phase, Player } from '../types/gameflow';
+import { DeterministicApp } from '@/App';
+import { CardClass } from '@/types/card';
+import { Phase, Player } from '@/types/gameflow';
+
 import { advanceToPhase, getAll, getFirst, getThe, queryA } from './app.test-utils';
 
 const { Main, Start } = Phase;

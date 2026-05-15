@@ -1,5 +1,5 @@
-import { data } from '../state';
-import { Phase } from '../types/gameflow';
+import { data } from '@/state';
+import { Phase } from '@/types/gameflow';
 
 export const finishMainPhase = () =>
   data(({ get, set }) => {

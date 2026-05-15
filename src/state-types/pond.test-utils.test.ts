@@ -1,4 +1,5 @@
-import { Player } from '../types/gameflow';
+import { Player } from '@/types/gameflow';
+
 import { getPondStateAt, HOME } from './pond';
 import {
   ANOTHER_POND,

@@ -1,8 +1,8 @@
 import { useCallback, useId } from 'react';
 
-import { CardLocation, CardType, type CardState } from '../types/card';
-import { Phase, type Player, PLAYER_CLASSNAME } from '../types/gameflow';
-import { CardBack, Froglet, LeafCard } from '../view/Card';
+import { CardLocation, CardType, type CardState } from '@/types/card';
+import { Phase, type Player, PLAYER_CLASSNAME } from '@/types/gameflow';
+import { CardBack, Froglet, LeafCard } from '@/view/Card';
 
 export const INITIAL_HAND_SIZE = 7;
 export const SMALL_HAND_SIZE = 8;

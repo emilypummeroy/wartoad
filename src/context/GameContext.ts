@@ -9,12 +9,12 @@ import {
   pickCard,
   finishPhase,
   DEFAULT_GAME_ACTIONS,
-} from '../actions';
-import { cancelActivePhase } from '../actions/cancel-active-phase';
-import { createState, DEFAULT_GAME_STATE } from '../state';
-import type { GameState } from '../state-types';
-import { type CardState } from '../types/card';
-import { Player } from '../types/gameflow';
+} from '@/actions';
+import { cancelActivePhase } from '@/actions/cancel-active-phase';
+import { createState, DEFAULT_GAME_STATE } from '@/state';
+import type { GameState } from '@/state-types';
+import { type CardState } from '@/types/card';
+import { Player } from '@/types/gameflow';
 
 export type GameContext = [GameState, GameActions];
 

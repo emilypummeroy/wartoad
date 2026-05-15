@@ -6,8 +6,9 @@ import {
   CardType,
   LeafClass,
   UnitClass,
-} from '../types/card';
-import { Player } from '../types/gameflow';
+} from '@/types/card';
+import { Player } from '@/types/gameflow';
+
 import { createUnit, createLeaf, isUnit, isLeaf, createCard } from './card';
 
 describe.for<[Player, number]>([

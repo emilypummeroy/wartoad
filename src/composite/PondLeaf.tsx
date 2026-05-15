@@ -1,14 +1,14 @@
 import { useId, useContext } from 'react';
 
-import { PondLeafCard } from '../basic/PondLeafCard';
-import { PondLeafDropzone } from '../basic/PondLeafDropzone';
-import { PondUnitCard } from '../basic/PondUnitCard';
-import { GameContext } from '../context/GameContext';
-import type { ActivationState } from '../state-types';
-import { type PondState } from '../state-types/pond';
-import type { LeafState, UnitState } from '../types/card';
-import { type Gameflow } from '../types/gameflow';
-import { type Position } from '../types/position';
+import { PondLeafCard } from '@/basic/PondLeafCard';
+import { PondLeafDropzone } from '@/basic/PondLeafDropzone';
+import { PondUnitCard } from '@/basic/PondUnitCard';
+import { GameContext } from '@/context/GameContext';
+import type { ActivationState } from '@/state-types';
+import { type PondState } from '@/state-types/pond';
+import type { LeafState, UnitState } from '@/types/card';
+import { type Gameflow } from '@/types/gameflow';
+import { type Position } from '@/types/position';
 
 type PondLeafContext = readonly [
   {

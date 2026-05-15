@@ -1,11 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { createUnit } from '../state-types/card';
-import { TestLeafKey, TEST_LEAVES_BY_KEY } from '../state-types/pond.test-utils';
-import { CardClass } from '../types/card';
-import { Player, Phase } from '../types/gameflow';
-import type { Position } from '../types/position';
-import { _, counter, gameflowFrom } from '../types/test-utils';
+import { createUnit } from '@/state-types/card';
+import { TestLeafKey, TEST_LEAVES_BY_KEY } from '@/state-types/pond.test-utils';
+import { CardClass } from '@/types/card';
+import { Player, Phase } from '@/types/gameflow';
+import type { Position } from '@/types/position';
+import { _, counter, gameflowFrom } from '@/types/test-utils';
+
 import { PondLeafDropzone } from './PondLeafDropzone';
 
 const { North, South } = Player;

@@ -1,11 +1,11 @@
 import { useContext } from 'react';
 
-import { GameContext } from '../context/GameContext';
-import { type PondState, getPondStateAt, HOME } from '../state-types/pond';
-import { CardLocation } from '../types/card';
-import { PLAYER_CLASSNAME } from '../types/gameflow';
-import { type Position, arePositionsEqual } from '../types/position';
-import { CardBack, LeafCard } from '../view/Card';
+import { GameContext } from '@/context/GameContext';
+import { type PondState, getPondStateAt, HOME } from '@/state-types/pond';
+import { CardLocation } from '@/types/card';
+import { PLAYER_CLASSNAME } from '@/types/gameflow';
+import { type Position, arePositionsEqual } from '@/types/position';
+import { CardBack, LeafCard } from '@/view/Card';
 
 type PondLeafCardSlice = [
   {

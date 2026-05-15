@@ -3,22 +3,23 @@ import {
   setPondStateAt,
   setPondStateAtEach,
   type PondLeafState,
-} from '../state-types/pond';
+} from '@/state-types/pond';
 import {
   TestPondKey,
   TestLeafKey,
   TEST_PONDS_BY_KEY,
   TEST_LEAVES_BY_KEY,
-} from '../state-types/pond.test-utils';
+} from '@/state-types/pond.test-utils';
 import {
   createStateWith,
   gameflowOf,
   phaseStateOf,
   winningPondOf,
-} from '../state/test-utils';
-import { Phase, Player } from '../types/gameflow';
-import type { Position } from '../types/position';
-import { partial } from '../types/test-utils';
+} from '@/state/test-utils';
+import { Phase, Player } from '@/types/gameflow';
+import type { Position } from '@/types/position';
+import { partial } from '@/types/test-utils';
+
 import { captureIfYouCan } from './capture-if-you-can';
 
 const { North, South } = Player;

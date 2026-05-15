@@ -1,10 +1,11 @@
 import { render, screen, within } from '@testing-library/react';
 
-import { renderWithGameContext } from '../context/GameContext.test-utils';
-import { draw } from '../state-types/card.test-utils';
-import { gameflowOf } from '../state/test-utils';
-import { CardClass } from '../types/card';
-import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
+import { renderWithGameContext } from '@/context/GameContext.test-utils';
+import { draw } from '@/state-types/card.test-utils';
+import { gameflowOf } from '@/state/test-utils';
+import { CardClass } from '@/types/card';
+import { Phase, Player, PLAYER_AFTER } from '@/types/gameflow';
+
 import { Bench } from './Bench';
 
 const { South, North } = Player;

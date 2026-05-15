@@ -1,8 +1,9 @@
 import { screen, fireEvent } from '@testing-library/react';
 
-import { renderWithGameContext } from '../context/GameContext.test-utils';
-import { gameflowOf, winningPondOf } from '../state/test-utils';
-import { Phase, Player } from '../types/gameflow';
+import { renderWithGameContext } from '@/context/GameContext.test-utils';
+import { gameflowOf, winningPondOf } from '@/state/test-utils';
+import { Phase, Player } from '@/types/gameflow';
+
 import { PhaseTracker } from './PhaseTracker';
 
 const { North, South } = Player;

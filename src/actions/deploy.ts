@@ -1,6 +1,6 @@
-import { data } from '../state';
-import type { UnitState } from '../types/card';
-import { Phase } from '../types/gameflow';
+import { data } from '@/state';
+import type { UnitState } from '@/types/card';
+import { Phase } from '@/types/gameflow';
 
 export const deploy = (unit: UnitState) =>
   data(({ get, make }) => {

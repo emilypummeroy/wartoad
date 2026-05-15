@@ -1,7 +1,8 @@
-import { CardClass } from '../types/card';
-import { Player } from '../types/gameflow';
-import type { Position } from '../types/position';
-import { asPosition } from '../types/position.test-utils';
+import { CardClass } from '@/types/card';
+import { Player } from '@/types/gameflow';
+import type { Position } from '@/types/position';
+import { asPosition } from '@/types/position.test-utils';
+
 import { createUnit } from './card';
 import {
   isPondState,

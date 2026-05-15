@@ -1,6 +1,6 @@
-import { data } from '../state';
-import { Phase } from '../types/gameflow';
-import { type Position } from '../types/position';
+import { data } from '@/state';
+import { Phase } from '@/types/gameflow';
+import { type Position } from '@/types/position';
 
 export const commitUpgrade = (target: Position) =>
   data(({ get, set }) => {

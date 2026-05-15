@@ -27,8 +27,8 @@ import {
   type LeafState,
   type LeafStats,
   type UnitStats,
-} from '../types/card';
-import { type Player, PLAYER_CLASSNAME } from '../types/gameflow';
+} from '@/types/card';
+import { type Player, PLAYER_CLASSNAME } from '@/types/gameflow';
 
 export type LeafCardProps = Readonly<{
   leaf: LeafState;

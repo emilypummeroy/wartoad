@@ -1,8 +1,9 @@
 import { screen, within, render, fireEvent } from '@testing-library/react';
 
-import { draw } from '../state-types/card.test-utils';
-import { CardClass, type CardState, type CardKey } from '../types/card';
-import { Phase, Player } from '../types/gameflow';
+import { draw } from '@/state-types/card.test-utils';
+import { CardClass, type CardState, type CardKey } from '@/types/card';
+import { Phase, Player } from '@/types/gameflow';
+
 import { Hand, classForHand, INITIAL_HAND_SIZE, SMALL_HAND_SIZE, BIG_HAND_HAND_SIZE } from './Hand';
 
 const MANY = 15;

@@ -1,16 +1,17 @@
-import type { GameState } from '../state-types';
-import { draw } from '../state-types/card.test-utils';
-import { generateDeck, INITIAL_DECK_SIZE } from '../state-types/deck';
+import type { GameState } from '@/state-types';
+import { draw } from '@/state-types/card.test-utils';
+import { generateDeck, INITIAL_DECK_SIZE } from '@/state-types/deck';
 import {
   createStateWith,
   deckOf,
   gameflowOf,
   phaseStateOf,
   winningPondOf,
-} from '../state/test-utils';
-import { CardClass, CardKey } from '../types/card';
-import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
-import { _, counter, partial } from '../types/test-utils';
+} from '@/state/test-utils';
+import { CardClass, CardKey } from '@/types/card';
+import { Phase, Player, PLAYER_AFTER } from '@/types/gameflow';
+import { _, counter, partial } from '@/types/test-utils';
+
 import { finishStartPhase } from './finish-start-phase';
 
 const { North, South } = Player;

@@ -1,6 +1,6 @@
 import { screen, render, within } from '@testing-library/react';
 
-import { renderWithGameContext } from '../context/GameContext.test-utils';
+import { renderWithGameContext } from '@/context/GameContext.test-utils';
 import {
   LEAF_COUNT_PER_ROW,
   HOME,
@@ -9,13 +9,14 @@ import {
   type PondState,
   getPondStateAt,
   DEFAULT_POND,
-} from '../state-types/pond';
-import { TestPondKey, TEST_PONDS_BY_KEY } from '../state-types/pond.test-utils';
-import { activationOf, gameflowOf, winningPondOf } from '../state/test-utils';
-import { Phase, Player, PLAYER_AFTER } from '../types/gameflow';
-import type { Position } from '../types/position';
-import { asPosition } from '../types/position.test-utils';
-import { _ } from '../types/test-utils';
+} from '@/state-types/pond';
+import { TestPondKey, TEST_PONDS_BY_KEY } from '@/state-types/pond.test-utils';
+import { activationOf, gameflowOf, winningPondOf } from '@/state/test-utils';
+import { Phase, Player, PLAYER_AFTER } from '@/types/gameflow';
+import type { Position } from '@/types/position';
+import { asPosition } from '@/types/position.test-utils';
+import { _ } from '@/types/test-utils';
+
 import { Pond } from './Pond';
 
 const { North, South } = Player;

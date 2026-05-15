@@ -1,11 +1,11 @@
 import { Replace, Move } from 'lucide-react';
 import { Fragment, useCallback, useId, type ReactNode } from 'react';
 
-import type { ActivationState } from '../state-types';
-import { HOME, type PondLeafState } from '../state-types/pond';
-import { noop } from '../types';
-import { type Gameflow, Phase, PLAYER_CLASSNAME } from '../types/gameflow';
-import { distanceBetween, type Position } from '../types/position';
+import type { ActivationState } from '@/state-types';
+import { HOME, type PondLeafState } from '@/state-types/pond';
+import { noop } from '@/types';
+import { type Gameflow, Phase, PLAYER_CLASSNAME } from '@/types/gameflow';
+import { distanceBetween, type Position } from '@/types/position';
 
 type PondLeafDropzoneProps = Readonly<{
   children: ReactNode;

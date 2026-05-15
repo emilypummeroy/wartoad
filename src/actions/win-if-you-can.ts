@@ -1,6 +1,6 @@
-import { data } from '../state';
-import { HOME } from '../state-types/pond';
-import { Phase, PLAYER_AFTER, type Player } from '../types/gameflow';
+import { data } from '@/state';
+import { HOME } from '@/state-types/pond';
+import { Phase, PLAYER_AFTER, type Player } from '@/types/gameflow';
 
 export const winIfYouCan = (you: Player) =>
   data(({ get, make }) => {

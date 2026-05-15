@@ -1,5 +1,6 @@
-import { never, pick } from '../state/get-out';
-import { type CardState, CardType } from '../types/card';
+import { never, pick } from '@/state/get-out';
+import { type CardState, CardType } from '@/types/card';
+
 import { deploy } from './deploy';
 import { upgrade } from './upgrade';
 

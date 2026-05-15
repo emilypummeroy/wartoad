@@ -1,10 +1,11 @@
-import type { GameState } from '../state-types';
-import { createUnit } from '../state-types/card';
-import { createStateWith, gameflowOf, phaseStateOf } from '../state/test-utils';
-import { UnitClass } from '../types/card';
-import { Phase, Player } from '../types/gameflow';
-import type { Position } from '../types/position';
-import { ALL_POSITIONS } from '../types/position.test-utils';
+import type { GameState } from '@/state-types';
+import { createUnit } from '@/state-types/card';
+import { createStateWith, gameflowOf, phaseStateOf } from '@/state/test-utils';
+import { UnitClass } from '@/types/card';
+import { Phase, Player } from '@/types/gameflow';
+import type { Position } from '@/types/position';
+import { ALL_POSITIONS } from '@/types/position.test-utils';
+
 import { activate } from './activate';
 
 const { North, South } = Player;
