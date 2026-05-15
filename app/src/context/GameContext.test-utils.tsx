@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, type RenderResult } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 import { type GameActions, DEFAULT_GAME_ACTIONS } from '@/actions';
@@ -14,7 +14,7 @@ export const renderWithGameContext =
     state?: Partial<GameState>,
     dispatch?: Partial<GameActions>,
   ] = []) =>
-  (children: ReactNode) =>
+  (children: ReactNode): RenderResult =>
     render(
       <GameContext
         value={[
